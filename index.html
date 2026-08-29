@@ -99,7 +99,7 @@
   .hero-sub { margin-top: 9px; font-size: 11px; letter-spacing: 0.09em; color: var(--c-pale); max-width: 40ch; text-shadow: 0 1px 6px rgba(0,0,0,0.8); }
   .hero-handle { margin-top: 5px; font-size: 9px; letter-spacing: 0.13em; color: var(--c-mid); text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
 
-  /* ---------- MARQUEE ---------- */
+  /* ---------- MARQUEE (SLOWED DOWN) ---------- */
 
   .marquee { 
     overflow: hidden; white-space: nowrap; padding: 13px 0; margin-top: 14px;
@@ -108,7 +108,7 @@
     background: rgba(3,3,2,0.4);
     backdrop-filter: blur(4px);
   }
-  .marquee-track { display: inline-flex; animation: marquee 22s linear infinite; }
+  .marquee-track { display: inline-flex; animation: marquee 42s linear infinite; }
   .marquee-track span {
     font-size: clamp(0.92rem, 4.9vw, 1.55rem); font-weight: 700; letter-spacing: 0.02em;
     background: linear-gradient(120deg, var(--c-deep), var(--c-pale), var(--white), var(--c-mid));
@@ -325,26 +325,17 @@
   } catch (err) { console.error('hue slider failed:', err); }
 
   /* ============================================================
-     BACKGROUND STARSCAPE + NORTH STAR + BLOOM
+     BACKGROUND STARSCAPE + 4-POINTED SPARKLE NORTH STAR + MAX BLOOM
   ============================================================ */
   try {
     var canvas = document.getElementById('bgCanvas');
     if (canvas) {
       var ctx = canvas.getContext('2d');
       var W, H;
-      var scrollVelocity = 0;
-      var lastScrollY = 0;
-      var velocityDamping = 0.92;
 
       function resizeBg() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
       resizeBg();
       window.addEventListener('resize', resizeBg);
-
-      window.addEventListener('scroll', function() {
-        var currentY = window.scrollY;
-        scrollVelocity = (currentY - lastScrollY) * 0.45;
-        lastScrollY = currentY;
-      });
 
       var rootEl = document.documentElement;
       function getHue() {
@@ -352,16 +343,16 @@
         return Math.round(parseFloat(v) || 35);
       }
 
-      // Generate fixed starfield
+      // Generate fixed starfield with very gentle, subtle twinkling
       var stars = [];
-      var NUM_STARS = 140;
+      var NUM_STARS = 150;
       for (var s = 0; s < NUM_STARS; s++) {
         stars.push({
           x: Math.random() * 2000 - 500,
           y: Math.random() * 3000 - 500,
-          size: Math.random() * 1.8 + 0.4,
-          alpha: Math.random() * 0.7 + 0.3,
-          twinkleSpeed: Math.random() * 0.02 + 0.005,
+          size: Math.random() * 1.6 + 0.4,
+          alpha: Math.random() * 0.5 + 0.2,
+          twinkleSpeed: Math.random() * 0.005 + 0.001, // much slower & smoother
           twinklePhase: Math.random() * Math.PI * 2
         });
       }
@@ -369,53 +360,80 @@
       function frame(t) {
         ctx.clearRect(0, 0, W, H);
         var hue = getHue();
-        scrollVelocity *= velocityDamping;
 
-        // 1. Fully bloomed cosmic background haze across every inch
-        var bgGrad = ctx.createRadialGradient(W / 2, H * 0.35, 20, W / 2, H * 0.35, Math.max(W, H) * 0.85);
-        bgGrad.addColorStop(0, 'hsla(' + hue + ', 85%, 22%, 0.38)');
-        bgGrad.addColorStop(0.5, 'hsla(' + (hue + 15) % 360 + ', 65%, 12%, 0.22)');
-        bgGrad.addColorStop(1, 'rgba(3,3,2,0.96)');
+        // 1. Drenched, heavy warm cosmic haze bloom across every single inch of the scene
+        var bgGrad = ctx.createRadialGradient(W / 2, H * 0.4, 30, W / 2, H * 0.4, Math.max(W, H) * 0.95);
+        bgGrad.addColorStop(0, 'hsla(' + hue + ', 92%, 28%, 0.52)');
+        bgGrad.addColorStop(0.45, 'hsla(' + (hue + 20) % 360 + ', 75%, 16%, 0.36)');
+        bgGrad.addColorStop(0.8, 'hsla(' + hue + ', 80%, 10%, 0.22)');
+        bgGrad.addColorStop(1, 'rgba(3,3,2,0.92)');
         ctx.fillStyle = bgGrad;
         ctx.fillRect(0, 0, W, H);
 
-        // 2. Render Starry Scene
+        // Secondary corner bloom overlays for maximum saturation
+        var cornerGlow1 = ctx.createRadialGradient(0, 0, 10, 0, 0, W * 0.7);
+        cornerGlow1.addColorStop(0, 'hsla(' + hue + ', 95%, 55%, 0.18)');
+        cornerGlow1.addColorStop(1, 'transparent');
+        ctx.fillStyle = cornerGlow1;
+        ctx.fillRect(0, 0, W, H);
+
+        var cornerGlow2 = ctx.createRadialGradient(W, H, 10, W, H, W * 0.7);
+        cornerGlow2.addColorStop(0, 'hsla(' + (hue + 30) % 360 + ', 90%, 50%, 0.15)');
+        cornerGlow2.addColorStop(1, 'transparent');
+        ctx.fillStyle = cornerGlow2;
+        ctx.fillRect(0, 0, W, H);
+
+        // 2. Render Starry Scene (subtle twinkle)
         for (var i = 0; i < stars.length; i++) {
           var star = stars[i];
-          var currentAlpha = star.alpha * (0.6 + 0.4 * Math.sin(t * star.twinkleSpeed + star.twinklePhase));
-          ctx.fillStyle = 'hsla(' + hue + ', 90%, 88%, ' + currentAlpha + ')';
+          var currentAlpha = star.alpha * (0.8 + 0.2 * Math.sin(t * star.twinkleSpeed + star.twinklePhase));
+          ctx.fillStyle = 'hsla(' + hue + ', 90%, 90%, ' + currentAlpha + ')';
           ctx.beginPath();
-          ctx.arc(star.x % W, (star.y + window.scrollY * 0.15) % H, star.size, 0, Math.PI * 2);
+          ctx.arc(star.x % W, (star.y + window.scrollY * 0.12) % H, star.size, 0, Math.PI * 2);
           ctx.fill();
         }
 
-        // 3. Render North Star at the exact center of the page background
+        // 3. Render Classic 4-Pointed Sparkle North Star (✨ style) at center of background
         var nsX = W / 2;
         var nsY = H * 0.42;
-        
-        // North star outer bloom
-        var nsGlow = ctx.createRadialGradient(nsX, nsY, 0, nsX, nsY, 140);
-        nsGlow.addColorStop(0, 'hsla(' + hue + ', 95%, 80%, 0.55)');
-        nsGlow.addColorStop(0.3, 'hsla(' + hue + ', 85%, 60%, 0.2)');
+
+        // Large ambient glow around the North Star
+        var nsGlow = ctx.createRadialGradient(nsX, nsY, 0, nsX, nsY, 180);
+        nsGlow.addColorStop(0, 'hsla(' + hue + ', 98%, 85%, 0.65)');
+        nsGlow.addColorStop(0.35, 'hsla(' + hue + ', 90%, 62%, 0.25)');
         nsGlow.addColorStop(1, 'transparent');
         ctx.fillStyle = nsGlow;
         ctx.beginPath();
-        ctx.arc(nsX, nsY, 140, 0, Math.PI * 2);
+        ctx.arc(nsX, nsY, 180, 0, Math.PI * 2);
         ctx.fill();
 
-        // North star core
+        // Draw classic four-pointed sparkle shape ✨
+        ctx.save();
+        ctx.translate(nsX, nsY);
         ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = 'hsla(' + hue + ', 95%, 80%, 0.9)';
+        ctx.shadowBlur = 18;
+        
         ctx.beginPath();
-        ctx.arc(nsX, nsY, 3.2, 0, Math.PI * 2);
+        // A classic 4-pointed star curve/path
+        var outerR = 22;
+        var innerR = 4.5;
+        for (var p = 0; p < 4; p++) {
+          var angleOuter = (p * Math.PI / 2) - Math.PI / 2;
+          var angleInner = angleOuter + (Math.PI / 4);
+          
+          var ox = Math.cos(angleOuter) * outerR;
+          var oy = Math.sin(angleOuter) * outerR;
+          var ix = Math.cos(angleInner) * innerR;
+          var iy = Math.sin(angleInner) * innerR;
+          
+          if (p === 0) ctx.moveTo(ox, oy);
+          else ctx.lineTo(ox, oy);
+          ctx.quadraticCurveTo(0, 0, ix, iy);
+        }
+        ctx.closePath();
         ctx.fill();
-
-        // North star diffraction rays
-        ctx.strokeStyle = 'hsla(' + hue + ', 95%, 85%, 0.7)';
-        ctx.lineWidth = 1.2;
-        ctx.beginPath();
-        ctx.moveTo(nsX - 28, nsY); ctx.lineTo(nsX + 28, nsY);
-        ctx.moveTo(nsX, nsY - 28); ctx.lineTo(nsX, nsY + 28);
-        ctx.stroke();
+        ctx.restore();
 
         requestAnimationFrame(frame);
       }
