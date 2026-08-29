@@ -34,7 +34,7 @@
     min-height: 100vh;
   }
 
-  canvas#bgCanvas { position: fixed; inset: 0; z-index: 1; pointer-events: auto; cursor: default; }
+  canvas#bgCanvas { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
 
   .grain {
     position: fixed; inset: 0; z-index: 998; pointer-events: none; opacity: 0.014; mix-blend-mode: overlay;
@@ -114,6 +114,13 @@
     background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
     animation: textshimmer 6s ease-in-out infinite;
   }
+  .marquee-track .terminal-star-btn {
+    cursor: pointer; display: inline-block; transition: transform 0.2s ease, text-shadow 0.2s ease;
+  }
+  .marquee-track .terminal-star-btn:hover {
+    transform: scale(1.3);
+    text-shadow: 0 0 15px var(--glow-strong);
+  }
   @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
   @keyframes textshimmer { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
 
@@ -133,7 +140,7 @@
   }
   .spotify-embed iframe:hover { box-shadow: 0 0 66px hsla(var(--hue), 95%, 70%, 0.34); }
 
-  /* ---------- SOCIAL ICONS ---------- */
+  /* ---------- SOCIAL ICONS (EXACTLY 5 BUTTONS) ---------- */
 
   .icon-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 13px; }
   .icon-orb {
@@ -154,36 +161,30 @@
     transform: translateY(-2px) scale(1.1);
   }
 
-  /* ---------- STOCKY HUE SLIDER ---------- */
+  /* ---------- HUE SLIDER ---------- */
 
   .hue-panel { text-align: center; padding-top: 4px; }
-  .hue-readout { font-size: 9px; letter-spacing: 0.09em; color: var(--c-deep); margin-bottom: 12px; text-transform: uppercase; }
+  .hue-readout { font-size: 9px; letter-spacing: 0.09em; color: var(--c-deep); margin-bottom: 9px; text-transform: uppercase; }
   .hue-readout span { color: var(--c-pale); font-weight: 700; }
 
   input#hueSlider {
-    width: 100%; max-width: 380px;
+    width: 100%; max-width: 340px;
     -webkit-appearance: none; appearance: none;
-    height: 10px; border-radius: 6px;
+    height: 2px; border-radius: 6px;
     background: linear-gradient(90deg, hsl(0,70%,55%), hsl(60,70%,55%), hsl(120,70%,55%), hsl(180,70%,55%), hsl(240,70%,55%), hsl(300,70%,55%), hsl(360,70%,55%));
     outline: none; cursor: pointer;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.6), 0 0 15px hsla(var(--hue), 80%, 60%, 0.25);
-    border: 1px solid var(--line-color);
   }
   input#hueSlider::-webkit-slider-thumb {
     -webkit-appearance: none; appearance: none;
-    width: 26px; height: 26px; border-radius: 50%;
+    width: 14px; height: 14px; border-radius: 50%;
     background: var(--white);
-    box-shadow: 0 0 16px var(--glow-strong), 0 2px 6px rgba(0,0,0,0.8);
+    box-shadow: 0 0 11px var(--glow-strong);
     cursor: pointer;
-    border: 2px solid var(--c-mid);
-    transition: transform 0.2s ease;
-  }
-  input#hueSlider::-webkit-slider-thumb:hover {
-    transform: scale(1.15);
+    border: 1px solid var(--c-pale);
   }
   input#hueSlider::-moz-range-thumb {
-    width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--c-mid);
-    background: var(--white); box-shadow: 0 0 16px var(--glow-strong), 0 2px 6px rgba(0,0,0,0.8); cursor: pointer;
+    width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--c-pale);
+    background: var(--white); box-shadow: 0 0 11px var(--glow-strong); cursor: pointer;
   }
 
   /* ---------- FOOTER ---------- */
@@ -237,18 +238,23 @@
 
     <section class="reveal">
       <div class="icon-row">
+        <!-- 1. TikTok -->
         <a class="icon-orb" href="https://tiktok.com/@mirrorlesssmoke" target="_blank" rel="noopener" aria-label="TikTok">
           <svg viewBox="0 0 24 24" fill="none"><path d="M14 4v10.5a3.5 3.5 0 1 1-2-3.16V4h2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M14 4c0 2.5 2 4.2 4.3 4.2" stroke="currentColor" stroke-width="1.5"/></svg>
         </a>
+        <!-- 2. Bandcamp -->
         <a class="icon-orb" href="https://fakespacefogmachine.bandcamp.com" target="_blank" rel="noopener" aria-label="Bandcamp">
           <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="3.2" fill="currentColor"/></svg>
         </a>
+        <!-- 3. Instagram -->
         <a class="icon-orb" href="https://instagram.com/mirrorlesssmoke" target="_blank" rel="noopener" aria-label="Instagram">
           <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="15" rx="4.5" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12.5" r="4" stroke="currentColor" stroke-width="1.5"/><circle cx="17.2" cy="8.3" r="1" fill="currentColor"/></svg>
         </a>
+        <!-- 4. Twitter -->
         <a class="icon-orb" href="https://twitter.com/mirrorlesssmoke" target="_blank" rel="noopener" aria-label="Twitter">
           <svg viewBox="0 0 24 24" fill="none"><path d="M3 11.2L21 3l-8 18-2.6-7.6L3 11.2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
         </a>
+        <!-- 5. YouTube -->
         <a class="icon-orb" href="https://youtube.com/@mirrorlesssmoke" target="_blank" rel="noopener" aria-label="YouTube">
           <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="4" stroke="currentColor" stroke-width="1.5"/><polygon points="10,9 16,12 10,15" fill="currentColor"/></svg>
         </a>
@@ -270,6 +276,8 @@
 
   /* ============================================================
      TIME-BASED HERO BACKGROUND IMAGE SWITCHER
+     08:00 to 20:00 -> https://i.ibb.co/P09HHpS/IMG-20260812-191415-649.jpg
+     20:01 to 07:59 -> https://i.ibb.co/TMx3n2DL/IMG-20260812-213416-877.jpg
   ============================================================ */
   try {
     var heroSection = document.getElementById('heroSection');
@@ -283,24 +291,41 @@
   } catch (e) {}
 
   /* ============================================================
-     MARQUEE
+     MARQUEE WITH CLICKABLE TERMINAL STAR BUTTON
   ============================================================ */
   try {
     var marqueeTrack = document.getElementById('marqueeTrack');
     if (marqueeTrack) {
-      var unit = 'FAKE SPACE FOG MACHINE';
-      var sep = '\u00A0\u00A0\u2726\u00A0\u00A0';
-      var line = '';
-      for (var m = 0; m < 8; m++) { line += unit + sep; }
-      var span1 = document.createElement('span'); span1.textContent = line;
-      var span2 = document.createElement('span'); span2.textContent = line;
-      marqueeTrack.appendChild(span1);
-      marqueeTrack.appendChild(span2);
+      function buildMarqueeContent() {
+        marqueeTrack.innerHTML = '';
+        var unitText = 'FAKE SPACE FOG MACHINE';
+        
+        for (var run = 0; run < 2; run++) {
+          var containerSpan = document.createElement('span');
+          for (var m = 0; m < 6; m++) {
+            containerSpan.appendChild(document.createTextNode(unitText + '\u00A0\u00A0'));
+            
+            // Interactive clickable star sparkle
+            var starBtn = document.createElement('span');
+            starBtn.className = 'terminal-star-btn';
+            starBtn.textContent = '\u2726';
+            starBtn.title = '';
+            starBtn.addEventListener('click', function(e) {
+              e.stopPropagation();
+              window.location.href = 'terminal.html';
+            });
+            containerSpan.appendChild(starBtn);
+            containerSpan.appendChild(document.createTextNode('\u00A0\u00A0'));
+          }
+          marqueeTrack.appendChild(containerSpan);
+        }
+      }
+      buildMarqueeContent();
     }
   } catch (err) { console.error('marquee failed:', err); }
 
   /* ============================================================
-     HUE SLIDER
+     HUE SLIDER (SESSION PERSISTENCE, FRESH ON RESTART, FIXED 0°)
   ============================================================ */
   try {
     var hueSlider = document.getElementById('hueSlider');
@@ -308,34 +333,31 @@
     var root = document.documentElement;
 
     var savedHue = null;
-    try { savedHue = localStorage.getItem('fsfm_main_hue'); } catch (e) {}
-    if (savedHue !== null) {
-      hueSlider.value = savedHue;
-      root.style.setProperty('--hue', savedHue);
-      hueValue.textContent = savedHue;
-    }
+    try { savedHue = sessionStorage.getItem('fsfm_main_hue'); } catch (e) {}
+    
+    var initialHue = (savedHue !== null) ? parseInt(savedHue, 10) : 35;
+    hueSlider.value = initialHue;
+    root.style.setProperty('--hue', initialHue);
+    hueValue.textContent = initialHue;
 
     hueSlider.addEventListener('input', function() {
-      root.style.setProperty('--hue', hueSlider.value);
-      hueValue.textContent = hueSlider.value;
-      try { localStorage.setItem('fsfm_main_hue', hueSlider.value); } catch (e) {}
+      var val = parseInt(hueSlider.value, 10) || 0;
+      root.style.setProperty('--hue', val);
+      hueValue.textContent = val;
+      try { sessionStorage.setItem('fsfm_main_hue', val); } catch (e) {}
     });
   } catch (err) { console.error('hue slider failed:', err); }
 
   /* ============================================================
-     BACKGROUND STARSCAPE + CLICKABLE NORTH STAR ✨
+     BACKGROUND STARSCAPE + 4-POINTED SPARKLE NORTH STAR + MAX BLOOM
   ============================================================ */
   try {
     var canvas = document.getElementById('bgCanvas');
     if (canvas) {
       var ctx = canvas.getContext('2d');
       var W, H;
-      var nsX = 0, nsY = 0, nsRadius = 35;
 
-      function resizeBg() { 
-        W = canvas.width = window.innerWidth; 
-        H = canvas.height = window.innerHeight; 
-      }
+      function resizeBg() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
       resizeBg();
       window.addEventListener('resize', resizeBg);
 
@@ -352,29 +374,16 @@
           x: Math.random() * 2000 - 500,
           y: Math.random() * 3000 - 500,
           size: Math.random() * 1.6 + 0.4,
-          alpha: Math.random() * 0.5 + 0.2,
-          twinkleSpeed: Math.random() * 0.005 + 0.001,
+          alpha: Math.random() * 0.4 + 0.2,
+          twinkleSpeed: Math.random() * 0.003 + 0.0008,
           twinklePhase: Math.random() * Math.PI * 2
         });
       }
-
-      // Handle clicking/tapping the North Star to launch the terminal
-      canvas.addEventListener('click', function(e) {
-        var rect = canvas.getBoundingClientRect();
-        var mouseX = e.clientX - rect.left;
-        var mouseY = e.clientY - rect.top;
-        var dx = mouseX - nsX;
-        var dy = mouseY - nsY;
-        if (Math.sqrt(dx * dx + dy * dy) <= nsRadius) {
-          window.location.href = 'terminal.html';
-        }
-      });
 
       function frame(t) {
         ctx.clearRect(0, 0, W, H);
         var hue = getHue();
 
-        // Cosmic background bloom across every inch
         var bgGrad = ctx.createRadialGradient(W / 2, H * 0.4, 30, W / 2, H * 0.4, Math.max(W, H) * 0.95);
         bgGrad.addColorStop(0, 'hsla(' + hue + ', 92%, 28%, 0.52)');
         bgGrad.addColorStop(0.45, 'hsla(' + (hue + 20) % 360 + ', 75%, 16%, 0.36)');
@@ -395,19 +404,17 @@
         ctx.fillStyle = cornerGlow2;
         ctx.fillRect(0, 0, W, H);
 
-        // Render Starry Scene
         for (var i = 0; i < stars.length; i++) {
           var star = stars[i];
-          var currentAlpha = star.alpha * (0.8 + 0.2 * Math.sin(t * star.twinkleSpeed + star.twinklePhase));
+          var currentAlpha = star.alpha * (0.85 + 0.15 * Math.sin(t * star.twinkleSpeed + star.twinklePhase));
           ctx.fillStyle = 'hsla(' + hue + ', 90%, 90%, ' + currentAlpha + ')';
           ctx.beginPath();
           ctx.arc(star.x % W, (star.y + window.scrollY * 0.12) % H, star.size, 0, Math.PI * 2);
           ctx.fill();
         }
 
-        // Position North Star ✨ exactly at center
-        nsX = W / 2;
-        nsY = H * 0.42;
+        var nsX = W / 2;
+        var nsY = H * 0.42;
 
         var nsGlow = ctx.createRadialGradient(nsX, nsY, 0, nsX, nsY, 180);
         nsGlow.addColorStop(0, 'hsla(' + hue + ', 98%, 85%, 0.65)');
@@ -466,7 +473,7 @@
   } catch (err) { console.error('reveal failed:', err); }
 
   /* ============================================================
-     HIDDEN ARG TERMINAL TRIGGER (PASSPHRASE & LOGO TAPS BACKUP)
+     HIDDEN ARG TERMINAL KEYBOARD TRIGGER (FALLBACK)
   ============================================================ */
   try {
     var PASSPHRASE = '22khz';
@@ -478,19 +485,6 @@
         if (buffer.indexOf(PASSPHRASE) !== -1) { buffer = ''; window.location.href = 'terminal.html'; }
       }
     });
-
-    var logoTaps = 0;
-    var logoTapTimeout;
-    var navLogo = document.querySelector('.nav-logo');
-    if (navLogo) {
-      navLogo.addEventListener('click', function(e) {
-        logoTaps++;
-        if (logoTaps === 1) {
-          logoTapTimeout = setTimeout(function() { logoTaps = 0; }, 800);
-        }
-        if (logoTaps >= 3) { clearTimeout(logoTapTimeout); logoTaps = 0; window.location.href = 'terminal.html'; }
-      });
-    }
   } catch (err) { console.error('terminal trigger failed:', err); }
 
 })();
