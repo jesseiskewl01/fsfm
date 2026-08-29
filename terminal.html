@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>fsfm — terminal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --hue: 35;
+    --black: #030302;
+    --white: #f7f5ef;
+    --c-pale: hsl(var(--hue), 85%, 84%);
+    --c-mid: hsl(var(--hue), 68%, 62%);
+    --c-deep: hsl(var(--hue), 52%, 42%);
+    --glow: hsla(var(--hue), 90%, 65%, 0.65);
+    --glow-strong: hsla(var(--hue), 95%, 72%, 0.9);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: var(--black); }
+  
+  body {
+    background: var(--black); color: var(--white);
+    font-family: 'Roboto Mono', monospace; font-size: 12px;
+    -webkit-font-smoothing: antialiased; position: relative;
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 16px;
+  }
+
+  .grain {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.02; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .bloom-vignette {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse at 50% 0%, hsla(var(--hue), 85%, 62%, 0.16) 0%, transparent 60%),
+      radial-gradient(ellipse at 50% 100%, hsla(var(--hue), 80%, 55%, 0.12) 0%, transparent 60%),
+      radial-gradient(circle at center, transparent 40%, rgba(3,3,2,0.48) 100%);
+    mix-blend-mode: screen;
+  }
+
+  .terminal-box {
+    width: 100%; max-width: 680px; height: 75vh; max-height: 600px;
+    background: #050400; border-radius: 8px; box-shadow: 0 0 72px var(--glow-strong);
+    display: flex; flex-direction: column; overflow: hidden; position: relative;
+    border: 1px solid hsla(var(--hue), 50%, 40%, 0.22);
+    z-index: 1;
+  }
+
+  .terminal-titlebar {
+    display: flex; align-items: center; gap: 7px;
+    padding: 11px 15px; background: hsla(var(--hue), 30%, 7%, 0.96);
+    border-bottom: 1px solid hsla(var(--hue), 40%, 30%, 0.26);
+    font-size: 10px; letter-spacing: 0.08em; color: var(--c-deep);
+  }
+
+  .terminal-dot { width: 8px; height: 8px; border-radius: 50%; background: hsla(var(--hue), 60%, 45%, 0.62); }
+  .terminal-titletext { margin-left: 6px; opacity: 0.72; }
+
+  .terminal-scanlines {
+    position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,0.032) 0px, rgba(255,255,255,0.032) 1px, transparent 1px, transparent 3px);
+  }
+
+  .terminal-content {
+    flex: 1; overflow-y: auto; padding: 18px 20px; font-size: 12px; color: var(--c-pale); white-space: pre-wrap; line-height: 1.66; text-shadow: 0 0 6px var(--glow); outline: none;
+  }
+  .terminal-content::-webkit-scrollbar { width: 6px; }
+  .terminal-content::-webkit-scrollbar-track { background: transparent; }
+  .terminal-content::-webkit-scrollbar-thumb { background: hsla(var(--hue), 60%, 45%, 0.36); border-radius: 3px; }
+
+  .cursor {
+    display: inline-block; width: 6px; height: 14px; background: var(--c-pale); margin-left: 1px; animation: cursorBlink 1s step-end infinite; vertical-align: text-bottom;
+  }
+  @keyframes cursorBlink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .grain, .cursor { animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="bloom-vignette" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <div class="terminal-box">
+    <div class="terminal-titlebar">
+      <span class="terminal-dot"></span><span class="terminal-dot"></span><span class="terminal-dot"></span>
+      <span class="terminal-titletext">guest@fsfm: ~</span>
+    </div>
+    <div class="terminal-scanlines" aria-hidden="true"></div>
+    <div class="terminal-content" id="terminalContent" role="log" aria-label="Terminal output" tabindex="0"></div>
+  </div>
+
+<script>
+'use strict';
+(function() {
+
+  var terminalContent = document.getElementById('terminalContent');
+  var root = document.documentElement;
+
+  var history = [];
+  var historyIndex = -1;
+  var isLoggedIn = false;
+  var currentLine = '';
+  var fullOutput = '';
+
+  function render() {
+    terminalContent.textContent = fullOutput + currentLine + '\u2588';
+    terminalContent.scrollTop = terminalContent.scrollHeight;
+  }
+
+  function typeLine(text, delay, done) {
+    setTimeout(function() {
+      var i = 0;
+      var typed = '';
+      var iv = setInterval(function() {
+        typed += text.charAt(i);
+        fullOutput = fullOutput.slice(0, fullOutput.lastIndexOf('\n') + 1) + typed;
+        render();
+        i++;
+        if (i >= text.length) { 
+          clearInterval(iv); 
+          fullOutput += text.slice(typed.length);
+          render();
+          if (done) done(); 
+        }
+      }, 8);
+    }, delay || 0);
+  }
+
+  function bootSequence() {
+    fullOutput = '';
+    currentLine = '';
+    terminalContent.focus();
+
+    var lines = [
+      { text: 'fsfm-archive v2.6.0', delay: 200 },
+      { text: 'connecting to frequency network... ok', delay: 800 },
+      { text: 'authenticating protocol... ok', delay: 1600 },
+      { text: 'loading memory cache... ok', delay: 2400 },
+      { text: '', delay: 2800 },
+      { text: 'welcome, early bird. you found the deep place.', delay: 3200 },
+      { text: "type 'help' if you want somewhere to start.", delay: 3800 }
+    ];
+
+    lines.forEach(function(line, idx) {
+      typeLine(line.text, line.delay, function() {
+        if (idx < lines.length - 1) {
+          fullOutput += '\n';
+          render();
+        }
+      });
+    });
+
+    setTimeout(function() {
+      fullOutput += '\nguest@fsfm:~$ ';
+      currentLine = '';
+      render();
+      terminalContent.focus();
+    }, 4400);
+  }
+
+  function loginScreen() {
+    fullOutput = 'fsfm-archive login: guest\npassword: ';
+    currentLine = '';
+    render();
+    terminalContent.focus();
+  }
+
+  var COMMANDS = {
+    help: "commands: about, secret, credits, ls, cat <file>, neofetch, date, clear, exit",
+    about: "this whole site was built line by line, by one person. thanks for digging this deep.",
+    secret: "there's a version of GOODNIGHT! that never made the album. maybe someday.",
+    credits: "written / produced / mixed / mastered / coded — all one person. fake space fog machine."
+  };
+
+  var FILES = {
+    "readme.md": "you found the terminal. that's the whole readme. congrats.",
+    "lore.txt": "the fog was here before the machine. the machine just learned to make more of it.",
+    "notes.txt": "track 4 almost didn't make the album. glad it did."
+  };
+
+  var ADMIN_COMMANDS_LIST =
+    "hidden commands:\n" +
+    "  huejack <deg>    — force this page's hue slider\n" +
+    "  hueparty         — quick disco spin, then settles\n" +
+    "  matrix           — you know\n" +
+    "  glitch           — brief corruption\n" +
+    "  fortune          — a thought\n" +
+    "  8ball <question> — ask the void\n" +
+    "  flipcoin         — heads or tails\n" +
+    "  rolldice         — 1 to 6\n" +
+    "  roast            — gently\n" +
+    "  compliment       — sincerely\n" +
+    "  catfact          — mandatory\n" +
+    "  weather          — the forecast\n" +
+    "  banner <text>    — big letters\n" +
+    "  love             — sends some\n" +
+    "  whoami           — ask the system\n" +
+    "  selfdestruct     — relax";
+
+  var FORTUNES = [
+    "the fog remembers everything it swallows.",
+    "early birds catch worms. late birds catch dreams.",
+    "static is just silence trying to speak.",
+    "every sunset is a rerun that never looks the same twice.",
+    "you are exactly on time. there was never a schedule."
+  ];
+
+  var EIGHTBALL = [
+    "signs point to yes.", "absolutely not.", "ask again after the next sunrise.",
+    "the fog is unclear on this one.", "yes, but at 22 kilohertz.", "no. but nice try.",
+    "outlook hazy. literally, it's fog."
+  ];
+
+  var ROASTS = [
+    "you use more tabs than RAM.",
+    "your playlist has more skips than a rock on a lake.",
+    "you've read this far into a fake terminal. respect.",
+    "you still have unread notifications.",
+    "you probably tried the passphrase more than once."
+  ];
+
+  var COMPLIMENTS = [
+    "you found the hidden thing. that's genuinely rare.",
+    "you have great taste in fake terminals.",
+    "you're the kind of person who reads credits.",
+    "you clearly pay attention.",
+    "you're early. the good kind."
+  ];
+
+  var CATFACTS = [
+    "cats sleep for around 70% of their lives.",
+    "a group of cats is called a clowder.",
+    "cats can't taste sweetness.",
+    "a cat's purr can be a self-soothing frequency, roughly 25-150 hz.",
+    "cats have fewer toes on their back paws."
+  ];
+
+  function runMatrix() {
+    var chars = '01FOGBIRDSPACE';
+    var count = 0;
+    var iv = setInterval(function() {
+      var line = '';
+      for (var i = 0; i < 46; i++) line += chars.charAt(Math.floor(Math.random() * chars.length));
+      fullOutput += line + '\n';
+      render();
+      count++;
+      if (count > 10) { clearInterval(iv); fullOutput += 'guest@fsfm:~$ '; currentLine = ''; render(); }
+    }, 60);
+  }
+
+  function runGlitch() {
+    var glitchChars = '#%&@$*!?';
+    var frames = 7;
+    var i = 0;
+    var iv = setInterval(function() {
+      var g = '';
+      for (var k = 0; k < 40; k++) g += glitchChars.charAt(Math.floor(Math.random() * glitchChars.length));
+      fullOutput += g + '\n';
+      render();
+      i++;
+      if (i >= frames) { clearInterval(iv); fullOutput += '...signal restored.\n' + 'guest@fsfm:~$ '; currentLine = ''; render(); }
+    }, 50);
+  }
+
+  function runHueParty() {
+    var steps = 0;
+    var iv = setInterval(function() {
+      if (window.__fsfmSetHue) window.__fsfmSetHue(Math.floor(Math.random() * 360));
+      steps++;
+      if (steps > 14) { clearInterval(iv); if (window.__fsfmSetHue) window.__fsfmSetHue(35); fullOutput += 'settled back to 35°.\n' + 'guest@fsfm:~$ '; currentLine = ''; render(); }
+    }, 120);
+  }
+
+  terminalContent.addEventListener('keydown', function(e) {
+    if (!isLoggedIn) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (currentLine.length === 7) {
+          isLoggedIn = true;
+          fullOutput = '';
+          currentLine = '';
+          bootSequence();
+        } else {
+          fullOutput += '\npassword: ';
+          currentLine = '';
+          render();
+        }
+      } else if (e.key === 'Backspace') {
+        e.preventDefault();
+        currentLine = currentLine.slice(0, -1);
+        render();
+      } else if (e.key.length === 1 && currentLine.length < 7) {
+        e.preventDefault();
+        currentLine += e.key;
+        render();
+      }
+      return;
+    }
+
+    if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (history.length === 0) return;
+      historyIndex = Math.max(0, historyIndex - 1);
+      currentLine = history[historyIndex] || '';
+      render();
+      return;
+    }
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (history.length === 0) return;
+      historyIndex = Math.min(history.length, historyIndex + 1);
+      currentLine = history[historyIndex] || '';
+      render();
+      return;
+    }
+
+    if (e.key === 'Backspace') {
+      e.preventDefault();
+      if (currentLine.length > 0) {
+        currentLine = currentLine.slice(0, -1);
+        render();
+      }
+      return;
+    }
+
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      var cmd = currentLine.trim().toLowerCase();
+      var raw = currentLine.trim();
+      
+      if (raw !== '') { history.push(raw); historyIndex = history.length; }
+      fullOutput += currentLine + '\n';
+
+      if (cmd === '') { /* no-op */ }
+      else if (cmd === 'date') { fullOutput += new Date().toString() + '\n'; }
+      else if (cmd === 'clear') { fullOutput = ''; }
+      else if (cmd === 'exit' || cmd === 'close') { window.location.href = 'index.html'; }
+      else if (cmd === 'ls') { fullOutput += 'readme.md   lore.txt   notes.txt   tracks/\n'; }
+      else if (cmd.indexOf('cat ') === 0) {
+        var fname = raw.slice(4).trim();
+        var content = FILES.hasOwnProperty(fname) ? FILES[fname] : "cat: " + fname + ": no such file";
+        fullOutput += content + '\n';
+      }
+      else if (cmd === 'neofetch') {
+        fullOutput += 'guest@fsfm\n----------\nOS: FogOS 2.6\nHost: fsfm.port82.net\nUptime: since the last sunrise\nShell: fogsh 1.0\nTerminal: you found it\nCPU: one person, mildly caffeinated\n';
+      }
+      else if (cmd === 'adminhelp') { fullOutput += ADMIN_COMMANDS_LIST + '\n'; }
+      else if (cmd.indexOf('huejack') === 0) {
+        var hm = raw.match(/(\d{1,3})/);
+        if (hm && window.__fsfmSetHue) { window.__fsfmSetHue(hm[1]); fullOutput += 'hue: ' + hm[1] + '°\n'; }
+        else { fullOutput += 'usage: huejack <0-360>\n'; }
+      }
+      else if (cmd === 'hueparty') { runHueParty(); }
+      else if (cmd === 'matrix') { runMatrix(); }
+      else if (cmd === 'glitch') { runGlitch(); }
+      else if (cmd === 'fortune') { fullOutput += FORTUNES[Math.floor(Math.random() * FORTUNES.length)] + '\n'; }
+      else if (cmd.indexOf('8ball') === 0) { fullOutput += EIGHTBALL[Math.floor(Math.random() * EIGHTBALL.length)] + '\n'; }
+      else if (cmd === 'flipcoin') { fullOutput += (Math.random() < 0.5 ? 'heads.' : 'tails.') + '\n'; }
+      else if (cmd === 'rolldice') { fullOutput += 'you rolled a ' + (Math.floor(Math.random() * 6) + 1) + '.\n'; }
+      else if (cmd === 'roast') { fullOutput += ROASTS[Math.floor(Math.random() * ROASTS.length)] + '\n'; }
+      else if (cmd === 'compliment') { fullOutput += COMPLIMENTS[Math.floor(Math.random() * COMPLIMENTS.length)] + '\n'; }
+      else if (cmd === 'catfact') { fullOutput += CATFACTS[Math.floor(Math.random() * CATFACTS.length)] + '\n'; }
+      else if (cmd === 'weather') { fullOutput += 'foggy, with a chance of static. 22khz winds out of the west.\n'; }
+      else if (cmd.indexOf('banner') === 0) {
+        var txt = raw.slice(6).trim().toUpperCase();
+        if (txt) { fullOutput += txt.split('').join(' ') + '\n'; } 
+        else { fullOutput += 'usage: banner <text>\n'; }
+      }
+      else if (cmd === 'love') { fullOutput += 'sending some your way.\n'; }
+      else if (cmd === 'whoami') { fullOutput += 'you are the early bird. or maybe just curious. either way, welcome.\n'; }
+      else if (cmd === 'selfdestruct') { fullOutput += 'initiating self destruct in 3... 2... 1...\n'; setTimeout(function() { fullOutput += '...jk. relax.\n'; render(); }, 900); }
+      else if (cmd.indexOf('sudo') === 0) { fullOutput += 'nice try. no sudo here, just vibes.\n'; }
+      else if (COMMANDS.hasOwnProperty(cmd)) { fullOutput += COMMANDS[cmd] + '\n'; }
+      else { fullOutput += cmd.split(' ')[0] + ": command not found\n"; }
+
+      currentLine = '';
+      fullOutput += 'guest@fsfm:~$ ';
+      render();
+      return;
+    }
+
+    if (e.key.length === 1) {
+      e.preventDefault();
+      currentLine += e.key;
+      render();
+    }
+  });
+
+  window.addEventListener('keydown', function(e) {
+    if (isLoggedIn && e.key === 'Escape') { window.location.href = 'index.html'; }
+  });
+
+  loginScreen();
+  terminalContent.focus();
+
+})();
+</script>
+</body>
+</html>
