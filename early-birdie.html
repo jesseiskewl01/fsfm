@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Early Bird.... — Fake Space Fog Machine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --hue: 35;
+    --black: #020201;
+    --white: #fcf9f0;
+    --gold-pale: hsl(var(--hue), 92%, 88%);
+    --gold: hsl(var(--hue), 78%, 70%);
+    --gold-deep: hsl(var(--hue), 60%, 50%);
+    --glow-color: hsla(var(--hue), 98%, 74%, 0.85);
+    --glow-intense: hsla(var(--hue), 100%, 82%, 0.98);
+    --line-color: hsla(var(--hue), 55%, 45%, 0.45);
+    --font-mono: 'Roboto Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; background: var(--black); }
+
+  body {
+    background: var(--black); color: var(--white);
+    font-family: var(--font-mono); line-height: 1.7;
+    -webkit-font-smoothing: antialiased; position: relative; overflow-x: hidden; min-height: 100vh;
+  }
+
+  canvas#nebulaCanvas { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+
+  .bloom-vignette {
+    position: fixed; inset: 0; z-index: 5; pointer-events: none;
+    background:
+      radial-gradient(ellipse at 50% 0%, hsla(var(--hue), 94%, 64%, 0.38) 0%, transparent 48%),
+      radial-gradient(ellipse at 50% 100%, hsla(var(--hue), 90%, 58%, 0.32) 0%, transparent 48%),
+      radial-gradient(circle at center, transparent 40%, rgba(2,2,1,0.65) 100%);
+    mix-blend-mode: screen;
+  }
+
+  .grain {
+    position: fixed; inset: 0; z-index: 998; pointer-events: none; opacity: 0.034; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  a { color: var(--gold-pale); text-decoration: none; transition: all 0.2s ease; }
+  a:hover, a:focus-visible { color: var(--gold); text-shadow: 0 0 22px var(--glow-intense); }
+
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 28px; position: relative; z-index: 4; }
+
+  .reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1); }
+  .reveal.in-view { opacity: 1; transform: translateY(0); }
+
+  /* ---------- NAV ---------- */
+
+  .site-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 500; padding: 16px 28px;
+    display: flex; justify-content: center; backdrop-filter: blur(12px);
+    background: linear-gradient(180deg, rgba(2,2,1,0.92), rgba(2,2,1,0.6));
+    border-bottom: 2px solid var(--line-color);
+    box-shadow: 0 0 35px hsla(var(--hue), 80%, 50%, 0.2);
+  }
+  .nav-inner { max-width: 760px; width: 100%; display: flex; align-items: center; justify-content: space-between; }
+  .nav-logo { font-size: 11.5px; font-weight: 700; letter-spacing: 0.22em; color: var(--white); text-shadow: 0 0 16px var(--glow-color); }
+  .nav-links { display: flex; gap: 24px; font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; }
+  .nav-links a { opacity: 0.7; transition: opacity 0.2s ease; font-weight: 600; }
+  .nav-links a.active, .nav-links a:hover { opacity: 1; color: var(--gold-pale); text-shadow: 0 0 14px var(--glow-intense); }
+
+  /* ---------- HERO ---------- */
+
+  .hero { position: relative; z-index: 4; min-height: 88vh; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; }
+  .hero-bg {
+    position: absolute; inset: -8%;
+    background: url('https://i.ibb.co/Cs84n14c/cover-1.png') center center / cover no-repeat;
+    filter: blur(56px) saturate(1.65) brightness(0.35) contrast(1.35); transform: scale(1.12); opacity: 0.9;
+  }
+  .hero-bg-sharp {
+    position: absolute; inset: 0;
+    background: url('https://i.ibb.co/Cs84n14c/cover-1.png') center center / cover no-repeat;
+    filter: contrast(1.25) saturate(1.35) brightness(0.98); opacity: 0.92;
+  }
+  .hero::before {
+    content: ""; position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(180deg, rgba(2,2,1,0.15) 0%, rgba(2,2,1,0.68) 56%, rgba(2,2,1,0.99) 100%);
+  }
+  .hero-inner { position: relative; z-index: 2; padding: 104px 28px 58px; }
+  .eyebrow {
+    font-size: 10.5px; font-weight: 700; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold-pale);
+    margin-bottom: 18px; display: inline-flex; align-items: center; gap: 10px;
+    text-shadow: 0 0 22px hsla(var(--hue), 98%, 72%, 0.7);
+  }
+  .eyebrow::before {
+    content: ""; display: inline-block; width: 9px; height: 9px; border-radius: 50%;
+    background: var(--gold-pale); box-shadow: 0 0 16px var(--glow-intense), 0 0 38px var(--glow-color);
+    animation: pulseGlow 2s infinite alternate;
+  }
+  @keyframes pulseGlow { 0% { transform: scale(0.6); opacity: 0.4; } 100% { transform: scale(1.4); opacity: 1; } }
+  .hero h1 {
+    font-family: var(--font-mono);
+    font-size: clamp(3.2rem, 14vw, 6.8rem); line-height: 0.94; letter-spacing: -0.005em; color: var(--white);
+    text-shadow: 0 0 54px rgba(0,0,0,0.98), 0 0 38px var(--glow-color), 0 0 88px hsla(var(--hue), 98%, 72%, 0.6);
+  }
+  .hero .artist { margin-top: 18px; font-size: 17px; font-weight: 700; color: var(--gold-pale); letter-spacing: 0.06em; text-shadow: 0 0 18px var(--glow-color); }
+  .hero .meta { margin-top: 7px; font-size: 11px; font-weight: 600; color: var(--gold); letter-spacing: 0.04em; }
+
+  /* ---------- SECTIONS ---------- */
+
+  section { padding: 42px 0; position: relative; z-index: 4; }
+  section:not(:first-of-type) { border-top: 1.5px solid hsla(var(--hue), 45%, 40%, 0.2); padding-top: 44px; }
+
+  .bio-text { font-size: 14px; color: var(--white); opacity: 0.92; max-width: 52ch; margin: 0 auto; text-align: center; line-height: 1.8; letter-spacing: 0.01em; text-shadow: 0 0 10px hsla(var(--hue), 50%, 50%, 0.15); }
+
+  .listen { text-align: center; }
+  .listen iframe {
+    width: 100%; border: none; display: block; border-radius: 14px;
+    box-shadow: 0 0 64px hsla(var(--hue), 98%, 72%, 0.26), inset 0 0 15px hsla(var(--hue), 80%, 60%, 0.15);
+    border: 2px solid var(--line-color);
+    transition: box-shadow 0.35s ease;
+  }
+  .listen iframe:hover { box-shadow: 0 0 92px hsla(var(--hue), 98%, 72%, 0.45); }
+
+  /* ---------- CONSTELLATION ---------- */
+
+  .constellation-wrap {
+    position: relative;
+    width: 100%;
+    height: 74vh;
+    min-height: 500px;
+    max-height: 740px;
+  }
+
+  .constellation-glow {
+    position: absolute; inset: -12%; z-index: 0; pointer-events: none;
+    background: radial-gradient(ellipse at 50% 50%, hsla(var(--hue), 90%, 58%, 0.18) 0%, transparent 65%);
+  }
+
+  .constellation-svg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+  .constellation-svg line {
+    stroke: hsla(var(--hue), 85%, 78%, 0.45);
+    stroke-width: 1.2;
+    animation: linePulse 5s ease-in-out infinite;
+  }
+  @keyframes linePulse {
+    0%, 100% { opacity: 0.45; stroke-width: 1.2; }
+    50% { opacity: 0.85; stroke-width: 1.8; }
+  }
+
+  .star {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    display: block;
+    text-decoration: none;
+    width: clamp(52px, 9vw, 68px);
+    height: clamp(52px, 9vw, 68px);
+  }
+
+  .star-shape {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 30% 30%, #fffef8 0%, var(--gold-pale) 36%, var(--gold) 68%, transparent 100%);
+    clip-path: polygon(50% 0%, 61% 38%, 100% 50%, 61% 62%, 50% 100%, 39% 62%, 0% 50%, 39% 38%);
+    filter:
+      drop-shadow(0 0 10px var(--glow-intense))
+      drop-shadow(0 0 28px var(--glow-color))
+      drop-shadow(0 0 54px hsla(var(--hue), 98%, 70%, 0.5));
+    transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+  }
+
+  .star:hover .star-shape, .star:focus-visible .star-shape {
+    transform: scale(1.45);
+    filter:
+      drop-shadow(0 0 16px var(--glow-intense))
+      drop-shadow(0 0 44px var(--glow-color))
+      drop-shadow(0 0 82px hsla(var(--hue), 98%, 70%, 0.7));
+  }
+
+  footer.site-footer {
+    padding: 32px 0 44px; text-align: center; font-size: 11px; font-weight: 600; color: var(--gold-deep); letter-spacing: 0.14em; opacity: 0.85;
+    border-top: 2px solid var(--line-color);
+    text-shadow: 0 0 10px var(--glow-color);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .grain, .eyebrow::before, .constellation-svg line { animation: none !important; }
+    .reveal { opacity: 1; transform: none; transition: none; }
+  }
+</style>
+</head>
+<body>
+
+  <canvas id="nebulaCanvas" aria-hidden="true"></canvas>
+  <div class="bloom-vignette" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="index.html">FSFM</a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="the-early-bird.html" class="active">Album</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-bg" aria-hidden="true"></div>
+    <div class="hero-bg-sharp" aria-hidden="true"></div>
+    <div class="hero-inner">
+      <div class="eyebrow">out now!!</div>
+      <h1>The Early Bird....</h1>
+      <div class="artist">by Fake Space Fog Machine</div>
+      <div class="meta">7 tracks · this is where the magic happens</div>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <section class="reveal">
+      <p class="bio-text">"...i have no real idea if this'll take me anywhere or if there are any real prospects for making music in my future but it really doesnt matter to me because i have had an unimaginable amount of fun doing just this and its something i fully recommend doing yourself. like it may not be music, you may admire a different kind of art, you might have an entirely different passion, but i urge you to do make something good and bring it into this world because no one else can do it for you."</p>
+    </section>
+
+    <section class="listen reveal">
+      <iframe
+        src="https://open.spotify.com/embed/album/0clOFZSG1MHTVtK9DAjUOe?utm_source=generator&theme=0&si=1afed0dea1284572"
+        width="100%" height="352" frameborder="0" allowfullscreen=""
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+        loading="lazy">
+      </iframe>
+    </section>
+
+    <section class="reveal">
+      <div class="constellation-wrap" id="constellationWrap">
+        <div class="constellation-glow" aria-hidden="true"></div>
+        <svg class="constellation-svg" id="constellationSvg" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+      </div>
+    </section>
+
+  </div>
+
+  <footer class="site-footer">2026 © Fake Space Fog Machine</footer>
+
+<script>
+'use strict';
+(function() {
+
+  try {
+    var nCanvas = document.getElementById('nebulaCanvas');
+    if (nCanvas) {
+      var nCtx = nCanvas.getContext('2d');
+      var nW, nH;
+      function resizeNebula() { nW = nCanvas.width = window.innerWidth; nH = nCanvas.height = window.innerHeight; }
+      resizeNebula();
+      window.addEventListener('resize', resizeNebula);
+
+      var HUE = 35;
+      var mx = 0, my = 0, px = 0, py = 0;
+      window.addEventListener('mousemove', function(e) {
+        mx = (e.clientX / window.innerWidth - 0.5) * 2;
+        my = (e.clientY / window.innerHeight - 0.5) * 2;
+      });
+
+      var blobs = [
+        { xr: 0.2, yr: 0.15, r: 0.58, light: 48, speed: 0.00018, phase: 0 },
+        { xr: 0.8, yr: 0.75, r: 0.52, light: 44, speed: 0.00014, phase: 2 },
+        { xr: 0.5, yr: 0.4,  r: 0.44, light: 52, speed: 0.00022, phase: 4 },
+        { xr: 0.15, yr: 0.85, r: 0.45, light: 46, speed: 0.00016, phase: 1 },
+        { xr: 0.85, yr: 0.2, r: 0.4,  light: 40, speed: 0.0002, phase: 3 }
+      ];
+
+      var dust = [];
+      for (var d = 0; d < 100; d++) {
+        dust.push({
+          x: Math.random() * 2200 - 600, y: Math.random() * 2600 - 500,
+          size: Math.random() * 1.8 + 0.5, alpha: Math.random() * 0.45 + 0.2,
+          tSpeed: Math.random() * 0.003 + 0.0008, tPhase: Math.random() * Math.PI * 2
+        });
+      }
+
+      function drawNebula(t) {
+        nCtx.clearRect(0, 0, nW, nH);
+        px += (mx - px) * 0.025;
+        py += (my - py) * 0.025;
+
+        for (var i = 0; i < dust.length; i++) {
+          var star = dust[i];
+          var a = star.alpha * (0.8 + 0.2 * Math.sin(t * star.tSpeed + star.tPhase));
+          nCtx.fillStyle = 'hsla(' + HUE + ', 65%, 92%, ' + a + ')';
+          nCtx.beginPath();
+          nCtx.arc((star.x + px * 8) % nW, (star.y + py * 8) % nH, star.size, 0, Math.PI * 2);
+          nCtx.fill();
+        }
+
+        nCtx.globalCompositeOperation = 'screen';
+        blobs.forEach(function(b) {
+          var x = (b.xr + Math.sin(t * b.speed + b.phase) * 0.09) * nW + px * 20;
+          var y = (b.yr + Math.cos(t * b.speed * 0.8 + b.phase) * 0.09) * nH + py * 16;
+          var radius = b.r * Math.max(nW, nH);
+          var grad = nCtx.createRadialGradient(x, y, 0, x, y, radius);
+          grad.addColorStop(0, 'hsla(' + HUE + ',85%,' + b.light + '%,0.22)');
+          grad.addColorStop(1, 'hsla(' + HUE + ',85%,' + b.light + '%,0)');
+          nCtx.fillStyle = grad;
+          nCtx.beginPath();
+          nCtx.arc(x, y, radius, 0, Math.PI * 2);
+          nCtx.fill();
+        });
+        nCtx.globalCompositeOperation = 'source-over';
+
+        requestAnimationFrame(drawNebula);
+      }
+      requestAnimationFrame(drawNebula);
+    }
+  } catch (err) {}
+
+  try {
+    var revealEls = document.querySelectorAll('.reveal');
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) { if (entry.isIntersecting) { entry.target.classList.add('in-view'); io.unobserve(entry.target); } });
+      }, { threshold: 0.1 });
+      revealEls.forEach(function(el) { io.observe(el); });
+    } else {
+      revealEls.forEach(function(el) { el.classList.add('in-view'); });
+    }
+  } catch (err) {}
+
+  try {
+    var TRACKS = [
+      { name: "I Made You Cry",        x: 50, y: 22, url: "https://genius.com/Fake-space-fog-machine-i-made-you-cry-lyrics" },
+      { name: "Carpe Diem",            x: 28, y: 38, url: "https://genius.com/Fake-space-fog-machine-carpe-diem-lyrics" },
+      { name: "Do What You Wish",      x: 8, y: 52, url: "https://genius.com/Fake-space-fog-machine-do-what-you-wish-lyrics" },
+      { name: "Biscuit",               x: 50, y: 56, url: "https://genius.com/Fake-space-fog-machine-biscuit-lyrics" },
+      { name: "Sandisk Cruzer Blade",  x: 72, y: 38, url: "https://genius.com/Fake-space-fog-machine-sandisk-cruzer-blade-lyrics" },
+      { name: "Cleveland Z",           x: 92, y: 52, url: "https://genius.com/Fake-space-fog-machine-cleveland-z-lyrics" },
+      { name: "Goodnight!",            x: 50, y: 78, url: "https://genius.com/Fake-space-fog-machine-goodnight-lyrics" }
+    ];
+
+    var CONNECTIONS = [
+      [0, 1], [1, 2],
+      [0, 4], [4, 5],
+      [0, 3], [3, 6]
+    ];
+
+    var wrapEl = document.getElementById('constellationWrap');
+    var svgEl = document.getElementById('constellationSvg');
+
+    if (wrapEl && svgEl) {
+      CONNECTIONS.forEach(function(pair) {
+        var a = TRACKS[pair[0]], b = TRACKS[pair[1]];
+        var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', a.x); line.setAttribute('y1', a.y);
+        line.setAttribute('x2', b.x); line.setAttribute('y2', b.y);
+        svgEl.appendChild(line);
+      });
+
+      TRACKS.forEach(function(track) {
+        var star = document.createElement('a');
+        star.className = 'star';
+        star.href = track.url;
+        star.target = '_blank';
+        star.rel = 'noopener';
+        star.style.left = track.x + '%';
+        star.style.top = track.y + '%';
+        star.setAttribute('aria-label', track.name + ' — view lyrics on Genius');
+
+        var shape = document.createElement('div');
+        shape.className = 'star-shape';
+
+        star.appendChild(shape);
+        wrapEl.appendChild(star);
+      });
+    }
+  } catch (err) {}
+
+})();
+</script>
+</body>
+</html>

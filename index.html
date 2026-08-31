@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fake Space Fog Machine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --hue: 35;
+    --black: #020201;
+    --white: #fcf9f0;
+    --c-pale: hsl(var(--hue), 92%, 88%);
+    --c-mid: hsl(var(--hue), 78%, 68%);
+    --c-deep: hsl(var(--hue), 60%, 48%);
+    --glow: hsla(var(--hue), 98%, 74%, 0.85);
+    --glow-strong: hsla(var(--hue), 100%, 82%, 0.98);
+    --line-color: hsla(var(--hue), 55%, 45%, 0.45);
+    --font-mono: 'Roboto Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; background: var(--black); }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: var(--font-mono);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    position: relative;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  canvas#bgCanvas { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+
+  .bloom-vignette {
+    position: fixed; inset: 0; z-index: 5; pointer-events: none;
+    background:
+      radial-gradient(ellipse at 50% 0%, hsla(var(--hue), 95%, 65%, 0.42) 0%, transparent 52%),
+      radial-gradient(ellipse at 50% 100%, hsla(var(--hue), 92%, 58%, 0.35) 0%, transparent 52%),
+      radial-gradient(circle at center, transparent 36%, rgba(2,2,1,0.72) 100%);
+    mix-blend-mode: screen;
+  }
+
+  .grain {
+    position: fixed; inset: 0; z-index: 998; pointer-events: none; opacity: 0.034; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  a { color: var(--c-pale); text-decoration: none; transition: all 0.2s ease; }
+  a:hover, a:focus-visible { color: var(--c-mid); text-shadow: 0 0 22px var(--glow-strong); }
+
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 28px; position: relative; z-index: 4; }
+
+  .reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1); }
+  .reveal.in-view { opacity: 1; transform: translateY(0); }
+
+  /* ---------- NAV ---------- */
+
+  .site-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+    padding: 16px 28px;
+    display: flex; justify-content: center;
+    backdrop-filter: blur(12px);
+    background: linear-gradient(180deg, rgba(2,2,1,0.92), rgba(2,2,1,0.6));
+    border-bottom: 2px solid var(--line-color);
+    box-shadow: 0 0 35px hsla(var(--hue), 80%, 50%, 0.2);
+  }
+  .nav-inner { max-width: 760px; width: 100%; display: flex; align-items: center; justify-content: space-between; }
+  .nav-logo { font-size: 11.5px; font-weight: 700; letter-spacing: 0.22em; color: var(--white); text-shadow: 0 0 16px var(--glow); }
+  .nav-links { display: flex; gap: 24px; font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; }
+  .nav-links a { opacity: 0.7; transition: opacity 0.2s ease; font-weight: 600; }
+  .nav-links a.active, .nav-links a:hover { opacity: 1; color: var(--c-pale); text-shadow: 0 0 14px var(--glow-strong); }
+
+  /* ---------- HERO ---------- */
+
+  .hero {
+    position: relative; z-index: 4;
+    min-height: 64vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    padding: 104px 28px 28px;
+    background-size: cover;
+    background-position: center;
+    transition: background-image 1s ease-in-out;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 50% 36%, hsla(var(--hue), 90%, 55%, 0.26) 0%, transparent 48%),
+      radial-gradient(circle at center, rgba(2,2,1,0.45) 0%, rgba(2,2,1,0.88) 78%, rgba(2,2,1,0.98) 100%);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .hero > * { position: relative; z-index: 2; }
+
+  .hero-mark {
+    font-family: var(--font-mono);
+    font-size: clamp(2.9rem, 13vw, 6.1rem);
+    line-height: 0.94; letter-spacing: -0.005em;
+    color: var(--white);
+    text-shadow: 0 2px 20px rgba(0,0,0,0.96), 0 0 54px var(--glow), 0 0 110px hsla(var(--hue), 98%, 70%, 0.6);
+  }
+
+  .hero-sub { margin-top: 14px; font-size: 13px; font-weight: 600; letter-spacing: 0.1em; color: var(--c-pale); max-width: 42ch; text-shadow: 0 1px 10px rgba(0,0,0,0.9); }
+  .hero-handle { margin-top: 7px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.16em; color: var(--c-mid); text-shadow: 0 1px 8px rgba(0,0,0,0.9), 0 0 24px hsla(var(--hue),92%,68%,0.45); }
+
+  /* ---------- MARQUEE ---------- */
+
+  .marquee {
+    overflow: hidden; white-space: nowrap; padding: 16px 0; margin-top: 18px;
+    border-top: 2px solid var(--line-color);
+    border-bottom: 2px solid var(--line-color);
+    background: rgba(2,2,1,0.6);
+    backdrop-filter: blur(6px);
+    box-shadow: inset 0 0 30px hsla(var(--hue), 80%, 40%, 0.15);
+  }
+  .marquee-track { display: inline-flex; animation: marquee 46s linear infinite; }
+  .marquee-track span {
+    font-size: clamp(1.1rem, 5.6vw, 1.9rem); font-weight: 700; letter-spacing: 0.03em;
+    background: linear-gradient(120deg, var(--c-deep), var(--c-pale), var(--white), var(--c-mid));
+    background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: textshimmer 6s ease-in-out infinite;
+    text-shadow: 0 0 20px var(--glow);
+  }
+  .marquee-track .terminal-star-btn {
+    cursor: pointer; display: inline-block; transition: transform 0.2s ease, text-shadow 0.2s ease;
+  }
+  .marquee-track .terminal-star-btn:hover {
+    transform: scale(1.4);
+    text-shadow: 0 0 24px var(--glow-strong);
+  }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @keyframes textshimmer { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+
+  /* ---------- SECTIONS ---------- */
+
+  section { padding: 42px 0; position: relative; z-index: 4; }
+  section:not(:first-of-type) { border-top: 1.5px solid hsla(var(--hue), 45%, 40%, 0.2); padding-top: 44px; }
+
+  .bio-text { font-size: 14px; color: var(--white); opacity: 0.92; max-width: 50ch; margin: 0 auto; text-align: center; line-height: 1.8; letter-spacing: 0.01em; text-shadow: 0 0 10px hsla(var(--hue), 50%, 50%, 0.15); }
+
+  /* ---------- SPOTIFY EMBED ---------- */
+
+  .spotify-embed { text-align: center; }
+  .spotify-embed iframe {
+    width: 100%; max-width: 760px; border: none; display: block; border-radius: 14px;
+    box-shadow: 0 0 64px hsla(var(--hue), 98%, 72%, 0.26), inset 0 0 15px hsla(var(--hue), 80%, 60%, 0.15);
+    border: 2px solid var(--line-color);
+    transition: box-shadow 0.35s ease;
+  }
+  .spotify-embed iframe:hover { box-shadow: 0 0 92px hsla(var(--hue), 98%, 72%, 0.45); }
+
+  /* ---------- SUBSTANTIAL TACTILE SOCIAL BUTTONS ---------- */
+
+  .icon-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 18px; }
+  .icon-orb {
+    width: 72px; height: 72px; border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    background: hsla(var(--hue), 25%, 8%, 0.94);
+    color: var(--c-pale);
+    box-shadow: 0 0 22px hsla(var(--hue), 92%, 68%, 0.18), inset 0 0 4px hsla(var(--hue), 60%, 50%, 0.2);
+    transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+    border: 2px solid hsla(var(--hue), 50%, 42%, 0.35);
+  }
+  .icon-orb svg { width: 26px; height: 26px; filter: drop-shadow(0 0 6px var(--glow)); }
+  .icon-orb:hover, .icon-orb:focus-visible {
+    color: var(--black);
+    background: radial-gradient(circle at 32% 30%, #fffef8, var(--c-pale) 50%, var(--c-mid) 100%);
+    box-shadow: 0 0 42px var(--glow-strong), 0 0 84px var(--glow);
+    border-color: var(--white);
+    transform: translateY(-4px) scale(1.08);
+  }
+
+  /* ---------- CHUNKY INCREMENT LOCKED HUE SLIDER ---------- */
+
+  .hue-panel { text-align: center; padding-top: 6px; }
+  .hue-readout { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; color: var(--c-deep); margin-bottom: 14px; text-transform: uppercase; text-shadow: 0 0 10px var(--glow); }
+  .hue-readout span { color: var(--c-pale); font-size: 13px; }
+
+  input#hueSlider {
+    width: 100%; max-width: 400px;
+    -webkit-appearance: none; appearance: none;
+    height: 8px; border-radius: 6px;
+    background: linear-gradient(90deg, hsl(0,80%,55%), hsl(60,80%,55%), hsl(120,80%,55%), hsl(180,80%,55%), hsl(240,80%,55%), hsl(300,80%,55%), hsl(360,80%,55%));
+    outline: none; cursor: pointer;
+    border: 2px solid hsla(var(--hue), 50%, 40%, 0.5);
+    box-shadow: 0 0 20px hsla(var(--hue), 80%, 50%, 0.3);
+  }
+  input#hueSlider::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 28px; height: 32px; border-radius: 6px;
+    background: var(--white);
+    box-shadow: 0 0 20px var(--glow-strong), inset 0 0 4px rgba(0,0,0,0.8);
+    cursor: pointer;
+    border: 2px solid var(--c-pale);
+  }
+  input#hueSlider::-moz-range-thumb {
+    width: 28px; height: 32px; border-radius: 6px; border: 2px solid var(--c-pale);
+    background: var(--white); box-shadow: 0 0 20px var(--glow-strong); cursor: pointer;
+  }
+
+  /* ---------- FOOTER ---------- */
+
+  footer.site-footer {
+    padding: 32px 0 44px; text-align: center; font-size: 11px; font-weight: 600; color: var(--c-deep); letter-spacing: 0.14em; opacity: 0.85;
+    border-top: 2px solid var(--line-color);
+    text-shadow: 0 0 10px var(--glow);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .grain, .marquee-track { animation: none !important; }
+    .reveal { opacity: 1; transform: none; transition: none; }
+  }
+</style>
+</head>
+<body>
+
+  <canvas id="bgCanvas" aria-hidden="true"></canvas>
+  <div class="bloom-vignette" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="index.html">FSFM</a>
+      <div class="nav-links">
+        <a href="index.html" class="active">Home</a>
+        <a href="the-early-bird.html">Album</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero" id="heroSection">
+    <div class="hero-mark">Fake Space Fog Machine</div>
+    <div class="hero-sub">est 2026</div>
+    <div class="hero-handle">@mirrorlesssmoke</div>
+  </header>
+
+  <div class="marquee">
+    <div class="marquee-track" id="marqueeTrack"></div>
+  </div>
+
+  <div class="wrap">
+
+    <section class="reveal">
+      <p class="bio-text">Fake Space Fog Machine is a fully independent artist based in the United Kingdom who doesn't know how to write about himself in the third person.</p>
+    </section>
+
+    <section class="reveal spotify-embed">
+      <iframe data-testid="embed-iframe" style="border-radius:14px" src="https://open.spotify.com/embed/artist/2PcGMMcKTObTrK7XVw9GSX?utm_source=generator&theme=0&si=d7fa4c4e3030473c" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    </section>
+
+    <section class="reveal">
+      <script charset="utf-8" src="https://widgetv3.bandsintown.com/main.min.js"></script>
+      <a class="bit-widget-initializer"
+        data-artist-name="id_15662842"
+        data-app-id="5cadd40a475f81e41e3c518d0b71644c"
+        data-display-details="true"
+        data-display-lineup="true"
+        data-display-start-time="true"
+        data-display-local-dates="true"
+        data-local-dates-position="tab"
+        data-font="Roboto Mono"
+        data-follow-section-position="hidden"
+        data-follow-section-alignment="center"
+        data-follow-section-cta-text="FOLLOW"
+        data-event-rsvp-position="hidden"
+        data-play-my-city-position="bottom"
+        data-play-my-city-alignment="center"
+        data-play-my-city-cta-icon="true"
+        data-event-rsvp-only-show-icon="true">
+      </a>
+    </section>
+
+    <section class="reveal">
+      <div class="icon-row">
+        <!-- 1. TikTok -->
+        <a class="icon-orb" href="https://tiktok.com/@mirrorlesssmoke" target="_blank" rel="noopener" aria-label="TikTok">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M14 4v10.5a3.5 3.5 0 1 1-2-3.16V4h2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M14 4c0 2.5 2 4.2 4.3 4.2" stroke="currentColor" stroke-width="2"/></svg>
+        </a>
+        <!-- 2. Bandcamp -->
+        <a class="icon-orb" href="https://fakespacefogmachine.bandcamp.com" target="_blank" rel="noopener" aria-label="Bandcamp">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3.5" fill="currentColor"/></svg>
+        </a>
+        <!-- 3. Instagram -->
+        <a class="icon-orb" href="https://instagram.com/mirrorlesssmoke" target="_blank" rel="noopener" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="15" rx="4.5" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12.5" r="4" stroke="currentColor" stroke-width="2"/><circle cx="17.2" cy="8.3" r="1.2" fill="currentColor"/></svg>
+        </a>
+        <!-- 4. Twitter -->
+        <a class="icon-orb" href="https://twitter.com/mirrorlesssmoke" target="_blank" rel="noopener" aria-label="Twitter">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M3 11.2L21 3l-8 18-2.6-7.6L3 11.2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+        </a>
+        <!-- 5. YouTube -->
+        <a class="icon-orb" href="https://youtube.com/@mirrorlesssmoke" target="_blank" rel="noopener" aria-label="YouTube">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="4" stroke="currentColor" stroke-width="2"/><polygon points="10,9 16,12 10,15" fill="currentColor"/></svg>
+        </a>
+      </div>
+    </section>
+
+    <section class="reveal hue-panel">
+      <div class="hue-readout">frequency spectrum — <span id="hueValue">35</span>° (locked to 15° steps)</div>
+      <input type="range" id="hueSlider" min="0" max="360" step="15" value="35" aria-label="Adjust site hue in degrees">
+    </section>
+
+  </div>
+
+  <footer class="site-footer">© Fake Space Fog Machine</footer>
+
+<script>
+'use strict';
+(function() {
+
+  try {
+    var heroSection = document.getElementById('heroSection');
+    if (heroSection) {
+      var hour = new Date().getHours();
+      var imgUrl = (hour >= 8 && hour < 20)
+        ? 'https://i.ibb.co/P09HHpS/IMG-20260812-191415-649.jpg'
+        : 'https://i.ibb.co/TMx3n2DL/IMG-20260812-213416-877.jpg';
+      heroSection.style.backgroundImage = 'url("' + imgUrl + '")';
+    }
+  } catch (e) {}
+
+  try {
+    var marqueeTrack = document.getElementById('marqueeTrack');
+    if (marqueeTrack) {
+      function buildMarqueeContent() {
+        marqueeTrack.innerHTML = '';
+        var unitText = 'FAKE SPACE FOG MACHINE';
+        for (var run = 0; run < 2; run++) {
+          var containerSpan = document.createElement('span');
+          for (var m = 0; m < 6; m++) {
+            containerSpan.appendChild(document.createTextNode(unitText + '\u00A0\u00A0'));
+            var starBtn = document.createElement('span');
+            starBtn.className = 'terminal-star-btn';
+            starBtn.textContent = '\u2726';
+            starBtn.addEventListener('click', function(e) {
+              e.stopPropagation();
+              window.location.href = 'terminal.html';
+            });
+            containerSpan.appendChild(starBtn);
+            containerSpan.appendChild(document.createTextNode('\u00A0\u00A0'));
+          }
+          marqueeTrack.appendChild(containerSpan);
+        }
+      }
+      buildMarqueeContent();
+    }
+  } catch (err) {}
+
+  try {
+    var hueSlider = document.getElementById('hueSlider');
+    var hueValue = document.getElementById('hueValue');
+    var root = document.documentElement;
+
+    var savedHue = null;
+    try { savedHue = sessionStorage.getItem('fsfm_main_hue'); } catch (e) {}
+
+    var initialHue = (savedHue !== null) ? parseInt(savedHue, 10) : 35;
+    hueSlider.value = initialHue;
+    root.style.setProperty('--hue', initialHue);
+    hueValue.textContent = initialHue;
+
+    hueSlider.addEventListener('input', function() {
+      var val = Math.round(parseInt(hueSlider.value, 10) / 15) * 15;
+      if (val > 360) val = 360;
+      hueSlider.value = val;
+      root.style.setProperty('--hue', val);
+      hueValue.textContent = val;
+      try { sessionStorage.setItem('fsfm_main_hue', val); } catch (e) {}
+    });
+  } catch (err) {}
+
+  try {
+    var canvas = document.getElementById('bgCanvas');
+    if (canvas) {
+      var ctx = canvas.getContext('2d');
+      var W, H;
+      function resizeBg() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+      resizeBg();
+      window.addEventListener('resize', resizeBg);
+
+      var rootEl = document.documentElement;
+      function getHue() {
+        var v = getComputedStyle(rootEl).getPropertyValue('--hue').trim();
+        return Math.round(parseFloat(v) || 35);
+      }
+
+      var mouseX = 0, mouseY = 0, parX = 0, parY = 0;
+      window.addEventListener('mousemove', function(e) {
+        mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+        mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+      });
+
+      var stars = [];
+      var NUM_STARS = 210;
+      for (var s = 0; s < NUM_STARS; s++) {
+        stars.push({
+          x: Math.random() * 2400 - 700,
+          y: Math.random() * 3400 - 700,
+          size: Math.random() * 2.0 + 0.5,
+          alpha: Math.random() * 0.5 + 0.25,
+          twinkleSpeed: Math.random() * 0.004 + 0.001,
+          twinklePhase: Math.random() * Math.PI * 2
+        });
+      }
+
+      var fogBlobs = [
+        { xr: 0.18, yr: 0.22, r: 0.55, speed: 0.00008, phase: 0 },
+        { xr: 0.82, yr: 0.70, r: 0.52, speed: 0.00006, phase: 1.7 },
+        { xr: 0.50, yr: 0.86, r: 0.46, speed: 0.00007, phase: 3.1 },
+        { xr: 0.72, yr: 0.18, r: 0.42, speed: 0.00009, phase: 4.4 },
+        { xr: 0.26, yr: 0.80, r: 0.38, speed: 0.00007, phase: 2.2 }
+      ];
+
+      function frame(t) {
+        ctx.clearRect(0, 0, W, H);
+        var hue = getHue();
+        parX += (mouseX - parX) * 0.025;
+        parY += (mouseY - parY) * 0.025;
+
+        var bgGrad = ctx.createRadialGradient(W / 2, H * 0.4, 20, W / 2, H * 0.4, Math.max(W, H) * 0.98);
+        bgGrad.addColorStop(0, 'hsla(' + hue + ', 94%, 30%, 0.65)');
+        bgGrad.addColorStop(0.48, 'hsla(' + hue + ', 84%, 18%, 0.45)');
+        bgGrad.addColorStop(1, 'rgba(2,2,1,0.96)');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, W, H);
+
+        ctx.globalCompositeOperation = 'screen';
+
+        fogBlobs.forEach(function(b) {
+          var x = (b.xr + Math.sin(t * b.speed + b.phase) * 0.1) * W + parX * 32;
+          var y = (b.yr + Math.cos(t * b.speed * 0.7 + b.phase) * 0.1) * H + parY * 24;
+          var r = b.r * Math.max(W, H);
+          var g = ctx.createRadialGradient(x, y, 0, x, y, r);
+          g.addColorStop(0, 'hsla(' + hue + ', 85%, 48%, 0.16)');
+          g.addColorStop(0.5, 'hsla(' + hue + ', 80%, 42%, 0.08)');
+          g.addColorStop(1, 'hsla(' + hue + ', 75%, 38%, 0)');
+          ctx.fillStyle = g;
+          ctx.beginPath();
+          ctx.arc(x, y, r, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        var c1 = ctx.createRadialGradient(parX * 16, parY * 16, 10, parX * 16, parY * 16, W * 0.75);
+        c1.addColorStop(0, 'hsla(' + hue + ', 98%, 60%, 0.22)');
+        c1.addColorStop(1, 'transparent');
+        ctx.fillStyle = c1;
+        ctx.fillRect(0, 0, W, H);
+
+        var c2 = ctx.createRadialGradient(W + parX * 16, H + parY * 16, 10, W + parX * 16, H + parY * 16, W * 0.75);
+        c2.addColorStop(0, 'hsla(' + hue + ', 95%, 55%, 0.18)');
+        c2.addColorStop(1, 'transparent');
+        ctx.fillStyle = c2;
+        ctx.fillRect(0, 0, W, H);
+
+        ctx.globalCompositeOperation = 'source-over';
+
+        for (var i = 0; i < stars.length; i++) {
+          var star = stars[i];
+          var currentAlpha = star.alpha * (0.8 + 0.2 * Math.sin(t * star.twinkleSpeed + star.twinklePhase));
+          ctx.fillStyle = 'hsla(' + hue + ', 90%, 94%, ' + currentAlpha + ')';
+          ctx.beginPath();
+          ctx.arc((star.x + parX * 10) % W, (star.y + window.scrollY * 0.14 + parY * 10) % H, star.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        var nsX = W / 2 + parX * 12;
+        var nsY = H * 0.4 + parY * 10;
+
+        var nsGlow = ctx.createRadialGradient(nsX, nsY, 0, nsX, nsY, 300);
+        nsGlow.addColorStop(0, 'hsla(' + hue + ', 100%, 90%, 0.75)');
+        nsGlow.addColorStop(0.3, 'hsla(' + hue + ', 95%, 70%, 0.35)');
+        nsGlow.addColorStop(1, 'transparent');
+        ctx.fillStyle = nsGlow;
+        ctx.beginPath();
+        ctx.arc(nsX, nsY, 300, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.save();
+        ctx.translate(nsX, nsY);
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = 'hsla(' + hue + ', 100%, 85%, 1)';
+        ctx.shadowBlur = 40;
+
+        ctx.beginPath();
+        var outerR = 34;
+        var innerR = 7;
+        for (var p = 0; p < 4; p++) {
+          var angleOuter = (p * Math.PI / 2) - Math.PI / 2;
+          var angleInner = angleOuter + (Math.PI / 4);
+
+          var ox = Math.cos(angleOuter) * outerR;
+          var oy = Math.sin(angleOuter) * outerR;
+          var ix = Math.cos(angleInner) * innerR;
+          var iy = Math.sin(angleInner) * innerR;
+
+          if (p === 0) ctx.moveTo(ox, oy);
+          else ctx.lineTo(ox, oy);
+          ctx.quadraticCurveTo(0, 0, ix, iy);
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    }
+  } catch (err) {}
+
+  try {
+    var revealEls = document.querySelectorAll('.reveal');
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) { if (entry.isIntersecting) { entry.target.classList.add('in-view'); io.unobserve(entry.target); } });
+      }, { threshold: 0.1 });
+      revealEls.forEach(function(el) { io.observe(el); });
+    } else {
+      revealEls.forEach(function(el) { el.classList.add('in-view'); });
+    }
+  } catch (err) {}
+
+  try {
+    var PASSPHRASE = '22khz';
+    var buffer = '';
+    window.addEventListener('keydown', function(e) {
+      if (e.key.length === 1) {
+        buffer = (buffer + e.key).slice(-40).toLowerCase();
+        if (buffer.indexOf(PASSPHRASE) !== -1) { buffer = ''; window.location.href = 'terminal.html'; }
+      }
+    });
+  } catch (err) {}
+
+})();
+</script>
+</body>
+</html>
