@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="day">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>fsfm — terminal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --hue: 35;
+    --black: #000000;
+    --white: #f5f5f5;
+    --terminal-dim: #888888;
+    --terminal-bright: #ffffff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: var(--black); }
+
+  body {
+    background: var(--black); color: var(--white);
+    font-family: 'Roboto Mono', monospace; font-size: 14.5px; font-weight: 500;
+    -webkit-font-smoothing: antialiased; position: relative;
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 16px;
+    overflow: hidden;
+  }
+
+  .grain {
+    position: fixed; inset: 0; z-index: 10; pointer-events: none; opacity: 0.28; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .crt-monitor {
+    width: 100%; max-width: 920px; height: 88vh; max-height: 800px;
+    background: #000000; border-radius: 12px;
+    box-shadow: 0 0 60px rgba(255,255,255,0.08), inset 0 0 50px rgba(0,0,0,0.95);
+    display: flex; flex-direction: column; overflow: hidden; position: relative;
+    border: 1.5px solid #333333;
+    z-index: 5;
+  }
+
+  .crt-screen {
+    flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative;
+    background: #000000;
+  }
+
+  .crt-scanlines {
+    position: absolute; inset: 0; z-index: 3; pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,0.3) 0px, rgba(0,0,0,0.3) 1px, transparent 1px, transparent 3px);
+  }
+
+  .terminal-titlebar {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 22px; background: #0a0a0a;
+    border-bottom: 1.5px solid #222222;
+    font-size: 12.5px; font-weight: 700; letter-spacing: 0.15em; color: var(--terminal-dim);
+    z-index: 5;
+  }
+
+  .terminal-dot { width: 12px; height: 12px; border-radius: 50%; transition: all 0.2s ease; }
+  .terminal-dot.red { background: #FF5F56; box-shadow: 0 0 8px rgba(255, 95, 86, 0.8); cursor: pointer; }
+  .terminal-dot.amber { background: #FFBD2E; box-shadow: 0 0 8px rgba(255, 189, 46, 0.75); }
+  .terminal-dot.green { background: #27C93F; box-shadow: 0 0 8px rgba(39, 201, 63, 0.75); }
+  .terminal-dot.red:hover { transform: scale(1.15); box-shadow: 0 0 12px rgba(255, 95, 86, 1); }
+
+  .terminal-titletext { margin-left: 6px; }
+
+  .terminal-content {
+    flex: 1; overflow-y: auto; padding: 24px 26px; font-size: 14px; font-weight: 500; color: var(--white);
+    white-space: pre-wrap; line-height: 1.8; outline: none;
+    z-index: 5; position: relative;
+  }
+  .terminal-content::-webkit-scrollbar { width: 6px; }
+  .terminal-content::-webkit-scrollbar-track { background: transparent; }
+  .terminal-content::-webkit-scrollbar-thumb { background: #444444; border-radius: 3px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .grain { animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="grain" aria-hidden="true"></div>
+
+  <div class="crt-monitor" id="terminalBox">
+    <div class="terminal-titlebar">
+      <span class="terminal-dot red" id="dotRed"></span>
+      <span class="terminal-dot amber"></span>
+      <span class="terminal-dot green"></span>
+      <span class="terminal-titletext">guest@fsfm: ~</span>
+    </div>
+    <div class="crt-screen">
+      <div class="crt-scanlines" aria-hidden="true"></div>
+      <div class="terminal-content" id="terminalContent" role="log" aria-label="Terminal output" tabindex="0"></div>
+    </div>
+  </div>
+
+<script>
+'use strict';
+(function() {
+
+  try {
+    var savedTheme = sessionStorage.getItem('fsfm_theme') || 'day';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  } catch (e) {}
+
+  var termEl = document.getElementById('terminalContent');
+  var dotRed = document.getElementById('dotRed');
+  var root = document.documentElement;
+
+  dotRed.addEventListener('click', function(e) {
+    e.preventDefault();
+    window.location.href = 'index.html';
+  });
+
+  var dotAmber = document.querySelector('.terminal-dot.amber');
+  var dotGreen = document.querySelector('.terminal-dot.green');
+  if (dotAmber) dotAmber.style.cursor = 'default';
+  if (dotGreen) dotGreen.style.cursor = 'default';
+
+  try {
+    var savedHue = sessionStorage.getItem('fsfm_main_hue');
+    if (savedHue !== null) {
+      var num = parseFloat(savedHue);
+      if (isNaN(num) || num === 0) num = 360;
+      root.style.setProperty('--hue', num.toString());
+    }
+  } catch (e) {}
+
+  var history = [];
+  var historyIndex = -1;
+  var isLoggedIn = false;
+  var currentLine = '';
+  var fullOutput = '';
+
+  function render(masked) {
+    var shown = masked ? new Array(currentLine.length + 1).join('\u2022') : currentLine;
+    termEl.textContent = fullOutput + shown + '\u2588';
+    termEl.scrollTop = termEl.scrollHeight;
+  }
+
+  function typeLine(text, delay, done) {
+    setTimeout(function() {
+      var i = 0;
+      var typed = '';
+      var iv = setInterval(function() {
+        typed += text.charAt(i);
+        fullOutput = fullOutput.slice(0, fullOutput.lastIndexOf('\n') + 1) + typed;
+        render(false);
+        i++;
+        if (i >= text.length) {
+          clearInterval(iv);
+          fullOutput = fullOutput.slice(0, fullOutput.lastIndexOf('\n') + 1) + text;
+          render(false);
+          if (done) done();
+        }
+      }, 7);
+    }, delay || 0);
+  }
+
+  function bootSequence() {
+    fullOutput = '';
+    currentLine = '';
+    termEl.focus();
+
+    var lines = [
+      { text: 'fsfm-archive v2.6.0', delay: 180 },
+      { text: 'connecting to frequency network... ok', delay: 760 },
+      { text: 'authenticating protocol... ok', delay: 1520 },
+      { text: 'loading memory cache... ok', delay: 2280 },
+      { text: '', delay: 2660 },
+      { text: 'welcome, early bird. you found the deep place.', delay: 3040 },
+      { text: "type 'help' if you want somewhere to start.", delay: 3620 }
+    ];
+
+    lines.forEach(function(line, idx) {
+      typeLine(line.text, line.delay, function() {
+        if (idx < lines.length - 1) {
+          fullOutput += '\n';
+          render(false);
+        }
+      });
+    });
+
+    setTimeout(function() {
+      fullOutput += '\nguest@fsfm:~$ ';
+      currentLine = '';
+      render(false);
+      termEl.focus();
+    }, 4200);
+  }
+
+  function loginScreen() {
+    fullOutput = 'fsfm-archive login: guest\npassword: ';
+    currentLine = '';
+    render(true);
+    termEl.focus();
+  }
+
+  var ABOUT = "woah!!! hey!!!!!!!";
+  var CREDITS = "written / produced / mixed / mastered / engineered / directed by fake space fog machine.";
+  var SECRET = "this album's story is nowhere near linear";
+  var CHANGELOG = "=== FSFM v1.0 FEATURE LIST ===\n\n• 3-page responsive portfolio (homepage, album, terminal)\n• Single-hue color system (gold 35°, purple 265° night mode)\n• Day/Night theme toggle via darkmode command\n• Canvas-based animated background with 240-star starfield\n• Mouse parallax movement on all backgrounds\n• 5 fog blob elements with sinusoidal drift\n• Constellation section: 7 interactive stars in bird formation\n• Pulsing connection lines between constellation stars (5s cycle)\n• Spotify artist & album embed integration\n• Bandsintown live events widget\n• 7 Genius links to album lyrics (one per track)\n• Terminal easter egg trigger: type 22khz anywhere on homepage\n• macOS-style traffic light window controls (red closes)\n• CRT monitor aesthetic with scanlines & flicker animation\n• 0.28 opacity grain texture overlay (all pages)\n• Responsive design: mobile, tablet, desktop optimized\n• SessionStorage persistence for hue & theme preference\n• 7-character login with masked password input\n• 4.2s boot sequence with typeout animations\n• Smooth scroll-triggered reveal animations\n• Time-based hero image (day/night swap based on local time)\n• White scrolling marquee banner on homepage\n• 5 social icon links (TikTok, Bandcamp, Instagram, Twitter, YouTube)\n• Typography scaling with CSS clamp() function\n• Semantic HTML with ARIA labels\n• Keyboard navigation: up/down arrow history in terminal\n• ESC key to exit terminal\n• 14 total commands with command-line history\n• Persistent theme & hue state across page reloads\n• Smooth 0.8s theme transitions\n• No external dependencies (pure HTML/CSS/JS)";
+  var HELP = "commands: help, about, credits, secret, darkmode <on/off>, neofetch, date, clear, exit";
+
+  var FILES = {
+    "readme.md": "hey! this is silly but i like it. i hope you like it too",
+    "lore.txt": "the shitty gaming mic i recorded this entire album on doesn't even have a working right channel",
+    "notes.txt": "i cut genuinely like a good 4 fully finished songs from this album and i'm kind of glad they'll never see the light of day!"
+  };
+
+  termEl.addEventListener('keydown', function(e) {
+    if (!isLoggedIn) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (currentLine.length === 7) {
+          isLoggedIn = true;
+          fullOutput = '';
+          currentLine = '';
+          bootSequence();
+        } else {
+          fullOutput += '\npassword: ';
+          currentLine = '';
+          render(true);
+        }
+      } else if (e.key === 'Backspace') {
+        e.preventDefault();
+        currentLine = currentLine.slice(0, -1);
+        render(true);
+      } else if (e.key.length === 1 && currentLine.length < 7) {
+        e.preventDefault();
+        currentLine += e.key;
+        render(true);
+      }
+      return;
+    }
+
+    if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (history.length === 0) return;
+      historyIndex = Math.max(0, historyIndex - 1);
+      currentLine = history[historyIndex] || '';
+      render(false);
+      return;
+    }
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (history.length === 0) return;
+      historyIndex = Math.min(history.length, historyIndex + 1);
+      currentLine = history[historyIndex] || '';
+      render(false);
+      return;
+    }
+
+    if (e.key === 'Backspace') {
+      e.preventDefault();
+      if (currentLine.length > 0) {
+        currentLine = currentLine.slice(0, -1);
+        render(false);
+      }
+      return;
+    }
+
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      var cmd = currentLine.trim().toLowerCase();
+      var raw = currentLine.trim();
+
+      if (raw !== '') { history.push(raw); historyIndex = history.length; }
+      fullOutput += currentLine + '\n';
+
+      if (cmd === '') { /* no-op */ }
+      else if (cmd === 'help') { fullOutput += HELP + '\n'; }
+      else if (cmd === 'about') { fullOutput += ABOUT + '\n'; }
+      else if (cmd === 'credits') { fullOutput += CREDITS + '\n'; }
+      else if (cmd === 'secret') { fullOutput += SECRET + '\n'; }
+      else if (cmd.indexOf('darkmode ') === 0) {
+        var modeArg = raw.slice(9).trim().toLowerCase();
+        if (modeArg === 'on' || modeArg === 'true' || modeArg === '1') {
+          root.setAttribute('data-theme', 'night');
+          root.style.setProperty('--hue', '265');
+          try {
+            sessionStorage.setItem('fsfm_theme', 'night');
+            sessionStorage.setItem('fsfm_main_hue', '265');
+          } catch (e) {}
+          fullOutput += 'nightmode activated (darkmode ON - purple hint active)\n';
+        } else if (modeArg === 'off' || modeArg === 'false' || modeArg === '0') {
+          root.setAttribute('data-theme', 'day');
+          root.style.setProperty('--hue', '35');
+          try {
+            sessionStorage.setItem('fsfm_theme', 'day');
+            sessionStorage.setItem('fsfm_main_hue', '35');
+          } catch (e) {}
+          fullOutput += 'daymode activated (darkmode OFF)\n';
+        } else {
+          fullOutput += 'usage: darkmode <on/off>\n';
+        }
+      }
+      else if (cmd === 'darkmode') {
+        var curTheme = root.getAttribute('data-theme');
+        fullOutput += 'darkmode is currently: ' + (curTheme === 'night' ? 'ON' : 'OFF') + '\n';
+      }
+      else if (cmd === 'neofetch') {
+        fullOutput += 'guest@fsfm\n----------\nFogOS 4.33\nHost: fsfm.port82.net\nthis was a triumph!\n';
+      }
+      else if (cmd === 'date') { fullOutput += new Date().toString() + '\n'; }
+      else if (cmd === 'clear') { fullOutput = ''; }
+      else if (cmd === 'exit' || cmd === 'close') { window.location.href = 'index.html'; return; }
+      else if (cmd === 'changelog') { fullOutput += CHANGELOG + '\n'; }
+      else { fullOutput += 'fogsh: ' + cmd.split(' ')[0] + ': command not found\n'; }
+
+      currentLine = '';
+      fullOutput += 'guest@fsfm:~$ ';
+      render(false);
+      return;
+    }
+
+    if (e.key.length === 1) {
+      e.preventDefault();
+      currentLine += e.key;
+      render(false);
+    }
+  });
+
+  window.addEventListener('keydown', function(e) {
+    if (isLoggedIn && e.key === 'Escape') { window.location.href = 'index.html'; }
+  });
+
+  var box = document.getElementById('terminalBox');
+  if (box) { box.addEventListener('click', function() { termEl.focus(); }); }
+
+  loginScreen();
+  termEl.focus();
+
+})();
+</script>
+</body>
+</html>
