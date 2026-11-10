@@ -1,0 +1,43 @@
+{
+  "siteName": "Fake Space Fog Machine",
+  "homeBrowserTitle": "Fake Space Fog Machine",
+  "albumBrowserTitle": "The Early Bird.... | Fake Space Fog Machine",
+  "favicon": "",
+  "description": "Fake Space Fog Machine. Independent music from the United Kingdom.",
+  "home": {
+    "heroWindowTitle": "Fake Space Fog Machine — Artist Portal",
+    "heroBadge": "Independent Artist Portal",
+    "heroTitle": "Fake Space Fog Machine",
+    "heroSubtitle": "Sonic Space-Age Aesthetics · Est. 2026",
+    "heroHandle": "@mirrorlesssmoke",
+    "marqueeMessages": [
+      "WELCOME TO THE FSFM DESKTOP",
+      "THE EARLY BIRD.... · SEVEN TRACKS",
+      "INDEPENDENT MUSIC FROM THE UNITED KINGDOM",
+      "TRANSMISSION RECEIVED",
+      "THANK YOU FOR LISTENING"
+    ],
+    "bioWindowTitle": "ABOUT FSFM",
+    "bio": "Fake Space Fog Machine is a fully independent artist based in the United Kingdom who doesn't know how to write about himself in the third person.",
+    "spotifyWindowTitle": "FSFM ON SPOTIFY",
+    "eventsWindowTitle": "UPCOMING TRANSMISSIONS",
+    "socialWindowTitle": "FIND FSFM",
+    "featuredWindowTitle": "FEATURED RELEASE",
+    "featuredAlbumTitle": "The Early Bird....",
+    "featuredAlbumMeta": "Seven tracks · Full album",
+    "featuredLinkText": "OPEN ALBUM PAGE",
+    "featuredCoverImage": "/media/images/cover.png",
+    "featuredLinkUrl": "the-early-bird.html"
+  },
+  "album": {
+    "windowTitle": "Fake Space Fog Machine — The Early Bird....",
+    "title": "The Early Bird....",
+    "artistLine": "by Fake Space Fog Machine",
+    "bio": "\"...i have no real idea if this'll take me anywhere or if there are any real prospects for making music in my future but it really doesnt matter to me because i have had an unimaginable amount of fun doing just this and its something i fully recommend doing yourself. like it may not be music, you may admire a different kind of art, you might have an entirely different passion, but i urge you to do make something good and bring it into this world because no one else can do it for you.\"",
+    "playerWindowTitle": "FSFM Media Player",
+    "spotifyLabel": "ALSO AVAILABLE ON SPOTIFY",
+    "playerArtistName": "Fake Space Fog Machine",
+    "eyebrow": "08/21"
+  },
+  "footerText": "© 2026 FAKE SPACE FOG MACHINE"
+}

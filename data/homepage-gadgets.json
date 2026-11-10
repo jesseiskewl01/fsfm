@@ -1,0 +1,13 @@
+{
+  "photos": [],
+  "dates": [],
+  "stickyNote": {
+    "text": "A little message from Fake Space Fog Machine."
+  },
+  "funWidgets": {
+    "showBarrelRoll": true,
+    "showBubbleSlider": true,
+    "showMusicPlayer": true,
+    "showPurblePlace": true
+  }
+}
