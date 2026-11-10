@@ -2,11 +2,11 @@
   "siteName": "Fake Space Fog Machine",
   "homeBrowserTitle": "Fake Space Fog Machine",
   "albumBrowserTitle": "The Early Bird.... | Fake Space Fog Machine",
-  "description": "Fake Space Fog Machine. Independent music from the United Kingdom.",
+  "description": "Fake Space Fog Machine. Portfolio. Cool as heck",
   "home": {
     "heroWindowTitle": "Fake Space Fog Machine  ·  Homepage",
     "heroTitle": "Fake Space Fog Machine",
-    "heroSubtitle": "Est. 2026",
+    "heroSubtitle": "Way Too Passionate Passion Project",
     "heroHandle": "@mirrorlesssmoke",
     "marqueeMessages": [
       "SEASON'S GREETINGS",
@@ -24,7 +24,8 @@
     "featuredWindowTitle": "FEATURED RELEASE",
     "featuredAlbumTitle": "The Early Bird....",
     "featuredAlbumMeta": "Debut album",
-    "featuredLinkText": "OPEN ALBUM PAGE"
+    "featuredLinkText": "OPEN ALBUM PAGE",
+    "heroBadge": "Est. 2026"
   },
   "album": {
     "windowTitle": "The Early Bird....",
