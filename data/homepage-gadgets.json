@@ -1,7 +1,17 @@
 {
-  "photos": [],
-  "dates": [],
+  "photos": [
+    "/media/images/cover.png",
+    "/media/images/ab6761670000ecd4bb47a48967d7b8ae1bbead23.jpg",
+    "/media/images/crunch-some-numbers-step-2.png"
+  ],
+  "dates": [
+    {
+      "title": "unc status",
+      "date": "2026-11-16",
+      "description": "happy birthday to me"
+    }
+  ],
   "stickyNote": {
-    "text": "A little message from Fake Space Fog Machine."
+    "text": "i am my son"
   }
 }
