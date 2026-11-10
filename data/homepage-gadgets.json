@@ -1,8 +1,18 @@
 {
-  "photos": [],
-  "dates": [],
+  "photos": [
+    "/media/images/cover.png",
+    "/media/images/earlybirdcd.jpg",
+    "/media/images/crunchsomenumbers.png"
+  ],
+  "dates": [
+    {
+      "title": "unc status",
+      "date": "2026-11-16",
+      "description": "fake space birthday machine"
+    }
+  ],
   "stickyNote": {
-    "text": "A little message from Fake Space Fog Machine."
+    "text": "i am my son"
   },
   "funWidgets": {
     "showBarrelRoll": true,
