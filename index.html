@@ -1,0 +1,1797 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Fake Space Fog Machine</title>
+<meta name="description" id="siteDescription" content="Fake Space Fog Machine. Independent music from the United Kingdom.">
+<link id="siteFavicon" rel="icon">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<script>
+
+/* ==========================================
+
+   VISTA WALLPAPER THEMES
+
+   img = wallpaper URL (host on imgbb and paste here)
+
+   deep/mid/glass/bright/hi = "r, g, b" triples, accent = readable-on-white hex
+
+========================================== */
+
+var VISTA_THEMES = [
+
+{ name: "Violet Haze", img: "https://i.ibb.co/nMPTzBT0/6977632-2351606-blazedmissile-untitled-6977632-010cb9d4b1ac03571b1d994a706b6d53.webp", sky: "#1d0f5e", deep: "29, 15, 94",  mid: "43, 26, 122", glass: "124, 77, 230", accent: "#6a2bd9", bright: "184, 115, 255", hi: "218, 183, 255" },
+
+{ name: "Aqua Glass",  img: "https://i.ibb.co/zW78885n/bdvrspnnio7d1.png", sky: "#004b4c", deep: "0, 75, 76",   mid: "0, 110, 112", glass: "30, 170, 175", accent: "#007a82", bright: "38, 201, 207",  hi: "129, 254, 250" },
+
+{ name: "Solar Flare", img: "https://i.ibb.co/7JKvqbtJ/mar192026-2-1.png", sky: "#4a2200", deep: "74, 34, 0",   mid: "122, 58, 0",  glass: "232, 123, 0",  accent: "#a64b00", bright: "251, 196, 27",  hi: "253, 224, 142" },
+
+{ name: "Rose Bloom",  img: "https://i.ibb.co/Gv9Zsyh1/fv6z11x7ph7a1.jpg", sky: "#5c1236", deep: "92, 18, 54",  mid: "130, 34, 82", glass: "221, 110, 168", accent: "#b02a72", bright: "244, 166, 207", hi: "250, 236, 246" }
+
+];
+
+function paintPalette(t) {
+
+var r = document.documentElement.style;
+
+r.setProperty('--sky-bg', t.sky);
+
+r.setProperty('--deep-rgb', t.deep);
+
+r.setProperty('--mid-rgb', t.mid);
+
+r.setProperty('--glass-rgb', t.glass);
+
+r.setProperty('--bright-rgb', t.bright);
+
+r.setProperty('--hi-rgb', t.hi);
+
+r.setProperty('--accent', t.accent);
+
+}
+
+(function() {
+
+var idx = Math.floor(Math.random() * VISTA_THEMES.length);
+
+try {
+
+var last = parseInt(sessionStorage.getItem('fsfm_home_theme'), 10);
+
+if (VISTA_THEMES.length > 1 && idx === last) {
+
+idx = (idx + 1 + Math.floor(Math.random() * (VISTA_THEMES.length - 1))) % VISTA_THEMES.length;
+
+}
+
+sessionStorage.setItem('fsfm_home_theme', String(idx));
+
+} catch (e) {}
+
+window.__themeIdx = idx;
+
+paintPalette(VISTA_THEMES[idx]);
+
+})();
+
+</script>
+
+<style>
+
+/* ==========================================
+
+WINDOWS VISTA CORE THEME DYNAMICS & CSS
+
+========================================== */
+
+:root {
+
+font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+
+font-size: 12px;
+
+color: #111;
+
+--sky-bg: #004b4c;
+
+--deep-rgb: 0, 75, 76;
+
+--mid-rgb: 0, 110, 112;
+
+--glass-rgb: 30, 170, 175;
+
+--bright-rgb: 38, 201, 207;
+
+--hi-rgb: 129, 254, 250;
+
+--accent: #007a82;
+
+--taskbar-height: 38px;
+
+--font-vista: "Segoe UI", Tahoma, Arial, sans-serif;
+
+--font-mono: 'Roboto Mono', monospace;
+
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  width:100%; min-height:100%; height:auto;
+  overflow-x:clip; overflow-y:scroll; scroll-behavior:smooth;
+  scrollbar-width:thin; scrollbar-color:rgba(var(--hi-rgb),.9) rgba(var(--deep-rgb),.72);
+  scrollbar-gutter:stable;
+}
+body {
+  width:100%; min-height:100vh; height:auto;
+  overflow-x:clip; overflow-y:visible; scroll-behavior:smooth;
+}
+html::-webkit-scrollbar { width:12px; }
+html::-webkit-scrollbar-track { background:rgba(var(--deep-rgb),.78); border-left:1px solid rgba(var(--hi-rgb),.18); }
+html::-webkit-scrollbar-thumb {
+  border:2px solid rgba(var(--deep-rgb),.78); border-radius:10px;
+  background:linear-gradient(180deg,rgba(var(--hi-rgb),.98),rgba(var(--bright-rgb),.82) 48%,rgba(var(--glass-rgb),.92));
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.42);
+}
+html::-webkit-scrollbar-thumb:hover { background:linear-gradient(180deg,#fff,rgba(var(--hi-rgb),.98) 48%,rgba(var(--bright-rgb),.98)); }
+[hidden] { display:none !important; }
+
+body {
+
+background: var(--sky-bg);
+
+color: #111;
+
+font-family: var(--font-vista);
+
+font-size: 12px;
+
+line-height: 1.5;
+
+-webkit-font-smoothing: antialiased;
+
+position: relative;
+
+min-height: 100vh;
+
+transition: background-color 0.8s ease, color 0.3s ease;
+
+}
+
+/* ---------- WALLPAPER LAYERS (crossfade) ---------- */
+
+.wall {
+
+position: fixed; inset: 0; z-index: 0; pointer-events: none;
+
+background-size: cover; background-position: center; background-repeat: no-repeat;
+
+opacity: 0; transition: opacity 0.9s ease;
+
+}
+
+.wall.show { opacity: 1; }
+
+/* ---------- FSFM STARTUP SCREEN: MINIMAL XP-ERA SPLASH ---------- */
+.fsfm-boot-overlay {
+  position: fixed; inset: 0; z-index: 99999;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: #03060d;
+  color: #f4f7fb;
+  transition: opacity 0.55s ease, visibility 0.55s ease;
+}
+.fsfm-boot-overlay.loaded { opacity: 0; visibility: hidden; pointer-events: none; }
+.boot-brand {
+  font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+  font-size: clamp(12px, 2vw, 15px); font-weight: 600;
+  color: #f1f5fb; letter-spacing: 0.24em; text-transform: uppercase;
+  text-shadow: 0 0 18px rgba(75, 155, 235, 0.24);
+}
+.boot-progress-container {
+  width: 220px; height: 13px; margin-top: 24px;
+  border: 1px solid #52627b; border-radius: 2px;
+  background: linear-gradient(180deg, #050910, #101b2a);
+  overflow: hidden; position: relative;
+  box-shadow: inset 0 1px 4px #000, 0 0 12px rgba(48, 115, 190, 0.12);
+}
+.boot-progress-bar {
+  position: absolute; top: 1px; bottom: 1px; left: 0;
+  width: 66px; border-radius: 1px;
+  background: repeating-linear-gradient(90deg,
+    #1b66b4 0 15px, #4ca5ed 15px 18px,
+    #2c80ce 18px 32px, #7ac4ff 32px 35px);
+  box-shadow: 0 0 8px rgba(76, 165, 237, 0.58);
+  animation: fsfmXpLoad 1.35s linear infinite;
+}
+@keyframes fsfmXpLoad {
+  from { transform: translateX(-72px); }
+  to { transform: translateX(226px); }
+}
+.boot-status {
+  margin-top: 12px; min-height: 14px;
+  font: 9px var(--font-mono); color: #91a9c5;
+  letter-spacing: 0.16em; text-align: center;
+}
+.boot-caption {
+  position: absolute; bottom: 34px;
+  color: rgba(177, 196, 219, 0.48);
+  font: 8px var(--font-mono); letter-spacing: 0.2em;
+}
+@media (prefers-reduced-motion: reduce) {
+  .boot-progress-bar { animation: none; width: 58px; left: calc(50% - 29px); }
+}
+
+/* ---------- DESKTOP CANVAS & DECORATION ---------- */
+
+canvas#bgCanvas { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+
+a { color: var(--accent); text-decoration: none; transition: all 0.2s ease; }
+
+a:hover, a:focus-visible { text-decoration: underline; text-shadow: 0 0 12px rgba(255, 255, 255, 0.8); }
+
+.wrap { max-width: 880px; margin: 0 auto; padding: 0 20px 40px; position: relative; z-index: 10; }
+
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1); }
+
+.reveal.in-view { opacity: 1; transform: translateY(0); }
+
+/* ---------- AUTHENTIC VISTA TASKBAR ---------- */
+
+.taskbar {
+
+position: fixed; top: 0; left: 0; right: 0;
+
+height: var(--taskbar-height); z-index: 9000;
+
+display: flex; align-items: center; justify-content: space-between; gap: 5px;
+
+padding: 0 12px;
+
+background: linear-gradient(rgba(var(--mid-rgb), 0.82) 0%, rgba(var(--mid-rgb), 0.72) 5%, rgba(var(--mid-rgb), 0.82) 43%, rgba(var(--deep-rgb), 0.92) 49%, rgba(var(--deep-rgb), 0.9) 89%, rgba(var(--mid-rgb), 0.85));
+
+border-bottom: 1px solid rgba(var(--hi-rgb), 0.45);
+
+box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+
+backdrop-filter: blur(14px);
+
+}
+
+.taskbar-inner { max-width: 880px; margin: 0 auto; width: 100%; display: flex; align-items: center; justify-content: space-between; }
+
+.start-orb {
+
+width: 32px; height: 32px; border-radius: 50%; border: 1px solid #ffffff;
+
+background: radial-gradient(circle at 35% 35%, rgb(var(--hi-rgb)) 0%, rgb(var(--glass-rgb)) 45%, rgb(var(--deep-rgb)) 100%);
+
+box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6), inset 0 1px 2px #ffffff;
+
+display: flex; align-items: center; justify-content: center;
+
+position: relative; overflow: hidden; flex-shrink: 0; cursor: pointer;
+
+}
+
+.start-orb::after {
+
+content: ''; position: absolute; top: 1px; left: 2px; right: 2px; height: 10px; border-radius: 50%;
+
+background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.1));
+
+}
+
+.brand-title {
+
+font-size: 12px; font-weight: 700; color: #ffffff; text-shadow: 0 1px 2px #000;
+
+display: flex; align-items: center; gap: 10px;
+
+}
+
+.task-buttons { display: flex; gap: 6px; }
+
+.task-button {
+
+font-size: 11px; color: #ffffff; text-shadow: 0 1px 1px #000;
+
+padding: 3px 14px; border-radius: 3px; border: 1px solid #0006;
+
+background: linear-gradient(rgba(var(--hi-rgb), 0.22), rgba(var(--hi-rgb), 0.12) 44%, rgba(var(--deep-rgb), 0.5) 50%, rgba(var(--mid-rgb), 0.32));
+
+box-shadow: inset 0 0 0 1px #e5f4ff4f; cursor: pointer; transition: all 0.15s ease;
+
+}
+
+.task-button.active, .task-button:hover {
+
+background: linear-gradient(rgba(var(--hi-rgb), 0.5), rgba(var(--bright-rgb), 0.4) 47%, rgba(var(--glass-rgb), 0.45) 50%, rgba(var(--bright-rgb), 0.38));
+
+box-shadow: inset 0 0 0 1px rgba(var(--hi-rgb), 0.55), 0 0 8px rgba(var(--bright-rgb), 0.55);
+
+}
+
+/* Theme selection lives on the moving marquee star. */
+
+/* ---------- AUTHENTIC VISTA AERO WINDOW ---------- */
+
+.aero-window {
+
+position: relative; z-index: 10;
+
+margin-top: 52px;
+
+border: 1px solid rgba(var(--deep-rgb), 0.75);
+
+border-radius: 7px 7px 4px 4px;
+
+padding: 0 7px 7px;
+
+background:
+
+linear-gradient(130deg, #effbff70 0%, #bfe9ff18 15%, #102c3e50 29%, #e7f8ff2f 30%, #6aa6b515 36%, #1a485451 60%, #e1f7ff45 82%, #8acde826 92%),
+
+rgba(var(--glass-rgb), 0.55);
+
+backdrop-filter: blur(14px) saturate(1.25);
+
+box-shadow: 0 7px 23px rgba(0,0,0,0.5), inset 0 0 0 1px #effbffc4;
+
+overflow: hidden;
+
+}
+
+.titlebar {
+
+height: 30px; padding: 0 4px;
+
+display: flex; align-items: center; justify-content: space-between;
+
+}
+
+.window-title {
+
+font-size: 12px; color: #081722; font-weight: 600;
+
+text-shadow: 0 0 4px white, 0 0 9px #fff, 0 0 12px white;
+
+display: flex; align-items: center; gap: 6px; flex: 1;
+
+}
+
+.caption-buttons { display: flex; height: 20px; filter: drop-shadow(0 1px 1px #0005); }
+
+.caption-button {
+
+border: 1px solid rgba(var(--deep-rgb), 0.5); border-top: 0; border-right: 0;
+
+box-shadow: inset 0 0 0 1px #ffffff65;
+
+background: linear-gradient(rgba(var(--hi-rgb), 0.4), rgba(var(--hi-rgb), 0.15) 46%, rgba(var(--deep-rgb), 0.4) 50%, rgba(var(--mid-rgb), 0.3));
+
+width: 27px; height: 20px; color: #fff; text-shadow: 0 0 1px #000, 1px 1px 1px #000;
+
+font: 700 14px Arial; display: flex; align-items: center; justify-content: center; cursor: pointer;
+
+}
+
+.caption-button.minimize { border-radius: 0 0 0 4px; }
+
+.caption-button.close { width: 46px; border-radius: 0 0 4px 0; border-right: 1px solid #654338; background: linear-gradient(#e9b4a2, #ca7865 44%, #ad3a22 48%, #bd4c31); }
+
+.caption-button:hover { background: linear-gradient(rgb(var(--hi-rgb)), rgb(var(--bright-rgb)) 45%, rgb(var(--glass-rgb)) 50%, rgb(var(--bright-rgb))); box-shadow: 0 0 12px rgb(var(--bright-rgb)), inset 0 0 0 1px #fff9; }
+
+.caption-button.close:hover { background: linear-gradient(#f7c4a4, #e7856e 44%, #d23d14 48%, #f26b3b); box-shadow: 0 0 14px #ff5d22, inset 0 0 0 1px #ffd8a9; }
+
+.window-body {
+
+background: #ffffff; border: 1px solid rgb(var(--mid-rgb)); box-shadow: 0 0 0 1px #eefbff99;
+
+position: relative; overflow: hidden;
+
+}
+
+.hero {
+
+position: relative; min-height: 48vh;
+
+display: flex; flex-direction: column; align-items: center; justify-content: center;
+
+text-align: center; padding: 40px 20px;
+
+background-size: cover; background-position: center; background-color: var(--sky-bg);
+
+transition: background-image 0.8s ease;
+
+}
+
+.hero::before {
+
+content: ''; position: absolute; inset: 0;
+
+background: linear-gradient(180deg, rgba(var(--deep-rgb), 0.4) 0%, rgba(var(--deep-rgb), 0.78) 80%, rgba(var(--deep-rgb), 0.95) 100%);
+
+z-index: 1; pointer-events: none;
+
+}
+
+.hero > * { position: relative; z-index: 3; }
+
+.hero-badge {
+
+display: inline-flex; align-items: center; gap: 6px; padding: 3px 12px; border-radius: 3px;
+
+background: linear-gradient(#f4f4f4, #e9e9e9 45%, #d6d6d6 49%, #e5e5e5);
+
+border: 1px solid #707070; box-shadow: inset 0 0 0 1px #fff9;
+
+font-size: 11px; font-weight: 600; color: #111; margin-bottom: 14px;
+
+}
+
+.hero-mark {
+
+font-family: var(--font-vista);
+
+font-size: clamp(2.3rem, 7vw, 4.2rem); font-weight: 700;
+
+line-height: 1.1; color: #ffffff;
+
+text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85);
+
+}
+
+.hero-sub { margin-top: 10px; font-size: 13px; color: rgb(var(--hi-rgb)); max-width: 46ch; text-shadow: 0 1px 4px #000; }
+
+.hero-handle {
+
+margin-top: 12px; font-family: var(--font-mono); font-size: 11px; color: #ffffff;
+
+background: rgba(var(--deep-rgb), 0.85); padding: 4px 14px; border-radius: 3px;
+
+border: 1px solid rgb(var(--mid-rgb)); box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+
+}
+
+/* ---------- VISTA MARQUEE & CONTENT CARDS ---------- */
+
+.marquee {
+
+position: relative; z-index: 10;
+
+overflow: hidden; white-space: nowrap; padding: 10px 0; margin-top: 20px;
+
+background: linear-gradient(#ffffff, rgba(var(--hi-rgb), 0.4) 48%, rgba(var(--hi-rgb), 0.6) 50%, rgba(var(--hi-rgb), 0.3)), #ffffff;
+
+border: 1px solid rgba(var(--mid-rgb), 0.5); box-shadow: inset 0 1px 0 #fff;
+
+}
+
+.marquee-track { display: inline-flex; align-items:center; animation: marquee 38s linear infinite; }
+.marquee-track > span { display:inline-flex; align-items:center; }
+
+.marquee-track span { font-size: 13px; font-weight: 700; color: var(--accent); }
+
+.marquee-track .star-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  margin: 0 10px; padding: 0 3px; border: 0; background: transparent;
+  color: var(--accent); font: inherit; font-size: 17px; line-height: 1;
+  cursor: pointer; vertical-align: middle; text-shadow: 0 0 8px rgba(var(--bright-rgb), 0.55);
+  position:relative; top:-1px; align-self:center;
+  transition: transform 0.18s ease, color 0.18s ease, text-shadow 0.18s ease;
+}
+.marquee-track .star-icon:hover, .marquee-track .star-icon:focus-visible {
+  color: var(--deep-rgb); transform: translateY(-1px) scale(1.35) rotate(18deg);
+  text-shadow: 0 0 12px rgb(var(--bright-rgb)); outline: none;
+}
+
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+section { padding: 18px 0; position: relative; z-index: 10; }
+
+.glass-card {
+
+padding: 24px; border-radius: 4px;
+
+background: #ffffff; border: 1px solid rgb(var(--mid-rgb));
+
+box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), inset 0 0 0 1px #eefbff99;
+
+}
+
+.bio-text { font-size: 13px; color: #111; max-width: 54ch; margin: 0 auto; text-align: center; line-height: 1.7; }
+
+.spotify-embed iframe {
+
+width: 100%; max-width: 880px; border: none; display: block; border-radius: 4px;
+
+box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35); border: 1px solid rgb(var(--mid-rgb));
+
+}
+
+.bit-container {
+
+padding: 20px; border-radius: 4px; background: #ffffff !important;
+
+border: 1px solid rgb(var(--mid-rgb)); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+
+}
+
+.icon-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; }
+
+.icon-orb {
+
+width: 56px; height: 56px; border-radius: 4px;
+
+display: flex; align-items: center; justify-content: center;
+
+background:
+  radial-gradient(ellipse at 26% 16%, rgba(255,255,255,.98), rgba(255,255,255,.35) 24%, transparent 48%),
+  linear-gradient(145deg, #f8fdff 0%, #d8effa 40%, #8bbbd5 52%, #e8f8ff 100%);
+
+color: #174d72; border: 1px solid rgba(30,83,115,.72);
+
+box-shadow: inset 0 0 0 1px #fff, inset 0 -5px 9px rgba(35,90,122,.20), 0 4px 9px rgba(0,0,0,.32), 0 0 0 2px rgba(255,255,255,.20);
+
+transition: all 0.15s ease;
+
+}
+
+.icon-orb svg { width: 25px; height: 25px; stroke-width: 2.05px; filter: drop-shadow(0 1px 0 rgba(255,255,255,.85)) drop-shadow(0 1px 2px rgba(16,55,80,.35)); }
+.icon-orb::before { content:""; position:absolute; inset:3px 5px auto; height:15px; border-radius:50%; background:linear-gradient(180deg,rgba(255,255,255,.72),rgba(255,255,255,0)); pointer-events:none; }
+.icon-orb { position:relative; overflow:hidden; }
+
+.icon-orb:hover, .icon-orb:focus-visible {
+
+border-color: var(--accent);
+
+background: linear-gradient(rgba(var(--hi-rgb), 0.45), rgba(var(--hi-rgb), 0.6) 46%, rgba(var(--bright-rgb), 0.5) 50%, rgba(var(--bright-rgb), 0.4)), #fff;
+
+box-shadow: inset 0 0 0 1px #fff9, 0 0 10px rgba(var(--bright-rgb), 0.75);
+
+}
+
+footer.site-footer {
+
+padding: 24px 0 36px; text-align: center; font-size: 11px; color: #ffffff; letter-spacing: 0.1em;
+
+text-shadow: 0 1px 3px rgb(var(--deep-rgb)), 0 0 8px rgba(var(--deep-rgb), 0.8);
+
+}
+
+
+
+/* ---------- FSFM CONTENT WINDOWS: MATCH THE VISTA HERO ---------- */
+.home-window-grid {
+  display:grid; grid-template-columns:minmax(245px,.86fr) minmax(0,1.14fr);
+  gap:18px; align-items:stretch; padding:20px 0 2px;
+}
+.content-window {
+  min-width:0; overflow:hidden; padding:0 6px 6px; border:1px solid rgba(var(--deep-rgb),.72);
+  border-radius:7px 7px 4px 4px;
+  background:linear-gradient(130deg,#effbff70 0%,#bfe9ff18 15%,#102c3e50 29%,#e7f8ff2f 30%,#6aa6b515 36%,#1a485451 60%,#e1f7ff45 82%,#8acde826 92%),rgba(var(--glass-rgb),.52);
+  backdrop-filter:blur(14px) saturate(1.25);
+  box-shadow:0 7px 23px rgba(0,0,0,.42),inset 0 0 0 1px #effbffc0;
+}
+.content-window .titlebar { height:30px; padding:0 4px; }
+.content-window .window-body { height:calc(100% - 30px); }
+.window-mini-icon { width:17px; height:17px; display:inline-flex; align-items:center; justify-content:center; border-radius:4px; color:#164968; font:700 12px Georgia,serif; background:linear-gradient(145deg,#fff,#dff4ff 48%,#83bbd8 51%,#e9f8ff); border:1px solid rgba(36,95,130,.55); box-shadow:inset 0 1px 2px #fff,0 1px 2px #0003; }
+.window-mini-icon.music { font:700 13px Georgia,serif; }
+.window-mini-icon.calendar { font:700 12px Arial,sans-serif; }
+.window-mini-icon.social { font-size:15px; }
+.bio-window-body { min-height:352px; display:flex; align-items:center; justify-content:center; padding:28px 24px; background:linear-gradient(145deg,#fff,#f1f8fb); }
+.bio-window-body .bio-text { max-width:39ch; font-size:14px; line-height:1.85; text-align:left; }
+.spotify-window-body { padding:0; background:#121212; }
+.spotify-window-body iframe { width:100%; max-width:none; height:352px; min-height:352px; display:block; border:0; border-radius:0; box-shadow:none; background:#121212; }
+.events-window { margin-top:20px; }
+.events-window .bit-container { min-height:100px; padding:15px; border:0; border-radius:0; box-shadow:none; background:linear-gradient(145deg,#fff,#f4f9fc) !important; }
+.social-window { margin-top:20px; }
+.social-window-body { padding:18px; background:linear-gradient(145deg,#fff,#f4f9fc); }
+.site-footer { margin-top:16px; }
+
+/* Window controls behave like actual Vista windows. */
+.caption-buttons { align-items:stretch; }
+.caption-button { padding:0; text-decoration:none; }
+.caption-button.minimize { border-radius:0 0 0 4px; }
+.window-minimized { padding-bottom:0 !important; }
+.window-minimized > .window-body { display:none !important; }
+.home-window-grid:has(> .content-window[hidden]) { grid-template-columns:minmax(0,1fr); }
+
+/* Four small interactive desktop toys, kept in normal flow so they also work on mobile. */
+.fun-widget-grid {
+  display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px;
+  margin:18px 0 4px; align-items:stretch;
+}
+.fun-widget { min-width:0; display:flex; flex-direction:column; }
+.fun-widget .window-body {
+  height:auto; min-height:104px; flex:1; padding:13px 12px;
+  display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(145deg,#fff,#edf7fb);
+}
+.fun-widget .titlebar { min-width:0; }
+.fun-widget .window-title { min-width:0; font-size:10px; }
+.fun-widget .window-title-label { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.fun-widget .caption-button { width:22px; height:18px; font-size:12px; }
+.fun-action-button {
+  min-height:34px; max-width:100%; padding:7px 11px; border:1px solid rgba(35,88,119,.7); border-radius:4px;
+  color:#173b53; font:700 9px var(--font-mono); letter-spacing:.025em; text-align:center;
+  background:linear-gradient(180deg,#fff 0%,#e7f6ff 45%,#c5e5f6 51%,#f7fcff 100%);
+  box-shadow:inset 0 1px 0 #fff,0 2px 5px rgba(0,0,0,.17); cursor:pointer;
+  transition:filter .15s ease,transform .15s ease,box-shadow .15s ease;
+}
+.fun-action-button:hover, .fun-action-button:focus-visible { filter:brightness(1.05); transform:translateY(-1px); box-shadow:inset 0 1px 0 #fff,0 0 10px rgba(var(--bright-rgb),.62); }
+.fun-action-button:active { transform:translateY(1px); }
+.fun-action-button[aria-pressed="true"] { background:linear-gradient(180deg,#dff8ff,#a9dff1 47%,#83c2df 52%,#e8faff); }
+.bubble-control { width:100%; display:flex; flex-direction:column; gap:8px; }
+.bubble-control label { color:#294d65; font:700 8px var(--font-mono); letter-spacing:.06em; }
+.bubble-control input[type="range"] { width:100%; accent-color:#438eb4; cursor:pointer; }
+.bubble-control output { color:#48677b; text-align:center; font:8px var(--font-mono); min-height:12px; }
+.music-control { width:100%; display:flex; align-items:center; justify-content:center; }
+.music-control .fun-action-button { min-width:122px; }
+.purble-overlay {
+  position:fixed; inset:0; z-index:10020; display:flex; align-items:center; justify-content:center;
+  padding:3vh 3vw; background:rgba(2,8,16,.76); backdrop-filter:blur(7px);
+}
+.purble-dialog {
+  width:min(960px,94vw); height:min(720px,92vh); display:flex; flex-direction:column; overflow:hidden;
+  border:1px solid rgba(225,246,255,.95); border-radius:9px;
+  background:linear-gradient(135deg,rgba(255,255,255,.85),rgba(174,216,239,.62));
+  box-shadow:0 18px 60px rgba(0,0,0,.65),inset 0 0 0 1px #fff9;
+}
+.purble-titlebar {
+  height:34px; min-height:34px; display:flex; align-items:center; justify-content:space-between; gap:10px; padding:0 9px;
+  color:#17344b; font:700 10px var(--font-mono); text-shadow:0 1px #fff;
+  background:linear-gradient(180deg,#fff,#e6f5ff 48%,#c6e2f2 52%,#edf8ff); border-bottom:1px solid rgba(57,104,133,.5);
+}
+.purble-titlebar button { width:34px; height:24px; border:1px solid #78483f; border-radius:3px; color:#fff; font:700 16px Arial; background:linear-gradient(#efb4a4,#ce755e 48%,#aa3d29 52%,#d66c51); cursor:pointer; }
+.purble-frame { display:block; width:100%; flex:1; min-height:0; border:0; background:#1a1a1a; }
+.purble-fallback { padding:7px 10px; color:#1b3e55; text-align:center; font:9px var(--font-mono); background:#eaf6fc; }
+.fsfm-shutdown {
+  position:fixed; inset:0; z-index:10050; display:flex; align-items:center; justify-content:center; padding:22px;
+  color:#f4f8ff; background:radial-gradient(ellipse at 50% 40%,#152e4c 0%,#080e1b 58%,#02050b 100%);
+}
+.shutdown-dialog { width:min(410px,92vw); text-align:center; padding:30px 24px; border:1px solid rgba(136,181,224,.46); background:rgba(8,18,34,.78); box-shadow:0 18px 55px #0009; }
+.shutdown-dialog strong { display:block; margin-bottom:9px; font:600 16px "Segoe UI",sans-serif; letter-spacing:.04em; }
+.shutdown-dialog p { color:#afc2d9; font:9px/1.7 var(--font-mono); }
+.shutdown-dialog button { margin-top:20px; padding:8px 16px; border:1px solid #a8cbed; border-radius:3px; color:#102238; font:700 10px var(--font-mono); background:linear-gradient(#fff,#b7d9f4); cursor:pointer; }
+body.fsfm-shutdown-active { overflow:hidden; }
+body.fsfm-shutdown-active > *:not(#fsfmShutdown) { visibility:hidden !important; }
+@keyframes fsfmBarrelRoll {
+  0% { transform:rotate(0deg) scale(1); }
+  30% { transform:rotate(125deg) scale(.78); }
+  68% { transform:rotate(275deg) scale(.78); }
+  100% { transform:rotate(360deg) scale(1); }
+}
+@media (prefers-reduced-motion:no-preference) {
+  html.fsfm-barrel-roll { transform-origin:50vw 50vh; animation:fsfmBarrelRoll 1.35s cubic-bezier(.25,.75,.35,1) both; }
+}
+@media (max-width: 900px) { .fun-widget-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width: 520px) { .fun-widget-grid { grid-template-columns:minmax(0,1fr); } .fun-widget .window-body { min-height:88px; } }
+
+
+/* ---------- RESPONSIVE / ACCESSIBILITY ---------- */
+:focus-visible { outline: 2px solid #ffffff; outline-offset: 3px; }
+@media (max-width: 760px) { .home-window-grid { grid-template-columns:minmax(0,1fr); } .bio-window-body { min-height:190px; } }
+@media (max-width: 640px) {
+  .taskbar { padding: 0 9px; }
+  .taskbar-inner { gap: 8px; }
+  .brand-title { font-size: 10px; gap: 7px; }
+  .start-orb { width: 28px; height: 28px; }
+  .task-buttons { gap: 4px; }
+  .task-button { padding: 5px 9px; font-size: 10px; }
+  .wrap { padding: 0 10px 28px; }
+  .home-window-grid { grid-template-columns:minmax(0,1fr); gap:14px; padding-top:14px; }
+  .bio-window-body { min-height:180px; padding:22px 18px; }
+  .bio-window-body .bio-text { text-align:center; }
+  .spotify-window-body iframe { height:352px; min-height:352px; }
+  .aero-window { margin-top: 50px; padding: 0 4px 4px; }
+  .hero { min-height: 46vh; padding: 34px 14px; }
+  .hero-mark { font-size: clamp(2rem, 10vw, 3.4rem); overflow-wrap: anywhere; }
+  .hero-sub { font-size: 12px; }
+  .glass-card { padding: 18px 15px; }
+  .bit-container { padding: 12px; }
+  .icon-row { gap: 10px; }
+  .icon-orb { width: 48px; height: 48px; }
+  .marquee { margin-top: 14px; }
+  .marquee-track span { font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  .reveal { opacity: 1; transform: none; }
+}
+
+
+
+/* ---------- FSFM VISTA DESKTOP GADGETS ---------- */
+.sr-only { position:absolute !important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+.fsfm-gadgets-desktop { display:none; }
+@media (min-width: 1320px) and (min-height: 700px) {
+  .fsfm-gadgets-desktop { display:block; position:relative; z-index:35; }
+  .fsfm-gadget {
+    position:fixed; left:16px; top:90px; width:184px; z-index:35;
+    overflow:hidden; padding:0; border:1px solid rgba(255,255,255,.88); border-radius:9px;
+    color:#172b3a; background:linear-gradient(135deg,rgba(255,255,255,.78),rgba(221,243,255,.52) 38%,rgba(95,153,184,.35) 100%);
+    box-shadow:0 8px 24px rgba(0,0,0,.34),0 1px 3px rgba(0,0,0,.25),inset 0 0 0 1px rgba(255,255,255,.55);
+    backdrop-filter:blur(18px) saturate(1.55); -webkit-backdrop-filter:blur(18px) saturate(1.55);
+    user-select:none; -webkit-user-select:none; touch-action:pan-y;
+  }
+  .gadget-titlebar {
+    height:27px; display:flex; align-items:center; gap:6px; padding:0 8px;
+    cursor:grab; color:#17344b; font:600 10px "Segoe UI",Tahoma,Arial,sans-serif;
+    text-shadow:0 1px 0 rgba(255,255,255,.95); background:linear-gradient(180deg,rgba(255,255,255,.86),rgba(225,244,255,.42) 50%,rgba(100,151,183,.18));
+    border-bottom:1px solid rgba(255,255,255,.75); touch-action:none;
+  }
+  .gadget-titlebar:active { cursor:grabbing; }
+  .gadget-titlebar:focus-visible { outline:2px solid #fff; outline-offset:-3px; }
+  .gadget-grip { font-size:13px; color:rgba(30,69,94,.75); line-height:1; }
+  .gadget-title { flex:1; }
+  .gadget-mark { font:7px "Roboto Mono",monospace; letter-spacing:.08em; color:rgba(27,62,85,.68); }
+  .gadget-body { position:relative; padding:9px; }
+  .clock-body { display:flex; align-items:center; flex-direction:column; gap:3px; padding:7px 8px 8px; }
+  .analog-clock { width:130px; height:130px; filter:drop-shadow(0 3px 4px rgba(25,55,77,.24)); }
+  .clock-digital { font:10px "Roboto Mono",monospace; color:#25465c; letter-spacing:.09em; text-shadow:0 1px #fff; }
+  .calendar-body { padding:8px 9px 9px; }
+  .calendar-heading { display:flex; align-items:center; justify-content:space-between; gap:5px; margin:0 0 7px; color:#17364e; }
+  .calendar-heading strong { font:600 11px "Segoe UI",sans-serif; text-shadow:0 1px #fff; }
+  .calendar-nav { width:21px; height:20px; border:1px solid rgba(66,105,132,.42); border-radius:4px; background:linear-gradient(#fff,#d9eaf5 48%,#c2d9e8 51%,#f8fcff); color:#17364e; font:16px/15px Arial; box-shadow:inset 0 1px #fff; cursor:pointer; }
+  .calendar-nav:hover { filter:brightness(1.08); box-shadow:0 0 7px rgba(255,255,255,.9),inset 0 1px #fff; }
+  .calendar-grid { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:2px; text-align:center; }
+  .calendar-weekdays { margin-bottom:3px; color:#446176; font:8px "Roboto Mono",monospace; }
+  .calendar-day { height:21px; display:flex; align-items:center; justify-content:center; border-radius:4px; color:#1a3549; font:9px "Segoe UI",sans-serif; position:relative; }
+  .calendar-day.is-today { background:linear-gradient(#fff,#dcefff 48%,#bbddf5 51%,#f5fbff); border:1px solid rgba(54,111,153,.5); font-weight:700; box-shadow:inset 0 1px #fff; }
+  .calendar-day.has-event::after { content:""; position:absolute; bottom:2px; width:3px; height:3px; border-radius:50%; background:#bd6b3e; }
+  .calendar-day.is-outside { opacity:.32; }
+  .calendar-legend { display:flex; align-items:center; gap:5px; margin-top:7px; color:#49677b; font:8px "Roboto Mono",monospace; }
+  .calendar-legend i { width:5px; height:5px; border-radius:50%; background:#bd6b3e; }
+  .featured-body { display:grid; grid-template-columns:76px minmax(0,1fr); gap:9px; align-items:center; padding:10px; }
+  .featured-art { width:76px; height:76px; overflow:hidden; border:1px solid rgba(255,255,255,.96); border-radius:5px; background:linear-gradient(145deg,#eaf8ff,#9bc8df 55%,#edf8ff); box-shadow:0 2px 6px rgba(0,0,0,.25),inset 0 0 0 1px #fff8; }
+  .featured-art img { width:100%; height:100%; display:block; object-fit:cover; }
+  .featured-copy { min-width:0; display:flex; flex-direction:column; gap:5px; }
+  .featured-copy strong { color:#17344b; font:700 10px/1.3 "Segoe UI",sans-serif; overflow-wrap:anywhere; }
+  .featured-copy small { color:#537186; font:8px/1.4 "Segoe UI",sans-serif; }
+    #homeMusicAudio { display:none; }
+  .featured-body:has(.featured-art[hidden]) { grid-template-columns:minmax(0,1fr); }
+  .featured-release-link { display:block; color:inherit; text-decoration:none; }
+  .featured-release-link:hover { text-decoration:none; background:rgba(255,255,255,.16); }
+  .featured-copy span { margin-top:4px; color:#245f82; font:7px "Roboto Mono",monospace; letter-spacing:.025em; line-height:1.4; }
+  .featured-release-link:hover .featured-copy span { color:#123d5c; text-decoration:underline; }
+  .featured-release-link[aria-disabled="true"] { pointer-events:none; cursor:default; }
+  .photo-body { padding:8px; }
+  .photo-stage { height:111px; display:flex; align-items:center; justify-content:center; overflow:hidden; background:linear-gradient(145deg,#d8eaf3,#a8c7d8 50%,#eff8fc); border:4px solid rgba(255,255,255,.9); outline:1px solid rgba(61,105,133,.35); box-shadow:inset 0 0 10px rgba(35,66,85,.22),0 2px 5px rgba(0,0,0,.2); }
+  .photo-stage img { width:100%; height:100%; object-fit:cover; display:block; }
+  .photo-stage img[hidden], .photo-empty[hidden] { display:none !important; }
+  .photo-empty { display:flex; flex-direction:column; align-items:center; gap:6px; color:#42677e; text-align:center; text-shadow:0 1px #fff; }
+  .photo-empty span { font:700 10px "Segoe UI",sans-serif; letter-spacing:.1em; }
+  .photo-empty small { font:7px "Roboto Mono",monospace; }
+  .photo-controls { display:flex; align-items:center; justify-content:space-between; padding:6px 2px 0; color:#45677e; font:8px "Roboto Mono",monospace; }
+  .photo-controls button { width:22px; height:19px; border:1px solid rgba(61,104,133,.45); border-radius:4px; background:linear-gradient(#fff,#dcecf5 48%,#c1dce9 51%,#f8fcff); color:#1e4761; font:15px/13px Arial; cursor:pointer; }
+  .dates-body { padding:8px 10px 9px; }
+  .gadget-date-list { display:flex; flex-direction:column; gap:7px; }
+  .gadget-date-item { display:grid; grid-template-columns:39px minmax(0,1fr); align-items:center; gap:7px; padding-bottom:6px; border-bottom:1px solid rgba(75,112,137,.2); }
+  .gadget-date-item:last-child { padding-bottom:0; border-bottom:0; }
+  .gadget-date-chip { padding:4px 2px; border:1px solid rgba(87,130,158,.4); border-radius:4px; background:linear-gradient(#fff,#e1f1f9 48%,#cce3ef 51%,#f8fcff); text-align:center; color:#254b63; }
+  .gadget-date-chip strong { display:block; font:700 12px "Segoe UI",sans-serif; line-height:1.1; }
+  .gadget-date-chip small { display:block; margin-top:2px; font:7px "Roboto Mono",monospace; }
+  .gadget-date-copy { min-width:0; }
+  .gadget-date-copy strong { display:block; color:#1c3b52; font:600 9px "Segoe UI",sans-serif; overflow-wrap:anywhere; }
+  .gadget-date-copy small { display:block; margin-top:2px; color:#557184; font:7px "Segoe UI",sans-serif; line-height:1.3; }
+  .gadget-empty { color:#5d7c91; text-align:center; font:8px "Roboto Mono",monospace; line-height:1.6; padding:8px 2px; }
+  .note-body { min-height:93px; padding:13px 12px 15px; background:linear-gradient(145deg,rgba(255,250,211,.97),rgba(248,229,151,.94)); color:#574a25; box-shadow:inset 0 1px 0 rgba(255,255,255,.9); }
+  .note-body p { min-height:61px; white-space:pre-wrap; overflow-wrap:anywhere; font:11px/1.5 "Segoe UI",Tahoma,sans-serif; }
+  .note-pin { position:absolute; top:7px; right:9px; width:7px; height:7px; border-radius:50%; background:radial-gradient(circle at 30% 25%,#fff,#bd8b4e 45%,#77512a); box-shadow:0 1px 2px rgba(0,0,0,.35); }
+}
+@media (max-width: 1319px), (max-height: 699px) {
+  .fsfm-gadgets-desktop { display:none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fsfm-gadget, .fsfm-gadget * { scroll-behavior:auto !important; transition:none !important; }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- FSFM STARTUP / PRELOAD ALL FOUR HOME WALLPAPERS -->
+
+<div class="fsfm-boot-overlay" id="fsfmBootScreen" role="status" aria-live="polite">
+
+<div class="boot-brand" id="bootBrand">FAKE SPACE FOG MACHINE</div>
+<div class="boot-progress-container">
+<div class="boot-progress-bar" id="bootProgressBar"></div>
+</div>
+<div class="boot-status" id="bootStatus">LOADING YOUR DESKTOP</div>
+<div class="boot-caption">SONIC SPACE-AGE AESTHETICS</div>
+
+</div>
+
+<div class="wall" id="wallA" aria-hidden="true"></div>
+
+<div class="wall" id="wallB" aria-hidden="true"></div>
+
+<canvas id="bgCanvas" aria-hidden="true"></canvas>
+
+<!-- FSFM DESKTOP GADGETS: content is loaded from data/homepage-gadgets.json -->
+<div class="fsfm-gadgets-desktop" id="fsfmGadgets" aria-label="FSFM desktop gadgets">
+  <section class="fsfm-gadget" id="gadget-clock" data-gadget="clock" aria-label="Analog clock gadget">
+    <header class="gadget-titlebar" data-drag-handle tabindex="0" aria-label="Drag Clock gadget. Use arrow keys to move it.">
+      <span class="gadget-grip" aria-hidden="true">⠿</span><span class="gadget-title">Clock</span><span class="gadget-mark">FSFM</span>
+    </header>
+    <div class="gadget-body clock-body">
+      <svg class="analog-clock" viewBox="0 0 160 160" role="img" aria-label="Current local time">
+        <defs><radialGradient id="clockGlass" cx="34%" cy="25%"><stop offset="0" stop-color="#fff" stop-opacity=".98"/><stop offset=".58" stop-color="#e8f7ff" stop-opacity=".82"/><stop offset="1" stop-color="#9fc9df" stop-opacity=".68"/></radialGradient></defs>
+        <circle cx="80" cy="80" r="73" fill="url(#clockGlass)" stroke="#fff" stroke-width="2.5"/>
+        <circle cx="80" cy="80" r="66" fill="none" stroke="#5c7891" stroke-opacity=".45" stroke-width="1"/>
+        <g class="clock-ticks" stroke="#314b64" stroke-linecap="round">
+          <path d="M80 14v8 M80 138v8 M14 80h8 M138 80h8" stroke-width="2.5"/>
+          <path d="M80 19v4 M80 137v4 M19 80h4 M137 80h4 M49 26l2 4 M109 130l2 4 M26 49l4 2 M130 109l4 2 M111 26l-2 4 M51 130l-2 4 M134 49l-4 2 M30 109l-4 2" stroke-width="1.5"/>
+        </g>
+        <g fill="#183149" font-family="Segoe UI,Arial" font-size="12" font-weight="700" text-anchor="middle" dominant-baseline="middle"><text x="80" y="35">12</text><text x="125" y="82">3</text><text x="80" y="128">6</text><text x="35" y="82">9</text></g>
+        <g id="clockHands" transform="translate(80 80)">
+          <path id="clockHour" d="M0 5 L0 -31" stroke="#1c354b" stroke-width="5" stroke-linecap="round"/>
+          <path id="clockMinute" d="M0 7 L0 -48" stroke="#24465f" stroke-width="3.5" stroke-linecap="round"/>
+          <path id="clockSecond" d="M0 12 L0 -55" stroke="#a64f32" stroke-width="1.5" stroke-linecap="round"/>
+          <circle r="4.3" fill="#24465f" stroke="#fff" stroke-width="1.2"/>
+        </g>
+        <path d="M28 38 Q56 7 103 17" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="5" stroke-linecap="round"/>
+      </svg>
+      <div class="clock-digital" id="clockDigital">--:--:--</div>
+    </div>
+  </section>
+
+  <section class="fsfm-gadget" id="gadget-calendar" data-gadget="calendar" aria-label="Calendar gadget">
+    <header class="gadget-titlebar" data-drag-handle tabindex="0" aria-label="Drag Calendar gadget. Use arrow keys to move it.">
+      <span class="gadget-grip" aria-hidden="true">⠿</span><span class="gadget-title">Calendar</span><span class="gadget-mark">FSFM</span>
+    </header>
+    <div class="gadget-body calendar-body">
+      <div class="calendar-heading"><button type="button" class="calendar-nav" data-calendar-step="-1" aria-label="Previous month">‹</button><strong id="calendarMonth">MONTH YEAR</strong><button type="button" class="calendar-nav" data-calendar-step="1" aria-label="Next month">›</button></div>
+      <div class="calendar-grid calendar-weekdays" aria-hidden="true"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
+      <div class="calendar-grid" id="calendarDays" aria-label="Calendar dates"></div>
+      <div class="calendar-legend"><i></i> FSFM dates</div>
+    </div>
+  </section>
+
+  <section class="fsfm-gadget" id="gadget-now-playing" data-gadget="featured-release" aria-label="Featured release gadget">
+    <header class="gadget-titlebar" data-drag-handle tabindex="0" aria-label="Drag Featured Release gadget. Use arrow keys to move it.">
+      <span class="gadget-grip" aria-hidden="true">⠿</span><span class="gadget-title" id="featuredGadgetTitle">Featured Release</span><span class="gadget-mark">FSFM</span>
+    </header>
+    <a class="featured-release-link" id="featuredReleaseLink" href="the-early-bird.html" aria-label="Open featured release">
+      <div class="gadget-body featured-body">
+        <div class="featured-art" id="featuredAlbumArt"><img id="featuredAlbumCover" src="/media/images/cover.png" alt="The Early Bird album artwork" loading="lazy" onerror="this.closest('.featured-art').hidden=true"></div>
+        <div class="featured-copy">
+          <strong id="featuredAlbumTitle">The Early Bird....</strong>
+          <small id="featuredAlbumMeta">Seven tracks · Full album</small>
+          <span id="featuredLinkText">OPEN ALBUM PAGE ↗</span>
+        </div>
+      </div>
+    </a>
+  </section>
+
+  <section class="fsfm-gadget" id="gadget-photos" data-gadget="photos" aria-label="Picture frame gadget">
+    <header class="gadget-titlebar" data-drag-handle tabindex="0" aria-label="Drag Picture Frame gadget. Use arrow keys to move it.">
+      <span class="gadget-grip" aria-hidden="true">⠿</span><span class="gadget-title">Picture Frame</span><span class="gadget-mark">FSFM</span>
+    </header>
+    <div class="gadget-body photo-body">
+      <div class="photo-stage" id="photoStage">
+        <img id="gadgetPhoto" alt="FSFM picture frame photograph" hidden>
+        <div class="photo-empty" id="photoEmpty" hidden><span>PICTURE FRAME</span></div>
+      </div>
+      <div class="photo-controls" hidden><button type="button" id="photoPrevious" aria-label="Previous photo">‹</button><span id="photoCounter" hidden></span><button type="button" id="photoNext" aria-label="Next photo">›</button></div>
+    </div>
+  </section>
+
+  <section class="fsfm-gadget" id="gadget-dates" data-gadget="dates" aria-label="Important dates gadget">
+    <header class="gadget-titlebar" data-drag-handle tabindex="0" aria-label="Drag Important Dates gadget. Use arrow keys to move it.">
+      <span class="gadget-grip" aria-hidden="true">⠿</span><span class="gadget-title">Important Dates</span><span class="gadget-mark">FSFM</span>
+    </header>
+    <div class="gadget-body dates-body"><div id="gadgetDateList" class="gadget-date-list"><div class="gadget-empty">ADD DATES IN PAGES CMS</div></div></div>
+  </section>
+
+  <section class="fsfm-gadget" id="gadget-note" data-gadget="note" aria-label="Sticky note gadget">
+    <header class="gadget-titlebar" data-drag-handle tabindex="0" aria-label="Drag Sticky Note gadget. Use arrow keys to move it.">
+      <span class="gadget-grip" aria-hidden="true">⠿</span><span class="gadget-title">Sticky Note</span><span class="gadget-mark">FSFM</span>
+    </header>
+    <div class="gadget-body note-body"><p id="gadgetStickyText">A little message from Fake Space Fog Machine.</p><span class="note-pin" aria-hidden="true"></span></div>
+  </section>
+</div>
+
+
+<nav class="taskbar">
+
+<div class="taskbar-inner">
+
+<div class="brand-title">
+
+<div class="start-orb"></div>
+
+<span id="taskbarSiteName">Fake Space Fog Machine</span>
+
+</div>
+
+<div class="task-buttons">
+
+<a href="index.html" class="task-button active" aria-current="page">Home</a>
+
+<a href="the-early-bird.html" class="task-button">Album</a>
+
+</div>
+
+</div>
+
+</nav>
+
+<div class="wrap">
+
+<div class="aero-window hero-window">
+
+<div class="titlebar">
+
+<div class="window-title">
+
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#081722" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="1"/></svg>
+
+<span id="heroWindowTitle">Fake Space Fog Machine — Artist Portal</span>
+
+</div>
+
+<div class="caption-buttons"><button type="button" class="caption-button minimize" data-window-action="minimize" aria-label="Minimize homepage hero window" title="Minimize">−</button><button type="button" class="caption-button close" data-window-action="close" aria-label="Close homepage desktop" title="Close">×</button></div>
+
+</div>
+
+<div class="window-body">
+
+<header class="hero" id="heroSection">
+
+<div class="hero-badge" id="heroBadge">Independent Artist Portal</div>
+
+<div class="hero-mark" id="heroTitle">Fake Space Fog Machine</div>
+
+<div class="hero-sub" id="heroSubtitle">Sonic Space-Age Aesthetics · Est. 2026</div>
+
+<div class="hero-handle" id="heroHandle">@mirrorlesssmoke</div>
+
+</header>
+
+</div>
+
+</div>
+<div class="marquee">
+
+<div class="marquee-track" id="marqueeTrack"></div>
+
+</div>
+
+
+<div class="fun-widget-grid" id="funWidgetGrid" aria-label="Interactive FSFM widgets">
+  <section class="reveal content-window fun-widget" id="funWidgetBarrelRoll" data-fun-widget="barrelRoll" aria-label="Barrel roll widget">
+    <div class="titlebar">
+      <div class="window-title"><span class="window-mini-icon" aria-hidden="true">↻</span><span class="window-title-label">BARREL ROLL</span></div>
+      <div class="caption-buttons"><button type="button" class="caption-button minimize" data-window-action="minimize" aria-label="Minimize barrel roll widget" title="Minimize">−</button><button type="button" class="caption-button close" data-window-action="close" aria-label="Close barrel roll widget" title="Close">×</button></div>
+    </div>
+    <div class="window-body"><button type="button" id="barrelRollButton" class="fun-action-button">DO A BARREL ROLL</button></div>
+  </section>
+
+  <section class="reveal content-window fun-widget" id="funWidgetBubbles" data-fun-widget="bubbleSlider" aria-label="Bubble frequency widget">
+    <div class="titlebar">
+      <div class="window-title"><span class="window-mini-icon" aria-hidden="true">◌</span><span class="window-title-label">BUBBLE FREQUENCY</span></div>
+      <div class="caption-buttons"><button type="button" class="caption-button minimize" data-window-action="minimize" aria-label="Minimize bubble frequency widget" title="Minimize">−</button><button type="button" class="caption-button close" data-window-action="close" aria-label="Close bubble frequency widget" title="Close">×</button></div>
+    </div>
+    <div class="window-body">
+      <div class="bubble-control"><label for="bubbleRateSlider">AMBIENT BUBBLES</label><input id="bubbleRateSlider" type="range" min="0" max="100" step="1" value="50" aria-label="Bubble frequency"><output id="bubbleRateValue" for="bubbleRateSlider">DEFAULT · 1×</output></div>
+    </div>
+  </section>
+
+  <section class="reveal content-window fun-widget" id="funWidgetMusic" data-fun-widget="musicPlayer" aria-label="Homepage music player">
+    <div class="titlebar">
+      <div class="window-title"><span class="window-mini-icon music" aria-hidden="true">♫</span><span class="window-title-label">FSFM RADIO</span></div>
+      <div class="caption-buttons"><button type="button" class="caption-button minimize" data-window-action="minimize" aria-label="Minimize music player" title="Minimize">−</button><button type="button" class="caption-button close" data-window-action="close" aria-label="Close music player" title="Close">×</button></div>
+    </div>
+    <div class="window-body"><div class="music-control"><button type="button" id="homeMusicToggle" class="fun-action-button" aria-pressed="false"><span aria-hidden="true">▶</span> <span id="homeMusicLabel">PLAY MUSIC</span></button></div></div>
+    <audio id="homeMusicAudio" preload="none" aria-hidden="true" src="https://github.com/jesseiskewl01/fsfm/raw/refs/heads/main/audio/groovy.mp3"></audio>
+  </section>
+
+  <section class="reveal content-window fun-widget" id="funWidgetPurble" data-fun-widget="purblePlace" aria-label="Purble Place widget">
+    <div class="titlebar">
+      <div class="window-title"><span class="window-mini-icon" aria-hidden="true">✿</span><span class="window-title-label">PURBLE PLACE</span></div>
+      <div class="caption-buttons"><button type="button" class="caption-button minimize" data-window-action="minimize" aria-label="Minimize Purble Place widget" title="Minimize">−</button><button type="button" class="caption-button close" data-window-action="close" aria-label="Close Purble Place widget" title="Close">×</button></div>
+    </div>
+    <div class="window-body"><button type="button" id="purbleOpenButton" class="fun-action-button">OPEN PURBLE PLACE</button></div>
+  </section>
+</div>
+
+<div class="home-window-grid">
+  <section class="reveal content-window" aria-label="About Fake Space Fog Machine">
+    <div class="titlebar">
+      <div class="window-title"><span class="window-mini-icon" aria-hidden="true">i</span><span id="bioWindowTitle">ABOUT FSFM</span></div>
+      <div class="caption-buttons"><button type="button" class="caption-button minimize" data-window-action="minimize" aria-label="Minimize about window" title="Minimize">−</button><button type="button" class="caption-button close" data-window-action="close" aria-label="Close about window" title="Close">×</button></div>
+    </div>
+    <div class="window-body bio-window-body">
+      <p class="bio-text" id="homeBio">Fake Space Fog Machine is a fully independent artist based in the United Kingdom who doesn\'t know how to write about himself in the third person.</p>
+    </div>
+  </section>
+  <section class="reveal content-window spotify-window" aria-label="Fake Space Fog Machine on Spotify">
+    <div class="titlebar">
+      <div class="window-title"><span class="window-mini-icon music" aria-hidden="true">♫</span><span id="spotifyWindowTitle">FSFM ON SPOTIFY</span></div>
+      <div class="caption-buttons"><button type="button" class="caption-button minimize" data-window-action="minimize" aria-label="Minimize Spotify window" title="Minimize">−</button><button type="button" class="caption-button close" data-window-action="close" aria-label="Close Spotify window" title="Close">×</button></div>
+    </div>
+    <div class="window-body spotify-window-body">
+      <iframe data-testid="embed-iframe" title="Fake Space Fog Machine on Spotify" src="https://open.spotify.com/embed/artist/2PcGMMcKTObTrK7XVw9GSX?utm_source=generator&theme=0&si=d7fa4c4e3030473c" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    </div>
+  </section>
+</div>
+
+<section class="reveal content-window events-window" aria-label="Upcoming events">
+<div class="titlebar">
+  <div class="window-title"><span class="window-mini-icon calendar" aria-hidden="true">▦</span><span id="eventsWindowTitle">UPCOMING TRANSMISSIONS</span></div>
+  <div class="caption-buttons"><button type="button" class="caption-button minimize" data-window-action="minimize" aria-label="Minimize events window" title="Minimize">−</button><button type="button" class="caption-button close" data-window-action="close" aria-label="Close events window" title="Close">×</button></div>
+</div>
+<div class="window-body bit-container">
+
+<script charset="utf-8" src="https://widgetv3.bandsintown.com/main.min.js"></script>
+
+<a class="bit-widget-initializer"
+
+data-artist-name="id_15662842"
+
+data-app-id="5cadd40a475f81e41e3c518d0b71644c"
+
+data-display-details="true"
+
+data-display-lineup="true"
+
+data-display-start-time="true"
+
+data-display-local-dates="true"
+
+data-local-dates-position="tab"
+
+data-font="Segoe UI"
+
+data-follow-section-position="hidden"
+
+data-follow-section-alignment="center"
+
+data-follow-section-cta-text="FOLLOW"
+
+data-event-rsvp-position="hidden"
+
+data-play-my-city-position="bottom"
+
+data-play-my-city-alignment="center"
+
+data-play-my-city-cta-icon="true"
+
+data-event-rsvp-only-show-icon="true">
+
+</a>
+
+</div>
+</section>
+
+<section class="reveal content-window social-window" aria-label="Social links">
+<div class="titlebar">
+  <div class="window-title"><span class="window-mini-icon social" aria-hidden="true">✧</span><span id="socialWindowTitle">FIND FSFM</span></div>
+  <div class="caption-buttons"><button type="button" class="caption-button minimize" data-window-action="minimize" aria-label="Minimize social links window" title="Minimize">−</button><button type="button" class="caption-button close" data-window-action="close" aria-label="Close social links window" title="Close">×</button></div>
+</div>
+<div class="window-body social-window-body">
+<div class="icon-row">
+
+<a class="icon-orb" href="https://tiktok.com/@mirrorlesssmoke" target="_blank" rel="noopener" aria-label="TikTok">
+
+<svg viewBox="0 0 24 24" fill="none"><path d="M14 4v10.5a3.5 3.5 0 1 1-2-3.16V4h2z" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M14 4c0 2.5 2 4.2 4.3 4.2" stroke="currentColor" stroke-width="2.2"/></svg>
+
+</a>
+
+<a class="icon-orb" href="https://fakespacefogmachine.bandcamp.com" target="_blank" rel="noopener" aria-label="Bandcamp">
+
+<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="3.6" fill="currentColor"/></svg>
+
+</a>
+
+<a class="icon-orb" href="https://instagram.com/mirrorlesssmoke" target="_blank" rel="noopener" aria-label="Instagram">
+
+<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="15" rx="4.5" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12.5" r="4" stroke="currentColor" stroke-width="2.2"/><circle cx="17.2" cy="8.3" r="1.3" fill="currentColor"/></svg>
+
+</a>
+
+<a class="icon-orb" href="https://twitter.com/mirrorlesssmoke" target="_blank" rel="noopener" aria-label="Twitter">
+
+<svg viewBox="0 0 24 24" fill="none"><path d="M3 11.2L21 3l-8 18-2.6-7.6L3 11.2z" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg>
+
+</a>
+
+<a class="icon-orb" href="https://youtube.com/@mirrorlesssmoke" target="_blank" rel="noopener" aria-label="YouTube">
+
+<svg viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="4" stroke="currentColor" stroke-width="2.2"/><polygon points="10,9 16,12 10,15" fill="currentColor"/></svg>
+
+</a>
+
+</div>
+</div>
+</section>
+
+<footer class="site-footer" id="siteFooter">© 2026 FAKE SPACE FOG MACHINE</footer>
+
+</div>
+
+<div class="purble-overlay" id="purbleOverlay" hidden>
+  <section class="purble-dialog" role="dialog" aria-modal="true" aria-labelledby="purbleDialogTitle">
+    <header class="purble-titlebar"><span id="purbleDialogTitle">PURBLE PLACE</span><button type="button" id="purbleCloseButton" aria-label="Close Purble Place">×</button></header>
+    <iframe class="purble-frame" id="purbleFrame" title="Purble Place game" src="about:blank" data-src="https://www.play-games.com/iframe/37376.html" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups allow-popups-to-escape-sandbox"></iframe>
+    <div class="purble-fallback">Game not loading? <a href="https://www.play-games.com/iframe/37376.html" target="_blank" rel="noopener noreferrer">Open Purble Place in a new tab</a>.</div>
+  </section>
+</div>
+
+<div class="fsfm-shutdown" id="fsfmShutdown" hidden role="dialog" aria-modal="true" aria-labelledby="shutdownTitle">
+  <div class="shutdown-dialog">
+    <strong id="shutdownTitle">The FSFM desktop has shut down.</strong>
+    <p>The desktop session has ended. The system is waiting for another boot.</p>
+    <button type="button" id="restartDesktop">START UP AGAIN</button>
+  </div>
+</div>
+
+<script>
+
+'use strict';
+
+/* ==========================================
+
+   THEME ENGINE (palettes live in <head>)
+
+========================================== */
+
+(function() {
+// HOME THEME ENGINE: all four wallpaper files are warmed before the page is revealed.
+var wallFront = document.getElementById('wallA');
+var wallBack = document.getElementById('wallB');
+var currentTheme = Number.isInteger(window.__themeIdx) ? window.__themeIdx : 0;
+var themeImages = [];
+var applyToken = 0;
+
+var bootStartedAt = Date.now();
+var bootMinimumTime = 2400;
+function updateBootProgress(done, total) {
+  var status = document.getElementById('bootStatus');
+  if (!status) return;
+  status.textContent = done < total ? 'LOADING YOUR DESKTOP' : 'STARTING ARTIST DESKTOP';
+}
+
+function preloadAllThemes() {
+  var completed = 0;
+  updateBootProgress(0, VISTA_THEMES.length);
+  return Promise.all(VISTA_THEMES.map(function(theme, index) {
+    return new Promise(function(resolve) {
+      var image = new Image();
+      var settled = false;
+      var failSafe = window.setTimeout(function() { finish(false); }, 12000);
+      function finish(ok) {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(failSafe);
+        themeImages[index] = { image: ok ? image : null, ready: ok };
+        completed += 1;
+        updateBootProgress(completed, VISTA_THEMES.length);
+        resolve({ ok: ok, index: index });
+      }
+      image.onload = function() { finish(true); };
+      image.onerror = function() { finish(false); };
+      image.src = theme.img;
+    });
+  }));
+}
+
+function applyTheme(index) {
+  var token = ++applyToken;
+  currentTheme = (index + VISTA_THEMES.length) % VISTA_THEMES.length;
+  var theme = VISTA_THEMES[currentTheme];
+  paintPalette(theme);
+
+  var url = theme.img ? "url('" + theme.img + "')" : 'none';
+  var incoming = wallBack;
+  var outgoing = wallFront;
+  incoming.style.backgroundImage = url;
+  requestAnimationFrame(function() { incoming.classList.add('show'); });
+  window.setTimeout(function() { if (token === applyToken) outgoing.classList.remove('show'); }, 950);
+  wallFront = incoming;
+  wallBack = outgoing;
+
+  var hero = document.getElementById('heroSection');
+  if (hero) hero.style.backgroundImage = url;
+
+  document.querySelectorAll('.star-icon').forEach(function(button) {
+    button.setAttribute('aria-label', 'Change wallpaper. Current theme: ' + theme.name + '. Activate for the next theme.');
+    button.title = 'Wallpaper: ' + theme.name + ' · click to change';
+  });
+}
+
+function cycleTheme() { applyTheme(currentTheme + 1); }
+
+// The marquee is populated from data/site-content.json. Its message list is editable in Pages CMS.
+var marqueeTrack = document.getElementById('marqueeTrack');
+function renderMarquee(messages) {
+  if (!marqueeTrack) return;
+  marqueeTrack.innerHTML = '';
+  var items = Array.isArray(messages) ? messages.map(function(x){return String(x || '').trim();}).filter(Boolean) : [];
+  if (marqueeTrack.parentElement) marqueeTrack.parentElement.hidden = !items.length;
+  if (!items.length) return;
+  for (var run=0; run<2; run+=1) {
+    var group=document.createElement('span');
+    items.forEach(function(message, index) {
+      var item=document.createElement('span'); item.className='marquee-message'; item.textContent=message; group.appendChild(item);
+      var star=document.createElement('button'); star.type='button'; star.className='star-icon'; star.textContent='✦';
+      star.setAttribute('aria-label','Change wallpaper theme'); star.addEventListener('click',cycleTheme); group.appendChild(star);
+    });
+    marqueeTrack.appendChild(group);
+  }
+}
+window.__fsfmRenderMarquee = renderMarquee;
+renderMarquee(['WELCOME TO THE FSFM DESKTOP','THE EARLY BIRD.... · SEVEN TRACKS','INDEPENDENT MUSIC FROM THE UNITED KINGDOM']);
+
+// Keep the splash simple: the moving XP-era segment stays visible until the four
+// homepage wallpapers have loaded (or timed out), with a short minimum display time.
+preloadAllThemes().then(function(results) {
+  applyTheme(currentTheme);
+  var failures = results.filter(function(result) { return !result.ok; }).length;
+  var elapsed = Date.now() - bootStartedAt;
+  var remaining = Math.max(0, bootMinimumTime - elapsed);
+  window.setTimeout(function() {
+    var status = document.getElementById('bootStatus');
+    if (status) status.textContent = failures ? 'DESKTOP READY' : 'WELCOME';
+    window.setTimeout(function() {
+      var overlay = document.getElementById('fsfmBootScreen');
+      if (overlay) overlay.classList.add('loaded');
+    }, 260);
+  }, remaining);
+});
+
+// Ambient Glass Refraction Canvas
+
+try {
+
+var canvas = document.getElementById('bgCanvas');
+
+if (canvas && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+
+var ctx = canvas.getContext('2d');
+
+var W, H;
+
+function resizeBg() { var dpr = Math.min(window.devicePixelRatio || 1, 1.5); W = window.innerWidth; H = window.innerHeight; canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr); canvas.style.width = W + 'px'; canvas.style.height = H + 'px'; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); }
+
+resizeBg();
+
+window.addEventListener('resize', resizeBg);
+
+var bubbles = [];
+var bubbleFrequencyLevel = 50;
+function makeBubble() {
+  var baseSpeed = Math.random() * 0.7 + 0.3;
+  return {
+    x: Math.random() * window.innerWidth,
+    y: Math.random() * window.innerHeight,
+    r: Math.random() * 14 + 4,
+    baseSpeed: baseSpeed,
+    speed: baseSpeed * (bubbleFrequencyLevel / 50),
+    opacity: Math.random() * 0.5 + 0.3
+  };
+}
+function setBubbleFrequency(level) {
+  bubbleFrequencyLevel = Math.max(0, Math.min(100, Number(level) || 0));
+  var target = bubbleFrequencyLevel <= 0 ? 0 : Math.round(bubbleFrequencyLevel * 0.9);
+  while (bubbles.length < target) bubbles.push(makeBubble());
+  if (bubbles.length > target) bubbles.length = target;
+  var multiplier = bubbleFrequencyLevel / 50;
+  bubbles.forEach(function(bubble) { bubble.speed = bubble.baseSpeed * multiplier; });
+}
+window.__fsfmSetBubbleFrequency = setBubbleFrequency;
+setBubbleFrequency(50);
+
+var ambientFrame = 0;
+function drawAeroScene() {
+
+if (document.hidden) { ambientFrame = 0; return; }
+ctx.clearRect(0, 0, W, H);
+
+bubbles.forEach(function(bub) {
+
+bub.y -= bub.speed;
+
+if (bub.y < -bub.r * 2) { bub.y = H + bub.r * 2; bub.x = Math.random() * W; }
+
+ctx.beginPath();
+
+ctx.arc(bub.x, bub.y, bub.r, 0, Math.PI * 2);
+
+ctx.strokeStyle = 'rgba(255, 255, 255, ' + (bub.opacity * 0.7) + ')';
+
+ctx.lineWidth = 1.4;
+
+ctx.stroke();
+
+var bubGrad = ctx.createRadialGradient(bub.x - bub.r * 0.3, bub.y - bub.r * 0.3, 1, bub.x, bub.y, bub.r);
+
+bubGrad.addColorStop(0, 'rgba(255, 255, 255, ' + (bub.opacity * 0.8) + ')');
+
+bubGrad.addColorStop(0.5, 'rgba(255, 255, 255, ' + (bub.opacity * 0.2) + ')');
+
+bubGrad.addColorStop(1, 'transparent');
+
+ctx.fillStyle = bubGrad;
+
+ctx.fill();
+
+});
+
+ambientFrame = requestAnimationFrame(drawAeroScene);
+
+}
+
+function startAmbientAnimation() {
+  if (!document.hidden && !ambientFrame) ambientFrame = requestAnimationFrame(drawAeroScene);
+}
+function stopAmbientAnimation() {
+  if (ambientFrame) { cancelAnimationFrame(ambientFrame); ambientFrame = 0; }
+}
+document.addEventListener('visibilitychange', function() {
+  if (document.hidden) stopAmbientAnimation(); else startAmbientAnimation();
+});
+startAmbientAnimation();
+
+}
+
+} catch (err) {}
+
+// Intersection Observer Reveal
+
+try {
+
+var revealEls = document.querySelectorAll('.reveal');
+
+if ('IntersectionObserver' in window) {
+
+var io = new IntersectionObserver(function(entries) {
+
+entries.forEach(function(entry) { if (entry.isIntersecting) { entry.target.classList.add('in-view'); io.unobserve(entry.target); } });
+
+}, { threshold: 0.1 });
+
+revealEls.forEach(function(el) { io.observe(el); });
+
+} else {
+
+revealEls.forEach(function(el) { el.classList.add('in-view'); });
+
+}
+
+} catch (err) {}
+
+})();
+
+</script>
+
+<script>
+(function(){
+  'use strict';
+
+  // Minimize collapses a window to its title bar; closing an ordinary window removes it.
+  // Closing the hero produces a Windows-like shutdown screen (browsers do not permit
+  // websites to close tabs they did not open).
+  var originalTitle = document.title;
+  var shutdown = document.getElementById('fsfmShutdown');
+  var restart = document.getElementById('restartDesktop');
+  function shutdownDesktop(){
+    if(shutdown) shutdown.hidden=false;
+    document.body.classList.add('fsfm-shutdown-active');
+    document.title='Desktop shut down | Fake Space Fog Machine';
+    if(restart) restart.focus();
+  }
+  function closeWindow(button){
+    var win=button.closest('.aero-window, .content-window');
+    if(!win) return;
+    if(win.classList.contains('hero-window')) { shutdownDesktop(); return; }
+    if(win.id==='funWidgetMusic') {
+      var player=document.getElementById('homeMusicAudio');
+      if(player){player.pause();player.currentTime=0;}
+    }
+    win.hidden=true;
+  }
+  document.querySelectorAll('[data-window-action="close"]').forEach(function(button){
+    button.addEventListener('click',function(){closeWindow(button);});
+  });
+  document.querySelectorAll('[data-window-action="minimize"]').forEach(function(button){
+    button.addEventListener('click',function(){
+      var win=button.closest('.aero-window, .content-window');
+      if(!win) return;
+      var minimized=win.classList.toggle('window-minimized');
+      button.textContent=minimized?'□':'−';
+      button.setAttribute('aria-label',(minimized?'Restore ':'Minimize ')+(win.getAttribute('aria-label')||'window'));
+      button.title=minimized?'Restore':'Minimize';
+    });
+  });
+  if(restart) restart.addEventListener('click',function(){
+    document.body.classList.remove('fsfm-shutdown-active');
+    if(shutdown) shutdown.hidden=true;
+    document.title=originalTitle;
+    window.scrollTo(0,0);
+  });
+
+  // The roll is intentionally a one-click flourish, not an endless animation.
+  var rollButton=document.getElementById('barrelRollButton');
+  if(rollButton) rollButton.addEventListener('click',function(){
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var root=document.documentElement;
+    if(root.classList.contains('fsfm-barrel-roll')) return;
+    root.classList.add('fsfm-barrel-roll');
+    root.addEventListener('animationend',function handler(){root.classList.remove('fsfm-barrel-roll');root.removeEventListener('animationend',handler);},{once:true});
+  });
+
+  // Slider midpoint (50) is the site's original bubble count; 0 turns bubbles off.
+  var slider=document.getElementById('bubbleRateSlider');
+  var output=document.getElementById('bubbleRateValue');
+  function applyBubbleLevel(value){
+    var level=Math.max(0,Math.min(100,Number(value)||0));
+    if(typeof window.__fsfmSetBubbleFrequency==='function') window.__fsfmSetBubbleFrequency(level);
+    if(output){
+      if(level===0) output.textContent='OFF · 0';
+      else if(level===50) output.textContent='DEFAULT · 1×';
+      else output.textContent=(level/50).toFixed(1)+'×';
+    }
+  }
+  if(slider){
+    var savedLevel=null;
+    try { savedLevel=localStorage.getItem('fsfm_bubble_frequency_v1'); } catch(e) {}
+    if(savedLevel!==null && savedLevel!=='' && Number.isFinite(Number(savedLevel))) slider.value=String(Math.max(0,Math.min(100,Number(savedLevel))));
+    applyBubbleLevel(slider.value);
+    slider.addEventListener('input',function(){
+      applyBubbleLevel(slider.value);
+      try { localStorage.setItem('fsfm_bubble_frequency_v1',String(slider.value)); } catch(e) {}
+    });
+  }
+
+  // Homepage-only play/pause switch. Audio begins only after the visitor presses it.
+  var audio=document.getElementById('homeMusicAudio');
+  var musicButton=document.getElementById('homeMusicToggle');
+  var musicLabel=document.getElementById('homeMusicLabel');
+  function setMusicState(playing){
+    if(!musicButton) return;
+    musicButton.setAttribute('aria-pressed',playing?'true':'false');
+    musicButton.innerHTML=playing?'<span aria-hidden="true">Ⅱ</span> <span id="homeMusicLabel">PAUSE MUSIC</span>':'<span aria-hidden="true">▶</span> <span id="homeMusicLabel">PLAY MUSIC</span>';
+    musicLabel=document.getElementById('homeMusicLabel');
+  }
+  if(audio && musicButton){
+    musicButton.addEventListener('click',function(){
+      if(audio.paused){
+        var promise=audio.play();
+        if(promise && typeof promise.then==='function') promise.then(function(){setMusicState(true);}).catch(function(){setMusicState(false);});
+        else setMusicState(true);
+      } else {audio.pause();setMusicState(false);}
+    });
+    audio.addEventListener('pause',function(){setMusicState(false);});
+    audio.addEventListener('play',function(){setMusicState(true);});
+    audio.addEventListener('ended',function(){setMusicState(false);});
+    audio.addEventListener('error',function(){setMusicState(false);if(musicButton) musicButton.title='The audio file could not be loaded.';});
+  }
+
+  // Purble Place opens in a dimmed, dismissible window over the homepage.
+  var purbleOverlay=document.getElementById('purbleOverlay');
+  var purbleOpen=document.getElementById('purbleOpenButton');
+  var purbleClose=document.getElementById('purbleCloseButton');
+  var purbleFrame=document.getElementById('purbleFrame');
+  function closePurble(){if(purbleOverlay) purbleOverlay.hidden=true;if(purbleFrame) purbleFrame.src='about:blank';}
+  if(purbleOpen && purbleOverlay) purbleOpen.addEventListener('click',function(){if(purbleFrame && purbleFrame.dataset.src) purbleFrame.src=purbleFrame.dataset.src;purbleOverlay.hidden=false;if(purbleClose) purbleClose.focus();});
+  if(purbleClose) purbleClose.addEventListener('click',closePurble);
+  if(purbleOverlay) purbleOverlay.addEventListener('click',function(event){if(event.target===purbleOverlay) closePurble();});
+  document.addEventListener('keydown',function(event){if(event.key==='Escape' && purbleOverlay && !purbleOverlay.hidden) closePurble();});
+
+  // Fun-widget visibility is loaded independently of the large-screen gadget layer,
+  // so its Pages CMS switches work on laptops, tablets and phones too.
+  fetch('data/homepage-gadgets.json',{cache:'no-store'})
+    .then(function(response){if(!response.ok) throw new Error('Homepage gadget settings unavailable');return response.json();})
+    .then(function(data){
+      var flags=Object.assign({showBarrelRoll:true,showBubbleSlider:true,showMusicPlayer:true,showPurblePlace:true},data && data.funWidgets || {});
+      var map={showBarrelRoll:'funWidgetBarrelRoll',showBubbleSlider:'funWidgetBubbles',showMusicPlayer:'funWidgetMusic',showPurblePlace:'funWidgetPurble'};
+      Object.keys(map).forEach(function(key){var widget=document.getElementById(map[key]);if(widget) widget.hidden=flags[key]===false;});
+    }).catch(function(){});
+})();
+</script>
+
+<script>
+'use strict';
+(function() {
+  var layer = document.getElementById('fsfmGadgets');
+  if (!layer || !window.matchMedia('(min-width: 1320px) and (min-height: 700px)').matches) return;
+
+  var STORAGE_KEY = 'fsfm_gadget_positions_v1';
+  var widgets = Array.prototype.slice.call(layer.querySelectorAll('.fsfm-gadget'));
+  var positions = {};
+  var defaultPositions = {
+    'gadget-clock': [16, 82],
+    'gadget-now-playing': [16, 286],
+    'gadget-dates': [16, 440],
+    'gadget-calendar': [0, 82],
+    'gadget-photos': [0, 335],
+    'gadget-note': [0, 532]
+  };
+
+  function clampWidget(widget, x, y) {
+    var maxX = Math.max(8, window.innerWidth - widget.offsetWidth - 8);
+    var maxY = Math.max(48, window.innerHeight - widget.offsetHeight - 8);
+    return { x: Math.min(Math.max(8, x), maxX), y: Math.min(Math.max(48, y), maxY) };
+  }
+  function applyPosition(widget, x, y) {
+    var p = clampWidget(widget, x, y);
+    widget.style.left = p.x + 'px';
+    widget.style.top = p.y + 'px';
+    positions[widget.id] = [p.x, p.y];
+  }
+  try {
+    positions = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}') || {};
+  } catch (e) { positions = {}; }
+  widgets.forEach(function(widget) {
+    var saved = positions[widget.id];
+    var fallback = defaultPositions[widget.id] || [16, 90];
+    var x = saved && Number.isFinite(saved[0]) ? saved[0] : fallback[0];
+    var y = saved && Number.isFinite(saved[1]) ? saved[1] : fallback[1];
+    if (widget.id === 'gadget-calendar' || widget.id === 'gadget-photos' || widget.id === 'gadget-note') {
+      if (!(saved && Number.isFinite(saved[0]))) x = window.innerWidth - widget.offsetWidth - 16;
+    }
+    applyPosition(widget, x, y);
+  });
+  function savePositions() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(positions)); } catch (e) {}
+  }
+  widgets.forEach(function(widget) {
+    var handle = widget.querySelector('[data-drag-handle]');
+    if (!handle) return;
+    var drag = null;
+    handle.addEventListener('pointerdown', function(event) {
+      if (event.button !== 0 || event.target.closest('button,select,a,input')) return;
+      var rect = widget.getBoundingClientRect();
+      drag = { pointerId:event.pointerId, startX:event.clientX, startY:event.clientY, left:rect.left, top:rect.top };
+      widget.style.zIndex = '80';
+      widgets.forEach(function(other) { if (other !== widget) other.style.zIndex = '35'; });
+      try { handle.setPointerCapture(event.pointerId); } catch (e) {}
+      event.preventDefault();
+    });
+    handle.addEventListener('pointermove', function(event) {
+      if (!drag || event.pointerId !== drag.pointerId) return;
+      applyPosition(widget, drag.left + event.clientX - drag.startX, drag.top + event.clientY - drag.startY);
+    });
+    function endDrag(event) {
+      if (!drag || (event && event.pointerId !== drag.pointerId)) return;
+      drag = null; savePositions();
+    }
+    handle.addEventListener('pointerup', endDrag);
+    handle.addEventListener('pointercancel', endDrag);
+    handle.addEventListener('keydown', function(event) {
+      var step = event.shiftKey ? 30 : 10;
+      var rect = widget.getBoundingClientRect();
+      var x = rect.left, y = rect.top;
+      if (event.key === 'ArrowLeft') x -= step;
+      else if (event.key === 'ArrowRight') x += step;
+      else if (event.key === 'ArrowUp') y -= step;
+      else if (event.key === 'ArrowDown') y += step;
+      else return;
+      event.preventDefault(); applyPosition(widget, x, y); savePositions();
+    });
+  });
+  window.addEventListener('resize', function() {
+    widgets.forEach(function(widget) {
+      var rect = widget.getBoundingClientRect();
+      applyPosition(widget, rect.left, rect.top);
+    });
+    savePositions();
+  });
+
+  // Clock
+  function updateClock() {
+    var now = new Date();
+    var seconds = now.getSeconds(), minutes = now.getMinutes(), hours = now.getHours() % 12;
+    var hour = document.getElementById('clockHour');
+    var minute = document.getElementById('clockMinute');
+    var second = document.getElementById('clockSecond');
+    if (hour) hour.setAttribute('transform', 'rotate(' + (hours * 30 + minutes * .5) + ')');
+    if (minute) minute.setAttribute('transform', 'rotate(' + (minutes * 6 + seconds * .1) + ')');
+    if (second) second.setAttribute('transform', 'rotate(' + (seconds * 6) + ')');
+    var digital = document.getElementById('clockDigital');
+    if (digital) digital.textContent = now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  }
+  updateClock(); window.setInterval(updateClock, 1000);
+
+  // CMS data: this file is edited by Pages CMS, not by visitors' browsers.
+  var cmsData = {
+    photos:[], dates:[], stickyNote:{text:'A little message from Fake Space Fog Machine.'},
+    funWidgets:{showBarrelRoll:true,showBubbleSlider:true,showMusicPlayer:true,showPurblePlace:true}
+  };
+  function safeLocalImage(path) {
+    if (typeof path !== 'string' || !path.trim()) return null;
+    var raw = path.trim();
+    try {
+      var base = new URL(document.baseURI);
+      var url = new URL(raw, base);
+      if (url.protocol !== 'https:' && url.protocol !== 'http:') return null;
+      if (url.origin !== base.origin && !/^https?:\/\//i.test(raw)) return null;
+      return url.href;
+    } catch (e) { return null; }
+  }
+  function parseLocalDate(value) {
+    if (typeof value !== 'string') return null;
+    var match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
+    if (!match) return null;
+    var d = new Date(Number(match[1]), Number(match[2])-1, Number(match[3]));
+    return Number.isNaN(d.getTime()) ? null : d;
+  }
+  var events = [];
+  var calendarMonth = new Date(); calendarMonth.setDate(1);
+  function renderCalendar() {
+    var monthLabel = document.getElementById('calendarMonth');
+    var daysNode = document.getElementById('calendarDays');
+    if (!monthLabel || !daysNode) return;
+    monthLabel.textContent = calendarMonth.toLocaleDateString(undefined, {month:'long',year:'numeric'});
+    var year = calendarMonth.getFullYear(), month = calendarMonth.getMonth();
+    var firstDay = new Date(year, month, 1).getDay();
+    var count = new Date(year, month + 1, 0).getDate();
+    var previousCount = new Date(year, month, 0).getDate();
+    var eventKeys = {};
+    events.forEach(function(event) { if (event.dateObj) eventKeys[event.dateObj.getFullYear()+'-'+event.dateObj.getMonth()+'-'+event.dateObj.getDate()] = true; });
+    var today = new Date();
+    var cells = [];
+    for (var i=0; i<42; i++) {
+      var day, d, outside = false;
+      if (i < firstDay) { day = previousCount - firstDay + i + 1; d = new Date(year, month-1, day); outside = true; }
+      else if (i >= firstDay + count) { day = i - firstDay - count + 1; d = new Date(year, month+1, day); outside = true; }
+      else { day = i - firstDay + 1; d = new Date(year, month, day); }
+      var key = d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate();
+      var classes = 'calendar-day' + (outside ? ' is-outside' : '') + (!outside && d.toDateString() === today.toDateString() ? ' is-today' : '') + (eventKeys[key] ? ' has-event' : '');
+      cells.push('<span class="'+classes+'">'+day+'</span>');
+    }
+    daysNode.innerHTML = cells.join('');
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-calendar-step]'), function(button) {
+    button.addEventListener('click', function() { calendarMonth.setMonth(calendarMonth.getMonth() + Number(button.getAttribute('data-calendar-step'))); renderCalendar(); });
+  });
+  function renderPhotos() {
+    var image = document.getElementById('gadgetPhoto');
+    var empty = document.getElementById('photoEmpty');
+    var counter = document.getElementById('photoCounter');
+    var photos = Array.isArray(cmsData.photos) ? cmsData.photos.map(safeLocalImage).filter(Boolean) : [];
+    window.__fsfmPhotos = photos;
+    var index = window.__fsfmPhotoIndex || 0;
+    if (!photos.length) {
+      if (image) { image.hidden = true; image.removeAttribute('src'); }
+      if (empty) empty.hidden = true;
+      var controls = document.querySelector('#gadget-photos .photo-controls');
+      if (controls) controls.hidden = true;
+      if (counter) { counter.textContent = ''; counter.hidden = true; }
+      return;
+    }
+    var controls = document.querySelector('#gadget-photos .photo-controls');
+    if (controls) controls.hidden = false;
+    if (counter) counter.hidden = false;
+    index = ((index % photos.length) + photos.length) % photos.length;
+    window.__fsfmPhotoIndex = index;
+    if (image) { image.src = photos[index]; image.hidden = false; }
+    if (empty) empty.hidden = true;
+    if (counter) counter.textContent = (index+1)+' / '+photos.length;
+  }
+  function renderDates() {
+    var node = document.getElementById('gadgetDateList');
+    if (!node) return;
+    var list = (Array.isArray(cmsData.dates) ? cmsData.dates : []).map(function(item) {
+      return {title:String(item && item.title || 'Untitled event'), description:String(item && item.description || ''), dateObj:parseLocalDate(item && item.date), rawDate:String(item && item.date || '')};
+    }).filter(function(item) { return item.dateObj; }).sort(function(a,b) { return a.dateObj - b.dateObj; });
+    events = list; renderCalendar();
+    var today = new Date(); today.setHours(0,0,0,0);
+    var upcoming = list.filter(function(item) { return item.dateObj >= today; }).slice(0,3);
+    if (!upcoming.length) upcoming = list.slice(-3).reverse();
+    if (!upcoming.length) {
+      node.innerHTML = '';
+      var datesWidget = document.getElementById('gadget-dates');
+      if (datesWidget) datesWidget.hidden = true;
+      return;
+    }
+    var datesWidget = document.getElementById('gadget-dates');
+    if (datesWidget) datesWidget.hidden = false;
+    node.innerHTML = upcoming.map(function(item) {
+      var day = item.dateObj.toLocaleDateString(undefined,{day:'2-digit'});
+      var mon = item.dateObj.toLocaleDateString(undefined,{month:'short'}).toUpperCase();
+      var description = item.description ? '<small>'+escapeHTML(item.description)+'</small>' : '';
+      return '<div class="gadget-date-item"><div class="gadget-date-chip"><strong>'+day+'</strong><small>'+mon+'</small></div><div class="gadget-date-copy"><strong>'+escapeHTML(item.title)+'</strong>'+description+'</div></div>';
+    }).join('');
+  }
+  function escapeHTML(value) { return String(value).replace(/[&<>"']/g, function(ch) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]; }); }
+  function applyCMSData(data) {
+    if (!data || typeof data !== 'object') return;
+    cmsData = Object.assign(cmsData, data);
+    cmsData.funWidgets = Object.assign({showBarrelRoll:true,showBubbleSlider:true,showMusicPlayer:true,showPurblePlace:true}, data.funWidgets || {});
+    renderPhotos(); renderDates();
+    var note = document.getElementById('gadgetStickyText');
+    var noteText = cmsData.stickyNote && typeof cmsData.stickyNote.text === 'string' ? cmsData.stickyNote.text : '';
+    if (note) { note.textContent = noteText; note.hidden = !noteText.trim(); }
+    var noteWidget = document.getElementById('gadget-note');
+    if (noteWidget) noteWidget.hidden = !noteText.trim();
+
+    var widgetFlags = {
+      showBarrelRoll:'funWidgetBarrelRoll', showBubbleSlider:'funWidgetBubbles',
+      showMusicPlayer:'funWidgetMusic', showPurblePlace:'funWidgetPurble'
+    };
+    Object.keys(widgetFlags).forEach(function(key) {
+      var widget = document.getElementById(widgetFlags[key]);
+      if (widget) widget.hidden = cmsData.funWidgets[key] === false;
+    });
+  }
+  renderCalendar();
+  fetch('data/homepage-gadgets.json', {cache:'no-store'})
+    .then(function(response) { if (!response.ok) throw new Error('CMS data unavailable'); return response.json(); })
+    .then(applyCMSData)
+    .catch(function() { applyCMSData(cmsData); });
+  document.getElementById('photoPrevious').addEventListener('click', function() { window.__fsfmPhotoIndex = (window.__fsfmPhotoIndex || 0)-1; renderPhotos(); });
+  document.getElementById('photoNext').addEventListener('click', function() { window.__fsfmPhotoIndex = (window.__fsfmPhotoIndex || 0)+1; renderPhotos(); });
+
+})();
+</script>
+
+
+<script>
+(function(){
+  'use strict';
+  var fallback={
+    siteName:'Fake Space Fog Machine',homeBrowserTitle:'Fake Space Fog Machine',albumBrowserTitle:'The Early Bird.... | Fake Space Fog Machine',
+    description:'Fake Space Fog Machine. Independent music from the United Kingdom.',footerText:'© 2026 FAKE SPACE FOG MACHINE',
+    home:{heroWindowTitle:'Fake Space Fog Machine — Artist Portal',heroBadge:'Independent Artist Portal',heroTitle:'Fake Space Fog Machine',heroSubtitle:'Sonic Space-Age Aesthetics · Est. 2026',heroHandle:'@mirrorlesssmoke',marqueeMessages:['WELCOME TO THE FSFM DESKTOP','THE EARLY BIRD.... · SEVEN TRACKS','INDEPENDENT MUSIC FROM THE UNITED KINGDOM'],bioWindowTitle:'ABOUT FSFM',bio:'Fake Space Fog Machine is a fully independent artist based in the United Kingdom who doesn\'t know how to write about himself in the third person.',spotifyWindowTitle:'FSFM ON SPOTIFY',eventsWindowTitle:'UPCOMING TRANSMISSIONS',socialWindowTitle:'FIND FSFM',featuredWindowTitle:'FEATURED RELEASE',featuredAlbumTitle:'The Early Bird....',featuredAlbumMeta:'Seven tracks · Full album',featuredCoverImage:'/media/images/cover.png',featuredLinkText:'OPEN ALBUM PAGE',featuredLinkUrl:'the-early-bird.html'}
+  };
+  function setText(id,value){var node=document.getElementById(id);if(node && typeof value==='string'){node.textContent=value;node.hidden=!value.trim();}}
+  function apply(data){
+    if(!data || typeof data!=='object') return;
+    var home=data.home||{};
+    document.title=typeof data.homeBrowserTitle==='string' && data.homeBrowserTitle.trim()?data.homeBrowserTitle:fallback.homeBrowserTitle;
+    var desc=document.getElementById('siteDescription');if(desc && typeof data.description==='string') desc.setAttribute('content',data.description);
+    setText('taskbarSiteName',data.siteName);setText('bootBrand',String(data.siteName||'').toUpperCase());setText('siteFooter',data.footerText);
+    ['heroWindowTitle','heroBadge','heroTitle','heroSubtitle','heroHandle','bioWindowTitle','spotifyWindowTitle','eventsWindowTitle','socialWindowTitle','featuredWindowTitle','featuredAlbumTitle','featuredAlbumMeta','featuredLinkText'].forEach(function(key){
+      var map={heroWindowTitle:'heroWindowTitle',heroBadge:'heroBadge',heroTitle:'heroTitle',heroSubtitle:'heroSubtitle',heroHandle:'heroHandle',bioWindowTitle:'bioWindowTitle',spotifyWindowTitle:'spotifyWindowTitle',eventsWindowTitle:'eventsWindowTitle',socialWindowTitle:'socialWindowTitle',featuredWindowTitle:'featuredGadgetTitle',featuredAlbumTitle:'featuredAlbumTitle',featuredAlbumMeta:'featuredAlbumMeta',featuredLinkText:'featuredLinkText'};
+      setText(map[key],home[key]);
+    });
+    setText('homeBio',home.bio);
+    var coverNode=document.getElementById('featuredAlbumCover');
+    var coverBox=document.getElementById('featuredAlbumArt');
+    var coverPath=typeof home.featuredCoverImage==='string'?home.featuredCoverImage.trim():'';
+    if(coverNode && coverBox){
+      var coverURL=null;
+      try { var parsedCover=new URL(coverPath,document.baseURI); if(parsedCover.protocol==='https:'||parsedCover.protocol==='http:') coverURL=parsedCover.href; } catch(e) {}
+      if(coverURL){coverNode.src=coverURL;coverBox.hidden=false;coverNode.alt=(typeof home.featuredAlbumTitle==='string' && home.featuredAlbumTitle.trim()?home.featuredAlbumTitle:'Featured release')+' artwork';} else {coverBox.hidden=true;}
+    }
+    var featuredLink=document.getElementById('featuredReleaseLink');
+    var featuredTarget=typeof home.featuredLinkUrl==='string'?home.featuredLinkUrl.trim():'';
+    if(featuredLink){
+      try {
+        var parsedTarget=new URL(featuredTarget,document.baseURI);
+        if(featuredTarget && (parsedTarget.protocol==='https:'||parsedTarget.protocol==='http:')){
+          featuredLink.href=featuredTarget;featuredLink.removeAttribute('aria-disabled');
+          if(parsedTarget.origin!==window.location.origin){featuredLink.target='_blank';featuredLink.rel='noopener noreferrer';}
+          else {featuredLink.removeAttribute('target');featuredLink.removeAttribute('rel');}
+        } else {featuredLink.removeAttribute('href');featuredLink.setAttribute('aria-disabled','true');featuredLink.removeAttribute('target');}
+      } catch(e) {featuredLink.removeAttribute('href');featuredLink.setAttribute('aria-disabled','true');}
+    }
+    if(typeof home.marqueeMessages!=='undefined' && typeof window.__fsfmRenderMarquee==='function') window.__fsfmRenderMarquee(home.marqueeMessages);
+    var icon=document.getElementById('siteFavicon');
+    if(icon){var href=typeof data.favicon==='string'?data.favicon.trim():'';if(href){icon.setAttribute('href',href);var ext=(href.split('?')[0].split('.').pop()||'').toLowerCase();var mime={ico:'image/x-icon',png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg',gif:'image/gif',webp:'image/webp'}[ext]||'image/png';icon.setAttribute('type',mime);}else{icon.removeAttribute('href');}}
+  }
+  fetch('data/site-content.json',{cache:'no-store'}).then(function(r){if(!r.ok) throw new Error('Site content unavailable');return r.json();}).then(apply).catch(function(){apply(fallback);});
+})();
+</script>
+</body>
+
+</html>
