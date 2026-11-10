@@ -1,0 +1,60 @@
+
+media:
+  input: media/images
+  output: /media/images
+  extensions:
+    - jpg
+    - jpeg
+    - png
+    - webp
+    - gif
+  categories:
+    - image
+  rename: safe
+
+content:
+  - name: homepage-gadgets
+    label: Homepage Gadgets
+    type: file
+    path: data/homepage-gadgets.json
+    format: json
+    fields:
+      - name: photos
+        label: Picture Frame Photos
+        type: image
+        list: true
+        options:
+          extensions:
+            - jpg
+            - jpeg
+            - png
+            - webp
+            - gif
+
+      - name: dates
+        label: Important Dates
+        type: object
+        list:
+          collapsible: true
+        fields:
+          - name: title
+            label: Event
+            type: string
+          - name: date
+            label: Date
+            type: date
+          - name: description
+            label: Description
+            type: text
+
+      - name: stickyNote
+        label: Sticky Note
+        type: object
+        fields:
+          - name: text
+            label: Your Message
+            type: text
+
+settings:
+  content:
+    merge: true
