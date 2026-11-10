@@ -7,7 +7,7 @@
   "home": {
     "heroWindowTitle": "Fake Space Fog Machine  ·  Homepage",
     "heroTitle": "Fake Space Fog Machine",
-    "heroSubtitle": "Way Too Passionate Passion Project · Est. 2026",
+    "heroSubtitle": "Way Too Passionate Passion Project",
     "heroHandle": "@mirrorlesssmoke",
     "marqueeMessages": [
       "SEASON'S GREETINGS",
@@ -27,7 +27,8 @@
     "featuredAlbumMeta": "Debut album",
     "featuredLinkText": "ON SPOTIFY...",
     "featuredCoverImage": "/media/images/cover.png",
-    "featuredLinkUrl": "https://open.spotify.com/album/0clOFZSG1MHTVtK9DAjUOe"
+    "featuredLinkUrl": "https://open.spotify.com/album/0clOFZSG1MHTVtK9DAjUOe",
+    "heroBadge": "est. 2026"
   },
   "album": {
     "windowTitle": "The Early Bird....",
