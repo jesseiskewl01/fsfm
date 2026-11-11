@@ -12,9 +12,9 @@
     "text": "i am my son"
   },
   "funWidgets": {
-    "showBarrelRoll": true,
+    "showBarrelRoll": false,
     "showBubbleSlider": true,
-    "showMusicPlayer": true,
-    "showPurblePlace": true
+    "showMusicPlayer": false,
+    "showPurblePlace": false
   }
 }
