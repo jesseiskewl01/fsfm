@@ -1,8 +1,15 @@
 {
-  "photos": [],
-  "dates": [],
+  "photos": [
+    "/media/images/earlybirdcd.jpg"
+  ],
+  "dates": [
+    {
+      "title": "fake space birthday machine",
+      "date": "2026-11-16"
+    }
+  ],
   "stickyNote": {
-    "text": "A little message from Fake Space Fog Machine."
+    "text": "i am my son"
   },
   "funWidgets": {
     "showBarrelRoll": true,
