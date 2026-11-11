@@ -1,0 +1,211 @@
+media:
+  input: media/images
+  output: /media/images
+  extensions:
+    - jpg
+    - jpeg
+    - png
+    - webp
+    - gif
+    - ico
+  categories:
+    - image
+  rename: safe
+
+content:
+  - name: homepage-gadgets
+    label: Homepage Gadgets
+    type: file
+    path: data/homepage-gadgets.json
+    format: json
+    fields:
+      - name: photos
+        label: Picture Frame Photos
+        type: image
+        list: true
+        options:
+          extensions:
+            - jpg
+            - jpeg
+            - png
+            - webp
+            - gif
+
+      - name: dates
+        label: Important Dates
+        type: object
+        list:
+          collapsible: true
+        fields:
+          - name: title
+            label: Event
+            type: string
+          - name: date
+            label: Date
+            type: date
+          - name: description
+            label: Description
+            type: text
+
+      - name: stickyNote
+        label: Sticky Note
+        type: object
+        fields:
+          - name: text
+            label: Your Message
+            type: text
+
+      - name: funWidgets
+        label: Fun Widgets
+        type: object
+        description: Choose which interactive homepage widgets are visible. Their controls still work on the live site.
+        fields:
+          - name: showBarrelRoll
+            label: Show Barrel Roll Button
+            type: boolean
+          - name: showBubbleSlider
+            label: Show Bubble Frequency Slider
+            type: boolean
+          - name: showMusicPlayer
+            label: Show Homepage Music Player
+            type: boolean
+          - name: showPurblePlace
+            label: Show Purble Place Shortcut
+            type: boolean
+
+  - name: site-content
+    label: Site Content & Identity
+    type: file
+    path: data/site-content.json
+    format: json
+    fields:
+      - name: siteName
+        label: Website Name
+        type: string
+        description: Used for site branding in the homepage taskbar, startup screen and footer.
+      - name: homeBrowserTitle
+        label: Homepage Browser Tab Title
+        type: string
+      - name: albumBrowserTitle
+        label: Album Page Browser Tab Title
+        type: string
+      - name: favicon
+        label: Favicon Image
+        type: image
+        description: Upload the icon you want browsers to show. PNG, ICO, GIF, JPG and WebP are supported.
+        options:
+          extensions:
+            - png
+            - ico
+            - gif
+            - jpg
+            - jpeg
+            - webp
+      - name: description
+        label: Site Description
+        type: text
+      - name: home
+        label: Homepage Content
+        type: object
+        fields:
+          - name: heroWindowTitle
+            label: Hero Window Title Bar
+            type: string
+          - name: heroBadge
+            label: Hero Badge
+            type: string
+          - name: heroTitle
+            label: Main Homepage Heading
+            type: string
+          - name: heroSubtitle
+            label: Homepage Subtitle
+            type: string
+          - name: heroHandle
+            label: Artist Handle
+            type: string
+          - name: marqueeMessages
+            label: Marquee Messages
+            type: string
+            list: true
+            description: Add, remove, reorder or rewrite each scrolling message. The wallpaper star remains between messages.
+          - name: bioWindowTitle
+            label: Homepage Bio Window Title
+            type: string
+          - name: bio
+            label: Homepage Biography
+            type: text
+          - name: spotifyWindowTitle
+            label: Spotify Window Title
+            type: string
+          - name: eventsWindowTitle
+            label: Bandsintown Window Title
+            type: string
+          - name: socialWindowTitle
+            label: Social Links Window Title
+            type: string
+          - name: featuredWindowTitle
+            label: Featured Release Window Title
+            type: string
+          - name: featuredAlbumTitle
+            label: Featured Release Title
+            type: string
+          - name: featuredAlbumMeta
+            label: Featured Release Description
+            type: string
+          - name: featuredCoverImage
+            label: Featured Release Artwork
+            type: image
+            description: Choose the image shown in the Featured Release widget.
+            options:
+              extensions:
+                - jpg
+                - jpeg
+                - png
+                - webp
+                - gif
+          - name: featuredLinkText
+            label: Featured Release Link Text
+            type: string
+          - name: featuredLinkUrl
+            label: Featured Release Destination URL
+            type: string
+            description: Link the whole Featured Release widget to a local page or a full https URL.
+          - name: shutdownRedirectUrl
+            label: Homepage Shutdown Redirect URL
+            type: string
+            description: Destination opened in the same tab when the homepage hero window is closed. Use a full https URL.
+      - name: album
+        label: Album Page Content
+        type: object
+        fields:
+          - name: windowTitle
+            label: Album Hero Window Title
+            type: string
+          - name: title
+            label: Album Heading
+            type: string
+          - name: eyebrow
+            label: Album Eyebrow
+            type: string
+          - name: artistLine
+            label: Artist Line
+            type: string
+          - name: bio
+            label: Album Artist Statement
+            type: text
+          - name: playerWindowTitle
+            label: Media Player Window Title
+            type: string
+          - name: playerArtistName
+            label: Player Artist Name
+            type: string
+          - name: spotifyLabel
+            label: Spotify Section Label
+            type: string
+      - name: footerText
+        label: Footer Text
+        type: string
+
+settings:
+  content:
+    merge: true
