@@ -14,7 +14,7 @@
   "funWidgets": {
     "showBarrelRoll": false,
     "showBubbleSlider": true,
-    "showMusicPlayer": true,
+    "showMusicPlayer": false,
     "showPurblePlace": false
   }
 }
