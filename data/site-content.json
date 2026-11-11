@@ -1,0 +1,45 @@
+{
+  "siteName": "Fake Space Fog Machine",
+  "homeBrowserTitle": "Fake Space Fog Machine",
+  "albumBrowserTitle": "The Early Bird.... | Fake Space Fog Machine",
+  "favicon": "/media/images/asadadasdges-removebg-preview.png",
+  "description": "Land of the free",
+  "home": {
+    "heroWindowTitle": "Fake Space Fog Machine  ·  Homepage",
+    "heroTitle": "Fake Space Fog Machine",
+    "heroSubtitle": "super passionate passion project",
+    "heroHandle": "@mirrorlesssmoke",
+    "marqueeMessages": [
+      "SEASON'S GREETINGS",
+      "THE EARLY BIRD....",
+      "FAKE SPACE FOG MACHINE",
+      "HOW GOES IT?",
+      "THANK YOU FOR LISTENING",
+      "HI GUY"
+    ],
+    "bioWindowTitle": "ABOUT FSFM",
+    "bio": "Fake Space Fog Machine is a fully independent artist based in the United Kingdom who doesn't know how to write about himself in the third person.",
+    "spotifyWindowTitle": "FSFM ON SPOTIFY",
+    "eventsWindowTitle": "ON THE HORIZON",
+    "socialWindowTitle": "FIND FSFM",
+    "featuredWindowTitle": "FEATURED RELEASE",
+    "featuredAlbumTitle": "The Early Bird....",
+    "featuredAlbumMeta": "Debut album",
+    "featuredLinkText": "ON SPOTIFY...",
+    "featuredCoverImage": "/media/images/cover.png",
+    "featuredLinkUrl": "https://open.spotify.com/album/0clOFZSG1MHTVtK9DAjUOe",
+    "heroBadge": ":]",
+    "shutdownRedirectUrl": "https://open.spotify.com/track/2CnrJj6Jz4vSe5E1hsWtpg"
+  },
+  "album": {
+    "windowTitle": "The Early Bird....",
+    "title": "The Early Bird....",
+    "artistLine": "by Fake Space Fog Machine",
+    "bio": "\"...I can sometimes overlook the times where my mixing is just shitty because every now and then I listen to this bullshit and I LOVE it and that is MORE than enough for me. I’m sure this is the best thing I’ll have made in a very long time for that exact reason. Goodnight.\"",
+    "playerWindowTitle": "FSFM Media Player",
+    "spotifyLabel": "OUT ON SPOTIFY",
+    "playerArtistName": "Fake Space Fog Machine",
+    "eyebrow": "08/21"
+  },
+  "footerText": "© 2026 FAKE SPACE FOG MACHINE"
+}
