@@ -722,10 +722,11 @@ components:
         hidden: true
   seo:
     type: object
-    label: SEO and sharing
+    label: Page title and sharing
+    description: Set the title shown in browser tabs and search results. Most other sharing details can stay at their defaults.
     fields:
     - name: title
-      label: Browser and search title
+      label: Page title (browser and search)
       type: string
       default: ''
     - name: description
@@ -851,28 +852,50 @@ components:
     - name: wallpaper
       label: Wallpaper
       type: object
+      description: Pick one visual style. The extra technical settings are handled automatically.
       fields:
-      - name: mode
-        label: Wallpaper mode
+      - name: choice
+        label: Wallpaper style
         type: select
         default: template-default
-        description: Use the template's default, choose one wallpaper, upload your own, or rotate through Vista colours.
+        description: Choose a colour, Aurora, Album Amber, a custom image, or rotating Vista colours.
+        options:
+          values:
+          - template-default
+          - vista-violet-haze
+          - vista-aqua-glass
+          - vista-solar-flare
+          - vista-rose-bloom
+          - aurora
+          - album-amber
+          - custom
+          - cycle
+          labels:
+          - Template default
+          - Violet Haze · Purple
+          - Aqua Glass · Teal
+          - Solar Flare · Orange
+          - Rose Bloom · Pink
+          - Aurora
+          - Album Amber
+          - Custom image
+          - Cycle Vista colours
+      - name: mode
+        label: false
+        type: select
+        hidden: true
+        default: template-default
         options:
           values:
           - preset
           - custom
           - cycle
           - template-default
-          labels:
-          - Preset
-          - Custom image
-          - Cycle Vista wallpapers
-          - Template default
       - name: preset
-        label: Static wallpaper preset
+        label: false
         type: select
+        hidden: true
         default: vista-violet-haze
-        description: Choose the main colour atmosphere for this page.
         options:
           values:
           - vista-violet-haze
@@ -881,13 +904,6 @@ components:
           - vista-rose-bloom
           - aurora
           - album-amber
-          labels:
-          - Violet Haze · Purple
-          - Aqua Glass · Teal
-          - Solar Flare · Orange
-          - Rose Bloom · Pink
-          - Aurora
-          - Album Amber
       - name: presets
         label: false
         type: select
@@ -910,8 +926,9 @@ components:
           - Solar Flare · Orange
           - Rose Bloom · Pink
       - name: customImage
-        label: Custom wallpaper image
+        label: Optional custom image
         type: image
+        description: Only used when Wallpaper style is set to Custom image.
         options:
           media: images
           extensions:
@@ -961,8 +978,9 @@ components:
           - vista-solar-flare
           - vista-rose-bloom
       - name: cycle
-        label: Wallpaper cycling
+        label: false
         type: object
+        hidden: true
         fields:
         - name: enabled
           label: Automatically rotate wallpapers
@@ -1008,8 +1026,8 @@ components:
         default: true
   homepageSections:
     type: block
-    label: PAGE LAYOUT · HOMEPAGE BUILDING BLOCKS
-    description: This is the main page builder. Add blocks, edit their content, and arrange them in the order visitors should see.
+    label: PAGE LAYOUT · BUILD THE HOMEPAGE
+    description: This is the main page builder. Add blocks, edit their content, and arrange them in the order visitors should see. Start here after the page name, title and wallpaper are set.
     list:
       collapsible:
         collapsed: true
@@ -1063,8 +1081,8 @@ components:
       component: blockSpacer
   albumSections:
     type: block
-    label: PAGE LAYOUT · ALBUM BUILDING BLOCKS
-    description: This is the main page builder. The album header and player are required; add optional blocks around them.
+    label: PAGE LAYOUT · BUILD THE ALBUM PAGE
+    description: This is the main page builder. The album header and player are built in; add optional blocks around them.
     list:
       collapsible:
         collapsed: true
@@ -1121,8 +1139,8 @@ components:
       component: blockSpotifyEmbed
   vistaSections:
     type: block
-    label: PAGE LAYOUT · BUILDING BLOCKS
-    description: Add, edit and reorder the content blocks that make up this page.
+    label: PAGE LAYOUT · BUILD THE PAGE
+    description: Add, edit and reorder the content visitors will see. This is the main part of the page editor.
     list:
       collapsible:
         collapsed: true
@@ -1519,15 +1537,15 @@ content:
       - name: footerText
         label: Footer text
         type: string
+    - name: seo
+      label: Page title and sharing
+      component: seo
     - name: appearance
       label: Page appearance
       component: appearance
     - name: publishing
       label: Publishing and navigation
       component: publishing
-    - name: seo
-      label: SEO and sharing
-      component: seo
     - name: sections
       label: Homepage content components
       component: homepageSections
@@ -1689,15 +1707,15 @@ content:
       - name: footerText
         label: Footer text
         type: string
+    - name: seo
+      label: Page title and sharing
+      component: seo
     - name: appearance
       label: Page appearance
       component: appearance
     - name: publishing
       label: Publishing and navigation
       component: publishing
-    - name: seo
-      label: SEO and sharing
-      component: seo
     - name: sections
       label: Album page layout
       component: albumSections
@@ -1758,15 +1776,15 @@ content:
       - name: footerText
         label: Footer text
         type: string
+    - name: seo
+      label: Page title and sharing
+      component: seo
     - name: appearance
       label: Page appearance
       component: appearance
     - name: publishing
       label: Publishing and navigation
       component: publishing
-    - name: seo
-      label: SEO and sharing
-      component: seo
     - name: sections
       label: Page building blocks
       component: vistaSections
@@ -1803,15 +1821,15 @@ content:
       - name: footerText
         label: Footer text
         type: string
+    - name: seo
+      label: Page title and sharing
+      component: seo
     - name: appearance
       label: Page appearance
       component: appearance
     - name: publishing
       label: Publishing and navigation
       component: publishing
-    - name: seo
-      label: SEO and sharing
-      component: seo
     - name: sections
       label: Page building blocks
       component: editorialSections
