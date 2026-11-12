@@ -1144,7 +1144,7 @@ components:
   vistaSections:
     type: block
     label: PAGE LAYOUT · BUILD THE PAGE
-    description: Add, edit and reorder the content visitors will see. This is the main part of the page editor.
+    description: MAIN PAGE BUILDER · Add, edit and reorder the content visitors will see. This is the main part of the page editor.
     list:
       collapsible:
         collapsed: true
@@ -1199,7 +1199,7 @@ components:
   editorialSections:
     type: block
     label: PAGE LAYOUT · BUILDING BLOCKS
-    description: Add, edit and reorder the content blocks that make up this page.
+    description: MAIN PAGE BUILDER · Add, edit and reorder the content blocks that make up this page.
     list:
       collapsible:
         collapsed: true
@@ -1551,7 +1551,7 @@ content:
       label: Publishing and navigation
       component: publishing
     - name: sections
-      label: Homepage content components
+      label: PAGE LAYOUT · BUILD THE HOMEPAGE
       component: homepageSections
   - name: albums
     label: Albums
@@ -1721,7 +1721,7 @@ content:
       label: Publishing and navigation
       component: publishing
     - name: sections
-      label: Album page layout
+      label: PAGE LAYOUT · BUILD THE ALBUM PAGE
       component: albumSections
       default:
       - type: album-header
@@ -1790,7 +1790,7 @@ content:
       label: Publishing and navigation
       component: publishing
     - name: sections
-      label: Page building blocks
+      label: PAGE LAYOUT · BUILD THE PAGE
       component: vistaSections
   - name: editorial-pages
     label: Editorial Pages
@@ -1835,7 +1835,7 @@ content:
       label: Publishing and navigation
       component: publishing
     - name: sections
-      label: Page building blocks
+      label: PAGE LAYOUT · BUILD THE PAGE
       component: editorialSections
 - name: site-settings
   label: Site settings
