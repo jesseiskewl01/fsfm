@@ -92,7 +92,8 @@
         "mode": "sequential",
         "intervalSeconds": 30,
         "manualControl": false
-      }
+      },
+      "choice": "template-default"
     },
     "effects": {
       "backgroundEffects": true,
