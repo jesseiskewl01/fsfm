@@ -74,3 +74,24 @@ test('CMS hides implementation fields and gives the block editor usable help', (
   assert.match(config, /description: Choose the page wallpaper/);
   assert.match(config, /list:\n\s+min: 0\n\s+default: \[\]/);
 });
+
+
+test('Wallpaper editor presents one clear choice and hides renderer implementation settings', () => {
+  const wallpaper = config.slice(config.indexOf('    - name: wallpaper'), config.indexOf('    - name: effects'));
+  assert.match(wallpaper, /- name: choice[\s\S]*?label: Wallpaper style[\s\S]*?type: select/);
+  assert.match(wallpaper, /- name: mode[\s\S]*?hidden: true/);
+  assert.match(wallpaper, /- name: preset[\s\S]*?hidden: true/);
+  assert.match(wallpaper, /- name: customImage[\s\S]*?label: Optional custom image/);
+  assert.match(wallpaper, /- name: cycle[\s\S]*?hidden: true/);
+});
+
+test('Page title and wallpaper settings appear before the page layout blocks', () => {
+  const vistaStart = config.indexOf('    - name: vista-pages');
+  const editorialStart = config.indexOf('    - name: editorial-pages');
+  const siteSettingsStart = config.indexOf('  - name: site-settings');
+  for (const section of [config.slice(vistaStart, editorialStart), config.slice(editorialStart, siteSettingsStart)]) {
+    assert.ok(section.indexOf('component: identity') < section.indexOf('component: seo'));
+    assert.ok(section.indexOf('component: seo') < section.indexOf('component: appearance'));
+    assert.ok(section.indexOf('component: appearance') < section.indexOf('component: sections'));
+  }
+});
