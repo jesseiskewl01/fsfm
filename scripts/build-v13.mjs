@@ -65,7 +65,9 @@ if (published.some((page) => page.template === 'album' && page.identity.slug ===
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>The Early Bird.... has moved | Fake Space Fog Machine</title>
+  <meta name="description" content="The Early Bird.... by Fake Space Fog Machine has moved to its album page.">
   <meta name="robots" content="noindex, follow">
+  <meta property="og:title" content="The Early Bird.... has moved | Fake Space Fog Machine">
   <link rel="canonical" href="https://fsfm.port82.net/albums/the-early-bird/">
   <meta http-equiv="refresh" content="0; url=/albums/the-early-bird/">
 </head>
