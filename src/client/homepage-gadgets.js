@@ -240,6 +240,7 @@
         defaultPositions[id] = [Number(pos[0]), Number(pos[1])];
       }
     });
+    resolveWidgetCollisions(defaultPositions);
     widgets.forEach(function(widget) {
       if (customPositions[widget.id]) {
         var rect = widget.getBoundingClientRect();
