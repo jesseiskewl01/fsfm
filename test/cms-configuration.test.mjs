@@ -57,11 +57,11 @@ test('CMS hides computed public routes and puts page-wide settings before the bl
   const albumStart = config.indexOf('  - name: albums');
   const vistaStart = config.indexOf('  - name: vista-pages');
   const albums = config.slice(albumStart, vistaStart);
-  assert.ok(albums.indexOf('component: identity') < albums.indexOf('component: appearance'));
+  assert.ok(albums.indexOf('component: identity') < albums.indexOf('component: seo'));
+  assert.ok(albums.indexOf('component: seo') < albums.indexOf('component: appearance'));
   assert.ok(albums.indexOf('component: appearance') < albums.indexOf('component: publishing'));
-  assert.ok(albums.indexOf('component: publishing') < albums.indexOf('component: seo'));
   assert.ok(albums.indexOf('component: seo') < albums.indexOf('component: albumSections'));
-  assert.match(config, /PAGE LAYOUT · ALBUM BUILDING BLOCKS/);
+  assert.match(config, /PAGE LAYOUT · BUILD THE ALBUM PAGE/);
   assert.match(config, /The name visitors see in the page menu/);
 });
 
@@ -71,7 +71,7 @@ test('CMS hides implementation fields and gives the block editor usable help', (
   assert.match(config, /label: Group name/);
   assert.match(config, /description: Give blocks the same group name/);
   assert.match(config, /description: The flexible text block/);
-  assert.match(config, /description: Choose the page wallpaper/);
+  assert.match(config, /description: Choose a colour, Aurora, Album Amber, a custom image, or rotating Vista colours/);
   assert.match(config, /list:\n\s+min: 0\n\s+default: \[\]/);
 });
 
