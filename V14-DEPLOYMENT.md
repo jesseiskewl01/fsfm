@@ -4,14 +4,17 @@ V14 builds the website into `dist/`. The production workflow runs the tests, val
 
 ## One-time GitHub Pages setting
 
-Before merging the V14 pull request:
+The V14 pull request is currently a draft. Do not change the publishing source while the implementation is still being reviewed.
+
+Once the pull request is marked ready and its checks have passed, make the publishing-source change immediately before merging:
 
 1. Open the repository on GitHub.
 2. Go to **Settings → Pages**.
 3. Under **Build and deployment → Source**, change **Deploy from a branch** to **GitHub Actions**.
 4. Leave the configured custom domain (`fsfm.port82.net`) in place.
+5. Return to the ready V14 pull request and merge it.
 
-GitHub Pages must use **GitHub Actions** as its publishing source for the `actions/deploy-pages` workflow to publish the generated `dist/` directory. The existing branch-root publishing mode serves the old root-level HTML and does not run the V14 build.
+GitHub's documented custom-workflow setup uses **GitHub Actions** as the publishing source. The V14 workflow builds the generated `dist/` directory and deploys that artifact; the old branch-root setting does not run this V14 build.
 
 ## After the V14 merge
 
