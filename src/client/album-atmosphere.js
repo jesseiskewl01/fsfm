@@ -296,6 +296,7 @@ try {
       canvas.style.width = width + 'px';
       canvas.style.height = height + 'px';
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      lastFrame = -1000;
 
       stars = [];
       blooms = [];
@@ -469,7 +470,10 @@ try {
     }
 
     resizeAurora();
-    window.addEventListener('resize', resizeAurora, { passive: true });
+    window.addEventListener('resize', function() {
+      resizeAurora();
+      if (reduceMotion && pageVisible && !document.hidden) drawAurora(40);
+    }, { passive: true });
     drawAurora(40);
     document.addEventListener('visibilitychange', function() {
       pageVisible = !document.hidden;
