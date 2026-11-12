@@ -65,7 +65,8 @@ export function validatePage(page, options = {}) {
     }
   }
 
-  if (!isRecord(page.templateData)) issue(problems, where, 'templateData object is required');
+  if (['homepage', 'album'].includes(page.template) && !isRecord(page.templateData)) issue(problems, where, 'templateData object is required');
+  else if (page.templateData !== undefined && !isRecord(page.templateData)) issue(problems, where, 'templateData must be an object when provided');
   if (!Array.isArray(page.sections)) issue(problems, where, 'sections must be an ordered array');
   else {
     const ids = new Set();
