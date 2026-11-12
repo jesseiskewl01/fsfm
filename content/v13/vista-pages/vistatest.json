@@ -45,8 +45,8 @@
     }
   ],
   "publishing": {
-    "published": true,
-    "showInNavigation": true,
+    "published": false,
+    "showInNavigation": false,
     "navigationLabel": "vistatest"
   },
   "appearance": {
