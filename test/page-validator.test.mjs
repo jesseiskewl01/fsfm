@@ -96,3 +96,15 @@ test('Normalizer generates stable internal IDs for blocks when omitted', () => {
   assert.deepEqual(normalized.sections.map(section=>section.id), ['test-hero-1','test-hero-2']);
   assert.equal(source.sections[0].id, undefined);
 });
+
+
+test('Layout group names become stable internal IDs without exposing implementation details', () => {
+  const source = { template:'vista-window', identity:{name:'Test',slug:'test'}, sections:[
+    {type:'hero',enabled:true,content:{title:'One'},group:{name:'Listening area',layout:'grid',columns:2}},
+    {type:'image',enabled:true,content:{src:'/media/images/cover.png'},group:{name:'Listening area',layout:'grid',columns:2}}
+  ] };
+  const normalized = normalizePageRecord(source, {baseUrl:'https://fsfm.port82.net/'});
+  assert.equal(normalized.sections[0].group.id, 'listening-area');
+  assert.equal(normalized.sections[1].group.id, 'listening-area');
+  assert.equal(source.sections[0].group.id, undefined);
+});
