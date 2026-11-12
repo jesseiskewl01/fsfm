@@ -1,0 +1,31 @@
+{
+  "slug": "example-page",
+  "title": "A new FSFM page",
+  "pageType": "editorial",
+  "published": false,
+  "navigationLabel": "",
+  "order": 99,
+  "seo": {
+    "title": "A new FSFM page | Fake Space Fog Machine",
+    "description": "An unpublished starter page for Fake Space Fog Machine.",
+    "canonical": "",
+    "socialImage": "/media/images/cover.png"
+  },
+  "layout": [
+    {
+      "type": "hero",
+      "eyebrow": "A LITTLE CORNER OF THE INTERNET",
+      "heading": "A new page",
+      "subheading": "Start making something strange.",
+      "image": ""
+    },
+    {
+      "type": "text",
+      "heading": "A little introduction",
+      "body": "Write something here. This page is unpublished until you switch Published on."
+    }
+  ],
+  "showInNavigation": false,
+  "wallpaper": "vista-teal",
+  "customWallpaper": ""
+}

@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://fsfm.port82.net/sitemap.xml

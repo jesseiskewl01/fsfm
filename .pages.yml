@@ -1,211 +1,2019 @@
 media:
+- name: images
+  label: Images
   input: media/images
   output: /media/images
   extensions:
-    - jpg
-    - jpeg
-    - png
-    - webp
-    - gif
-    - ico
+  - jpg
+  - jpeg
+  - png
+  - webp
+  - gif
+  - svg
+  - ico
+  rename: false
   categories:
-    - image
-  rename: safe
-
-content:
-  - name: homepage-gadgets
-    label: Homepage Gadgets
-    type: file
-    path: data/homepage-gadgets.json
-    format: json
+  - image
+- name: audio
+  label: Audio
+  input: media/audio
+  output: /media/audio
+  extensions:
+  - ogg
+  - mp3
+  - wav
+  - m4a
+  - aac
+  - flac
+  rename: false
+  categories:
+  - audio
+- name: lyrics
+  label: Synchronized lyrics
+  input: lyrics
+  output: lyrics
+  extensions:
+  - lrc
+  rename: false
+components:
+  blockSiteHeader:
+    type: object
+    label: Site header
     fields:
-      - name: photos
-        label: Picture Frame Photos
+    - name: id
+      label: Internal section ID
+      type: string
+      required: true
+    - name: enabled
+      label: Show this section
+      type: boolean
+      default: true
+    - name: presentation
+      label: Presentation
+      component: sectionPresentation
+    - name: content
+      label: Content
+      type: object
+      fields:
+      - name: name
+        label: Display name
+        type: string
+        required: true
+      - name: handle
+        label: Artist handle
+        type: string
+      - name: logo
+        label: Optional logo
         type: image
-        list: true
         options:
+          media: images
           extensions:
+          - jpg
+          - jpeg
+          - png
+          - webp
+          - gif
+          - svg
+          - ico
+          rename: false
+  blockHero:
+    type: object
+    label: Hero
+    fields:
+    - name: id
+      label: Internal section ID
+      type: string
+      required: true
+    - name: enabled
+      label: Show this section
+      type: boolean
+      default: true
+    - name: presentation
+      label: Presentation
+      component: sectionPresentation
+    - name: content
+      label: Content
+      type: object
+      fields:
+      - name: eyebrow
+        label: Eyebrow
+        type: string
+      - name: title
+        label: Heading
+        type: string
+        required: true
+      - name: subtitle
+        label: Supporting text
+        type: text
+      - name: image
+        label: Hero image
+        type: image
+        options:
+          media: images
+          extensions:
+          - jpg
+          - jpeg
+          - png
+          - webp
+          - gif
+          - svg
+          - ico
+          rename: false
+      - name: imageAlt
+        label: Image alternative text
+        type: string
+      - name: linkText
+        label: Link text
+        type: string
+      - name: linkUrl
+        label: Link URL
+        type: string
+  blockMarquee:
+    type: object
+    label: Marquee
+    fields:
+    - name: id
+      label: Internal section ID
+      type: string
+      required: true
+    - name: enabled
+      label: Show this section
+      type: boolean
+      default: true
+    - name: presentation
+      label: Presentation
+      component: sectionPresentation
+    - name: content
+      label: Content
+      type: object
+      fields:
+      - name: messages
+        label: Scrolling messages
+        type: string
+        list:
+          min: 1
+        default: []
+  blockArtistStatement:
+    type: object
+    label: Artist statement
+    fields:
+    - name: id
+      label: Internal section ID
+      type: string
+      required: true
+    - name: enabled
+      label: Show this section
+      type: boolean
+      default: true
+    - name: group
+      label: Layout group
+      component: sectionGroup
+    - name: presentation
+      label: Presentation
+      component: sectionPresentation
+    - name: content
+      label: Content
+      type: object
+      fields:
+      - name: body
+        label: Statement / biography
+        type: text
+        required: true
+  blockEmbedWindow:
+    type: object
+    label: Embed window
+    fields:
+    - name: id
+      label: Internal section ID
+      type: string
+      required: true
+    - name: enabled
+      label: Show this section
+      type: boolean
+      default: true
+    - name: group
+      label: Layout group
+      component: sectionGroup
+    - name: presentation
+      label: Presentation
+      component: sectionPresentation
+    - name: content
+      label: Content
+      type: object
+      fields:
+      - name: provider
+        label: Embed provider
+        type: select
+        default: custom
+        options:
+          values:
+          - spotify
+          - youtube
+          - bandcamp
+          - soundcloud
+          - custom
+      - name: url
+        label: Embed URL
+        type: string
+        required: true
+      - name: title
+        label: Accessible embed title
+        type: string
+      - name: height
+        label: Embed height (px)
+        type: number
+        default: 352
+  blockBandsintownEvents:
+    type: object
+    label: Bandsintown events
+    fields:
+    - name: id
+      label: Internal section ID
+      type: string
+      required: true
+    - name: enabled
+      label: Show this section
+      type: boolean
+      default: true
+    - name: group
+      label: Layout group
+      component: sectionGroup
+    - name: presentation
+      label: Presentation
+      component: sectionPresentation
+    - name: content
+      label: Content
+      type: object
+      fields:
+      - name: artistName
+        label: Bandsintown artist ID
+        type: string
+        required: true
+      - name: appId
+        label: Bandsintown app ID
+        type: string
+        required: true
+      - name: displayDetails
+        label: Show event details
+        type: boolean
+        default: true
+      - name: displayLineup
+        label: Show lineup
+        type: boolean
+        default: true
+      - name: displayStartTime
+        label: Show start time
+        type: boolean
+        default: true
+      - name: displayLocalDates
+        label: Show local dates
+        type: boolean
+        default: true
+      - name: localDatesPosition
+        label: Local dates position
+        type: string
+      - name: font
+        label: Widget font
+        type: string
+      - name: followSectionPosition
+        label: Follow section position
+        type: string
+      - name: followSectionAlignment
+        label: Follow section alignment
+        type: string
+      - name: followSectionCtaText
+        label: Follow button text
+        type: string
+      - name: eventRsvpPosition
+        label: RSVP position
+        type: string
+      - name: eventRsvpOnlyShowIcon
+        label: RSVP icon only
+        type: boolean
+        default: true
+      - name: playMyCityPosition
+        label: Play My City position
+        type: string
+      - name: playMyCityAlignment
+        label: Play My City alignment
+        type: string
+      - name: playMyCityCtaIcon
+        label: Play My City icon
+        type: boolean
+        default: true
+  blockSocialLinks:
+    type: object
+    label: Social links
+    fields:
+    - name: id
+      label: Internal section ID
+      type: string
+      required: true
+    - name: enabled
+      label: Show this section
+      type: boolean
+      default: true
+    - name: group
+      label: Layout group
+      component: sectionGroup
+    - name: presentation
+      label: Presentation
+      component: sectionPresentation
+    - name: content
+      label: Content
+      type: object
+      fields:
+      - name: links
+        label: Social links
+        type: object
+        fields:
+        - name: label
+          label: Network name
+          type: string
+        - name: url
+          label: Profile URL
+          type: string
+        list:
+          min: 1
+          collapsible:
+            collapsed: true
+            summary: '{label}'
+  blockFeaturedRelease:
+    type: object
+    label: Featured release
+    fields:
+    - name: id
+      label: Internal section ID
+      type: string
+      required: true
+    - name: enabled
+      label: Show this section
+      type: boolean
+      default: true
+    - name: group
+      label: Layout group
+      component: sectionGroup
+    - name: presentation
+      label: Presentation
+      component: sectionPresentation
+    - name: content
+      label: Content
+      type: object
+      fields:
+      - name: title
+        label: Release title
+        type: string
+        required: true
+      - name: description
+        label: Description
+        type: text
+      - name: artwork
+        label: Artwork
+        type: image
+        options:
+          media: images
+          extensions:
+          - jpg
+          - jpeg
+          - png
+          - webp
+          - gif
+          - svg
+          - ico
+          rename: false
+      - name: url
+        label: Destination URL
+        type: string
+        required: true
+      - name: linkText
+        label: Link text
+        type: string
+      - name: artworkAlt
+        label: Artwork alternative text
+        type: string
+  blockRichText:
+    type: object
+    label: Rich text
+    fields:
+    - name: id
+      label: Internal section ID
+      type: string
+      required: true
+    - name: enabled
+      label: Show this section
+      type: boolean
+      default: true
+    - name: group
+      label: Layout group
+      component: sectionGroup
+    - name: presentation
+      label: Presentation
+      component: sectionPresentation
+    - name: content
+      label: Content
+      type: object
+      fields:
+      - name: heading
+        label: Heading
+        type: string
+      - name: body
+        label: Formatted content
+        type: rich-text
+        required: true
+        options:
+          format: markdown
+          switcher: true
+          media: images
+  blockImage:
+    type: object
+    label: Image
+    fields:
+    - name: id
+      label: Internal section ID
+      type: string
+      required: true
+    - name: enabled
+      label: Show this section
+      type: boolean
+      default: true
+    - name: group
+      label: Layout group
+      component: sectionGroup
+    - name: presentation
+      label: Presentation
+      component: sectionPresentation
+    - name: content
+      label: Content
+      type: object
+      fields:
+      - name: src
+        label: Image
+        type: image
+        required: true
+        options:
+          media: images
+          extensions:
+          - jpg
+          - jpeg
+          - png
+          - webp
+          - gif
+          - svg
+          - ico
+          rename: false
+      - name: alt
+        label: Alternative text
+        type: string
+      - name: caption
+        label: Caption
+        type: text
+  blockGallery:
+    type: object
+    label: Image gallery
+    fields:
+    - name: id
+      label: Internal section ID
+      type: string
+      required: true
+    - name: enabled
+      label: Show this section
+      type: boolean
+      default: true
+    - name: group
+      label: Layout group
+      component: sectionGroup
+    - name: presentation
+      label: Presentation
+      component: sectionPresentation
+    - name: content
+      label: Content
+      type: object
+      fields:
+      - name: images
+        label: Images
+        type: image
+        list:
+          min: 1
+        options:
+          media: images
+          extensions:
+          - jpg
+          - jpeg
+          - png
+          - webp
+          - gif
+          - svg
+          - ico
+          rename: false
+      - name: altText
+        label: Shared alternative text guidance
+        type: text
+      - name: caption
+        label: Gallery caption
+        type: text
+  blockQuote:
+    type: object
+    label: Quote
+    fields:
+    - name: id
+      label: Internal section ID
+      type: string
+      required: true
+    - name: enabled
+      label: Show this section
+      type: boolean
+      default: true
+    - name: group
+      label: Layout group
+      component: sectionGroup
+    - name: presentation
+      label: Presentation
+      component: sectionPresentation
+    - name: content
+      label: Content
+      type: object
+      fields:
+      - name: text
+        label: Quotation
+        type: text
+        required: true
+      - name: attribution
+        label: Attribution
+        type: string
+  blockLinkButton:
+    type: object
+    label: Link or button
+    fields:
+    - name: id
+      label: Internal section ID
+      type: string
+      required: true
+    - name: enabled
+      label: Show this section
+      type: boolean
+      default: true
+    - name: group
+      label: Layout group
+      component: sectionGroup
+    - name: presentation
+      label: Presentation
+      component: sectionPresentation
+    - name: content
+      label: Content
+      type: object
+      fields:
+      - name: label
+        label: Button text
+        type: string
+        required: true
+      - name: url
+        label: Destination URL
+        type: string
+        required: true
+      - name: style
+        label: Visual style
+        type: select
+        default: primary
+        options:
+          values:
+          - primary
+          - secondary
+          - text
+  blockDivider:
+    type: object
+    label: Divider
+    fields:
+    - name: id
+      label: Internal section ID
+      type: string
+      required: true
+    - name: enabled
+      label: Show this section
+      type: boolean
+      default: true
+    - name: presentation
+      label: Presentation
+      component: sectionPresentation
+    - name: content
+      label: Content
+      type: object
+      fields:
+      - name: style
+        label: Divider style
+        type: select
+        default: line
+        options:
+          values:
+          - line
+          - star
+          - space
+  blockSpacer:
+    type: object
+    label: Spacer
+    fields:
+    - name: id
+      label: Internal section ID
+      type: string
+      required: true
+    - name: enabled
+      label: Show this section
+      type: boolean
+      default: true
+    - name: presentation
+      label: Presentation
+      component: sectionPresentation
+    - name: content
+      label: Content
+      type: object
+      fields:
+      - name: size
+        label: Height (px)
+        type: number
+        default: 32
+  blockAlbumHeader:
+    type: object
+    label: Album header (built-in)
+    fields:
+    - name: id
+      label: Internal section ID
+      type: string
+      required: true
+    - name: enabled
+      label: Show this section
+      type: boolean
+      default: true
+    - name: presentation
+      label: Presentation
+      component: sectionPresentation
+    - name: content
+      label: Content
+      type: object
+      fields:
+      - name: source
+        label: Uses album details
+        type: string
+        default: templateData.album
+        readonly: true
+  blockAlbumPlayer:
+    type: object
+    label: FSFM Media Player (required)
+    fields:
+    - name: id
+      label: Internal section ID
+      type: string
+      required: true
+    - name: enabled
+      label: Show this section
+      type: boolean
+      default: true
+    - name: presentation
+      label: Presentation
+      component: sectionPresentation
+    - name: content
+      label: Content
+      type: object
+      fields:
+      - name: source
+        label: Uses album player data
+        type: string
+        default: templateData.player
+        readonly: true
+  blockSpotifyEmbed:
+    type: object
+    label: Spotify album embed
+    fields:
+    - name: id
+      label: Internal section ID
+      type: string
+      required: true
+    - name: enabled
+      label: Show this section
+      type: boolean
+      default: true
+    - name: presentation
+      label: Presentation
+      component: sectionPresentation
+    - name: content
+      label: Content
+      type: object
+      fields:
+      - name: source
+        label: Uses Spotify settings
+        type: string
+        default: templateData.spotify
+        readonly: true
+  seo:
+    type: object
+    label: SEO and sharing
+    fields:
+    - name: title
+      label: Browser and search title
+      type: string
+      default: ''
+    - name: description
+      label: Search description
+      type: text
+      default: ''
+    - name: canonical
+      label: Canonical URL
+      type: string
+      default: ''
+    - name: socialImage
+      label: Social sharing image
+      type: image
+      options:
+        media: images
+        extensions:
+        - jpg
+        - jpeg
+        - png
+        - webp
+        - gif
+        - svg
+        - ico
+        rename: false
+    - name: allowIndexing
+      label: Allow search engines to index this page
+      type: boolean
+      default: true
+  identity:
+    type: object
+    label: Page identity
+    fields:
+    - name: name
+      label: Page name
+      type: string
+      required: true
+    - name: slug
+      label: URL slug
+      type: string
+      required: true
+      pattern: ^[a-z0-9]+(?:-[a-z0-9]+)*$
+    - name: route
+      label: Public URL
+      type: string
+      required: true
+      description: Use a leading slash. New albums can use /albums/your-slug/; Vista and Editorial pages use /pages/your-slug/. Keep The Early Bird.... at /the-early-bird.html.
+    - name: order
+      label: Page order
+      type: number
+      default: 10
+  publishing:
+    type: object
+    label: Publishing and navigation
+    fields:
+    - name: published
+      label: Published / publicly available
+      type: boolean
+      default: false
+    - name: showInNavigation
+      label: Show in site navigation
+      type: boolean
+      default: true
+    - name: navigationLabel
+      label: Navigation label
+      type: string
+      default: ''
+  sectionPresentation:
+    type: object
+    label: Presentation
+    fields:
+    - name: variant
+      label: Visual presentation variant
+      type: select
+      default: ''
+      options:
+        values:
+        - ''
+        - vista-window
+        - vista-desktop
+        - editorial
+        - amber-editorial
+        - amber-player
+        - plain
+    - name: windowTitle
+      label: Window / section title
+      type: string
+      default: ''
+  sectionGroup:
+    type: object
+    label: Layout group
+    fields:
+    - name: id
+      label: Group ID
+      type: string
+      default: ''
+    - name: layout
+      label: Layout
+      type: select
+      default: grid
+      options:
+        values:
+        - grid
+        - stack
+        - columns
+    - name: columns
+      label: Columns
+      type: number
+      default: 2
+  appearance:
+    type: object
+    label: Page appearance
+    fields:
+    - name: wallpaper
+      label: Wallpaper
+      type: object
+      fields:
+      - name: mode
+        label: Wallpaper mode
+        type: select
+        default: template-default
+        options:
+          values:
+          - preset
+          - custom
+          - cycle
+          - template-default
+          labels:
+          - Preset
+          - Custom image
+          - Cycle Vista wallpapers
+          - Template default
+      - name: preset
+        label: Static wallpaper preset
+        type: select
+        default: vista-violet-haze
+        options:
+          values:
+          - vista-violet-haze
+          - vista-aqua-glass
+          - vista-solar-flare
+          - vista-rose-bloom
+          - aurora
+          - album-amber
+          labels:
+          - Violet Haze · Purple
+          - Aqua Glass · Teal
+          - Solar Flare · Orange
+          - Rose Bloom · Pink
+          - Aurora
+          - Album Amber
+      - name: presets
+        label: Wallpapers included in cycle
+        type: select
+        list: true
+        default:
+        - vista-violet-haze
+        - vista-aqua-glass
+        - vista-solar-flare
+        - vista-rose-bloom
+        options:
+          values:
+          - vista-violet-haze
+          - vista-aqua-glass
+          - vista-solar-flare
+          - vista-rose-bloom
+          labels:
+          - Violet Haze · Purple
+          - Aqua Glass · Teal
+          - Solar Flare · Orange
+          - Rose Bloom · Pink
+      - name: customImage
+        label: Custom wallpaper image
+        type: image
+        options:
+          media: images
+          extensions:
+          - jpg
+          - jpeg
+          - png
+          - webp
+          - gif
+          - svg
+          - ico
+          rename: false
+      - name: customFit
+        label: Custom image fit
+        type: select
+        default: cover
+        options:
+          values:
+          - cover
+          - contain
+      - name: customPosition
+        label: Custom image focal position
+        type: select
+        default: center
+        options:
+          values:
+          - center
+          - top
+          - bottom
+          - left
+          - right
+          - top-left
+          - top-right
+          - bottom-left
+          - bottom-right
+      - name: initialSelection
+        label: Initial wallpaper selection
+        type: select
+        default: random
+        options:
+          values:
+          - random
+          - vista-violet-haze
+          - vista-aqua-glass
+          - vista-solar-flare
+          - vista-rose-bloom
+      - name: cycle
+        label: Wallpaper cycling
+        type: object
+        fields:
+        - name: enabled
+          label: Automatically rotate wallpapers
+          type: boolean
+          default: false
+        - name: mode
+          label: Rotation order
+          type: select
+          default: sequential
+          options:
+            values:
+            - sequential
+            - random
+        - name: intervalSeconds
+          label: Seconds between changes
+          type: number
+          default: 30
+        - name: manualControl
+          label: Allow visitors to change wallpaper manually
+          type: boolean
+          default: true
+    - name: effects
+      label: Background and motion effects
+      type: object
+      fields:
+      - name: backgroundEffects
+        label: Enable background effects
+        type: boolean
+        default: true
+      - name: pageTransition
+        label: Enable page transitions
+        type: boolean
+        default: true
+      - name: respectReducedMotion
+        label: Respect reduced-motion preference
+        type: boolean
+        default: true
+  homepageSections:
+    type: block
+    label: Homepage building blocks
+    list:
+      collapsible:
+        collapsed: true
+        summary: '{type} · {id}'
+    blockKey: type
+    blocks:
+    - name: site-header
+      label: Site header
+      component: blockSiteHeader
+    - name: hero
+      label: Hero
+      component: blockHero
+    - name: marquee
+      label: Marquee
+      component: blockMarquee
+    - name: artist-statement
+      label: Artist statement
+      component: blockArtistStatement
+    - name: embed-window
+      label: Embed window
+      component: blockEmbedWindow
+    - name: bandsintown-events
+      label: Bandsintown events
+      component: blockBandsintownEvents
+    - name: social-links
+      label: Social links
+      component: blockSocialLinks
+    - name: featured-release
+      label: Featured release
+      component: blockFeaturedRelease
+    - name: rich-text
+      label: Rich text
+      component: blockRichText
+    - name: image
+      label: Image
+      component: blockImage
+    - name: gallery
+      label: Image gallery
+      component: blockGallery
+    - name: quote
+      label: Quote
+      component: blockQuote
+    - name: link-button
+      label: Link or button
+      component: blockLinkButton
+    - name: divider
+      label: Divider
+      component: blockDivider
+    - name: spacer
+      label: Spacer
+      component: blockSpacer
+  albumSections:
+    type: block
+    label: Album page layout
+    list:
+      collapsible:
+        collapsed: true
+        summary: '{type} · {id}'
+    blockKey: type
+    blocks:
+    - name: site-header
+      label: Site header
+      component: blockSiteHeader
+    - name: marquee
+      label: Marquee
+      component: blockMarquee
+    - name: artist-statement
+      label: Artist statement
+      component: blockArtistStatement
+    - name: embed-window
+      label: Embed window
+      component: blockEmbedWindow
+    - name: social-links
+      label: Social links
+      component: blockSocialLinks
+    - name: featured-release
+      label: Featured release
+      component: blockFeaturedRelease
+    - name: rich-text
+      label: Rich text
+      component: blockRichText
+    - name: image
+      label: Image
+      component: blockImage
+    - name: gallery
+      label: Image gallery
+      component: blockGallery
+    - name: quote
+      label: Quote
+      component: blockQuote
+    - name: link-button
+      label: Link or button
+      component: blockLinkButton
+    - name: divider
+      label: Divider
+      component: blockDivider
+    - name: spacer
+      label: Spacer
+      component: blockSpacer
+    - name: album-header
+      label: Album header (built-in)
+      component: blockAlbumHeader
+    - name: album-player
+      label: FSFM Media Player (required)
+      component: blockAlbumPlayer
+    - name: spotify-embed
+      label: Spotify album embed
+      component: blockSpotifyEmbed
+  vistaSections:
+    type: block
+    label: Vista page building blocks
+    list:
+      collapsible:
+        collapsed: true
+        summary: '{type} · {id}'
+    blockKey: type
+    blocks:
+    - name: site-header
+      label: Site header
+      component: blockSiteHeader
+    - name: hero
+      label: Hero
+      component: blockHero
+    - name: marquee
+      label: Marquee
+      component: blockMarquee
+    - name: artist-statement
+      label: Artist statement
+      component: blockArtistStatement
+    - name: embed-window
+      label: Embed window
+      component: blockEmbedWindow
+    - name: bandsintown-events
+      label: Bandsintown events
+      component: blockBandsintownEvents
+    - name: social-links
+      label: Social links
+      component: blockSocialLinks
+    - name: featured-release
+      label: Featured release
+      component: blockFeaturedRelease
+    - name: rich-text
+      label: Rich text
+      component: blockRichText
+    - name: image
+      label: Image
+      component: blockImage
+    - name: gallery
+      label: Image gallery
+      component: blockGallery
+    - name: quote
+      label: Quote
+      component: blockQuote
+    - name: link-button
+      label: Link or button
+      component: blockLinkButton
+    - name: divider
+      label: Divider
+      component: blockDivider
+    - name: spacer
+      label: Spacer
+      component: blockSpacer
+  editorialSections:
+    type: block
+    label: Editorial page building blocks
+    list:
+      collapsible:
+        collapsed: true
+        summary: '{type} · {id}'
+    blockKey: type
+    blocks:
+    - name: site-header
+      label: Site header
+      component: blockSiteHeader
+    - name: hero
+      label: Hero
+      component: blockHero
+    - name: marquee
+      label: Marquee
+      component: blockMarquee
+    - name: artist-statement
+      label: Artist statement
+      component: blockArtistStatement
+    - name: embed-window
+      label: Embed window
+      component: blockEmbedWindow
+    - name: bandsintown-events
+      label: Bandsintown events
+      component: blockBandsintownEvents
+    - name: social-links
+      label: Social links
+      component: blockSocialLinks
+    - name: featured-release
+      label: Featured release
+      component: blockFeaturedRelease
+    - name: rich-text
+      label: Rich text
+      component: blockRichText
+    - name: image
+      label: Image
+      component: blockImage
+    - name: gallery
+      label: Image gallery
+      component: blockGallery
+    - name: quote
+      label: Quote
+      component: blockQuote
+    - name: link-button
+      label: Link or button
+      component: blockLinkButton
+    - name: divider
+      label: Divider
+      component: blockDivider
+    - name: spacer
+      label: Spacer
+      component: blockSpacer
+content:
+- name: pages
+  label: Pages
+  type: group
+  items:
+  - name: homepage
+    label: Homepage
+    type: file
+    path: content/v13/homepage.json
+    format: json
+    operations:
+      delete: false
+    fields:
+    - name: schemaVersion
+      label: Schema version
+      type: number
+      default: 1
+      readonly: true
+    - name: template
+      label: Template
+      type: string
+      default: homepage
+      readonly: true
+    - name: identity
+      label: Page identity
+      component: identity
+    - name: templateData
+      label: Homepage content
+      type: object
+      fields:
+      - name: hero
+        label: Homepage hero window
+        type: object
+        fields:
+        - name: windowTitle
+          label: Hero window title
+          type: string
+        - name: badge
+          label: Hero badge
+          type: string
+        - name: title
+          label: Main heading
+          type: string
+          required: true
+        - name: subtitle
+          label: Subtitle
+          type: string
+        - name: handle
+          label: Artist handle
+          type: string
+      - name: desktopLabels
+        label: Desktop interface text
+        type: object
+        fields:
+        - name: bootLoading
+          label: Loading screen status
+          type: string
+          default: LOADING YOUR DESKTOP
+        - name: bootWelcome
+          label: Welcome status
+          type: string
+          default: WELCOME
+        - name: bootReady
+          label: Ready status
+          type: string
+          default: DESKTOP READY
+        - name: bootCaption
+          label: Loading screen caption
+          type: string
+          default: SONIC SPACE-AGE AESTHETICS
+        - name: shutdownTitle
+          label: Shutdown title
+          type: string
+          default: Goodnight.
+        - name: shutdownMessage
+          label: Shutdown message
+          type: string
+          default: Closing the FSFM desktop...
+        - name: homeNavigationLabel
+          label: Homepage navigation label
+          type: string
+          default: Home
+      - name: gadgets
+        label: Homepage desktop gadgets
+        type: object
+        fields:
+        - name: photos
+          label: Picture frame photos
+          type: image
+          list: true
+          options:
+            media: images
+            extensions:
             - jpg
             - jpeg
             - png
             - webp
             - gif
-
-      - name: dates
-        label: Important Dates
-        type: object
-        list:
-          collapsible: true
-        fields:
+            - svg
+            - ico
+            rename: false
+        - name: dates
+          label: Important dates
+          type: object
+          fields:
           - name: title
-            label: Event
+            label: Event title
             type: string
           - name: date
             label: Date
             type: date
+            default: ''
           - name: description
             label: Description
             type: text
-
-      - name: stickyNote
-        label: Sticky Note
-        type: object
-        fields:
+          list:
+            collapsible:
+              collapsed: true
+              summary: '{title}'
+        - name: stickyNote
+          label: Sticky note
+          type: object
+          fields:
           - name: text
-            label: Your Message
+            label: Note text
             type: text
-
-      - name: funWidgets
-        label: Fun Widgets
-        type: object
-        description: Choose which interactive homepage widgets are visible. Their controls still work on the live site.
-        fields:
+        - name: labels
+          label: Gadget labels and button text
+          type: object
+          fields:
+          - name: clock
+            label: Clock gadget title
+            type: string
+            default: Clock
+          - name: calendar
+            label: Calendar gadget title
+            type: string
+            default: Calendar
+          - name: pictureFrame
+            label: Picture Frame gadget title
+            type: string
+            default: Picture Frame
+          - name: importantDates
+            label: Important Dates gadget title
+            type: string
+            default: Important Dates
+          - name: stickyNote
+            label: Sticky Note gadget title
+            type: string
+            default: Sticky Note
+          - name: barrelRoll
+            label: Barrel Roll gadget title
+            type: string
+            default: Barrel Roll
+          - name: bubbleFrequency
+            label: Bubble Frequency gadget title
+            type: string
+            default: Bubble Frequency
+          - name: radio
+            label: Radio gadget title
+            type: string
+            default: FSFM Radio
+          - name: purblePlace
+            label: Purble Place gadget title
+            type: string
+            default: Purble Place
+          - name: barrelRollButton
+            label: Barrel Roll button text
+            type: string
+            default: DO A BARREL ROLL
+          - name: bubbleFrequencyLabel
+            label: Bubble slider label
+            type: string
+            default: AMBIENT BUBBLES
+          - name: radioPlay
+            label: Radio play button text
+            type: string
+            default: PLAY MUSIC
+          - name: radioPause
+            label: Radio pause button text
+            type: string
+            default: PAUSE MUSIC
+          - name: purblePlaceButton
+            label: Purble Place button text
+            type: string
+            default: OPEN PURBLE PLACE
+        - name: funWidgets
+          label: Desktop gadget visibility
+          type: object
+          fields:
           - name: showBarrelRoll
-            label: Show Barrel Roll Button
+            label: Show Barrel Roll button
             type: boolean
+            default: true
           - name: showBubbleSlider
-            label: Show Bubble Frequency Slider
+            label: Show bubble frequency slider
             type: boolean
+            default: true
           - name: showMusicPlayer
-            label: Show Homepage Music Player
+            label: Show FSFM Radio gadget
             type: boolean
+            default: true
           - name: showPurblePlace
-            label: Show Purble Place Shortcut
+            label: Show Purble Place shortcut
             type: boolean
-
-  - name: site-content
-    label: Site Content & Identity
-    type: file
-    path: data/site-content.json
-    format: json
-    fields:
-      - name: siteName
-        label: Website Name
-        type: string
-        description: Used for site branding in the homepage taskbar, startup screen and footer.
-      - name: homeBrowserTitle
-        label: Homepage Browser Tab Title
-        type: string
-      - name: albumBrowserTitle
-        label: Album Page Browser Tab Title
-        type: string
-      - name: favicon
-        label: Favicon Image
-        type: image
-        description: Upload the icon you want browsers to show. PNG, ICO, GIF, JPG and WebP are supported.
-        options:
-          extensions:
-            - png
-            - ico
-            - gif
-            - jpg
-            - jpeg
-            - webp
-      - name: description
-        label: Site Description
-        type: text
-      - name: home
-        label: Homepage Content
-        type: object
-        fields:
-          - name: heroWindowTitle
-            label: Hero Window Title Bar
-            type: string
-          - name: heroBadge
-            label: Hero Badge
-            type: string
-          - name: heroTitle
-            label: Main Homepage Heading
-            type: string
-          - name: heroSubtitle
-            label: Homepage Subtitle
-            type: string
-          - name: heroHandle
-            label: Artist Handle
-            type: string
-          - name: marqueeMessages
-            label: Marquee Messages
-            type: string
-            list: true
-            description: Add, remove, reorder or rewrite each scrolling message. The wallpaper star remains between messages.
-          - name: bioWindowTitle
-            label: Homepage Bio Window Title
-            type: string
-          - name: bio
-            label: Homepage Biography
-            type: text
-          - name: spotifyWindowTitle
-            label: Spotify Window Title
-            type: string
-          - name: eventsWindowTitle
-            label: Bandsintown Window Title
-            type: string
-          - name: socialWindowTitle
-            label: Social Links Window Title
-            type: string
-          - name: featuredWindowTitle
-            label: Featured Release Window Title
-            type: string
-          - name: featuredAlbumTitle
-            label: Featured Release Title
-            type: string
-          - name: featuredAlbumMeta
-            label: Featured Release Description
-            type: string
-          - name: featuredCoverImage
-            label: Featured Release Artwork
-            type: image
-            description: Choose the image shown in the Featured Release widget.
-            options:
-              extensions:
-                - jpg
-                - jpeg
-                - png
-                - webp
-                - gif
-          - name: featuredLinkText
-            label: Featured Release Link Text
-            type: string
-          - name: featuredLinkUrl
-            label: Featured Release Destination URL
-            type: string
-            description: Link the whole Featured Release widget to a local page or a full https URL.
-          - name: shutdownRedirectUrl
-            label: Homepage Shutdown Redirect URL
-            type: string
-            description: Destination opened in the same tab when the homepage hero window is closed. Use a full https URL.
-      - name: album
-        label: Album Page Content
-        type: object
-        fields:
+            default: true
+        - name: visibility
+          label: Gadget visibility
+          type: object
+          fields:
+          - name: showClock
+            label: Show Clock
+            type: boolean
+            default: true
+          - name: showCalendar
+            label: Show Calendar
+            type: boolean
+            default: true
+          - name: showFeaturedRelease
+            label: Show Featured Release
+            type: boolean
+            default: true
+          - name: showPhotos
+            label: Show Picture Frame
+            type: boolean
+            default: true
+          - name: showDates
+            label: Show Important Dates
+            type: boolean
+            default: true
+          - name: showStickyNote
+            label: Show Sticky Note
+            type: boolean
+            default: true
+        - name: radioAudioUrl
+          label: FSFM Radio audio URL
+          type: string
+          default: https://github.com/jesseiskewl01/fsfm/raw/refs/heads/main/audio/groovy.mp3
+        - name: bubbleDefault
+          label: Default bubble frequency
+          type: number
+          default: 50
+        - name: purblePlaceUrl
+          label: Purble Place embed URL
+          type: string
+          default: https://www.play-games.com/iframe/37376.html
+        - name: featuredRelease
+          label: Featured release gadget
+          type: object
+          fields:
           - name: windowTitle
-            label: Album Hero Window Title
+            label: Window title
             type: string
           - name: title
-            label: Album Heading
+            label: Release title
             type: string
-          - name: eyebrow
-            label: Album Eyebrow
+          - name: description
+            label: Release description
             type: string
-          - name: artistLine
-            label: Artist Line
+          - name: artwork
+            label: Artwork
+            type: image
+            options:
+              media: images
+              extensions:
+              - jpg
+              - jpeg
+              - png
+              - webp
+              - gif
+              - svg
+              - ico
+              rename: false
+          - name: linkText
+            label: Link text
             type: string
-          - name: bio
-            label: Album Artist Statement
-            type: text
-          - name: playerWindowTitle
-            label: Media Player Window Title
+          - name: url
+            label: Destination URL
             type: string
-          - name: playerArtistName
-            label: Player Artist Name
+          - name: componentType
+            label: Component type
             type: string
-          - name: spotifyLabel
-            label: Spotify Section Label
-            type: string
+            default: featured-release
+            readonly: true
+        - name: shutdownRedirectUrl
+          label: Hero shutdown redirect URL
+          type: string
       - name: footerText
-        label: Footer Text
+        label: Footer text
         type: string
-
+    - name: sections
+      label: Homepage content components
+      component: homepageSections
+    - name: publishing
+      label: Publishing and navigation
+      component: publishing
+    - name: appearance
+      label: Page appearance
+      component: appearance
+    - name: seo
+      label: SEO and sharing
+      component: seo
+  - name: albums
+    label: Albums
+    type: collection
+    path: content/v13/albums
+    filename:
+      template: '{fields.identity.slug}.json'
+      field: false
+    format: json
+    operations:
+      rename: false
+      delete: false
+    view:
+      fields:
+      - identity.name
+      - identity.slug
+      - publishing.published
+      - identity.order
+      primary: identity.name
+      sort:
+      - identity.order
+      - identity.name
+      default:
+        sort: identity.order
+        order: asc
+    fields:
+    - name: schemaVersion
+      label: Schema version
+      type: number
+      default: 1
+      readonly: true
+    - name: template
+      label: Template
+      type: string
+      default: album
+      readonly: true
+    - name: identity
+      label: Page identity
+      component: identity
+    - name: templateData
+      label: Album content
+      type: object
+      fields:
+      - name: album
+        label: Album details
+        type: object
+        fields:
+        - name: windowTitle
+          label: Album window title
+          type: string
+        - name: title
+          label: Album title
+          type: string
+          required: true
+        - name: artistLine
+          label: Artist line
+          type: string
+        - name: eyebrow
+          label: Eyebrow / release code
+          type: string
+        - name: artwork
+          label: Album artwork
+          type: image
+          options:
+            media: images
+            extensions:
+            - jpg
+            - jpeg
+            - png
+            - webp
+            - gif
+            - svg
+            - ico
+            rename: false
+      - name: player
+        label: FSFM Media Player
+        type: object
+        fields:
+        - name: windowTitle
+          label: Player window title
+          type: string
+        - name: artistName
+          label: Player artist name
+          type: string
+        - name: tracks
+          label: Tracklist
+          type: object
+          list:
+            min: 1
+            collapsible:
+              collapsed: true
+              summary: '{title}'
+          fields:
+          - name: id
+            label: Stable track ID
+            type: string
+            required: true
+          - name: title
+            label: Track title
+            type: string
+            required: true
+          - name: audioUrl
+            label: External audio URL
+            type: string
+            default: ''
+          - name: audioFile
+            label: Uploaded audio file
+            type: file
+            options:
+              media: audio
+              path: media/audio
+              extensions:
+              - ogg
+              - mp3
+              - wav
+              - m4a
+              - aac
+              - flac
+              rename: false
+          - name: lyricsFile
+            label: Synchronized lyrics (.lrc)
+            type: file
+            options:
+              media: lyrics
+              path: lyrics
+              extensions:
+              - lrc
+              rename: false
+          - name: instrumental
+            label: Instrumental track
+            type: boolean
+            default: false
+        - name: behaviour
+          label: Player behaviour
+          type: object
+          fields:
+          - name: autoAdvance
+            label: Automatically play next track
+            type: boolean
+            default: true
+          - name: lineWideLyricHighlight
+            label: Highlight whole lyric lines
+            type: boolean
+            default: true
+          - name: preload
+            label: Audio preload strategy
+            type: select
+            default: metadata
+            options:
+              values:
+              - none
+              - metadata
+              - auto
+      - name: spotify
+        label: Spotify embed
+        type: object
+        fields:
+        - name: label
+          label: Spotify section label
+          type: string
+        - name: embedUrl
+          label: Spotify embed URL
+          type: string
+        - name: height
+          label: Embed height (px)
+          type: number
+          default: 352
+      - name: footerText
+        label: Footer text
+        type: string
+    - name: sections
+      label: Album page layout
+      component: albumSections
+      default:
+      - type: album-header
+        id: album-header
+        enabled: true
+        presentation:
+          variant: amber-editorial
+          windowTitle: ''
+        content:
+          source: templateData.album
+      - type: album-player
+        id: album-player
+        enabled: true
+        presentation:
+          variant: amber-player
+        content:
+          source: templateData.player
+      - type: spotify-embed
+        id: album-spotify
+        enabled: true
+        presentation:
+          variant: amber-editorial
+          windowTitle: ''
+        content:
+          source: templateData.spotify
+    - name: publishing
+      label: Publishing and navigation
+      component: publishing
+    - name: appearance
+      label: Page appearance
+      component: appearance
+    - name: seo
+      label: SEO and sharing
+      component: seo
+  - name: vista-pages
+    label: Vista Pages
+    type: collection
+    path: content/v13/vista-pages
+    filename:
+      template: '{fields.identity.slug}.json'
+      field: false
+    format: json
+    operations:
+      rename: false
+      delete: false
+    view:
+      fields:
+      - identity.name
+      - identity.slug
+      - publishing.published
+      - identity.order
+      primary: identity.name
+      sort:
+      - identity.order
+      - identity.name
+      default:
+        sort: identity.order
+        order: asc
+    fields:
+    - name: schemaVersion
+      label: Schema version
+      type: number
+      default: 1
+      readonly: true
+    - name: template
+      label: Template
+      type: string
+      default: vista-window
+      readonly: true
+    - name: identity
+      label: Page identity
+      component: identity
+    - name: templateData
+      label: Template-specific settings
+      type: object
+      fields:
+      - name: footerText
+        label: Footer text
+        type: string
+    - name: sections
+      label: Page building blocks
+      component: vistaSections
+    - name: publishing
+      label: Publishing and navigation
+      component: publishing
+    - name: appearance
+      label: Page appearance
+      component: appearance
+    - name: seo
+      label: SEO and sharing
+      component: seo
+  - name: editorial-pages
+    label: Editorial Pages
+    type: collection
+    path: content/v13/editorial-pages
+    filename:
+      template: '{fields.identity.slug}.json'
+      field: false
+    format: json
+    operations:
+      rename: false
+      delete: false
+    view:
+      fields:
+      - identity.name
+      - identity.slug
+      - publishing.published
+      - identity.order
+      primary: identity.name
+      sort:
+      - identity.order
+      - identity.name
+      default:
+        sort: identity.order
+        order: asc
+    fields:
+    - name: schemaVersion
+      label: Schema version
+      type: number
+      default: 1
+      readonly: true
+    - name: template
+      label: Template
+      type: string
+      default: editorial
+      readonly: true
+    - name: identity
+      label: Page identity
+      component: identity
+    - name: templateData
+      label: Template-specific settings
+      type: object
+      fields:
+      - name: footerText
+        label: Footer text
+        type: string
+    - name: sections
+      label: Page building blocks
+      component: editorialSections
+    - name: publishing
+      label: Publishing and navigation
+      component: publishing
+    - name: appearance
+      label: Page appearance
+      component: appearance
+    - name: seo
+      label: SEO and sharing
+      component: seo
+- name: site-settings
+  label: Site settings
+  type: group
+  items:
+  - name: site
+    label: Global identity and defaults
+    type: file
+    path: content/v13/site.json
+    format: json
+    operations:
+      delete: false
+    fields:
+    - name: schemaVersion
+      label: Schema version
+      type: number
+      default: 1
+      readonly: true
+    - name: siteName
+      label: Website name
+      type: string
+      required: true
+    - name: baseUrl
+      label: Canonical site URL
+      type: string
+      required: true
+    - name: favicon
+      label: Favicon
+      type: image
+      options:
+        media: images
+        extensions:
+        - jpg
+        - jpeg
+        - png
+        - webp
+        - gif
+        - svg
+        - ico
+        rename: false
+    - name: description
+      label: Default site description
+      type: text
+    - name: footerText
+      label: Default footer text
+      type: string
+    - name: seoDefaults
+      label: Default search and sharing metadata
+      type: object
+      fields:
+      - name: title
+        label: Default SEO title
+        type: string
+      - name: description
+        label: Default SEO description
+        type: text
+      - name: socialImage
+        label: Default social image
+        type: image
+        options:
+          media: images
+          extensions:
+          - jpg
+          - jpeg
+          - png
+          - webp
+          - gif
+          - svg
+          - ico
+          rename: false
+    - name: socialProfiles
+      label: Social profiles
+      type: object
+      list:
+        collapsible:
+          collapsed: true
+          summary: '{label}'
+      fields:
+      - name: label
+        label: Platform / network
+        type: string
+      - name: url
+        label: Profile URL
+        type: string
+  - name: wallpapers
+    label: Wallpaper catalogue
+    type: file
+    path: content/v13/wallpapers.json
+    format: json
+    operations:
+      delete: false
+    fields:
+    - name: presets
+      label: Wallpaper presets
+      type: object
+      list:
+        collapsible:
+          collapsed: true
+          summary: '{name} · {colour}'
+      fields:
+      - name: id
+        label: Preset ID
+        type: string
+        required: true
+      - name: name
+        label: Display name
+        type: string
+        required: true
+      - name: family
+        label: Wallpaper family
+        type: select
+        options:
+          values:
+          - vista
+          - atmospheric
+          - album
+      - name: colour
+        label: Colour family
+        type: select
+        options:
+          values:
+          - purple
+          - teal
+          - orange
+          - pink
+          - multi
+          - amber
+      - name: kind
+        label: Wallpaper type
+        type: select
+        options:
+          values:
+          - image
+          - css-preset
+          - template-preset
+      - name: imageUrl
+        label: Image URL
+        type: string
+      - name: status
+        label: Status / notes
+        type: string
+      - name: palette
+        label: Theme palette
+        type: object
+        fields:
+        - name: sky
+          label: Sky / background
+          type: string
+        - name: deep
+          label: Deep colour
+          type: string
+        - name: mid
+          label: Mid colour
+          type: string
+        - name: glass
+          label: Glass colour
+          type: string
+        - name: accent
+          label: Accent colour
+          type: string
+        - name: bright
+          label: Bright colour
+          type: string
+        - name: highlight
+          label: Highlight colour
+          type: string
+        - name: ink
+          label: Ink colour
+          type: string
+        - name: dark
+          label: Dark colour
+          type: string
+        - name: earth
+          label: Earth colour
+          type: string
+        - name: caramel
+          label: Caramel colour
+          type: string
+        - name: cream
+          label: Cream colour
+          type: string
+    - name: customImage
+      label: Custom image configuration
+      type: object
+      fields:
+      - name: source
+        label: Media folder
+        type: string
+        default: media/images
+        readonly: true
+      - name: outputPrefix
+        label: Public URL prefix
+        type: string
+        default: /media/images
+        readonly: true
+      - name: fitOptions
+        label: Supported fit modes
+        type: string
+        list: true
+        default:
+        - cover
+        - contain
 settings:
   content:
     merge: true
+  commit:
+    identity: app
+    templates:
+      create: 'content: create {path}'
+      update: 'content: update {path}'
+      delete: 'content: delete {path}'
+      rename: 'content: rename {oldPath} -> {newPath}'

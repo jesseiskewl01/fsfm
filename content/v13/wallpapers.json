@@ -1,0 +1,101 @@
+{
+  "presets": [
+    {
+      "id": "vista-violet-haze",
+      "name": "Violet Haze",
+      "family": "vista",
+      "colour": "purple",
+      "kind": "image",
+      "imageUrl": "https://i.ibb.co/nMPTzBT0/6977632-2351606-blazedmissile-untitled-6977632-010cb9d4b1ac03571b1d994a706b6d53.webp",
+      "palette": {
+        "sky": "#1d0f5e",
+        "deep": "29, 15, 94",
+        "mid": "43, 26, 122",
+        "glass": "124, 77, 230",
+        "accent": "#6a2bd9",
+        "bright": "184, 115, 255",
+        "highlight": "218, 183, 255"
+      }
+    },
+    {
+      "id": "vista-aqua-glass",
+      "name": "Aqua Glass",
+      "family": "vista",
+      "colour": "teal",
+      "kind": "image",
+      "imageUrl": "https://i.ibb.co/zW78885n/bdvrspnnio7d1.png",
+      "palette": {
+        "sky": "#004b4c",
+        "deep": "0, 75, 76",
+        "mid": "0, 110, 112",
+        "glass": "30, 170, 175",
+        "accent": "#007a82",
+        "bright": "38, 201, 207",
+        "highlight": "129, 254, 250"
+      }
+    },
+    {
+      "id": "vista-solar-flare",
+      "name": "Solar Flare",
+      "family": "vista",
+      "colour": "orange",
+      "kind": "image",
+      "imageUrl": "https://i.ibb.co/7JKvqbtJ/mar192026-2-1.png",
+      "palette": {
+        "sky": "#4a2200",
+        "deep": "74, 34, 0",
+        "mid": "122, 58, 0",
+        "glass": "232, 123, 0",
+        "accent": "#a64b00",
+        "bright": "251, 196, 27",
+        "highlight": "253, 224, 142"
+      }
+    },
+    {
+      "id": "vista-rose-bloom",
+      "name": "Rose Bloom",
+      "family": "vista",
+      "colour": "pink",
+      "kind": "image",
+      "imageUrl": "https://i.ibb.co/Gv9Zsyh1/fv6z11x7ph7a1.jpg",
+      "palette": {
+        "sky": "#5c1236",
+        "deep": "92, 18, 54",
+        "mid": "130, 34, 82",
+        "glass": "221, 110, 168",
+        "accent": "#b02a72",
+        "bright": "244, 166, 207",
+        "highlight": "250, 236, 246"
+      }
+    },
+    {
+      "id": "aurora",
+      "name": "Aurora",
+      "family": "atmospheric",
+      "colour": "multi",
+      "kind": "css-preset"
+    },
+    {
+      "id": "album-amber",
+      "name": "Album Amber",
+      "family": "album",
+      "colour": "amber",
+      "kind": "template-preset",
+      "palette": {
+        "ink": "#0a0806",
+        "dark": "#22160d",
+        "earth": "#634123",
+        "caramel": "#bd8b4e",
+        "cream": "#fef5de"
+      }
+    }
+  ],
+  "customImage": {
+    "source": "media/images",
+    "outputPrefix": "/media/images",
+    "fitOptions": [
+      "cover",
+      "contain"
+    ]
+  }
+}

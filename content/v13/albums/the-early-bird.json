@@ -1,0 +1,160 @@
+{
+  "schemaVersion": 1,
+  "template": "album",
+  "identity": {
+    "name": "The Early Bird....",
+    "slug": "the-early-bird",
+    "route": "/the-early-bird.html",
+    "order": 1
+  },
+  "templateData": {
+    "album": {
+      "windowTitle": "The Early Bird....",
+      "title": "The Early Bird....",
+      "artistLine": "by Fake Space Fog Machine",
+      "eyebrow": "08/21",
+      "artwork": "/media/images/cover.png"
+    },
+    "player": {
+      "windowTitle": "FSFM Media Player",
+      "artistName": "Fake Space Fog Machine",
+      "tracks": [
+        {
+          "id": "track-01",
+          "title": "I MADE YOU CRY",
+          "audioUrl": "https://github.com/jesseiskewl01/fsfm/raw/refs/heads/main/audio/1.%20IMYC.ogg",
+          "lyricsFile": "lyrics/01-i-made-you-cry.lrc",
+          "instrumental": false
+        },
+        {
+          "id": "track-02",
+          "title": "CARPE DIEM",
+          "audioUrl": "https://github.com/jesseiskewl01/fsfm/raw/refs/heads/main/audio/2%20CARPE%20DIEM.ogg",
+          "lyricsFile": "lyrics/02-carpe-diem.lrc",
+          "instrumental": false
+        },
+        {
+          "id": "track-03",
+          "title": "DO WHAT YOU WISH",
+          "audioUrl": "https://github.com/jesseiskewl01/fsfm/raw/refs/heads/main/audio/3.%20DO%20WHAT%20YOU%20WISH.ogg",
+          "lyricsFile": "lyrics/03-do-what-you-wish.lrc",
+          "instrumental": false
+        },
+        {
+          "id": "track-04",
+          "title": "BISCUIT",
+          "audioUrl": "https://github.com/jesseiskewl01/fsfm/raw/refs/heads/main/audio/4.%20BISCUIT.ogg",
+          "lyricsFile": "lyrics/04-biscuit.lrc",
+          "instrumental": false
+        },
+        {
+          "id": "track-05",
+          "title": "GOODNIGHT",
+          "audioUrl": "https://github.com/jesseiskewl01/fsfm/raw/refs/heads/main/audio/5.%20GOODNIGHT!.ogg",
+          "lyricsFile": "lyrics/05-goodnight.lrc",
+          "instrumental": false
+        },
+        {
+          "id": "track-06",
+          "title": "SANDISK CRUZER BLADE",
+          "audioUrl": "https://github.com/jesseiskewl01/fsfm/raw/refs/heads/main/audio/6.%20SANDISK%20CRUZER%20BLADE.ogg",
+          "lyricsFile": "lyrics/06-sandisk.lrc",
+          "instrumental": false
+        },
+        {
+          "id": "track-07",
+          "title": "CLEVELAND Z",
+          "audioUrl": "https://github.com/jesseiskewl01/fsfm/raw/refs/heads/main/audio/7.%20CLEVELAND%20Z.ogg",
+          "lyricsFile": "lyrics/07-cleveland-z.lrc",
+          "instrumental": true
+        }
+      ],
+      "behaviour": {
+        "autoAdvance": true,
+        "lineWideLyricHighlight": true,
+        "preload": "metadata"
+      }
+    },
+    "spotify": {
+      "label": "OUT ON SPOTIFY",
+      "embedUrl": "https://open.spotify.com/embed/album/0clOFZSG1MHTVtK9DAjUOe?utm_source=generator&theme=0&si=1afed0dea1284572",
+      "height": 352
+    },
+    "footerText": "© 2026 FAKE SPACE FOG MACHINE"
+  },
+  "sections": [
+    {
+      "id": "album-header",
+      "type": "album-header",
+      "enabled": true,
+      "presentation": {
+        "variant": "amber-editorial"
+      },
+      "content": {}
+    },
+    {
+      "id": "album-statement",
+      "type": "artist-statement",
+      "enabled": true,
+      "presentation": {
+        "variant": "amber-editorial",
+        "windowTitle": ""
+      },
+      "content": {
+        "body": "\"...I can sometimes overlook the times where my mixing is just shitty because every now and then I listen to this bullshit and I LOVE it and that is MORE than enough for me. I’m sure this is the best thing I’ll have made in a very long time for that exact reason. Goodnight.\""
+      }
+    },
+    {
+      "id": "album-player",
+      "type": "album-player",
+      "enabled": true,
+      "presentation": {
+        "variant": "amber-player"
+      },
+      "content": {
+        "source": "templateData.player"
+      }
+    },
+    {
+      "id": "album-spotify",
+      "type": "spotify-embed",
+      "enabled": true,
+      "presentation": {
+        "variant": "amber-editorial"
+      },
+      "content": {
+        "source": "templateData.spotify"
+      }
+    }
+  ],
+  "publishing": {
+    "published": true,
+    "showInNavigation": true,
+    "navigationLabel": "Album"
+  },
+  "appearance": {
+    "wallpaper": {
+      "mode": "preset",
+      "preset": "album-amber",
+      "customImage": "",
+      "cycle": {
+        "enabled": false,
+        "mode": "sequential",
+        "intervalSeconds": 30,
+        "manualControl": false
+      }
+    },
+    "effects": {
+      "backgroundEffects": true,
+      "pageTransition": true,
+      "respectReducedMotion": true
+    }
+  },
+  "seo": {
+    "title": "The Early Bird.... | Fake Space Fog Machine",
+    "description": "The Early Bird...., the debut album by Fake Space Fog Machine.",
+    "canonical": "https://fsfm.port82.net/the-early-bird.html",
+    "socialImage": "/media/images/cover.png",
+    "allowIndexing": true
+  }
+}

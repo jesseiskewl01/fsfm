@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "template": "editorial",
+  "identity": {
+    "name": "New Editorial Page",
+    "slug": "new-editorial-page",
+    "route": "/pages/new-editorial-page/",
+    "order": 10
+  },
+  "templateData": {
+    "footerText": ""
+  },
+  "sections": [],
+  "publishing": {
+    "published": false,
+    "showInNavigation": true,
+    "navigationLabel": "New Editorial Page"
+  },
+  "appearance": {
+    "wallpaper": {
+      "mode": "template-default",
+      "preset": "aurora",
+      "customImage": "",
+      "customFit": "cover",
+      "customPosition": "center",
+      "presets": ["vista-violet-haze", "vista-aqua-glass", "vista-solar-flare", "vista-rose-bloom"],
+      "initialSelection": "random",
+      "cycle": {
+        "enabled": false,
+        "mode": "sequential",
+        "intervalSeconds": 30,
+        "manualControl": false
+      }
+    },
+    "effects": {
+      "backgroundEffects": true,
+      "pageTransition": true,
+      "respectReducedMotion": true
+    }
+  },
+  "seo": {
+    "title": "New Editorial Page | Fake Space Fog Machine",
+    "description": "",
+    "canonical": "https://fsfm.port82.net/pages/new-editorial-page/",
+    "socialImage": "/media/images/cover.png",
+    "allowIndexing": true
+  }
+}

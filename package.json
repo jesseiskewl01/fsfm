@@ -1,0 +1,32 @@
+{
+  "name": "fsfm-site",
+  "private": true,
+  "version": "13.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-v13.mjs",
+    "validate:v13": "node scripts/validate-v13.mjs",
+    "test:v13": "node --test",
+    "build:v13:stage3-preview": "node scripts/build-stage3-preview.mjs",
+    "test": "node --test",
+    "build:v13:stage4-preview": "node scripts/build-v13-stage4-preview.mjs",
+    "check:v13:stage4": "node --check src/client/album-player.js && node --check src/client/album-atmosphere.js && node --check src/render/album-player.mjs && node --check src/render/components.mjs && node --check src/render/page.mjs",
+    "build:v13:stage5": "node scripts/build-v13-stage5.mjs",
+    "preview:v13:stage5": "node scripts/build-v13-stage5.mjs --preview",
+    "check:v13:stage5": "node --check src/render/homepage.mjs && node --check src/render/components.mjs && node --check src/render/page.mjs && node --check src/render/wallpaper.mjs && node --check src/client/homepage-desktop.js && node --check src/client/homepage-interactions.js && node --check src/client/homepage-gadgets.js && node --check src/client/wallpaper-engine.js",
+    "build:legacy": "node scripts/build-pages.mjs",
+    "build:v13:stage6": "node scripts/build-v13-stage6.mjs",
+    "preview:v13:stage6": "node scripts/build-v13-stage6.mjs --preview",
+    "preview:v13:stage6:drafts": "node scripts/build-v13-stage6.mjs --preview --include-drafts",
+    "new:page": "node scripts/create-page-v13.mjs",
+    "check:v13:stage6": "node --check src/render/components.mjs && node --check src/render/page.mjs && node --check src/core/page-validator.mjs && node --check scripts/build-v13-stage6.mjs && node --check scripts/create-page-v13.mjs && node --check scripts/build-v13-stage6-template-previews.mjs",
+    "preview:v13:stage6:templates": "npm run preview:v13:stage6 && node scripts/build-v13-stage6-template-previews.mjs",
+    "preview:v13": "node scripts/build-v13.mjs --preview",
+    "preview:v13:drafts": "node scripts/build-v13.mjs --preview --include-drafts",
+    "preview:v13:templates": "npm run preview:v13 && node scripts/build-v13-template-previews.mjs",
+    "audit:v13": "node scripts/audit-v13-release.mjs",
+    "verify-release": "npm run build && npm run audit:v13",
+    "predeploy-check": "npm run build && node scripts/audit-v13-release.mjs --require-media",
+    "check:all": "npm test && npm run validate:v13 && npm run check:v13:stage4 && npm run check:v13:stage5 && npm run check:v13:stage6"
+  }
+}

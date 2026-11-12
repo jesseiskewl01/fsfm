@@ -42,5 +42,14 @@
     "playerArtistName": "Fake Space Fog Machine",
     "eyebrow": "08/21"
   },
-  "footerText": "© 2026 FAKE SPACE FOG MACHINE"
+  "footerText": "© 2026 FAKE SPACE FOG MACHINE",
+  "seo": {
+    "homeTitle": "Fake Space Fog Machine",
+    "homeDescription": "Land of the free",
+    "siteUrl": "https://fsfm.port82.net/",
+    "socialImage": "/media/images/cover.png",
+    "albumTitle": "The Early Bird.... | Fake Space Fog Machine",
+    "albumDescription": "The Early Bird...., the debut album by Fake Space Fog Machine.",
+    "albumUrl": "https://fsfm.port82.net/the-early-bird.html"
+  }
 }

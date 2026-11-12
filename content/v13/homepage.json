@@ -1,0 +1,240 @@
+{
+  "schemaVersion": 1,
+  "template": "homepage",
+  "identity": {
+    "name": "Fake Space Fog Machine",
+    "slug": "home",
+    "route": "/",
+    "order": 0
+  },
+  "templateData": {
+    "hero": {
+      "windowTitle": "Homepage",
+      "badge": ":]",
+      "title": "Fake Space Fog Machine",
+      "subtitle": "jesse freaking scarsbrook",
+      "handle": "@mirrorlesssmoke"
+    },
+    "gadgets": {
+      "photos": [
+        "/media/images/earlybirdcd.jpg"
+      ],
+      "dates": [
+        {
+          "title": "fake space birthday machine",
+          "date": "2026-11-16"
+        }
+      ],
+      "stickyNote": {
+        "text": "typa shit that make you wanna grab a penguin"
+      },
+      "funWidgets": {
+        "showBarrelRoll": false,
+        "showBubbleSlider": true,
+        "showMusicPlayer": false,
+        "showPurblePlace": false
+      },
+      "visibility": {
+        "showClock": true,
+        "showCalendar": true,
+        "showFeaturedRelease": true,
+        "showPhotos": true,
+        "showDates": true,
+        "showStickyNote": true
+      },
+      "radioAudioUrl": "https://github.com/jesseiskewl01/fsfm/raw/refs/heads/main/audio/groovy.mp3",
+      "bubbleDefault": 50,
+      "purblePlaceUrl": "https://www.play-games.com/iframe/37376.html",
+      "featuredRelease": {
+        "windowTitle": "FEATURED RELEASE",
+        "title": "The Early Bird....",
+        "description": "Debut album",
+        "artwork": "/media/images/cover.png",
+        "linkText": "OUT NOW....",
+        "url": "https://open.spotify.com/album/0clOFZSG1MHTVtK9DAjUOe",
+        "componentType": "featured-release"
+      },
+      "shutdownRedirectUrl": "https://open.spotify.com/track/2CnrJj6Jz4vSe5E1hsWtpg",
+      "labels": {
+        "clock": "Clock",
+        "calendar": "Calendar",
+        "pictureFrame": "Picture Frame",
+        "importantDates": "Important Dates",
+        "stickyNote": "Sticky Note",
+        "barrelRoll": "Barrel Roll",
+        "bubbleFrequency": "Bubble Frequency",
+        "radio": "FSFM Radio",
+        "purblePlace": "Purble Place",
+        "barrelRollButton": "DO A BARREL ROLL",
+        "bubbleFrequencyLabel": "AMBIENT BUBBLES",
+        "radioPlay": "PLAY MUSIC",
+        "radioPause": "PAUSE MUSIC",
+        "purblePlaceButton": "OPEN PURBLE PLACE"
+      }
+    },
+    "footerText": "© 2026 FAKE SPACE FOG MACHINE",
+    "desktopLabels": {
+      "bootLoading": "LOADING YOUR DESKTOP",
+      "bootWelcome": "WELCOME",
+      "bootReady": "DESKTOP READY",
+      "bootCaption": "SONIC SPACE-AGE AESTHETICS",
+      "shutdownTitle": "Goodnight.",
+      "shutdownMessage": "Closing the FSFM desktop...",
+      "homeNavigationLabel": "Home"
+    }
+  },
+  "sections": [
+    {
+      "id": "home-marquee",
+      "type": "marquee",
+      "enabled": true,
+      "presentation": {
+        "variant": "vista-desktop"
+      },
+      "content": {
+        "messages": [
+          "SEASON'S GREETINGS",
+          "THE EARLY BIRD....",
+          "FAKE SPACE FOG MACHINE",
+          "HOW GOES IT?",
+          "THANK YOU FOR LISTENING",
+          "HI GUY",
+          "THE KINDA DEALS THAT MAKE Ü WANNA BOOGIE"
+        ]
+      }
+    },
+    {
+      "id": "home-about",
+      "type": "artist-statement",
+      "enabled": true,
+      "group": {
+        "id": "home-window-grid",
+        "layout": "grid",
+        "columns": 2
+      },
+      "presentation": {
+        "variant": "vista-window",
+        "windowTitle": "ABOUT FSFM"
+      },
+      "content": {
+        "body": "Fake Space Fog Machine is a fully independent artist based in the United Kingdom who doesn't know how to write about himself in the third person."
+      }
+    },
+    {
+      "id": "home-spotify",
+      "type": "embed-window",
+      "enabled": true,
+      "group": {
+        "id": "home-window-grid",
+        "layout": "grid",
+        "columns": 2
+      },
+      "presentation": {
+        "variant": "vista-window",
+        "windowTitle": "FSFM ON SPOTIFY"
+      },
+      "content": {
+        "provider": "spotify",
+        "url": "https://open.spotify.com/embed/artist/2PcGMMcKTObTrK7XVw9GSX?utm_source=generator&theme=0&si=d7fa4c4e3030473c",
+        "title": "Fake Space Fog Machine on Spotify",
+        "height": 352
+      }
+    },
+    {
+      "id": "home-events",
+      "type": "bandsintown-events",
+      "enabled": true,
+      "presentation": {
+        "variant": "vista-window",
+        "windowTitle": "ON THE HORIZON"
+      },
+      "content": {
+        "artistName": "id_15662842",
+        "appId": "5cadd40a475f81e41e3c518d0b71644c",
+        "displayDetails": true,
+        "displayLineup": true,
+        "displayStartTime": true,
+        "displayLocalDates": true,
+        "localDatesPosition": "tab",
+        "font": "Segoe UI",
+        "followSectionPosition": "hidden",
+        "followSectionAlignment": "center",
+        "followSectionCtaText": "FOLLOW",
+        "eventRsvpPosition": "hidden",
+        "playMyCityPosition": "bottom",
+        "playMyCityAlignment": "center",
+        "playMyCityCtaIcon": true,
+        "eventRsvpOnlyShowIcon": true
+      }
+    },
+    {
+      "id": "home-social-links",
+      "type": "social-links",
+      "enabled": true,
+      "presentation": {
+        "variant": "vista-window",
+        "windowTitle": "FIND FSFM"
+      },
+      "content": {
+        "links": [
+          {
+            "label": "TikTok",
+            "url": "https://tiktok.com/@mirrorlesssmoke"
+          },
+          {
+            "label": "Bandcamp",
+            "url": "https://fakespacefogmachine.bandcamp.com"
+          },
+          {
+            "label": "Instagram",
+            "url": "https://instagram.com/mirrorlesssmoke"
+          },
+          {
+            "label": "Twitter",
+            "url": "https://twitter.com/mirrorlesssmoke"
+          },
+          {
+            "label": "YouTube",
+            "url": "https://youtube.com/@mirrorlesssmoke"
+          }
+        ]
+      }
+    }
+  ],
+  "publishing": {
+    "published": true,
+    "showInNavigation": false,
+    "navigationLabel": ""
+  },
+  "appearance": {
+    "wallpaper": {
+      "mode": "cycle",
+      "presets": [
+        "vista-violet-haze",
+        "vista-aqua-glass",
+        "vista-solar-flare",
+        "vista-rose-bloom"
+      ],
+      "customImage": "",
+      "initialSelection": "random",
+      "cycle": {
+        "enabled": false,
+        "mode": "sequential",
+        "intervalSeconds": 30,
+        "manualControl": true
+      }
+    },
+    "effects": {
+      "backgroundEffects": true,
+      "pageTransition": true,
+      "respectReducedMotion": true
+    }
+  },
+  "seo": {
+    "title": "Fake Space Fog Machine",
+    "description": "Land of the free",
+    "canonical": "https://fsfm.port82.net/",
+    "socialImage": "/media/images/cover.png",
+    "allowIndexing": true
+  }
+}

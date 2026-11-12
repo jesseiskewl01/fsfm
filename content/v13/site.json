@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "siteName": "Fake Space Fog Machine",
+  "baseUrl": "https://fsfm.port82.net/",
+  "favicon": "/media/images/asadadasdges-removebg-preview.png",
+  "description": "Land of the free",
+  "footerText": "© 2026 FAKE SPACE FOG MACHINE",
+  "seoDefaults": {
+    "title": "Fake Space Fog Machine",
+    "description": "Land of the free",
+    "socialImage": "/media/images/cover.png"
+  },
+  "socialProfiles": [
+    {
+      "label": "Spotify",
+      "url": "https://open.spotify.com/artist/2PcGMMcKTObTrK7XVw9GSX"
+    },
+    {
+      "label": "TikTok",
+      "url": "https://tiktok.com/@mirrorlesssmoke"
+    },
+    {
+      "label": "Bandcamp",
+      "url": "https://fakespacefogmachine.bandcamp.com"
+    },
+    {
+      "label": "Instagram",
+      "url": "https://instagram.com/mirrorlesssmoke"
+    },
+    {
+      "label": "Twitter",
+      "url": "https://twitter.com/mirrorlesssmoke"
+    },
+    {
+      "label": "YouTube",
+      "url": "https://youtube.com/@mirrorlesssmoke"
+    }
+  ]
+}
