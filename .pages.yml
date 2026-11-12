@@ -46,7 +46,7 @@ components:
       type: string
       hidden: true
     - name: enabled
-      label: Show this section
+      label: Show block
       type: boolean
       default: true
     - name: presentation
@@ -1238,15 +1238,15 @@ content:
       delete: false
     fields:
     - name: schemaVersion
-      label: Schema version
+      label: false
       type: number
       default: 1
-      readonly: true
+      hidden: true
     - name: template
-      label: Template
+      label: false
       type: string
       default: homepage
-      readonly: true
+      hidden: true
     - name: identity
       label: Page identity
       component: identity
@@ -1540,15 +1540,15 @@ content:
     view:
       fields:
     - name: schemaVersion
-      label: Schema version
+      label: false
       type: number
       default: 1
-      readonly: true
+      hidden: true
     - name: template
-      label: Template
+      label: false
       type: string
       default: album
-      readonly: true
+      hidden: true
     - name: identity
       label: Page identity
       component: identity
@@ -1733,15 +1733,15 @@ content:
     view:
       fields:
     - name: schemaVersion
-      label: Schema version
+      label: false
       type: number
       default: 1
-      readonly: true
+      hidden: true
     - name: template
-      label: Template
+      label: false
       type: string
       default: vista-window
-      readonly: true
+      hidden: true
     - name: identity
       label: Page identity
       component: identity
@@ -1778,15 +1778,15 @@ content:
     view:
       fields:
     - name: schemaVersion
-      label: Schema version
+      label: false
       type: number
       default: 1
-      readonly: true
+      hidden: true
     - name: template
-      label: Template
+      label: false
       type: string
       default: editorial
-      readonly: true
+      hidden: true
     - name: identity
       label: Page identity
       component: identity
@@ -1822,10 +1822,10 @@ content:
       delete: false
     fields:
     - name: schemaVersion
-      label: Schema version
+      label: false
       type: number
       default: 1
-      readonly: true
+      hidden: true
     - name: siteName
       label: Website name
       type: string
