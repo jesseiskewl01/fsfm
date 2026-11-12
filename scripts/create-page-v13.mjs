@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { validatePage } from '../src/core/page-validator.mjs';
+import { routeForPage } from '../src/core/page-routes.mjs';
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -18,8 +19,8 @@ export function slugify(value) {
 function readJson(file) { return JSON.parse(fs.readFileSync(file, 'utf8')); }
 
 export function buildPageRecord({ root = projectRoot, template, name, slug, order, published = false, showInNavigation = true }) {
-  if (!['vista-window', 'editorial'].includes(template)) {
-    throw new Error('Template must be either "vista-window" or "editorial".');
+  if (!['album', 'vista-window', 'editorial'].includes(template)) {
+    throw new Error('Template must be "album", "vista-window" or "editorial".');
   }
   const cleanName = String(name || '').trim();
   if (!cleanName) throw new Error('A page name is required.');
@@ -30,7 +31,6 @@ export function buildPageRecord({ root = projectRoot, template, name, slug, orde
   const page = readJson(starterPath);
   const site = readJson(path.join(root, 'content', 'v13', 'site.json'));
   const canonicalBase = new URL(site.baseUrl || 'https://fsfm.port82.net/');
-  const route = `/pages/${cleanSlug}/`;
 
   const currentOrders = [];
   for (const dir of ['albums', 'vista-pages', 'editorial-pages']) {
@@ -47,9 +47,9 @@ export function buildPageRecord({ root = projectRoot, template, name, slug, orde
   page.identity = {
     name: cleanName,
     slug: cleanSlug,
-    route,
     order: Number.isFinite(order) ? order : (currentOrders.length ? Math.max(...currentOrders) + 10 : 10)
   };
+  page.identity.route = routeForPage(page);
   page.publishing = {
     published: Boolean(published),
     showInNavigation: Boolean(showInNavigation),
@@ -58,7 +58,7 @@ export function buildPageRecord({ root = projectRoot, template, name, slug, orde
   page.seo = {
     title: `${cleanName} | ${site.siteName}`,
     description: '',
-    canonical: new URL(route, canonicalBase).href,
+    canonical: new URL(page.identity.route, canonicalBase).href,
     socialImage: site.seoDefaults?.socialImage || site.favicon || '',
     allowIndexing: true
   };
@@ -71,7 +71,8 @@ export function buildPageRecord({ root = projectRoot, template, name, slug, orde
 export function createNewPage(options = {}) {
   const root = options.root || projectRoot;
   const page = buildPageRecord({ ...options, root });
-  const targetFolder = path.join(root, 'content', 'v13', page.template === 'vista-window' ? 'vista-pages' : 'editorial-pages');
+  const targetFolderName = page.template === 'album' ? 'albums' : page.template === 'vista-window' ? 'vista-pages' : 'editorial-pages';
+  const targetFolder = path.join(root, 'content', 'v13', targetFolderName);
   fs.mkdirSync(targetFolder, { recursive: true });
   const targetPath = path.join(targetFolder, `${page.identity.slug}.json`);
   if (fs.existsSync(targetPath)) throw new Error(`A page with slug "${page.identity.slug}" already exists.`);
@@ -81,7 +82,7 @@ export function createNewPage(options = {}) {
     if (!fs.existsSync(folder)) continue;
     for (const filename of fs.readdirSync(folder).filter((item) => item.endsWith('.json'))) {
       const existing = readJson(path.join(folder, filename));
-      if (existing.identity?.route === page.identity.route) duplicateRoute.push(filename);
+      try { if (routeForPage(existing) === page.identity.route) duplicateRoute.push(filename); } catch { /* Invalid existing records are reported by validation. */ }
     }
   }
   if (duplicateRoute.length) throw new Error(`Route "${page.identity.route}" is already in use.`);
