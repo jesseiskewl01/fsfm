@@ -41,9 +41,9 @@ components:
     label: Site header
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -81,9 +81,9 @@ components:
     label: Hero
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -133,9 +133,9 @@ components:
     label: Marquee
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -158,9 +158,9 @@ components:
     label: Artist statement
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -184,9 +184,9 @@ components:
     label: Embed window
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -228,9 +228,9 @@ components:
     label: Bandsintown events
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -306,9 +306,9 @@ components:
     label: Social links
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -343,9 +343,9 @@ components:
     label: Featured release
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -396,9 +396,9 @@ components:
     label: Rich text
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -429,9 +429,9 @@ components:
     label: Image
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -472,9 +472,9 @@ components:
     label: Image gallery
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -516,9 +516,9 @@ components:
     label: Quote
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -545,9 +545,9 @@ components:
     label: Link or button
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -584,9 +584,9 @@ components:
     label: Divider
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -612,9 +612,9 @@ components:
     label: Spacer
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -635,9 +635,9 @@ components:
     label: Album header (built-in)
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -650,18 +650,18 @@ components:
       type: object
       fields:
       - name: source
-        label: Uses album details
+        label: false
         type: string
         default: templateData.album
-        readonly: true
+        hidden: true
   blockAlbumPlayer:
     type: object
     label: FSFM Media Player (required)
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -674,18 +674,18 @@ components:
       type: object
       fields:
       - name: source
-        label: Uses album player data
+        label: false
         type: string
         default: templateData.player
-        readonly: true
+        hidden: true
   blockSpotifyEmbed:
     type: object
     label: Spotify album embed
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -698,10 +698,10 @@ components:
       type: object
       fields:
       - name: source
-        label: Uses Spotify settings
+        label: false
         type: string
         default: templateData.spotify
-        readonly: true
+        hidden: true
   seo:
     type: object
     label: SEO and sharing
@@ -778,8 +778,9 @@ components:
     description: Most blocks can use their template's default style. Change these only when you want a deliberate visual variation.
     fields:
     - name: variant
-      label: Visual presentation variant
+      label: false
       type: select
+      hidden: true
       default: ''
       options:
         values:
@@ -800,9 +801,14 @@ components:
     description: Give blocks the same group ID to place them together. Choose grid for side-by-side blocks or stack for a vertical group. Leave blank for normal full-width flow.
     fields:
     - name: id
-      label: Group ID
+      label: false
       type: string
+      hidden: true
       default: ''
+    - name: name
+      label: Group name
+      type: string
+      description: Give blocks the same group name to place them together. Leave blank for a standalone block.
     - name: layout
       label: Layout
       type: select
@@ -860,8 +866,9 @@ components:
           - Aurora
           - Album Amber
       - name: presets
-        label: Wallpapers included in cycle
+        label: false
         type: select
+        hidden: true
         list: true
         default:
         - vista-violet-haze
@@ -894,16 +901,18 @@ components:
           - ico
           rename: false
       - name: customFit
-        label: Custom image fit
+        label: false
         type: select
+        hidden: true
         default: cover
         options:
           values:
           - cover
           - contain
       - name: customPosition
-        label: Custom image focal position
+        label: false
         type: select
+        hidden: true
         default: center
         options:
           values:
@@ -917,8 +926,9 @@ components:
           - bottom-left
           - bottom-right
       - name: initialSelection
-        label: Initial wallpaper selection
+        label: false
         type: select
+        hidden: true
         default: random
         options:
           values:
@@ -936,36 +946,42 @@ components:
           type: boolean
           default: false
         - name: mode
-          label: Rotation order
+          label: false
           type: select
+          hidden: true
           default: sequential
           options:
             values:
             - sequential
             - random
         - name: intervalSeconds
-          label: Seconds between changes
+          label: false
           type: number
+          hidden: true
           default: 30
         - name: manualControl
-          label: Allow visitors to change wallpaper manually
+          label: false
           type: boolean
+          hidden: true
           default: true
     - name: effects
       label: Background and motion effects
       type: object
       fields:
       - name: backgroundEffects
-        label: Enable background effects
+        label: false
         type: boolean
+        hidden: true
         default: true
       - name: pageTransition
-        label: Enable page transitions
+        label: false
         type: boolean
+        hidden: true
         default: true
       - name: respectReducedMotion
-        label: Respect reduced-motion preference
+        label: false
         type: boolean
+        hidden: true
         default: true
   homepageSections:
     type: block
