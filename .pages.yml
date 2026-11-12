@@ -1144,7 +1144,7 @@ components:
   vistaSections:
     type: block
     label: PAGE LAYOUT · BUILD THE PAGE
-    description: MAIN PAGE BUILDER · Add, edit and reorder the content visitors will see. This is the main part of the page editor.
+    description: Page building blocks · MAIN PAGE BUILDER · Add, edit and reorder the content visitors will see. This is the main part of the page editor.
     list:
       collapsible:
         collapsed: true
@@ -1199,7 +1199,7 @@ components:
   editorialSections:
     type: block
     label: PAGE LAYOUT · BUILDING BLOCKS
-    description: MAIN PAGE BUILDER · Add, edit and reorder the content blocks that make up this page.
+    description: Page building blocks · MAIN PAGE BUILDER · Add, edit and reorder the content blocks that make up this page.
     list:
       collapsible:
         collapsed: true
