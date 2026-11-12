@@ -22,5 +22,5 @@ if (errors.length) {
 } else {
   const albums = pages.filter((page) => page.template === 'album');
   const tracks = albums.reduce((n, page) => n + (page.templateData?.player?.tracks?.length || 0), 0);
-  console.log(`V13 content validation passed: ${pages.length} page records (${albums.length} album(s)), ${tracks} album tracks, all referenced LRC files found.`);
+  console.log(`V14 content validation passed: ${pages.length} page records (${albums.length} album(s)), ${tracks} album tracks, all referenced LRC files found.`);
 }
