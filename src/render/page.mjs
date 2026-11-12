@@ -17,27 +17,94 @@ function siteNavigation(site, pages, currentPage) {
 }
 
 function structuredData(page, site, canonical, description) {
-  const common = {
-    '@context': 'https://schema.org',
-    '@type': page.template === 'homepage' ? 'MusicGroup' : page.template === 'album' ? 'MusicAlbum' : 'WebPage',
-    name: page.template === 'album' ? (page.templateData?.album?.title || page.identity.name) : page.identity.name,
-    url: canonical,
-    description
-  };
-  if (page.template === 'homepage') {
-    common.sameAs = (site.socialProfiles || []).map((item) => safeUrl(item.url, { allowRelative: false, requireHttps: true })).filter(Boolean);
+  const siteUrl = safeCanonical(site.baseUrl, 'https://fsfm.port82.net/');
+  const siteId = new URL('#website', siteUrl).href;
+  const artistId = new URL('#artist', siteUrl).href;
+  const pageId = `${canonical.replace(/#.*$/, '')}#webpage`;
+  const pageName = page.template === 'album'
+    ? (page.templateData?.album?.title || page.identity.name)
+    : (page.identity?.name || site.siteName);
+  const isHome = page.template === 'homepage';
+  const isAlbum = page.template === 'album';
+  const breadcrumbs = [{
+    '@type': 'ListItem',
+    position: 1,
+    name: 'Home',
+    item: siteUrl
+  }];
+  if (!isHome) {
+    breadcrumbs.push({
+      '@type': 'ListItem',
+      position: 2,
+      name: pageName,
+      item: canonical
+    });
   }
-  if (page.template === 'album') {
-    common.byArtist = { '@type': 'MusicGroup', name: page.templateData?.player?.artistName || site.siteName };
-    const albumImage = safeImageUrl(page.templateData?.album?.artwork);
-    if (albumImage) {
-      try { common.image = new URL(albumImage, canonical).href; } catch { /* omit malformed structured-data image */ }
+
+  const graph = [
+    {
+      '@type': 'WebSite',
+      '@id': siteId,
+      url: siteUrl,
+      name: site.siteName,
+      description: site.description || '',
+      publisher: { '@id': artistId },
+      inLanguage: 'en'
+    },
+    {
+      '@type': 'MusicGroup',
+      '@id': artistId,
+      name: site.siteName,
+      url: siteUrl,
+      description: site.description || description || '',
+      sameAs: (site.socialProfiles || [])
+        .map((item) => safeUrl(item.url, { allowRelative: false, requireHttps: true }))
+        .filter(Boolean)
+    },
+    {
+      '@type': 'BreadcrumbList',
+      '@id': `${canonical.replace(/#.*$/, '')}#breadcrumb`,
+      itemListElement: breadcrumbs
+    },
+    {
+      '@type': 'WebPage',
+      '@id': pageId,
+      url: canonical,
+      name: pageName,
+      description,
+      isPartOf: { '@id': siteId },
+      breadcrumb: { '@id': `${canonical.replace(/#.*$/, '')}#breadcrumb` },
+      inLanguage: 'en',
+      ...(isHome ? { mainEntity: { '@id': artistId } } : {})
     }
-    common.track = (page.templateData?.player?.tracks || []).map((track) => ({
-      '@type': 'MusicRecording', name: track.title
-    }));
+  ];
+
+  if (isAlbum) {
+    const album = page.templateData?.album || {};
+    const player = page.templateData?.player || {};
+    const albumNode = {
+      '@type': 'MusicAlbum',
+      '@id': `${canonical.replace(/#.*$/, '')}#album`,
+      name: pageName,
+      url: canonical,
+      description,
+      byArtist: { '@id': artistId },
+      mainEntityOfPage: { '@id': pageId },
+      isPartOf: { '@id': siteId },
+      track: (player.tracks || []).map((track) => ({
+        '@type': 'MusicRecording',
+        name: track.title
+      }))
+    };
+    const albumImage = safeImageUrl(album.artwork);
+    if (albumImage) {
+      try { albumNode.image = new URL(albumImage, siteUrl).href; } catch { /* omit malformed structured-data image */ }
+    }
+    graph[3].mainEntity = { '@id': albumNode['@id'] };
+    graph.push(albumNode);
   }
-  return common;
+
+  return { '@context': 'https://schema.org', '@graph': graph };
 }
 
 function renderGlobalHeader(site, nav) {
