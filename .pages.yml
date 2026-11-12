@@ -932,7 +932,7 @@ components:
       - name: customImage
         label: Optional custom image
         type: image
-        description: Only used when Wallpaper style is set to Custom image.
+        description: Note: This setting only applies when Wallpaper style is set to Custom image. For every other wallpaper style, you can safely leave this field empty and ignore it.
         options:
           media: images
           extensions:
