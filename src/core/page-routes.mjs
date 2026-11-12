@@ -48,7 +48,10 @@ export function normalizePageRecord(page, site = {}) {
             group.id = group.name.trim().toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
           }
         }
-        return { ...section, id, ...(group ? { group } : {}) };
+        const content = section.type === 'marquee'
+          ? { ...(section.content && typeof section.content === 'object' ? section.content : {}), messages: Array.isArray(section.content?.messages) ? section.content.messages : [] }
+          : section.content;
+        return { ...section, id, ...(group ? { group } : {}), ...(content !== undefined ? { content } : {}) };
       })
     : page.sections;
 
@@ -56,7 +59,15 @@ export function normalizePageRecord(page, site = {}) {
     ...page,
     identity: { ...page.identity, route },
     sections,
-    seo: { ...page.seo, canonical }
+    ...(page.template === 'homepage' || page.template === 'album' ? {} : { templateData: page.templateData && typeof page.templateData === 'object' ? page.templateData : {} }),
+    seo: {
+      ...page.seo,
+      title: page.seo?.title || page.identity?.name || site.siteName || '',
+      description: page.seo?.description || '',
+      canonical,
+      socialImage: page.seo?.socialImage || site.seoDefaults?.socialImage || site.favicon || '',
+      allowIndexing: typeof page.seo?.allowIndexing === 'boolean' ? page.seo.allowIndexing : true
+    }
   };
 }
 
