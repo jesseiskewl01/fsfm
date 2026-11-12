@@ -217,3 +217,14 @@ test('Homepage hero titlebar uses the site favicon and the taskbar uses one page
   assert.match(html, /<span>Album<\/span>/);
   assert.doesNotMatch(html, /class="task-button/);
 });
+
+
+test('Homepage and reusable page templates share the same custom scrollbar system', () => {
+  const homepageCss = fs.readFileSync(path.join(root, 'src/styles/homepage-vista.css'), 'utf8');
+  const pageCss = fs.readFileSync(path.join(root, 'src/styles/v13.css'), 'utf8');
+  for (const css of [homepageCss, pageCss]) {
+    assert.match(css, /\*::-webkit-scrollbar \{ width: 12px; height: 12px; \}/);
+    assert.match(css, /scrollbar-width: thin/);
+    assert.match(css, /rgba\(154,204,240,.9\)/);
+  }
+});
