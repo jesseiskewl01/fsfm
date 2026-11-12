@@ -60,7 +60,7 @@ test('CMS hides computed public routes and puts page-wide settings before the bl
   assert.ok(albums.indexOf('component: identity') < albums.indexOf('component: seo'));
   assert.ok(albums.indexOf('component: seo') < albums.indexOf('component: appearance'));
   assert.ok(albums.indexOf('component: appearance') < albums.indexOf('component: publishing'));
-  assert.ok(albums.indexOf('component: seo') < albums.indexOf('component: albumSections'));
+  assert.ok(albums.indexOf('component: publishing') < albums.indexOf('component: albumSections'));
   assert.match(config, /PAGE LAYOUT · BUILD THE ALBUM PAGE/);
   assert.match(config, /The name visitors see in the page menu/);
 });
@@ -86,12 +86,16 @@ test('Wallpaper editor presents one clear choice and hides renderer implementati
 });
 
 test('Page title and wallpaper settings appear before the page layout blocks', () => {
-  const vistaStart = config.indexOf('    - name: vista-pages');
-  const editorialStart = config.indexOf('    - name: editorial-pages');
+  const vistaStart = config.indexOf('  - name: vista-pages\n    label: Vista Pages');
+  const editorialStart = config.indexOf('  - name: editorial-pages\n    label: Editorial Pages');
   const siteSettingsStart = config.indexOf('  - name: site-settings');
-  for (const section of [config.slice(vistaStart, editorialStart), config.slice(editorialStart, siteSettingsStart)]) {
-    assert.ok(section.indexOf('component: identity') < section.indexOf('component: seo'));
-    assert.ok(section.indexOf('component: seo') < section.indexOf('component: appearance'));
-    assert.ok(section.indexOf('component: appearance') < section.indexOf('component: sections'));
+  const sections = [
+    { source: config.slice(vistaStart, editorialStart), layout: 'vistaSections' },
+    { source: config.slice(editorialStart, siteSettingsStart), layout: 'editorialSections' }
+  ];
+  for (const { source, layout } of sections) {
+    assert.ok(source.indexOf('component: identity') < source.indexOf('component: seo'));
+    assert.ok(source.indexOf('component: seo') < source.indexOf('component: appearance'));
+    assert.ok(source.indexOf('component: appearance') < source.indexOf(`component: ${layout}`));
   }
 });
