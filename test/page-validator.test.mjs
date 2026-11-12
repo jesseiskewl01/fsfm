@@ -119,3 +119,27 @@ test('Incomplete Pages CMS Vista records normalize to safe, buildable page recor
   assert.deepEqual(normalized.sections.find(section => section.type === 'marquee').content.messages, []);
   assert.deepEqual(validatePage(normalized, { root }), []);
 });
+
+
+test('Simple wallpaper choices preserve legacy styles and resolve to renderer settings', () => {
+  const homeNormalized = normalizePageRecord(home, { baseUrl: 'https://fsfm.port82.net/' });
+  assert.equal(homeNormalized.appearance.wallpaper.choice, 'cycle');
+  assert.equal(homeNormalized.appearance.wallpaper.mode, 'cycle');
+  assert.equal(homeNormalized.appearance.wallpaper.cycle.enabled, true);
+  assert.deepEqual(homeNormalized.appearance.wallpaper.presets, ['vista-violet-haze', 'vista-aqua-glass', 'vista-solar-flare', 'vista-rose-bloom']);
+
+  const albumNormalized = normalizePageRecord(album, { baseUrl: 'https://fsfm.port82.net/' });
+  assert.equal(albumNormalized.appearance.wallpaper.choice, 'album-amber');
+  assert.equal(albumNormalized.appearance.wallpaper.mode, 'preset');
+  assert.equal(albumNormalized.appearance.wallpaper.preset, 'album-amber');
+
+  const custom = structuredClone(album);
+  custom.appearance.wallpaper.choice = 'custom';
+  custom.appearance.wallpaper.customImage = '/media/images/cover.png';
+  const customNormalized = normalizePageRecord(custom, { baseUrl: 'https://fsfm.port82.net/' });
+  assert.equal(customNormalized.appearance.wallpaper.mode, 'custom');
+  assert.equal(customNormalized.appearance.wallpaper.customImage, '/media/images/cover.png');
+
+  const editorial = { template: 'editorial', identity: { name: 'Essay', slug: 'essay' }, appearance: { wallpaper: { choice: 'template-default' } } };
+  assert.equal(normalizePageRecord(editorial).appearance.wallpaper.preset, 'aurora');
+});
