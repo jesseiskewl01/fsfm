@@ -19,12 +19,16 @@ test('Current live Homepage gadget data is merged into the V13 canonical record'
   assert.equal(liveGadgets.stickyNote.text, 'typa shit that make you wanna grab a penguin');
 });
 
-test('The V13 default build emits a clean dist directory', () => {
+test('The V14 default build emits a clean dist directory', () => {
   const pkg = readJson('package.json');
   assert.equal(pkg.scripts.build, 'node scripts/build-v13.mjs');
   const builder = fs.readFileSync(path.join(root, 'scripts/build-v13.mjs'), 'utf8');
   assert.match(builder, /isPreview \? 'preview-v13' : 'dist'/);
   assert.match(pkg.scripts['predeploy-check'], /--require-media/);
+  assert.equal(pkg.version, '14.0.0');
+  assert.match(builder, /albums', 'the-early-bird/);
+  assert.match(builder, /legacyRedirect/);
+  assert.match(builder, /'CNAME'/);
 });
 
 test('Release audit distinguishes missing restored media from structural release failures', () => {
