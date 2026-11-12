@@ -72,5 +72,5 @@ test('CMS hides implementation fields and gives the block editor usable help', (
   assert.match(config, /description: Give blocks the same group name/);
   assert.match(config, /description: The flexible text block/);
   assert.match(config, /description: Choose the page wallpaper/);
-  assert.match(config, /hidden: true\n\s+default: \[\]/);
+  assert.match(config, /list:\n\s+min: 0\n\s+default: \[\]/);
 });
