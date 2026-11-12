@@ -676,6 +676,7 @@ html, body, * {
 *::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, #fff, rgba(190,225,255,.98) 48%, rgba(116,184,226,.98));
 }
+.hero-favicon { object-fit: contain; filter: drop-shadow(0 0 3px rgba(255,255,255,.95)); }
 .task-menu { position: relative; flex: 0 0 auto; z-index: 9500; }
 .task-menu > summary {
   list-style: none; display: inline-flex; align-items: center; gap: 8px;
