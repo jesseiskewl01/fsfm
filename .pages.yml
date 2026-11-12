@@ -744,16 +744,13 @@ components:
       label: Page name
       type: string
       required: true
+      description: The name visitors see in the page menu and page headings.
     - name: slug
       label: URL slug
       type: string
       required: true
       pattern: ^[a-z0-9]+(?:-[a-z0-9]+)*$
-    - name: route
-      label: Public URL
-      type: string
-      required: true
-      description: Use a leading slash. New albums can use /albums/your-slug/; Vista and Editorial pages use /pages/your-slug/. Keep The Early Bird.... at /the-early-bird.html.
+      description: Short address used in the URL. Lowercase letters, numbers and hyphens only. Album URLs use /albums/; other pages use /pages/.
     - name: order
       label: Page order
       type: number
@@ -761,6 +758,7 @@ components:
   publishing:
     type: object
     label: Publishing and navigation
+    description: Drafts stay off the public site. Navigation visibility controls whether a published page appears in the site menu.
     fields:
     - name: published
       label: Published / publicly available
@@ -776,7 +774,8 @@ components:
       default: ''
   sectionPresentation:
     type: object
-    label: Presentation
+    label: Optional block styling
+    description: Most blocks can use their template's default style. Change these only when you want a deliberate visual variation.
     fields:
     - name: variant
       label: Visual presentation variant
@@ -797,7 +796,8 @@ components:
       default: ''
   sectionGroup:
     type: object
-    label: Layout group
+    label: Arrange with other blocks
+    description: Give blocks the same group ID to place them together. Choose grid for side-by-side blocks or stack for a vertical group. Leave blank for normal full-width flow.
     fields:
     - name: id
       label: Group ID
@@ -819,6 +819,7 @@ components:
   appearance:
     type: object
     label: Page appearance
+    description: Choose the page wallpaper and visual effects here, before arranging the page layout.
     fields:
     - name: wallpaper
       label: Wallpaper
@@ -968,7 +969,8 @@ components:
         default: true
   homepageSections:
     type: block
-    label: Homepage building blocks
+    label: PAGE LAYOUT · HOMEPAGE BUILDING BLOCKS
+    description: This is the main page builder. Add blocks, edit their content, and arrange them in the order visitors should see.
     list:
       collapsible:
         collapsed: true
@@ -1022,7 +1024,8 @@ components:
       component: blockSpacer
   albumSections:
     type: block
-    label: Album page layout
+    label: PAGE LAYOUT · ALBUM BUILDING BLOCKS
+    description: This is the main page builder. The album header and player are required; add optional blocks around them.
     list:
       collapsible:
         collapsed: true
@@ -1079,7 +1082,8 @@ components:
       component: blockSpotifyEmbed
   vistaSections:
     type: block
-    label: Vista page building blocks
+    label: PAGE LAYOUT · BUILDING BLOCKS
+    description: Add, edit and reorder the content blocks that make up this page.
     list:
       collapsible:
         collapsed: true
@@ -1133,7 +1137,8 @@ components:
       component: blockSpacer
   editorialSections:
     type: block
-    label: Editorial page building blocks
+    label: PAGE LAYOUT · BUILDING BLOCKS
+    description: Add, edit and reorder the content blocks that make up this page.
     list:
       collapsible:
         collapsed: true
@@ -1475,18 +1480,18 @@ content:
       - name: footerText
         label: Footer text
         type: string
-    - name: sections
-      label: Homepage content components
-      component: homepageSections
-    - name: publishing
-      label: Publishing and navigation
-      component: publishing
     - name: appearance
       label: Page appearance
       component: appearance
+    - name: publishing
+      label: Publishing and navigation
+      component: publishing
     - name: seo
       label: SEO and sharing
       component: seo
+    - name: sections
+      label: Homepage content components
+      component: homepageSections
   - name: albums
     label: Albums
     type: collection
@@ -1500,18 +1505,6 @@ content:
       delete: false
     view:
       fields:
-      - identity.name
-      - identity.slug
-      - publishing.published
-      - identity.order
-      primary: identity.name
-      sort:
-      - identity.order
-      - identity.name
-      default:
-        sort: identity.order
-        order: asc
-    fields:
     - name: schemaVersion
       label: Schema version
       type: number
@@ -1656,6 +1649,15 @@ content:
       - name: footerText
         label: Footer text
         type: string
+    - name: appearance
+      label: Page appearance
+      component: appearance
+    - name: publishing
+      label: Publishing and navigation
+      component: publishing
+    - name: seo
+      label: SEO and sharing
+      component: seo
     - name: sections
       label: Album page layout
       component: albumSections
@@ -1683,15 +1685,6 @@ content:
           windowTitle: ''
         content:
           source: templateData.spotify
-    - name: publishing
-      label: Publishing and navigation
-      component: publishing
-    - name: appearance
-      label: Page appearance
-      component: appearance
-    - name: seo
-      label: SEO and sharing
-      component: seo
   - name: vista-pages
     label: Vista Pages
     type: collection
@@ -1705,18 +1698,6 @@ content:
       delete: false
     view:
       fields:
-      - identity.name
-      - identity.slug
-      - publishing.published
-      - identity.order
-      primary: identity.name
-      sort:
-      - identity.order
-      - identity.name
-      default:
-        sort: identity.order
-        order: asc
-    fields:
     - name: schemaVersion
       label: Schema version
       type: number
@@ -1737,18 +1718,18 @@ content:
       - name: footerText
         label: Footer text
         type: string
-    - name: sections
-      label: Page building blocks
-      component: vistaSections
-    - name: publishing
-      label: Publishing and navigation
-      component: publishing
     - name: appearance
       label: Page appearance
       component: appearance
+    - name: publishing
+      label: Publishing and navigation
+      component: publishing
     - name: seo
       label: SEO and sharing
       component: seo
+    - name: sections
+      label: Page building blocks
+      component: vistaSections
   - name: editorial-pages
     label: Editorial Pages
     type: collection
@@ -1762,18 +1743,6 @@ content:
       delete: false
     view:
       fields:
-      - identity.name
-      - identity.slug
-      - publishing.published
-      - identity.order
-      primary: identity.name
-      sort:
-      - identity.order
-      - identity.name
-      default:
-        sort: identity.order
-        order: asc
-    fields:
     - name: schemaVersion
       label: Schema version
       type: number
@@ -1794,18 +1763,18 @@ content:
       - name: footerText
         label: Footer text
         type: string
-    - name: sections
-      label: Page building blocks
-      component: editorialSections
-    - name: publishing
-      label: Publishing and navigation
-      component: publishing
     - name: appearance
       label: Page appearance
       component: appearance
+    - name: publishing
+      label: Publishing and navigation
+      component: publishing
     - name: seo
       label: SEO and sharing
       component: seo
+    - name: sections
+      label: Page building blocks
+      component: editorialSections
 - name: site-settings
   label: Site settings
   type: group
