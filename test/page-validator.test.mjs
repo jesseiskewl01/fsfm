@@ -108,3 +108,14 @@ test('Layout group names become stable internal IDs without exposing implementat
   assert.equal(normalized.sections[1].group.id, 'listening-area');
   assert.equal(source.sections[0].group.id, undefined);
 });
+
+
+test('Incomplete Pages CMS Vista records normalize to safe, buildable page records', () => {
+  const cmsRecord = read('content/v13/vista-pages/vistatest.json');
+  const site = read('content/v13/site.json');
+  const normalized = normalizePageRecord(cmsRecord, site);
+  assert.equal(normalized.identity.route, '/pages/vistatest/');
+  assert.equal(normalized.seo.socialImage, site.seoDefaults.socialImage);
+  assert.deepEqual(normalized.sections.find(section => section.type === 'marquee').content.messages, []);
+  assert.deepEqual(validatePage(normalized, { root }), []);
+});
