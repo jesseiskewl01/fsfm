@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { COMPONENTS } from '../components/registry.mjs';
 import { TEMPLATES } from '../templates/registry.mjs';
+import { routeForPage } from './page-routes.mjs';
 
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const PRESET_IDS = new Set(['vista-violet-haze','vista-aqua-glass','vista-solar-flare','vista-rose-bloom','aurora','album-amber']);
@@ -23,12 +24,12 @@ export function validatePage(page, options = {}) {
   if (!isRecord(identity)) issue(problems, where, 'identity object is required');
   else {
     if (!identity.name?.trim()) issue(problems, where, 'identity.name is required');
+    try { routeForPage(page); } catch (error) { issue(problems, where, error.message); }
     if (page.template === 'homepage') {
       if (identity.route !== '/') issue(problems, where, 'Homepage route must be /');
     } else if (!SLUG.test(identity.slug || '')) {
       issue(problems, where, 'identity.slug must use lowercase letters, numbers and hyphens');
     }
-    if (typeof identity.route !== 'string' || !identity.route.startsWith('/')) issue(problems, where, 'identity.route must be an absolute site path');
     if (!Number.isFinite(identity.order)) issue(problems, where, 'identity.order must be a number');
     const publishing = page.publishing;
     if (!isRecord(publishing)) issue(problems, where, 'publishing object is required');
@@ -113,7 +114,7 @@ export function validatePage(page, options = {}) {
       }
       if (page.template === 'album') {
         const player = page.templateData?.player;
-        if (!isRecord(player) || !Array.isArray(player.tracks) || player.tracks.length === 0) issue(problems, where, 'Album template requires at least one player track');
+        if (!isRecord(player) || !Array.isArray(player.tracks) || (page.publishing?.published !== false && player.tracks.length === 0)) issue(problems, where, 'Published Album template requires at least one player track');
         else {
           const trackIds = new Set();
           player.tracks.forEach((track, index) => {
@@ -146,10 +147,11 @@ export function validateSite(pages, options = {}) {
   for (const page of pages) {
     problems.push(...validatePage(page, options));
     const identity = page?.identity || {};
-    if (identity.route) {
-      if (routeOwners.has(identity.route)) issue(problems, 'Site', `route ${identity.route} is shared by ${routeOwners.get(identity.route)} and ${identity.name}`);
-      routeOwners.set(identity.route, identity.name || 'unnamed page');
-    }
+    try {
+      const route = routeForPage(page);
+      if (routeOwners.has(route)) issue(problems, 'Site', `route ${route} is shared by ${routeOwners.get(route)} and ${identity.name}`);
+      routeOwners.set(route, identity.name || 'unnamed page');
+    } catch { /* validatePage already reports invalid slugs/templates */ }
     if (page?.template !== 'homepage' && identity.slug) {
       if (slugOwners.has(identity.slug)) issue(problems, 'Site', `slug ${identity.slug} is shared by ${slugOwners.get(identity.slug)} and ${identity.name}`);
       slugOwners.set(identity.slug, identity.name || 'unnamed page');
