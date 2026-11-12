@@ -143,3 +143,10 @@ test('Simple wallpaper choices preserve legacy styles and resolve to renderer se
   const editorial = { template: 'editorial', identity: { name: 'Essay', slug: 'essay' }, appearance: { wallpaper: { choice: 'template-default' } } };
   assert.equal(normalizePageRecord(editorial).appearance.wallpaper.preset, 'aurora');
 });
+
+
+test('The temporary CMS-created Vista test page stays unpublished and out of navigation', () => {
+  const cmsRecord = read('content/v13/vista-pages/vistatest.json');
+  assert.equal(cmsRecord.publishing.published, false);
+  assert.equal(cmsRecord.publishing.showInNavigation, false);
+});
