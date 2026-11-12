@@ -1,7 +1,7 @@
 {
   "name": "fsfm-site",
   "private": true,
-  "version": "13.0.0",
+  "version": "14.0.0",
   "type": "module",
   "scripts": {
     "build": "node scripts/build-v13.mjs",
@@ -25,8 +25,13 @@
     "preview:v13:drafts": "node scripts/build-v13.mjs --preview --include-drafts",
     "preview:v13:templates": "npm run preview:v13 && node scripts/build-v13-template-previews.mjs",
     "audit:v13": "node scripts/audit-v13-release.mjs",
-    "verify-release": "npm run build && npm run audit:v13",
+    "verify-release": "npm run build && npm run audit:v14",
     "predeploy-check": "npm run build && node scripts/audit-v13-release.mjs --require-media",
-    "check:all": "npm test && npm run validate:v13 && npm run check:v13:stage4 && npm run check:v13:stage5 && npm run check:v13:stage6"
+    "check:all": "npm test && npm run validate:v14 && npm run check:v14 && npm run check:v13:stage4 && npm run check:v13:stage5 && npm run check:v13:stage6",
+    "validate:v14": "node scripts/validate-v13.mjs",
+    "preview:v14": "node scripts/build-v13.mjs --preview",
+    "preview:v14:drafts": "node scripts/build-v13.mjs --preview --include-drafts",
+    "audit:v14": "node scripts/audit-v13-release.mjs",
+    "check:v14": "node --check src/core/page-routes.mjs && node --check src/core/page-validator.mjs && node --check scripts/build-v13.mjs && node --check scripts/create-page-v13.mjs && node --check src/render/page.mjs && node --check src/render/homepage.mjs && node --check src/client/album-atmosphere.js"
   }
 }
