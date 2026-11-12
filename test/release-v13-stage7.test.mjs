@@ -25,7 +25,7 @@ test('The V14 default build emits a clean dist directory', () => {
   const builder = fs.readFileSync(path.join(root, 'scripts/build-v13.mjs'), 'utf8');
   assert.match(builder, /isPreview \? 'preview-v13' : 'dist'/);
   assert.match(pkg.scripts['predeploy-check'], /--require-media/);
-  assert.equal(pkg.version, '14.0.0');
+  assert.equal(pkg.version, '15.0.0');
   assert.match(builder, /\/albums\/the-early-bird\//);
   assert.match(builder, /legacyRedirect/);
   assert.match(builder, /'CNAME'/);

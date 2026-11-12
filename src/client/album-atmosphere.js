@@ -288,7 +288,7 @@ try {
     function random(min, max) { return min + Math.random() * (max - min); }
 
     function resizeAurora() {
-      dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 640 ? 1 : 1.25);
+      dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 640 ? 1 : 1.1);
       width = window.innerWidth;
       height = window.innerHeight;
       canvas.width = Math.round(width * dpr);
@@ -301,7 +301,7 @@ try {
       stars = [];
       blooms = [];
       curtains = [];
-      var starCount = Math.min(260, Math.max(90, Math.floor((width * height) / 6200)));
+      var starCount = Math.min(190, Math.max(70, Math.floor((width * height) / 9000)));
       compact = width < 640;
       for (var i = 0; i < starCount; i += 1) {
         var giant = i < Math.max(18, Math.floor(starCount * 0.075));
@@ -340,7 +340,7 @@ try {
     function drawCurtain(curtain, time) {
       var yTop = -height * (width < 640 ? 0.16 : 0.10);
       var yBottom = height * (compact ? Math.min(1.18, curtain.depth + 0.10) : Math.min(1.25, curtain.depth + 0.16));
-      var steps = 28;
+      var steps = 22;
       var left = [], right = [];
       var driftTime = reduceMotion ? 0 : time;
       for (var i = 0; i <= steps; i += 1) {
@@ -374,10 +374,10 @@ try {
       ctx.globalCompositeOperation = 'screen';
       ctx.fillStyle = vertical;
       ctx.globalAlpha = 0.76;
-      ctx.filter = 'blur(18px)';
+      ctx.filter = 'blur(13px)';
       ctx.fill(path);
       ctx.globalAlpha = 0.48;
-      ctx.filter = 'blur(6px)';
+      ctx.filter = 'blur(4px)';
       ctx.fill(path);
       ctx.globalAlpha = 0.24;
       ctx.filter = 'none';

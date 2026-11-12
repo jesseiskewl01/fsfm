@@ -2048,3 +2048,5 @@ settings:
       update: 'content: update {path}'
       delete: 'content: delete {path}'
       rename: 'content: rename {oldPath} -> {newPath}'
+
+# V15 cache refresh marker: forces Pages CMS to re-read this branch's configuration after merge.

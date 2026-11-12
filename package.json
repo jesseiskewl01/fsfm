@@ -1,7 +1,7 @@
 {
   "name": "fsfm-site",
   "private": true,
-  "version": "14.0.0",
+  "version": "15.0.0",
   "type": "module",
   "scripts": {
     "build": "node scripts/build-v13.mjs",

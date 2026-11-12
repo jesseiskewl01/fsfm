@@ -660,12 +660,10 @@ text-shadow: 0 1px 3px rgb(var(--deep-rgb)), 0 0 8px rgba(var(--deep-rgb), 0.8);
 html, body, * {
   scrollbar-width: thin;
   scrollbar-color: rgba(154,204,240,.9) rgba(8,18,40,.86);
-  scrollbar-gutter: stable;
 }
 *::-webkit-scrollbar { width: 12px; height: 12px; }
 *::-webkit-scrollbar-track {
   background: rgba(8,18,40,.86);
-  border-left: 1px solid rgba(220,232,255,.18);
 }
 *::-webkit-scrollbar-thumb {
   border: 2px solid rgba(8,18,40,.86);
