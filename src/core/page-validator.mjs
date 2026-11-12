@@ -25,9 +25,7 @@ export function validatePage(page, options = {}) {
   else {
     if (!identity.name?.trim()) issue(problems, where, 'identity.name is required');
     try { routeForPage(page); } catch (error) { issue(problems, where, error.message); }
-    if (page.template === 'homepage') {
-      if (identity.route !== '/') issue(problems, where, 'Homepage route must be /');
-    } else if (!SLUG.test(identity.slug || '')) {
+    if (page.template !== 'homepage' && !SLUG.test(identity.slug || '')) {
       issue(problems, where, 'identity.slug must use lowercase letters, numbers and hyphens');
     }
     if (!Number.isFinite(identity.order)) issue(problems, where, 'identity.order must be a number');
