@@ -47,8 +47,8 @@ test('Wallpaper cycle supports both configured modes', () => {
 test('Site requires one Homepage and unique routes', () => {
   assert.deepEqual(validateSite([home, album], { root }), []);
   const duplicateRoute = structuredClone(album);
-  duplicateRoute.identity.slug = home.identity.slug;
-  assert.ok(validateSite([home, duplicateRoute], { root }).some(message => message.includes('route / is shared')));
+  duplicateRoute.identity.slug = album.identity.slug;
+  assert.ok(validateSite([home, album, duplicateRoute], { root }).some(message => message.includes('route /albums/the-early-bird/ is shared')));
 });
 
 test('Album supports an uploaded audio file instead of an external URL', () => {
