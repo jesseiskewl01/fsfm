@@ -99,3 +99,12 @@ test('Page title and wallpaper settings appear before the page layout blocks', (
     assert.ok(source.indexOf('component: appearance') < source.indexOf(`component: ${layout}`));
   }
 });
+
+test('The page builder is visibly presented as the main editor area in every collection', () => {
+  for (const heading of [
+    'PAGE LAYOUT · BUILD THE HOMEPAGE',
+    'PAGE LAYOUT · BUILD THE ALBUM PAGE',
+    'PAGE LAYOUT · BUILD THE PAGE'
+  ]) assert.ok(config.includes(heading), `missing prominent page-builder heading: ${heading}`);
+  assert.match(config, /description: MAIN PAGE BUILDER · Add, edit and reorder/);
+});
