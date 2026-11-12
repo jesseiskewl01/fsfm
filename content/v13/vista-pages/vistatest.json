@@ -61,7 +61,8 @@
         "mode": "sequential",
         "intervalSeconds": 30,
         "manualControl": true
-      }
+      },
+      "choice": "vista-aqua-glass"
     },
     "effects": {
       "backgroundEffects": true,
