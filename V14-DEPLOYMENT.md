@@ -24,7 +24,7 @@ GitHub Pages must use **GitHub Actions** as its publishing source for the `actio
 
 ## Before the first production deployment
 
-- Confirm `content/v13/vista-pages/vistatest.json` is unpublished or hidden from navigation if it is still only a test page. It is currently marked published and navigation-visible.
+- The temporary `vistatest` record is kept unpublished and hidden from navigation in the V14 branch.
 - Confirm the custom domain remains configured in **Settings → Pages**.
 - Check the successful deployment URL and test the homepage, album route, page menu, media player, audio, lyrics, and wallpaper after deployment.
 
