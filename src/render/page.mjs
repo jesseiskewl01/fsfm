@@ -6,12 +6,14 @@ function siteNavigation(site, pages, currentPage) {
   const items = (pages || [])
     .filter((page) => page?.publishing?.published !== false && (page?.template === 'homepage' || page?.publishing?.showInNavigation === true))
     .sort((a, b) => (Number(a.identity?.order) || 0) - (Number(b.identity?.order) || 0));
-  return `<nav class="site-navigation" aria-label="Main navigation">${items.map((page) => {
+  const links = items.map((page) => {
     const current = page.identity?.route === currentPage.identity?.route;
     const href = safeRoute(page.identity?.route, '/');
     const label = page.publishing?.navigationLabel || (page.template === 'homepage' ? 'Home' : page.identity?.name) || 'Page';
-    return `<a href="${escapeHtml(href)}"${current ? ' aria-current="page"' : ''}>${escapeHtml(label)}</a>`;
-  }).join('')}</nav>`;
+    const type = page.template === 'homepage' ? 'HOME' : page.template === 'album' ? 'ALBUM' : 'PAGE';
+    return `<a href="${escapeHtml(href)}"${current ? ' aria-current="page"' : ''}><span>${escapeHtml(label)}</span><small>${type}</small></a>`;
+  }).join('');
+  return `<details class="site-menu"><summary aria-label="Open page menu"><span class="menu-glyph" aria-hidden="true">☰</span><span>Pages</span></summary><nav class="site-menu-panel" aria-label="Site pages">${links || '<span class="site-menu-empty">No published pages yet.</span>'}</nav></details>`;
 }
 
 function structuredData(page, site, canonical, description) {
