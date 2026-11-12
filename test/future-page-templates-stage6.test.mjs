@@ -137,6 +137,6 @@ test('Page navigation is presented as one menu containing all published pages', 
   const html = renderPage(current, { site, pages: [current, album, draft], wallpapers });
   assert.match(html, /<details class="site-menu">/);
   assert.match(html, /aria-label="Site pages"/);
-  assert.match(html, /The Early Bird/);
+  assert.match(html, /<span>Album<\/span>/);
   assert.doesNotMatch(html, /Private Draft/);
 });
