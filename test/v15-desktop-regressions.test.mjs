@@ -55,4 +55,5 @@ test('V15 homepage widgets form the intended six-window frame with loose bonus p
   assert.match(js, /isLegacyDefault/);
   assert.match(js, /function boxesOverlap/);
   assert.match(js, /function resolveWidgetCollisions/);
+  assert.ok(js.indexOf('var widgetById = {}') < js.indexOf('resolveWidgetCollisions(defaultPositions)'), 'widget lookup must exist before initial collision resolution');
 });
