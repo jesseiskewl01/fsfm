@@ -56,7 +56,7 @@ test('Site identity, favicon and footer are retained', () => {
 });
 
 test('Album text, palette and public URL are preserved', () => {
-  assert.equal(album.identity.route, '/the-early-bird.html');
+  assert.equal(album.identity.route, '/albums/the-early-bird/');
   assert.equal(album.templateData.album.title, site.album.title);
   assert.equal(album.templateData.album.windowTitle, site.album.windowTitle);
   assert.equal(album.templateData.album.artistLine, site.album.artistLine);
