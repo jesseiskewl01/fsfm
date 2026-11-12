@@ -48,3 +48,63 @@ test('Every template gets an appropriate block editor', () => {
     assert.ok(config.includes(`- name: ${block}`), `missing shared building block ${block}`);
   }
 });
+
+
+test('CMS hides computed public routes and puts page-wide settings before the block editor', () => {
+  const identity = config.slice(config.indexOf('  identity:'), config.indexOf('  publishing:'));
+  assert.match(identity, /name: slug/);
+  assert.doesNotMatch(identity, /name: route/);
+  const albumStart = config.indexOf('  - name: albums');
+  const vistaStart = config.indexOf('  - name: vista-pages');
+  const albums = config.slice(albumStart, vistaStart);
+  assert.ok(albums.indexOf('component: identity') < albums.indexOf('component: seo'));
+  assert.ok(albums.indexOf('component: seo') < albums.indexOf('component: appearance'));
+  assert.ok(albums.indexOf('component: appearance') < albums.indexOf('component: publishing'));
+  assert.ok(albums.indexOf('component: publishing') < albums.indexOf('component: albumSections'));
+  assert.match(config, /PAGE LAYOUT · BUILD THE ALBUM PAGE/);
+  assert.match(config, /The name visitors see in the page menu/);
+});
+
+ 
+test('CMS hides implementation fields and gives the block editor usable help', () => {
+  assert.match(config, /label: false\n\s+type: string\n\s+hidden: true/);
+  assert.match(config, /label: Group name/);
+  assert.match(config, /description: Give blocks the same group name/);
+  assert.match(config, /description: The flexible text block/);
+  assert.match(config, /description: Choose a colour, Aurora, Album Amber, a custom image, or rotating Vista colours/);
+  assert.match(config, /list:\n\s+min: 0\n\s+default: \[\]/);
+});
+
+
+test('Wallpaper editor presents one clear choice and hides renderer implementation settings', () => {
+  const wallpaper = config.slice(config.indexOf('    - name: wallpaper'), config.indexOf('    - name: effects'));
+  assert.match(wallpaper, /- name: choice[\s\S]*?label: Wallpaper style[\s\S]*?type: select/);
+  assert.match(wallpaper, /- name: mode[\s\S]*?hidden: true/);
+  assert.match(wallpaper, /- name: preset[\s\S]*?hidden: true/);
+  assert.match(wallpaper, /- name: customImage[\s\S]*?label: Optional custom image/);
+  assert.match(wallpaper, /- name: cycle[\s\S]*?hidden: true/);
+});
+
+test('Page title and wallpaper settings appear before the page layout blocks', () => {
+  const vistaStart = config.indexOf('  - name: vista-pages\n    label: Vista Pages');
+  const editorialStart = config.indexOf('  - name: editorial-pages\n    label: Editorial Pages');
+  const siteSettingsStart = config.indexOf('  - name: site-settings');
+  const sections = [
+    { source: config.slice(vistaStart, editorialStart), layout: 'vistaSections' },
+    { source: config.slice(editorialStart, siteSettingsStart), layout: 'editorialSections' }
+  ];
+  for (const { source, layout } of sections) {
+    assert.ok(source.indexOf('component: identity') < source.indexOf('component: seo'));
+    assert.ok(source.indexOf('component: seo') < source.indexOf('component: appearance'));
+    assert.ok(source.indexOf('component: appearance') < source.indexOf(`component: ${layout}`));
+  }
+});
+
+test('The page builder is visibly presented as the main editor area in every collection', () => {
+  for (const heading of [
+    'PAGE LAYOUT · BUILD THE HOMEPAGE',
+    'PAGE LAYOUT · BUILD THE ALBUM PAGE',
+    'PAGE LAYOUT · Page building blocks · BUILD THE PAGE'
+  ]) assert.ok(config.includes(heading), `missing prominent page-builder heading: ${heading}`);
+  assert.match(config, /description: Page building blocks · MAIN PAGE BUILDER/);
+});

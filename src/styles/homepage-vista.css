@@ -39,21 +39,11 @@ color: #111;
 html {
   width:100%; min-height:100%; height:auto;
   overflow-x:clip; overflow-y:scroll; scroll-behavior:smooth;
-  scrollbar-width:thin; scrollbar-color:rgba(var(--hi-rgb),.9) rgba(var(--deep-rgb),.72);
-  scrollbar-gutter:stable;
 }
 body {
   width:100%; min-height:100vh; height:auto;
   overflow-x:clip; overflow-y:visible; scroll-behavior:smooth;
 }
-html::-webkit-scrollbar { width:12px; }
-html::-webkit-scrollbar-track { background:rgba(var(--deep-rgb),.78); border-left:1px solid rgba(var(--hi-rgb),.18); }
-html::-webkit-scrollbar-thumb {
-  border:2px solid rgba(var(--deep-rgb),.78); border-radius:10px;
-  background:linear-gradient(180deg,rgba(var(--hi-rgb),.98),rgba(var(--bright-rgb),.82) 48%,rgba(var(--glass-rgb),.92));
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.42);
-}
-html::-webkit-scrollbar-thumb:hover { background:linear-gradient(180deg,#fff,rgba(var(--hi-rgb),.98) 48%,rgba(var(--bright-rgb),.98)); }
 [hidden] { display:none !important; }
 
 body {
@@ -663,3 +653,64 @@ text-shadow: 0 1px 3px rgb(var(--deep-rgb)), 0 0 8px rgba(var(--deep-rgb), 0.8);
 .home-component-window .titlebar { height:30px; padding:0 4px; }
 .home-component-window .window-body { min-height:64px; }
 @media(max-width:680px) { .home-component-body { padding:16px; } }
+
+
+/* ---------- V14: HOMEPAGE MENU AND FAVICON ---------- */
+/* One consistent Vista-glass scrollbar for the document and nested scroll areas. */
+html, body, * {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(154,204,240,.9) rgba(8,18,40,.86);
+  scrollbar-gutter: stable;
+}
+*::-webkit-scrollbar { width: 12px; height: 12px; }
+*::-webkit-scrollbar-track {
+  background: rgba(8,18,40,.86);
+  border-left: 1px solid rgba(220,232,255,.18);
+}
+*::-webkit-scrollbar-thumb {
+  border: 2px solid rgba(8,18,40,.86);
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(255,255,255,.94), rgba(154,204,240,.88) 48%, rgba(83,146,193,.94));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.42);
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #fff, rgba(190,225,255,.98) 48%, rgba(116,184,226,.98));
+}
+.hero-favicon { object-fit: contain; filter: drop-shadow(0 0 3px rgba(255,255,255,.95)); }
+.task-menu { position: relative; flex: 0 0 auto; z-index: 9500; }
+.task-menu > summary {
+  list-style: none; display: inline-flex; align-items: center; gap: 8px;
+  min-height: 29px; padding: 3px 13px; cursor: pointer; user-select: none;
+  border: 1px solid rgba(255,255,255,.7); border-radius: 3px; color: #fff;
+  font: 700 11px "Segoe UI", Tahoma, Arial, sans-serif; text-shadow: 0 1px 2px #000;
+  background: linear-gradient(rgba(var(--hi-rgb), .36),rgba(var(--hi-rgb), .18) 45%,rgba(var(--deep-rgb), .68) 50%,rgba(var(--mid-rgb), .54));
+  box-shadow: inset 0 1px 1px rgba(255,255,255,.72), 0 1px 5px rgba(0,0,0,.36);
+}
+.task-menu > summary::-webkit-details-marker { display: none; }
+.task-menu > summary::marker { content: ""; }
+.task-menu[open] > summary, .task-menu > summary:hover {
+  border-color: #fff; background: linear-gradient(rgba(var(--hi-rgb), .58),rgba(var(--bright-rgb), .42) 46%,rgba(var(--glass-rgb), .7) 51%,rgba(var(--bright-rgb), .45));
+}
+.task-menu-panel {
+  position: absolute; top: calc(100% + 6px); right: 0; width: min(290px, calc(100vw - 18px));
+  max-height: min(72vh, 520px); overflow: auto; display: grid; gap: 3px; padding: 7px;
+  border: 1px solid rgba(255,255,255,.76); border-radius: 5px;
+  background: linear-gradient(145deg,rgba(var(--mid-rgb),.98),rgba(var(--deep-rgb),.99));
+  box-shadow: 0 12px 36px rgba(0,0,0,.55),inset 0 1px rgba(255,255,255,.4);
+  backdrop-filter: blur(18px) saturate(145%);
+}
+.task-menu-link {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  padding: 9px 10px; border: 1px solid transparent; border-radius: 3px;
+  color: #fff; text-decoration: none; font: 11px "Segoe UI",Tahoma,Arial,sans-serif;
+  text-shadow: 0 1px 2px #000;
+}
+.task-menu-link:hover, .task-menu-link.active {
+  border-color: rgba(255,255,255,.45); background: rgba(var(--hi-rgb),.22);
+  box-shadow: inset 0 0 0 1px rgba(var(--hi-rgb),.12);
+}
+.task-menu-link small { flex: 0 0 auto; opacity: .68; font: 700 9px "Roboto Mono",monospace; letter-spacing: .12em; }
+.task-menu-empty { padding: 10px; color: rgba(255,255,255,.8); font: 11px "Segoe UI",Tahoma,Arial,sans-serif; }
+@media (max-width: 640px) {
+  .task-menu > summary { padding: 3px 10px; }
+}

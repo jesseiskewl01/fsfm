@@ -23,14 +23,20 @@
       "customImage": "",
       "customFit": "cover",
       "customPosition": "center",
-      "presets": ["vista-violet-haze", "vista-aqua-glass", "vista-solar-flare", "vista-rose-bloom"],
+      "presets": [
+        "vista-violet-haze",
+        "vista-aqua-glass",
+        "vista-solar-flare",
+        "vista-rose-bloom"
+      ],
       "initialSelection": "random",
       "cycle": {
         "enabled": false,
         "mode": "sequential",
         "intervalSeconds": 30,
         "manualControl": false
-      }
+      },
+      "choice": "template-default"
     },
     "effects": {
       "backgroundEffects": true,

@@ -4,7 +4,7 @@
   "identity": {
     "name": "The Early Bird....",
     "slug": "the-early-bird",
-    "route": "/the-early-bird.html",
+    "route": "/albums/the-early-bird/",
     "order": 1
   },
   "templateData": {
@@ -142,7 +142,8 @@
         "mode": "sequential",
         "intervalSeconds": 30,
         "manualControl": false
-      }
+      },
+      "choice": "album-amber"
     },
     "effects": {
       "backgroundEffects": true,
@@ -153,7 +154,7 @@
   "seo": {
     "title": "The Early Bird.... | Fake Space Fog Machine",
     "description": "The Early Bird...., the debut album by Fake Space Fog Machine.",
-    "canonical": "https://fsfm.port82.net/the-early-bird.html",
+    "canonical": "https://fsfm.port82.net/albums/the-early-bird/",
     "socialImage": "/media/images/cover.png",
     "allowIndexing": true
   }

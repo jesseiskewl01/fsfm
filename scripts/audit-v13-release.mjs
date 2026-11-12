@@ -18,14 +18,16 @@ function walk(dir) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const file = path.join(dir, entry.name);
     if (entry.isDirectory()) walk(file);
-    else if (entry.isFile() && entry.name.endsWith('.html')) pageFiles.push(file);
+    else if (entry.isFile() && entry.name.endsWith('.html') && entry.name !== 'google47366a80744746e8.html') pageFiles.push(file);
   }
 }
 function fail(message) { errors.push(message); }
 
 if (!fs.existsSync(dist)) fail('dist/ does not exist. Run npm run build first.');
 if (!fs.existsSync(path.join(dist, 'index.html'))) fail('Homepage dist/index.html is missing.');
-if (!fs.existsSync(path.join(dist, 'the-early-bird.html'))) fail('Album dist/the-early-bird.html is missing.');
+if (!fs.existsSync(path.join(dist, 'albums', 'the-early-bird', 'index.html'))) fail('Album dist/albums/the-early-bird/index.html is missing.');
+if (!fs.existsSync(path.join(dist, 'the-early-bird.html'))) fail('Legacy album URL redirect is missing.');
+if (!fs.existsSync(path.join(dist, 'CNAME'))) fail('CNAME is missing from the production output.');
 walk(dist);
 if (fs.existsSync(path.join(dist, 'preview-v13')) || fs.existsSync(path.join(dist, 'templates'))) fail('Private preview files must not be present in the production dist.');
 
@@ -89,7 +91,8 @@ else {
   const xml = fs.readFileSync(sitemapPath, 'utf8');
   const locs = [...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map((match) => match[1]);
   if (!locs.includes('https://fsfm.port82.net/')) fail('Sitemap does not include the Homepage canonical URL.');
-  if (!locs.includes('https://fsfm.port82.net/the-early-bird.html')) fail('Sitemap does not include the Album canonical URL.');
+  if (!locs.includes('https://fsfm.port82.net/albums/the-early-bird/')) fail('Sitemap does not include the Album canonical URL.');
+  if (locs.includes('https://fsfm.port82.net/the-early-bird.html')) fail('Sitemap must use the canonical Album route, not the legacy redirect.');
   if (locs.some((loc) => loc.includes('preview') || loc.includes('draft'))) fail('Sitemap contains a preview or draft URL.');
 }
 const robotsPath = path.join(dist, 'robots.txt');
@@ -100,7 +103,7 @@ else {
   if (/Disallow:\s*\//.test(robots)) fail('Production robots.txt blocks the entire site.');
 }
 
-console.log(`V13 production audit: ${pageFiles.length} HTML page(s) checked.`);
+console.log(`V14 production audit: ${pageFiles.length} HTML page(s) checked.`);
 if (missingMedia.length) console.log(`Live media pending: ${missingMedia.length} required file(s).`);
 if (warnings.length) for (const warning of warnings) console.warn(`WARN: ${warning}`);
 if (errors.length) {

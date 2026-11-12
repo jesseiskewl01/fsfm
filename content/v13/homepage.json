@@ -31,7 +31,7 @@
       "funWidgets": {
         "showBarrelRoll": false,
         "showBubbleSlider": true,
-        "showMusicPlayer": true,
+        "showMusicPlayer": false,
         "showPurblePlace": false
       },
       "visibility": {
@@ -231,7 +231,8 @@
       },
       "preset": "vista-violet-haze",
       "customFit": "cover",
-      "customPosition": "center"
+      "customPosition": "center",
+      "choice": "cycle"
     },
     "effects": {
       "backgroundEffects": true,

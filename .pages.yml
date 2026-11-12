@@ -39,13 +39,14 @@ components:
   blockSiteHeader:
     type: object
     label: Site header
+    description: A small shared site identity header for a page.
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
-      label: Show this section
+      label: Show block
       type: boolean
       default: true
     - name: presentation
@@ -79,11 +80,12 @@ components:
   blockHero:
     type: object
     label: Hero
+    description: A large page introduction with an optional image and link.
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -131,11 +133,12 @@ components:
   blockMarquee:
     type: object
     label: Marquee
+    description: A scrolling strip for short announcements or repeated phrases.
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -156,11 +159,12 @@ components:
   blockArtistStatement:
     type: object
     label: Artist statement
+    description: A paragraph or biography block. Use this for a short introduction.
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -182,11 +186,12 @@ components:
   blockEmbedWindow:
     type: object
     label: Embed window
+    description: Embed a supported music or video service using its embed URL.
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -226,11 +231,12 @@ components:
   blockBandsintownEvents:
     type: object
     label: Bandsintown events
+    description: Show upcoming live dates from the connected Bandsintown artist profile.
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -304,11 +310,12 @@ components:
   blockSocialLinks:
     type: object
     label: Social links
+    description: A tidy list of links to your artist profiles.
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -341,11 +348,12 @@ components:
   blockFeaturedRelease:
     type: object
     label: Featured release
+    description: Highlight one release with artwork, a short description and a destination link.
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -394,11 +402,12 @@ components:
   blockRichText:
     type: object
     label: Rich text
+    description: The flexible text block for headings, paragraphs and formatted content.
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -427,11 +436,12 @@ components:
   blockImage:
     type: object
     label: Image
+    description: Add one image with optional alternative text and a caption.
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -470,11 +480,12 @@ components:
   blockGallery:
     type: object
     label: Image gallery
+    description: Show a group of images together.
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -514,11 +525,12 @@ components:
   blockQuote:
     type: object
     label: Quote
+    description: Give a quotation its own visual space, with optional attribution.
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -543,11 +555,12 @@ components:
   blockLinkButton:
     type: object
     label: Link or button
+    description: Add one clear call-to-action link.
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -582,11 +595,12 @@ components:
   blockDivider:
     type: object
     label: Divider
+    description: Separate nearby blocks with a line, star or space.
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -610,11 +624,12 @@ components:
   blockSpacer:
     type: object
     label: Spacer
+    description: Add deliberate empty space between blocks.
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -633,11 +648,12 @@ components:
   blockAlbumHeader:
     type: object
     label: Album header (built-in)
+    description: The album artwork and title area. This is included automatically on album pages.
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -650,18 +666,19 @@ components:
       type: object
       fields:
       - name: source
-        label: Uses album details
+        label: false
         type: string
         default: templateData.album
-        readonly: true
+        hidden: true
   blockAlbumPlayer:
     type: object
     label: FSFM Media Player (required)
+    description: The FSFM track player and synchronized lyrics. Required on album pages.
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -674,18 +691,19 @@ components:
       type: object
       fields:
       - name: source
-        label: Uses album player data
+        label: false
         type: string
         default: templateData.player
-        readonly: true
+        hidden: true
   blockSpotifyEmbed:
     type: object
     label: Spotify album embed
+    description: An optional Spotify album embed.
     fields:
     - name: id
-      label: Internal section ID
+      label: false
       type: string
-      required: true
+      hidden: true
     - name: enabled
       label: Show this section
       type: boolean
@@ -698,16 +716,17 @@ components:
       type: object
       fields:
       - name: source
-        label: Uses Spotify settings
+        label: false
         type: string
         default: templateData.spotify
-        readonly: true
+        hidden: true
   seo:
     type: object
-    label: SEO and sharing
+    label: Page title and sharing
+    description: Set the title shown in browser tabs and search results. Most other sharing details can stay at their defaults.
     fields:
     - name: title
-      label: Browser and search title
+      label: Page title (browser and search)
       type: string
       default: ''
     - name: description
@@ -715,8 +734,9 @@ components:
       type: text
       default: ''
     - name: canonical
-      label: Canonical URL
+      label: false
       type: string
+      hidden: true
       default: ''
     - name: socialImage
       label: Social sharing image
@@ -736,6 +756,7 @@ components:
       label: Allow search engines to index this page
       type: boolean
       default: true
+      description: Turn this off only if you do not want search engines to list this page.
   identity:
     type: object
     label: Page identity
@@ -744,43 +765,47 @@ components:
       label: Page name
       type: string
       required: true
+      description: The name visitors see in the page menu and page headings.
     - name: slug
       label: URL slug
       type: string
       required: true
       pattern: ^[a-z0-9]+(?:-[a-z0-9]+)*$
-    - name: route
-      label: Public URL
-      type: string
-      required: true
-      description: Use a leading slash. New albums can use /albums/your-slug/; Vista and Editorial pages use /pages/your-slug/. Keep The Early Bird.... at /the-early-bird.html.
+      description: Short address used in the URL. Lowercase letters, numbers and hyphens only. Album URLs use /albums/; other pages use /pages/.
     - name: order
       label: Page order
       type: number
       default: 10
+      description: Controls the order pages appear in the navigation menu.
   publishing:
     type: object
     label: Publishing and navigation
+    description: Drafts stay off the public site. Navigation visibility controls whether a published page appears in the site menu.
     fields:
     - name: published
       label: Published / publicly available
       type: boolean
       default: false
+      description: Turn this on only when the page is ready for visitors.
     - name: showInNavigation
       label: Show in site navigation
       type: boolean
       default: true
+      description: Published pages can stay live without appearing in the menu.
     - name: navigationLabel
-      label: Navigation label
+      label: Menu label (optional)
       type: string
       default: ''
+      description: Leave blank to use the page name automatically.
   sectionPresentation:
     type: object
-    label: Presentation
+    label: Optional block styling
+    description: Most blocks can use their template's default style. Change these only when you want a deliberate visual variation.
     fields:
     - name: variant
-      label: Visual presentation variant
+      label: false
       type: select
+      hidden: true
       default: ''
       options:
         values:
@@ -797,12 +822,18 @@ components:
       default: ''
   sectionGroup:
     type: object
-    label: Layout group
+    label: Arrange with other blocks
+    description: Give blocks the same group ID to place them together. Choose grid for side-by-side blocks or stack for a vertical group. Leave blank for normal full-width flow.
     fields:
     - name: id
-      label: Group ID
+      label: false
       type: string
+      hidden: true
       default: ''
+    - name: name
+      label: Group name
+      type: string
+      description: Give blocks the same group name to place them together. Leave blank for a standalone block.
     - name: layout
       label: Layout
       type: select
@@ -813,20 +844,50 @@ components:
         - stack
         - columns
     - name: columns
-      label: Columns
+      label: false
       type: number
+      hidden: true
       default: 2
   appearance:
     type: object
     label: Page appearance
+    description: Choose the page wallpaper and visual effects here, before arranging the page layout.
     fields:
     - name: wallpaper
       label: Wallpaper
       type: object
+      description: Pick one visual style. The extra technical settings are handled automatically.
       fields:
-      - name: mode
-        label: Wallpaper mode
+      - name: choice
+        label: Wallpaper style
         type: select
+        default: template-default
+        description: Choose a colour, Aurora, Album Amber, a custom image, or rotating Vista colours.
+        options:
+          values:
+          - template-default
+          - vista-violet-haze
+          - vista-aqua-glass
+          - vista-solar-flare
+          - vista-rose-bloom
+          - aurora
+          - album-amber
+          - custom
+          - cycle
+          labels:
+          - Template default
+          - Violet Haze · Purple
+          - Aqua Glass · Teal
+          - Solar Flare · Orange
+          - Rose Bloom · Pink
+          - Aurora
+          - Album Amber
+          - Custom image
+          - Cycle Vista colours
+      - name: mode
+        label: false
+        type: select
+        hidden: true
         default: template-default
         options:
           values:
@@ -834,14 +895,10 @@ components:
           - custom
           - cycle
           - template-default
-          labels:
-          - Preset
-          - Custom image
-          - Cycle Vista wallpapers
-          - Template default
       - name: preset
-        label: Static wallpaper preset
+        label: false
         type: select
+        hidden: true
         default: vista-violet-haze
         options:
           values:
@@ -851,16 +908,10 @@ components:
           - vista-rose-bloom
           - aurora
           - album-amber
-          labels:
-          - Violet Haze · Purple
-          - Aqua Glass · Teal
-          - Solar Flare · Orange
-          - Rose Bloom · Pink
-          - Aurora
-          - Album Amber
       - name: presets
-        label: Wallpapers included in cycle
+        label: false
         type: select
+        hidden: true
         list: true
         default:
         - vista-violet-haze
@@ -879,8 +930,9 @@ components:
           - Solar Flare · Orange
           - Rose Bloom · Pink
       - name: customImage
-        label: Custom wallpaper image
+        label: Optional custom image
         type: image
+        description: Note: This setting only applies when Wallpaper style is set to Custom image. For every other wallpaper style, you can safely leave this field empty and ignore it.
         options:
           media: images
           extensions:
@@ -893,16 +945,18 @@ components:
           - ico
           rename: false
       - name: customFit
-        label: Custom image fit
+        label: false
         type: select
+        hidden: true
         default: cover
         options:
           values:
           - cover
           - contain
       - name: customPosition
-        label: Custom image focal position
+        label: false
         type: select
+        hidden: true
         default: center
         options:
           values:
@@ -916,8 +970,9 @@ components:
           - bottom-left
           - bottom-right
       - name: initialSelection
-        label: Initial wallpaper selection
+        label: false
         type: select
+        hidden: true
         default: random
         options:
           values:
@@ -927,52 +982,60 @@ components:
           - vista-solar-flare
           - vista-rose-bloom
       - name: cycle
-        label: Wallpaper cycling
+        label: false
         type: object
+        hidden: true
         fields:
         - name: enabled
           label: Automatically rotate wallpapers
           type: boolean
           default: false
         - name: mode
-          label: Rotation order
+          label: false
           type: select
+          hidden: true
           default: sequential
           options:
             values:
             - sequential
             - random
         - name: intervalSeconds
-          label: Seconds between changes
+          label: false
           type: number
+          hidden: true
           default: 30
         - name: manualControl
-          label: Allow visitors to change wallpaper manually
+          label: false
           type: boolean
+          hidden: true
           default: true
     - name: effects
       label: Background and motion effects
       type: object
       fields:
       - name: backgroundEffects
-        label: Enable background effects
+        label: false
         type: boolean
+        hidden: true
         default: true
       - name: pageTransition
-        label: Enable page transitions
+        label: false
         type: boolean
+        hidden: true
         default: true
       - name: respectReducedMotion
-        label: Respect reduced-motion preference
+        label: false
         type: boolean
+        hidden: true
         default: true
   homepageSections:
     type: block
-    label: Homepage building blocks
+    label: PAGE LAYOUT · BUILD THE HOMEPAGE
+    description: Page building blocks · MAIN PAGE BUILDER · Add blocks, edit their content, and arrange them in the order visitors should see. Start here after the page name, title and wallpaper are set.
     list:
       collapsible:
         collapsed: true
-        summary: '{type} · {id}'
+        summary: '{type}'
     blockKey: type
     blocks:
     - name: site-header
@@ -1022,11 +1085,12 @@ components:
       component: blockSpacer
   albumSections:
     type: block
-    label: Album page layout
+    label: PAGE LAYOUT · BUILD THE ALBUM PAGE
+    description: Page building blocks · MAIN PAGE BUILDER · The album header and player are built in; add optional blocks around them.
     list:
       collapsible:
         collapsed: true
-        summary: '{type} · {id}'
+        summary: '{type}'
     blockKey: type
     blocks:
     - name: site-header
@@ -1079,11 +1143,12 @@ components:
       component: blockSpotifyEmbed
   vistaSections:
     type: block
-    label: Vista page building blocks
+    label: PAGE LAYOUT · Page building blocks · BUILD THE PAGE
+    description: Page building blocks · MAIN PAGE BUILDER · Add, edit and reorder the content visitors will see. This is the main part of the page editor.
     list:
       collapsible:
         collapsed: true
-        summary: '{type} · {id}'
+        summary: '{type}'
     blockKey: type
     blocks:
     - name: site-header
@@ -1133,11 +1198,12 @@ components:
       component: blockSpacer
   editorialSections:
     type: block
-    label: Editorial page building blocks
+    label: PAGE LAYOUT · Page building blocks · BUILD THE PAGE
+    description: Page building blocks · MAIN PAGE BUILDER · Add, edit and reorder the content blocks that make up this page.
     list:
       collapsible:
         collapsed: true
-        summary: '{type} · {id}'
+        summary: '{type}'
     blockKey: type
     blocks:
     - name: site-header
@@ -1199,15 +1265,15 @@ content:
       delete: false
     fields:
     - name: schemaVersion
-      label: Schema version
+      label: false
       type: number
       default: 1
-      readonly: true
+      hidden: true
     - name: template
-      label: Template
+      label: false
       type: string
       default: homepage
-      readonly: true
+      hidden: true
     - name: identity
       label: Page identity
       component: identity
@@ -1475,18 +1541,18 @@ content:
       - name: footerText
         label: Footer text
         type: string
-    - name: sections
-      label: Homepage content components
-      component: homepageSections
-    - name: publishing
-      label: Publishing and navigation
-      component: publishing
+    - name: seo
+      label: Page title and sharing
+      component: seo
     - name: appearance
       label: Page appearance
       component: appearance
-    - name: seo
-      label: SEO and sharing
-      component: seo
+    - name: publishing
+      label: Publishing and navigation
+      component: publishing
+    - name: sections
+      label: PAGE LAYOUT · BUILD THE HOMEPAGE
+      component: homepageSections
   - name: albums
     label: Albums
     type: collection
@@ -1500,28 +1566,16 @@ content:
       delete: false
     view:
       fields:
-      - identity.name
-      - identity.slug
-      - publishing.published
-      - identity.order
-      primary: identity.name
-      sort:
-      - identity.order
-      - identity.name
-      default:
-        sort: identity.order
-        order: asc
-    fields:
     - name: schemaVersion
-      label: Schema version
+      label: false
       type: number
       default: 1
-      readonly: true
+      hidden: true
     - name: template
-      label: Template
+      label: false
       type: string
       default: album
-      readonly: true
+      hidden: true
     - name: identity
       label: Page identity
       component: identity
@@ -1574,7 +1628,8 @@ content:
           label: Tracklist
           type: object
           list:
-            min: 1
+            min: 0
+            default: []
             collapsible:
               collapsed: true
               summary: '{title}'
@@ -1656,8 +1711,17 @@ content:
       - name: footerText
         label: Footer text
         type: string
+    - name: seo
+      label: Page title and sharing
+      component: seo
+    - name: appearance
+      label: Page appearance
+      component: appearance
+    - name: publishing
+      label: Publishing and navigation
+      component: publishing
     - name: sections
-      label: Album page layout
+      label: PAGE LAYOUT · BUILD THE ALBUM PAGE
       component: albumSections
       default:
       - type: album-header
@@ -1683,15 +1747,6 @@ content:
           windowTitle: ''
         content:
           source: templateData.spotify
-    - name: publishing
-      label: Publishing and navigation
-      component: publishing
-    - name: appearance
-      label: Page appearance
-      component: appearance
-    - name: seo
-      label: SEO and sharing
-      component: seo
   - name: vista-pages
     label: Vista Pages
     type: collection
@@ -1705,28 +1760,16 @@ content:
       delete: false
     view:
       fields:
-      - identity.name
-      - identity.slug
-      - publishing.published
-      - identity.order
-      primary: identity.name
-      sort:
-      - identity.order
-      - identity.name
-      default:
-        sort: identity.order
-        order: asc
-    fields:
     - name: schemaVersion
-      label: Schema version
+      label: false
       type: number
       default: 1
-      readonly: true
+      hidden: true
     - name: template
-      label: Template
+      label: false
       type: string
       default: vista-window
-      readonly: true
+      hidden: true
     - name: identity
       label: Page identity
       component: identity
@@ -1737,18 +1780,18 @@ content:
       - name: footerText
         label: Footer text
         type: string
-    - name: sections
-      label: Page building blocks
-      component: vistaSections
-    - name: publishing
-      label: Publishing and navigation
-      component: publishing
+    - name: seo
+      label: Page title and sharing
+      component: seo
     - name: appearance
       label: Page appearance
       component: appearance
-    - name: seo
-      label: SEO and sharing
-      component: seo
+    - name: publishing
+      label: Publishing and navigation
+      component: publishing
+    - name: sections
+      label: PAGE LAYOUT · Page building blocks · BUILD THE PAGE
+      component: vistaSections
   - name: editorial-pages
     label: Editorial Pages
     type: collection
@@ -1762,28 +1805,16 @@ content:
       delete: false
     view:
       fields:
-      - identity.name
-      - identity.slug
-      - publishing.published
-      - identity.order
-      primary: identity.name
-      sort:
-      - identity.order
-      - identity.name
-      default:
-        sort: identity.order
-        order: asc
-    fields:
     - name: schemaVersion
-      label: Schema version
+      label: false
       type: number
       default: 1
-      readonly: true
+      hidden: true
     - name: template
-      label: Template
+      label: false
       type: string
       default: editorial
-      readonly: true
+      hidden: true
     - name: identity
       label: Page identity
       component: identity
@@ -1794,18 +1825,18 @@ content:
       - name: footerText
         label: Footer text
         type: string
-    - name: sections
-      label: Page building blocks
-      component: editorialSections
-    - name: publishing
-      label: Publishing and navigation
-      component: publishing
+    - name: seo
+      label: Page title and sharing
+      component: seo
     - name: appearance
       label: Page appearance
       component: appearance
-    - name: seo
-      label: SEO and sharing
-      component: seo
+    - name: publishing
+      label: Publishing and navigation
+      component: publishing
+    - name: sections
+      label: PAGE LAYOUT · Page building blocks · BUILD THE PAGE
+      component: editorialSections
 - name: site-settings
   label: Site settings
   type: group
@@ -1819,10 +1850,10 @@ content:
       delete: false
     fields:
     - name: schemaVersion
-      label: Schema version
+      label: false
       type: number
       default: 1
-      readonly: true
+      hidden: true
     - name: siteName
       label: Website name
       type: string

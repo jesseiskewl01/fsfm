@@ -281,14 +281,14 @@ try {
   var canvas = document.getElementById('nebulaCanvas');
   var ctx = canvas && canvas.getContext('2d');
   if (canvas && ctx) {
-    var width = 0, height = 0, dpr = 1, compact = false;
+    var width = 0, height = 0, dpr = 1, compact = false, frameId = 0, lastFrame = -1000, pageVisible = !document.hidden;
     var motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
     var reduceMotion = motionPreference.matches;
     var stars = [], blooms = [], curtains = [];
     function random(min, max) { return min + Math.random() * (max - min); }
 
     function resizeAurora() {
-      dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 640 ? 1 : 1.25);
       width = window.innerWidth;
       height = window.innerHeight;
       canvas.width = Math.round(width * dpr);
@@ -296,11 +296,12 @@ try {
       canvas.style.width = width + 'px';
       canvas.style.height = height + 'px';
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      lastFrame = -1000;
 
       stars = [];
       blooms = [];
       curtains = [];
-      var starCount = Math.min(460, Math.max(110, Math.floor((width * height) / 3200)));
+      var starCount = Math.min(260, Math.max(90, Math.floor((width * height) / 6200)));
       compact = width < 640;
       for (var i = 0; i < starCount; i += 1) {
         var giant = i < Math.max(18, Math.floor(starCount * 0.075));
@@ -312,7 +313,7 @@ try {
           drift: random(-0.035, 0.035), giant: giant
         });
       }
-      for (var b = 0; b < 8; b += 1) {
+      for (var b = 0; b < 4; b += 1) {
         blooms.push({
           x: random(width * 0.02, width * 0.98),
           y: random(height * 0.04, height * 0.98),
@@ -320,7 +321,7 @@ try {
           alpha: random(0.045, 0.095), phase: random(0, Math.PI * 2), speed: random(0.11, 0.24)
         });
       }
-      var curtainCount = Math.max(5, Math.min(11, Math.round(width / (compact ? 105 : 155)) + 2));
+      var curtainCount = Math.max(4, Math.min(7, Math.round(width / (compact ? 220 : 250)) + 2));
       for (var ci = 0; ci < curtainCount; ci += 1) {
         var fraction = -0.08 + (ci / Math.max(1, curtainCount - 1)) * 1.16;
         curtains.push({
@@ -339,7 +340,7 @@ try {
     function drawCurtain(curtain, time) {
       var yTop = -height * (width < 640 ? 0.16 : 0.10);
       var yBottom = height * (compact ? Math.min(1.18, curtain.depth + 0.10) : Math.min(1.25, curtain.depth + 0.16));
-      var steps = 42;
+      var steps = 28;
       var left = [], right = [];
       var driftTime = reduceMotion ? 0 : time;
       for (var i = 0; i <= steps; i += 1) {
@@ -373,10 +374,10 @@ try {
       ctx.globalCompositeOperation = 'screen';
       ctx.fillStyle = vertical;
       ctx.globalAlpha = 0.76;
-      ctx.filter = 'blur(32px)';
+      ctx.filter = 'blur(18px)';
       ctx.fill(path);
       ctx.globalAlpha = 0.48;
-      ctx.filter = 'blur(10px)';
+      ctx.filter = 'blur(6px)';
       ctx.fill(path);
       ctx.globalAlpha = 0.24;
       ctx.filter = 'none';
@@ -387,7 +388,7 @@ try {
       // Delicate vertical folds give the broad light curtains an aurora-like texture.
       ctx.globalAlpha = 0.18;
       ctx.lineWidth = 1;
-      for (var fold = 0; fold < 4; fold += 1) {
+      for (var fold = 0; fold < 2; fold += 1) {
         ctx.beginPath();
         for (var point = 0; point <= steps; point += 1) {
           var q = point / steps;
@@ -405,6 +406,9 @@ try {
     }
 
     function drawAurora(time) {
+      if (!pageVisible || document.hidden) { frameId = 0; return; }
+      if (time - lastFrame < 32) { frameId = requestAnimationFrame(drawAurora); return; }
+      lastFrame = time;
       ctx.clearRect(0, 0, width, height);
       var clock = reduceMotion ? 0 : time;
 
@@ -462,17 +466,26 @@ try {
         }
       });
 
-      if (!reduceMotion) requestAnimationFrame(drawAurora);
+      if (!reduceMotion && pageVisible && !document.hidden) frameId = requestAnimationFrame(drawAurora);
     }
 
     resizeAurora();
-    window.addEventListener('resize', resizeAurora, { passive: true });
-    drawAurora(0);
+    window.addEventListener('resize', function() {
+      resizeAurora();
+      if (reduceMotion && pageVisible && !document.hidden) drawAurora(40);
+    }, { passive: true });
+    drawAurora(40);
+    document.addEventListener('visibilitychange', function() {
+      pageVisible = !document.hidden;
+      if (!pageVisible && frameId) { cancelAnimationFrame(frameId); frameId = 0; }
+      else if (pageVisible && !reduceMotion && !frameId) frameId = requestAnimationFrame(drawAurora);
+    });
     if (motionPreference.addEventListener) {
       motionPreference.addEventListener('change', function(event) {
         reduceMotion = event.matches;
-        if (!reduceMotion) requestAnimationFrame(drawAurora);
-        else drawAurora(0);
+        if (frameId) { cancelAnimationFrame(frameId); frameId = 0; }
+        if (!reduceMotion && pageVisible && !document.hidden) frameId = requestAnimationFrame(drawAurora);
+        else if (reduceMotion && pageVisible && !document.hidden) drawAurora(40);
       });
     }
   }

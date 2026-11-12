@@ -14,6 +14,7 @@ const site = read('content/v13/site.json');
 const wallpapers = read('content/v13/wallpapers.json');
 const vistaStarter = read('content/v13/page-starters/vista-window.json');
 const editorialStarter = read('content/v13/page-starters/editorial.json');
+const albumStarter = read('content/v13/page-starters/album.json');
 
 function pageFrom(starter, template, name, slug) {
   const page = structuredClone(starter);
@@ -96,8 +97,10 @@ test('Page scaffolder creates safe unpublished Vista and Editorial records using
     fs.mkdirSync(path.join(temp, 'content/v13/page-starters'), { recursive: true });
     fs.mkdirSync(path.join(temp, 'content/v13/vista-pages'), { recursive: true });
     fs.mkdirSync(path.join(temp, 'content/v13/editorial-pages'), { recursive: true });
+    fs.mkdirSync(path.join(temp, 'content/v13/albums'), { recursive: true });
     fs.writeFileSync(path.join(temp, 'content/v13/page-starters/vista-window.json'), JSON.stringify(vistaStarter));
     fs.writeFileSync(path.join(temp, 'content/v13/page-starters/editorial.json'), JSON.stringify(editorialStarter));
+    fs.writeFileSync(path.join(temp, 'content/v13/page-starters/album.json'), JSON.stringify(albumStarter));
     fs.writeFileSync(path.join(temp, 'content/v13/site.json'), JSON.stringify(site));
     const result = createNewPage({ root: temp, template: 'vista-window', name: 'The Listening Room', showInNavigation: true });
     assert.equal(result.page.identity.slug, 'the-listening-room');
@@ -110,6 +113,11 @@ test('Page scaffolder creates safe unpublished Vista and Editorial records using
     const editorial = buildPageRecord({ root: temp, template: 'editorial', name: 'Notes & Fragments', slug: 'notes-fragments' });
     assert.equal(editorial.template, 'editorial');
     assert.equal(editorial.seo.canonical, 'https://fsfm.port82.net/pages/notes-fragments/');
+    const album = buildPageRecord({ root: temp, template: 'album', name: 'The Next Record' });
+    assert.equal(album.template, 'album');
+    assert.equal(album.identity.route, '/albums/the-next-record/');
+    assert.equal(album.publishing.published, false);
+    assert.deepEqual(album.templateData.player.tracks, []);
   } finally {
     fs.rmSync(temp, { recursive: true, force: true });
   }
@@ -118,4 +126,17 @@ test('Page scaffolder creates safe unpublished Vista and Editorial records using
 test('Slugification creates URL-safe lowercase slugs', () => {
   assert.equal(slugify('The Kinda Deals That Make Ü Wanna Boogie!'), 'the-kinda-deals-that-make-u-wanna-boogie');
   assert.equal(slugify('  A   Little Page  '), 'a-little-page');
+});
+
+
+test('Page navigation is presented as one menu containing all published pages', () => {
+  const current = pageFrom(vistaStarter, 'vista-window', 'Listening Room', 'listening-room');
+  const album = structuredClone(read('content/v13/albums/the-early-bird.json'));
+  const draft = pageFrom(editorialStarter, 'editorial', 'Private Draft', 'private-draft');
+  draft.publishing.published = false;
+  const html = renderPage(current, { site, pages: [current, album, draft], wallpapers });
+  assert.match(html, /<details class="site-menu">/);
+  assert.match(html, /aria-label="Site pages"/);
+  assert.match(html, /<span>Album<\/span>/);
+  assert.doesNotMatch(html, /Private Draft/);
 });

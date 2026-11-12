@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "template": "album",
+  "identity": {
+    "name": "New Album",
+    "slug": "new-album",
+    "order": 10
+  },
+  "templateData": {
+    "album": {
+      "windowTitle": "New Album",
+      "title": "New Album",
+      "artistLine": "by Fake Space Fog Machine",
+      "eyebrow": "",
+      "artwork": ""
+    },
+    "player": {
+      "windowTitle": "FSFM Media Player",
+      "artistName": "Fake Space Fog Machine",
+      "tracks": [],
+      "behaviour": {
+        "autoAdvance": true,
+        "lineWideLyricHighlight": true,
+        "preload": "metadata"
+      }
+    },
+    "spotify": {
+      "label": "OUT ON SPOTIFY",
+      "embedUrl": "",
+      "height": 352
+    },
+    "footerText": ""
+  },
+  "sections": [
+    {
+      "type": "album-header",
+      "id": "album-header",
+      "enabled": true,
+      "presentation": {
+        "variant": "amber-editorial",
+        "windowTitle": ""
+      },
+      "content": {
+        "source": "templateData.album"
+      }
+    },
+    {
+      "type": "album-player",
+      "id": "album-player",
+      "enabled": true,
+      "presentation": {
+        "variant": "amber-player"
+      },
+      "content": {
+        "source": "templateData.player"
+      }
+    },
+    {
+      "type": "spotify-embed",
+      "id": "album-spotify",
+      "enabled": true,
+      "presentation": {
+        "variant": "amber-editorial",
+        "windowTitle": ""
+      },
+      "content": {
+        "source": "templateData.spotify"
+      }
+    }
+  ],
+  "publishing": {
+    "published": false,
+    "showInNavigation": true,
+    "navigationLabel": "New Album"
+  },
+  "appearance": {
+    "wallpaper": {
+      "mode": "preset",
+      "preset": "album-amber",
+      "customImage": "",
+      "customFit": "cover",
+      "customPosition": "center",
+      "presets": [
+        "vista-violet-haze",
+        "vista-aqua-glass",
+        "vista-solar-flare",
+        "vista-rose-bloom"
+      ],
+      "initialSelection": "random",
+      "cycle": {
+        "enabled": false,
+        "mode": "sequential",
+        "intervalSeconds": 30,
+        "manualControl": false
+      },
+      "choice": "template-default"
+    },
+    "effects": {
+      "backgroundEffects": true,
+      "pageTransition": true,
+      "respectReducedMotion": true
+    }
+  },
+  "seo": {
+    "title": "",
+    "description": "",
+    "canonical": "",
+    "socialImage": "/media/images/cover.png",
+    "allowIndexing": true
+  }
+}

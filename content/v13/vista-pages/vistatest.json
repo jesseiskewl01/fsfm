@@ -45,8 +45,8 @@
     }
   ],
   "publishing": {
-    "published": true,
-    "showInNavigation": true,
+    "published": false,
+    "showInNavigation": false,
     "navigationLabel": "vistatest"
   },
   "appearance": {
@@ -61,7 +61,8 @@
         "mode": "sequential",
         "intervalSeconds": 30,
         "manualControl": true
-      }
+      },
+      "choice": "vista-aqua-glass"
     },
     "effects": {
       "backgroundEffects": true,

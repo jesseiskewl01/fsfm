@@ -51,21 +51,23 @@ function renderGadgets(page, site) {
 
 function renderTaskbar(site, pages, currentPage) {
   const navPages = [currentPage, ...(pages || [])]
-    .filter((page, index, arr) => page?.publishing?.published !== false && (index === 0 || page?.publishing?.showInNavigation === true))
+    .filter((page) => page?.publishing?.published !== false && (page?.template === 'homepage' || page?.publishing?.showInNavigation === true))
     .filter((page, index, arr) => arr.findIndex((candidate) => candidate.identity?.route === page.identity?.route) === index)
     .sort((a, b) => (Number(a.identity?.order) || 0) - (Number(b.identity?.order) || 0));
   const links = navPages.map((page) => {
     const isCurrent = page.identity?.route === currentPage.identity?.route;
     const href = safeRoute(page.identity?.route, '/');
     const label = page.template === 'homepage' ? (page.templateData?.desktopLabels?.homeNavigationLabel || 'Home') : (page.publishing?.navigationLabel || page.identity?.name || 'Page');
-    return `<a href="${escapeHtml(href)}" class="task-button${isCurrent ? ' active' : ''}"${isCurrent ? ' aria-current="page"' : ''}>${escapeHtml(label)}</a>`;
+    const type = page.template === 'homepage' ? 'HOME' : page.template === 'album' ? 'ALBUM' : 'PAGE';
+    return `<a href="${escapeHtml(href)}" class="task-menu-link${isCurrent ? ' active' : ''}"${isCurrent ? ' aria-current="page"' : ''}><span>${escapeHtml(label)}</span><small>${type}</small></a>`;
   }).join('');
-  return `<nav class="taskbar" aria-label="Desktop navigation"><div class="taskbar-inner"><div class="brand-title"><div class="start-orb" aria-hidden="true"></div><span id="taskbarSiteName">${escapeHtml(site.siteName)}</span></div><div class="task-buttons">${links}</div></div></nav>`;
+  return `<nav class="taskbar" aria-label="Desktop navigation"><div class="taskbar-inner"><div class="brand-title"><div class="start-orb" aria-hidden="true"></div><span id="taskbarSiteName">${escapeHtml(site.siteName)}</span></div><details class="task-menu"><summary aria-label="Open page menu"><span aria-hidden="true">☰</span><span>Pages</span></summary><div class="task-menu-panel">${links || '<span class="task-menu-empty">No published pages yet.</span>'}</div></details></div></nav>`;
 }
-
-function renderHero(page) {
+function renderHero(page, site) {
   const hero = page.templateData?.hero || {};
-  return `<div class="aero-window hero-window" aria-label="Homepage hero window"><div class="titlebar"><div class="window-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#081722" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="1"/></svg><span id="heroWindowTitle">${escapeHtml(text(hero.windowTitle, 'Homepage'))}</span></div><div class="caption-buttons"><button type="button" class="caption-button minimize" data-window-action="minimize" aria-label="Minimize homepage hero window" title="Minimize">−</button><button type="button" class="caption-button close" data-window-action="close" aria-label="Close homepage desktop" title="Close">×</button></div></div><div class="window-body"><header class="hero" id="heroSection"><div class="hero-badge" id="heroBadge">${escapeHtml(text(hero.badge, ':]'))}</div><div class="hero-mark" id="heroTitle">${escapeHtml(text(hero.title, page.identity?.name || 'Fake Space Fog Machine'))}</div><div class="hero-sub" id="heroSubtitle">${escapeHtml(text(hero.subtitle))}</div><div class="hero-handle" id="heroHandle">${escapeHtml(text(hero.handle))}</div></header></div></div>`;
+  const favicon = safeImage(site.favicon);
+  const icon = favicon ? `<img class="hero-favicon" src="${escapeHtml(favicon)}" alt="" aria-hidden="true" width="14" height="14">` : '<span class="hero-favicon-fallback" aria-hidden="true">✧</span>';
+  return `<div class="aero-window hero-window" aria-label="Homepage hero window"><div class="titlebar"><div class="window-title">${icon}<span id="heroWindowTitle">${escapeHtml(text(hero.windowTitle, 'Homepage'))}</span></div><div class="caption-buttons"><button type="button" class="caption-button minimize" data-window-action="minimize" aria-label="Minimize homepage hero window" title="Minimize">−</button><button type="button" class="caption-button close" data-window-action="close" aria-label="Close homepage desktop" title="Close">×</button></div></div><div class="window-body"><header class="hero" id="heroSection"><div class="hero-badge" id="heroBadge">${escapeHtml(text(hero.badge, ':]'))}</div><div class="hero-mark" id="heroTitle">${escapeHtml(text(hero.title, page.identity?.name || 'Fake Space Fog Machine'))}</div><div class="hero-sub" id="heroSubtitle">${escapeHtml(text(hero.subtitle))}</div><div class="hero-handle" id="heroHandle">${escapeHtml(text(hero.handle))}</div></header></div></div>`;
 }
 
 function renderPurbleOverlay(gadgets = {}) {
@@ -96,7 +98,7 @@ export function renderHomepage(page, { site, pages = [], wallpapers, assets = '/
   <div class="wall" id="wallA" aria-hidden="true"></div><div class="wall" id="wallB" aria-hidden="true"></div><canvas id="bgCanvas" aria-hidden="true"></canvas>
   ${renderGadgets(page, site)}
   ${renderTaskbar(site, pages, page)}
-  <main class="wrap" id="main-content">${renderHero(page)}${rendered.html}<footer class="site-footer" id="siteFooter">${escapeHtml(text(page.templateData?.footerText, site.footerText || ''))}</footer></main>
+  <main class="wrap" id="main-content">${renderHero(page, site)}${rendered.html}<footer class="site-footer" id="siteFooter">${escapeHtml(text(page.templateData?.footerText, site.footerText || ''))}</footer></main>
   ${renderPurbleOverlay(g)}<div class="fsfm-shutdown" id="fsfmShutdown" hidden role="status" aria-live="polite"><div class="shutdown-dialog"><strong id="shutdownTitle">${escapeHtml(text(page.templateData?.desktopLabels?.shutdownTitle, 'Goodnight.'))}</strong><p id="shutdownMessage">${escapeHtml(text(page.templateData?.desktopLabels?.shutdownMessage, 'Closing the FSFM desktop...'))}</p></div></div>
   <script type="application/json" id="fsfmHomeRuntimeConfig">${safeJsonForHtml(homeRuntime)}</script>`;
   const pageWithData = { ...page, seo: { ...page.seo, title: page.seo?.title || site.siteName, description: page.seo?.description || site.description, canonical: page.seo?.canonical || 'https://fsfm.port82.net/', allowIndexing: page.seo?.allowIndexing !== false } };

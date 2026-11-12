@@ -61,12 +61,13 @@ test('Album page preserves the amber hero, quote, Spotify embed and canonical UR
   assert.match(html, /album-hero-window/);
   assert.match(html, /intro-quote/);
   assert.match(html, /open\.spotify\.com\/embed\/album/);
-  assert.match(html, /https:\/\/fsfm\.port82\.net\/the-early-bird\.html/);
+  assert.match(html, /https:\/\/fsfm\.port82\.net\/albums\/the-early-bird\//);
   assert.match(html, /\"image\":\"https:\/\/fsfm\.port82\.net\/media\/images\/cover\.png\"/);
   assert.match(html, /name="robots" content="noindex, nofollow"/);
 });
 
-test('Album navigation contains Home and Album links', () => {
-  assert.match(html, />Home<\/a>/);
-  assert.match(html, />Album<\/a>/);
+test('Album navigation contains one page menu with Home and Album entries', () => {
+  assert.match(html, /<details class="site-menu">/);
+  assert.match(html, /<span>Home<\/span>/);
+  assert.match(html, /<span>Album<\/span>/);
 });
