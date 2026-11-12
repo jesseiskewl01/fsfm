@@ -202,9 +202,18 @@ test('Homepage interface labels are CMS-editable and render from the canonical r
   ]) assert.ok(config.includes(field), `CMS config is missing ${field}`);
 });
 
-test('Default build command targets V13 and the legacy builder is explicit', () => {
+test('Default build command targets the V14 generator and the legacy builder is explicit', () => {
   const pkg = readJson('package.json');
   assert.equal(pkg.scripts.build, 'node scripts/build-v13.mjs');
   assert.equal(pkg.scripts['build:v13:stage5'], 'node scripts/build-v13-stage5.mjs');
   assert.equal(pkg.scripts['build:legacy'], 'node scripts/build-pages.mjs');
+});
+
+ 
+test('Homepage hero titlebar uses the site favicon and the taskbar uses one page menu', () => {
+  assert.match(html, /class="hero-favicon" src="\/media\/images\/asadadasdges-removebg-preview\.png"/);
+  assert.match(html, /<details class="task-menu">/);
+  assert.match(html, /<span>Home<\/span>/);
+  assert.match(html, /<span>Album<\/span>/);
+  assert.doesNotMatch(html, /class="task-button/);
 });
