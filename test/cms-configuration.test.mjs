@@ -68,7 +68,7 @@ test('CMS hides computed public routes and puts page-wide settings before the bl
  
 test('CMS hides implementation fields and gives the block editor usable help', () => {
   assert.match(config, /label: false\n\s+type: string\n\s+hidden: true/);
-  assert.match(config, /name: Group name/);
+  assert.match(config, /label: Group name/);
   assert.match(config, /description: Give blocks the same group name/);
   assert.match(config, /description: The flexible text block/);
   assert.match(config, /description: Choose the page wallpaper/);
