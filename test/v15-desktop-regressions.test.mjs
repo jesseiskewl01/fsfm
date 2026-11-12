@@ -17,7 +17,7 @@ test('V15 scrollbar styling avoids universal gutters and hard right rails', () =
 
 test('V15 album page entrance leaves fixed navigation viewport-relative', () => {
   const css = read('src/styles/v13.css');
-  const entrance = css.match(/@keyframes fsfm-page-enter\s*\{[\s\S]*?\}/);
+  const entrance = css.match(/@keyframes fsfm-page-enter\s*\{\s*from\s*\{[^}]*\}\s*to\s*\{[^}]*\}\s*\}/s);
   assert.ok(entrance);
   assert.doesNotMatch(entrance[0], /transform:/);
 });
@@ -36,4 +36,21 @@ test('V15 album atmosphere has a bounded canvas workload', () => {
   assert.match(js, /Math\.min\(190,/);
   assert.match(js, /var steps = 22/);
   assert.match(js, /1 : 1\.1/);
+});
+
+test('V15 homepage widgets form the intended six-window frame with loose bonus positions', () => {
+  const js = read('src/client/homepage-gadgets.js');
+  for (const id of ['gadget-clock', 'gadget-now-playing', 'gadget-dates', 'gadget-calendar', 'gadget-photos', 'gadget-note']) {
+    assert.match(js, new RegExp("'" + id + "':"));
+  }
+  assert.match(js, /var leftOuter = 16/);
+  assert.match(js, /var leftInner = 34/);
+  assert.match(js, /var rightInner = viewportWidth - mainWidth - 34/);
+  for (const id of ['gadget-barrel-roll', 'gadget-bubbles', 'gadget-radio', 'gadget-purble']) {
+    assert.match(js, new RegExp("'" + id + "':"));
+  }
+  assert.match(js, /wrapLeft \+ 22/);
+  assert.match(js, /wrapRight - compactWidth - 22/);
+  assert.match(js, /fsfm_gadget_positions_v2/);
+  assert.match(js, /isLegacyDefault/);
 });
