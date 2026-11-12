@@ -39,6 +39,7 @@ components:
   blockSiteHeader:
     type: object
     label: Site header
+    description: A small shared site identity header for a page.
     fields:
     - name: id
       label: false
@@ -79,6 +80,7 @@ components:
   blockHero:
     type: object
     label: Hero
+    description: A large page introduction with an optional image and link.
     fields:
     - name: id
       label: false
@@ -131,6 +133,7 @@ components:
   blockMarquee:
     type: object
     label: Marquee
+    description: A scrolling strip for short announcements or repeated phrases.
     fields:
     - name: id
       label: false
@@ -156,6 +159,7 @@ components:
   blockArtistStatement:
     type: object
     label: Artist statement
+    description: A paragraph or biography block. Use this for a short introduction.
     fields:
     - name: id
       label: false
@@ -182,6 +186,7 @@ components:
   blockEmbedWindow:
     type: object
     label: Embed window
+    description: Embed a supported music or video service using its embed URL.
     fields:
     - name: id
       label: false
@@ -226,6 +231,7 @@ components:
   blockBandsintownEvents:
     type: object
     label: Bandsintown events
+    description: Show upcoming live dates from the connected Bandsintown artist profile.
     fields:
     - name: id
       label: false
@@ -304,6 +310,7 @@ components:
   blockSocialLinks:
     type: object
     label: Social links
+    description: A tidy list of links to your artist profiles.
     fields:
     - name: id
       label: false
@@ -341,6 +348,7 @@ components:
   blockFeaturedRelease:
     type: object
     label: Featured release
+    description: Highlight one release with artwork, a short description and a destination link.
     fields:
     - name: id
       label: false
@@ -394,6 +402,7 @@ components:
   blockRichText:
     type: object
     label: Rich text
+    description: The flexible text block for headings, paragraphs and formatted content.
     fields:
     - name: id
       label: false
@@ -427,6 +436,7 @@ components:
   blockImage:
     type: object
     label: Image
+    description: Add one image with optional alternative text and a caption.
     fields:
     - name: id
       label: false
@@ -470,6 +480,7 @@ components:
   blockGallery:
     type: object
     label: Image gallery
+    description: Show a group of images together.
     fields:
     - name: id
       label: false
@@ -514,6 +525,7 @@ components:
   blockQuote:
     type: object
     label: Quote
+    description: Give a quotation its own visual space, with optional attribution.
     fields:
     - name: id
       label: false
@@ -543,6 +555,7 @@ components:
   blockLinkButton:
     type: object
     label: Link or button
+    description: Add one clear call-to-action link.
     fields:
     - name: id
       label: false
@@ -582,6 +595,7 @@ components:
   blockDivider:
     type: object
     label: Divider
+    description: Separate nearby blocks with a line, star or space.
     fields:
     - name: id
       label: false
@@ -610,6 +624,7 @@ components:
   blockSpacer:
     type: object
     label: Spacer
+    description: Add deliberate empty space between blocks.
     fields:
     - name: id
       label: false
@@ -633,6 +648,7 @@ components:
   blockAlbumHeader:
     type: object
     label: Album header (built-in)
+    description: The album artwork and title area. This is included automatically on album pages.
     fields:
     - name: id
       label: false
@@ -657,6 +673,7 @@ components:
   blockAlbumPlayer:
     type: object
     label: FSFM Media Player (required)
+    description: The FSFM track player and synchronized lyrics. Required on album pages.
     fields:
     - name: id
       label: false
@@ -681,6 +698,7 @@ components:
   blockSpotifyEmbed:
     type: object
     label: Spotify album embed
+    description: An optional Spotify album embed.
     fields:
     - name: id
       label: false
@@ -1583,7 +1601,7 @@ content:
           label: Tracklist
           type: object
           list:
-            min: 1
+            min: 0
             collapsible:
               collapsed: true
               summary: '{title}'
