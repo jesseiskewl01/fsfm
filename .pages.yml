@@ -773,6 +773,7 @@ components:
       label: Page order
       type: number
       default: 10
+      description: Controls the order pages appear in the navigation menu.
   publishing:
     type: object
     label: Publishing and navigation
@@ -782,10 +783,12 @@ components:
       label: Published / publicly available
       type: boolean
       default: false
+      description: Turn this on only when the page is ready for visitors.
     - name: showInNavigation
       label: Show in site navigation
       type: boolean
       default: true
+      description: Published pages can stay live without appearing in the menu.
     - name: navigationLabel
       label: Navigation label
       type: string
@@ -853,6 +856,7 @@ components:
         label: Wallpaper mode
         type: select
         default: template-default
+        description: Use the template's default, choose one wallpaper, upload your own, or rotate through Vista colours.
         options:
           values:
           - preset
@@ -868,6 +872,7 @@ components:
         label: Static wallpaper preset
         type: select
         default: vista-violet-haze
+        description: Choose the main colour atmosphere for this page.
         options:
           values:
           - vista-violet-haze
@@ -1008,7 +1013,7 @@ components:
     list:
       collapsible:
         collapsed: true
-        summary: '{type} · {id}'
+        summary: '{type}'
     blockKey: type
     blocks:
     - name: site-header
@@ -1063,7 +1068,7 @@ components:
     list:
       collapsible:
         collapsed: true
-        summary: '{type} · {id}'
+        summary: '{type}'
     blockKey: type
     blocks:
     - name: site-header
@@ -1121,7 +1126,7 @@ components:
     list:
       collapsible:
         collapsed: true
-        summary: '{type} · {id}'
+        summary: '{type}'
     blockKey: type
     blocks:
     - name: site-header
@@ -1176,7 +1181,7 @@ components:
     list:
       collapsible:
         collapsed: true
-        summary: '{type} · {id}'
+        summary: '{type}'
     blockKey: type
     blocks:
     - name: site-header
