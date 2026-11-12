@@ -1,4 +1,4 @@
-name: V14 validation
+name: V15 validation
 
 on:
   pull_request:

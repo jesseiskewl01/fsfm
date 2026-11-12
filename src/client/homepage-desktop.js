@@ -134,26 +134,34 @@ if (canvas && runtimeConfig.effects?.backgroundEffects !== false && !window.matc
 
 var ctx = canvas.getContext('2d');
 
-var W, H;
-
-function resizeBg() { var dpr = Math.min(window.devicePixelRatio || 1, 1.5); W = window.innerWidth; H = window.innerHeight; canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr); canvas.style.width = W + 'px'; canvas.style.height = H + 'px'; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); }
-
+var W, H, bgDpr = 1, bubbles = [];
+function resizeBg() {
+  bgDpr = Math.min(window.devicePixelRatio || 1, 1.35);
+  W = window.innerWidth; H = window.innerHeight;
+  canvas.width = Math.round(W * bgDpr); canvas.height = Math.round(H * bgDpr);
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+  ctx.setTransform(bgDpr, 0, 0, bgDpr, 0, 0);
+  bubbles.forEach(function(bubble) { bubble.sprite = createBubbleSprite(bubble); });
+}
 resizeBg();
-
 window.addEventListener('resize', resizeBg);
-
-var bubbles = [];
 var bubbleFrequencyLevel = 50;
+function createBubbleSprite(bubble) {
+  var sprite = document.createElement('canvas');
+  var size = Math.ceil((bubble.r * 2 + 4) * bgDpr);
+  sprite.width = size; sprite.height = size;
+  var sc = sprite.getContext('2d'), radius = bubble.r * bgDpr, center = size / 2;
+  sc.beginPath(); sc.arc(center, center, radius, 0, Math.PI * 2);
+  sc.strokeStyle = 'rgba(255,255,255,' + (bubble.opacity * 0.7) + ')'; sc.lineWidth = 1.4 * bgDpr; sc.stroke();
+  var gradient = sc.createRadialGradient(center-radius*.3,center-radius*.3,bgDpr,center,center,radius);
+  gradient.addColorStop(0,'rgba(255,255,255,'+(bubble.opacity*.8)+')');
+  gradient.addColorStop(.5,'rgba(255,255,255,'+(bubble.opacity*.2)+')'); gradient.addColorStop(1,'transparent');
+  sc.fillStyle=gradient; sc.fill(); return sprite;
+}
 function makeBubble() {
   var baseSpeed = Math.random() * 0.7 + 0.3;
-  return {
-    x: Math.random() * window.innerWidth,
-    y: Math.random() * window.innerHeight,
-    r: Math.random() * 14 + 4,
-    baseSpeed: baseSpeed,
-    speed: baseSpeed * (bubbleFrequencyLevel / 50),
-    opacity: Math.random() * 0.5 + 0.3
-  };
+  var bubble = {x:Math.random()*window.innerWidth,y:Math.random()*window.innerHeight,r:Math.random()*14+4,baseSpeed:baseSpeed,speed:baseSpeed*(bubbleFrequencyLevel/50),opacity:Math.random()*.5+.3};
+  bubble.sprite=createBubbleSprite(bubble); return bubble;
 }
 function setBubbleFrequency(level) {
   bubbleFrequencyLevel = Math.max(0, Math.min(100, Number(level) || 0));
@@ -167,44 +175,18 @@ window.__fsfmSetBubbleFrequency = setBubbleFrequency;
 var configuredBubbleLevel = Number(runtimeConfig.bubbleDefault);
 setBubbleFrequency(Number.isFinite(configuredBubbleLevel) ? Math.max(0, Math.min(100, configuredBubbleLevel)) : 50);
 
-var ambientFrame = 0;
-function drawAeroScene() {
-
-if (document.hidden) { ambientFrame = 0; return; }
-ctx.clearRect(0, 0, W, H);
-
-bubbles.forEach(function(bub) {
-
-bub.y -= bub.speed;
-
-if (bub.y < -bub.r * 2) { bub.y = H + bub.r * 2; bub.x = Math.random() * W; }
-
-ctx.beginPath();
-
-ctx.arc(bub.x, bub.y, bub.r, 0, Math.PI * 2);
-
-ctx.strokeStyle = 'rgba(255, 255, 255, ' + (bub.opacity * 0.7) + ')';
-
-ctx.lineWidth = 1.4;
-
-ctx.stroke();
-
-var bubGrad = ctx.createRadialGradient(bub.x - bub.r * 0.3, bub.y - bub.r * 0.3, 1, bub.x, bub.y, bub.r);
-
-bubGrad.addColorStop(0, 'rgba(255, 255, 255, ' + (bub.opacity * 0.8) + ')');
-
-bubGrad.addColorStop(0.5, 'rgba(255, 255, 255, ' + (bub.opacity * 0.2) + ')');
-
-bubGrad.addColorStop(1, 'transparent');
-
-ctx.fillStyle = bubGrad;
-
-ctx.fill();
-
-});
-
-ambientFrame = requestAnimationFrame(drawAeroScene);
-
+var ambientFrame = 0, lastAmbientFrame = 0;
+function drawAeroScene(timestamp) {
+  if (document.hidden) { ambientFrame = 0; lastAmbientFrame = 0; return; }
+  if (timestamp-lastAmbientFrame < 1000/30) { ambientFrame=requestAnimationFrame(drawAeroScene); return; }
+  var frameScale=lastAmbientFrame?Math.min(50,timestamp-lastAmbientFrame)/(1000/60):1;
+  lastAmbientFrame=timestamp; ctx.clearRect(0,0,W,H);
+  bubbles.forEach(function(bub) {
+    bub.y-=bub.speed*frameScale;
+    if(bub.y < -bub.r*2){bub.y=H+bub.r*2;bub.x=Math.random()*W;}
+    if(bub.sprite)ctx.drawImage(bub.sprite,bub.x-bub.r-2,bub.y-bub.r-2,bub.r*2+4,bub.r*2+4);
+  });
+  ambientFrame=requestAnimationFrame(drawAeroScene);
 }
 
 function startAmbientAnimation() {
@@ -212,6 +194,7 @@ function startAmbientAnimation() {
 }
 function stopAmbientAnimation() {
   if (ambientFrame) { cancelAnimationFrame(ambientFrame); ambientFrame = 0; }
+  lastAmbientFrame = 0;
 }
 document.addEventListener('visibilitychange', function() {
   if (document.hidden) stopAmbientAnimation(); else startAmbientAnimation();
