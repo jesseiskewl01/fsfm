@@ -142,7 +142,8 @@
         "mode": "sequential",
         "intervalSeconds": 30,
         "manualControl": false
-      }
+      },
+      "choice": "album-amber"
     },
     "effects": {
       "backgroundEffects": true,
