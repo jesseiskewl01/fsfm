@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const workflow = fs.readFileSync(path.join(root, '.github/workflows/deploy-pages.yml'), 'utf8');
-const validation = fs.readFileSync(path.join(root, '.github/workflows/v14-validation.yml'), 'utf8');
+const validation = fs.readFileSync(path.join(root, '.github/workflows/v15-validation.yml'), 'utf8');
 
 test('Production deployment builds and audits dist before publishing it to GitHub Pages', () => {
   assert.match(workflow, /push:\n\s+branches:\n\s+- main/);
