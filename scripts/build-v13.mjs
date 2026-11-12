@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { renderHomepage } from '../src/render/homepage.mjs';
 import { renderPage } from '../src/render/page.mjs';
 import { validateSite } from '../src/core/page-validator.mjs';
+import { normalizePages } from '../src/core/page-routes.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const contentRoot = path.join(root, 'content', 'v13');
@@ -11,15 +12,16 @@ const readJson = (file) => JSON.parse(fs.readFileSync(file, 'utf8'));
 const home = readJson(path.join(contentRoot, 'homepage.json'));
 const site = readJson(path.join(contentRoot, 'site.json'));
 const wallpapers = readJson(path.join(contentRoot, 'wallpapers.json'));
-const pageRecords = [home];
+const rawPageRecords = [home];
 for (const dir of ['albums', 'vista-pages', 'editorial-pages']) {
   const folder = path.join(contentRoot, dir);
   if (!fs.existsSync(folder)) continue;
   for (const filename of fs.readdirSync(folder).filter((name) => name.endsWith('.json')).sort()) {
-    pageRecords.push(readJson(path.join(folder, filename)));
+    rawPageRecords.push(readJson(path.join(folder, filename)));
   }
 }
 
+const pageRecords = normalizePages(rawPageRecords, site);
 const validationErrors = validateSite(pageRecords, { root });
 if (validationErrors.length) {
   console.error(`V13 build stopped: ${validationErrors.length} validation error(s).`);
