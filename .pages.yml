@@ -1031,7 +1031,7 @@ components:
   homepageSections:
     type: block
     label: PAGE LAYOUT · BUILD THE HOMEPAGE
-    description: This is the main page builder. Add blocks, edit their content, and arrange them in the order visitors should see. Start here after the page name, title and wallpaper are set.
+    description: Page building blocks · MAIN PAGE BUILDER · Add blocks, edit their content, and arrange them in the order visitors should see. Start here after the page name, title and wallpaper are set.
     list:
       collapsible:
         collapsed: true
@@ -1086,7 +1086,7 @@ components:
   albumSections:
     type: block
     label: PAGE LAYOUT · BUILD THE ALBUM PAGE
-    description: This is the main page builder. The album header and player are built in; add optional blocks around them.
+    description: Page building blocks · MAIN PAGE BUILDER · The album header and player are built in; add optional blocks around them.
     list:
       collapsible:
         collapsed: true
@@ -1198,7 +1198,7 @@ components:
       component: blockSpacer
   editorialSections:
     type: block
-    label: PAGE LAYOUT · BUILDING BLOCKS
+    label: PAGE LAYOUT · BUILD THE PAGE
     description: Page building blocks · MAIN PAGE BUILDER · Add, edit and reorder the content blocks that make up this page.
     list:
       collapsible:
