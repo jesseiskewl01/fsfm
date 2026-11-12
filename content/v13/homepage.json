@@ -31,7 +31,7 @@
       "funWidgets": {
         "showBarrelRoll": false,
         "showBubbleSlider": true,
-        "showMusicPlayer": false,
+        "showMusicPlayer": true,
         "showPurblePlace": false
       },
       "visibility": {
@@ -74,10 +74,10 @@
     },
     "footerText": "© 2026 FAKE SPACE FOG MACHINE",
     "desktopLabels": {
-      "bootLoading": "LOADING YOUR DESKTOP",
+      "bootLoading": "LOADING...",
       "bootWelcome": "WELCOME",
-      "bootReady": "DESKTOP READY",
-      "bootCaption": "SONIC SPACE-AGE AESTHETICS",
+      "bootReady": "READY",
+      "bootCaption": "coolness as heckness",
       "shutdownTitle": "Goodnight.",
       "shutdownMessage": "Closing the FSFM desktop...",
       "homeNavigationLabel": "Home"
@@ -206,6 +206,13 @@
             "url": "https://youtube.com/@mirrorlesssmoke"
           }
         ]
+      }
+    },
+    {
+      "type": "spacer",
+      "enabled": true,
+      "content": {
+        "size": 32
       }
     }
   ],
