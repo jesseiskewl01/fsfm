@@ -734,8 +734,9 @@ components:
       type: text
       default: ''
     - name: canonical
-      label: Canonical URL
+      label: false
       type: string
+      hidden: true
       default: ''
     - name: socialImage
       label: Social sharing image
@@ -755,6 +756,7 @@ components:
       label: Allow search engines to index this page
       type: boolean
       default: true
+      description: Turn this off only if you do not want search engines to list this page.
   identity:
     type: object
     label: Page identity
@@ -791,9 +793,10 @@ components:
       default: true
       description: Published pages can stay live without appearing in the menu.
     - name: navigationLabel
-      label: Navigation label
+      label: Menu label (optional)
       type: string
       default: ''
+      description: Leave blank to use the page name automatically.
   sectionPresentation:
     type: object
     label: Optional block styling
@@ -841,8 +844,9 @@ components:
         - stack
         - columns
     - name: columns
-      label: Columns
+      label: false
       type: number
+      hidden: true
       default: 2
   appearance:
     type: object
