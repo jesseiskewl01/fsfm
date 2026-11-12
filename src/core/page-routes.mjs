@@ -1,5 +1,7 @@
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const DEFAULT_SITE_URL = 'https://fsfm.port82.net/';
+const DEFAULT_WALLPAPERS = Object.freeze({ homepage: 'vista-violet-haze', 'vista-window': 'vista-violet-haze', editorial: 'aurora', album: 'album-amber' });
+const DEFAULT_CYCLE_PRESETS = ['vista-violet-haze', 'vista-aqua-glass', 'vista-solar-flare', 'vista-rose-bloom'];
 
 /**
  * Public routes are derived from page type and slug.
@@ -17,6 +19,27 @@ export function routeForPage(page) {
   if (page.template === 'vista-window' || page.template === 'editorial') return `/pages/${slug}/`;
 
   throw new Error(`No public route rule exists for template "${page?.template || 'unknown'}".`);
+}
+
+
+function normalizeWallpaper(page) {
+  const current = page?.appearance?.wallpaper;
+  if (!current || typeof current !== 'object' || Array.isArray(current)) return current;
+  const legacyMode = current.mode || 'template-default';
+  const choice = current.choice || (legacyMode === 'custom' ? 'custom' : legacyMode === 'cycle' ? 'cycle' : (current.preset || 'template-default'));
+  if (choice === 'custom') return { ...current, choice, mode: 'custom' };
+  if (choice === 'cycle') {
+    return {
+      ...current,
+      choice,
+      mode: 'cycle',
+      presets: DEFAULT_CYCLE_PRESETS,
+      initialSelection: current.initialSelection || 'random',
+      cycle: { ...current.cycle, enabled: true, mode: current.cycle?.mode === 'random' ? 'random' : 'sequential', intervalSeconds: Math.max(5, Math.min(3600, Number(current.cycle?.intervalSeconds) || 30)), manualControl: current.cycle?.manualControl !== false }
+    };
+  }
+  const preset = choice === 'template-default' ? (DEFAULT_WALLPAPERS[page.template] || 'vista-violet-haze') : choice;
+  return { ...current, choice, mode: 'preset', preset };
 }
 
 /**
@@ -59,6 +82,7 @@ export function normalizePageRecord(page, site = {}) {
     ...page,
     identity: { ...page.identity, route },
     sections,
+    ...(page.appearance && typeof page.appearance === 'object' ? { appearance: { ...page.appearance, wallpaper: normalizeWallpaper(page) } } : {}),
     ...(page.template === 'homepage' || page.template === 'album' ? {} : { templateData: page.templateData && typeof page.templateData === 'object' ? page.templateData : {} }),
     seo: {
       ...page.seo,
