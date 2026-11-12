@@ -92,6 +92,9 @@
     return Math.abs(saved[0] - expectedX) <= 8 && Math.abs(saved[1] - legacy.y) <= 8;
   }
 
+  var widgetById = {};
+  widgets.forEach(function(widget) { widgetById[widget.id] = widget; });
+
   var defaultPositions = computeDesktopLayout();
   Object.keys(gadgetConfig.positions || {}).forEach(function(id) {
     var pos = gadgetConfig.positions[id];
@@ -100,9 +103,6 @@
     }
   });
   resolveWidgetCollisions(defaultPositions);
-
-  var widgetById = {};
-  widgets.forEach(function(widget) { widgetById[widget.id] = widget; });
 
   function boxesOverlap(a, b, gap) {
     var spacing = Number(gap) || 0;
