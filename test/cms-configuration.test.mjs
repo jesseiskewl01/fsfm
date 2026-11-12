@@ -106,5 +106,5 @@ test('The page builder is visibly presented as the main editor area in every col
     'PAGE LAYOUT · BUILD THE ALBUM PAGE',
     'PAGE LAYOUT · BUILD THE PAGE'
   ]) assert.ok(config.includes(heading), `missing prominent page-builder heading: ${heading}`);
-  assert.match(config, /description: MAIN PAGE BUILDER · Add, edit and reorder/);
+  assert.match(config, /description: Page building blocks · MAIN PAGE BUILDER/);
 });
