@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { validatePage, validateSite } from '../src/core/page-validator.mjs';
+import { normalizePageRecord, routeForPage } from '../src/core/page-routes.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = file => JSON.parse(fs.readFileSync(path.join(root, file), 'utf8'));
@@ -46,7 +47,7 @@ test('Wallpaper cycle supports both configured modes', () => {
 test('Site requires one Homepage and unique routes', () => {
   assert.deepEqual(validateSite([home, album], { root }), []);
   const duplicateRoute = structuredClone(album);
-  duplicateRoute.identity.route = '/';
+  duplicateRoute.identity.slug = home.identity.slug;
   assert.ok(validateSite([home, duplicateRoute], { root }).some(message => message.includes('route / is shared')));
 });
 
@@ -64,4 +65,34 @@ test('Album rejects missing or conflicting audio sources', () => {
   const conflicting = structuredClone(album);
   conflicting.templateData.player.tracks[0].audioFile = '/media/audio/first-track.ogg';
   assert.ok(validatePage(conflicting, { root }).some(message => message.includes('provide exactly one audio source')));
+});
+
+
+test('Public routes are derived from page type and slug, not editable route strings', () => {
+  assert.equal(routeForPage(home), '/');
+  assert.equal(routeForPage(album), '/albums/the-early-bird/');
+  const vista = { template: 'vista-window', identity: { name: 'A page', slug: 'a-page' } };
+  const editorial = { template: 'editorial', identity: { name: 'An essay', slug: 'an-essay' } };
+  assert.equal(routeForPage(vista), '/pages/a-page/');
+  assert.equal(routeForPage(editorial), '/pages/an-essay/');
+  const legacy = structuredClone(album);
+  legacy.identity.route = '/the-early-bird.html';
+  legacy.seo.canonical = '';
+  const normalized = normalizePageRecord(legacy, { baseUrl: 'https://fsfm.port82.net/' });
+  assert.equal(normalized.identity.route, '/albums/the-early-bird/');
+  assert.equal(normalized.seo.canonical, 'https://fsfm.port82.net/albums/the-early-bird/');
+});
+
+test('A draft album can be created before its tracklist is filled in', () => {
+  const draft = { ...structuredClone(album), publishing: { ...album.publishing, published: false }, templateData: { ...structuredClone(album.templateData), player: { ...structuredClone(album.templateData.player), tracks: [] } } };
+  assert.deepEqual(validatePage(draft, { root }), []);
+  draft.publishing.published = true;
+  assert.ok(validatePage(draft, { root }).some(message => message.includes('Published Album template requires at least one player track')));
+});
+
+test('Normalizer generates stable internal IDs for blocks when omitted', () => {
+  const source = { template:'vista-window', identity:{name:'Test',slug:'test'}, sections:[{type:'hero',enabled:true,content:{title:'Hi'}},{type:'hero',enabled:true,content:{title:'Again'}}] };
+  const normalized = normalizePageRecord(source, { baseUrl:'https://fsfm.port82.net/' });
+  assert.deepEqual(normalized.sections.map(section=>section.id), ['test-hero-1','test-hero-2']);
+  assert.equal(source.sections[0].id, undefined);
 });
