@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "template": "vista-window",
+  "identity": {
+    "name": "vistatest",
+    "slug": "vistatest",
+    "route": "vistatest",
+    "order": 10
+  },
+  "sections": [
+    {
+      "type": "hero",
+      "id": "herovistatest",
+      "enabled": true,
+      "presentation": {
+        "variant": "vista-window",
+        "windowTitle": "hi"
+      },
+      "content": {
+        "title": "hi"
+      }
+    },
+    {
+      "type": "marquee",
+      "id": "marqueevistatest",
+      "enabled": true,
+      "presentation": {
+        "variant": "vista-window"
+      }
+    },
+    {
+      "type": "artist-statement",
+      "id": "hellojesse",
+      "enabled": true,
+      "group": {
+        "layout": "grid",
+        "columns": 2
+      },
+      "presentation": {
+        "variant": "vista-window"
+      },
+      "content": {
+        "body": "+_-)5_('rhrfhfghgeth,88)85#=÷¥✓[¥√^"
+      }
+    }
+  ],
+  "publishing": {
+    "published": true,
+    "showInNavigation": true,
+    "navigationLabel": "vistatest"
+  },
+  "appearance": {
+    "wallpaper": {
+      "mode": "template-default",
+      "preset": "vista-aqua-glass",
+      "customFit": "cover",
+      "customPosition": "center",
+      "initialSelection": "random",
+      "cycle": {
+        "enabled": false,
+        "mode": "sequential",
+        "intervalSeconds": 30,
+        "manualControl": true
+      }
+    },
+    "effects": {
+      "backgroundEffects": true,
+      "pageTransition": true,
+      "respectReducedMotion": true
+    }
+  },
+  "seo": {
+    "title": "vistatest",
+    "description": "vistatest",
+    "allowIndexing": false
+  }
+}
