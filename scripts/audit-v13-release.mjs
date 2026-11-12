@@ -18,7 +18,7 @@ function walk(dir) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const file = path.join(dir, entry.name);
     if (entry.isDirectory()) walk(file);
-    else if (entry.isFile() && entry.name.endsWith('.html')) pageFiles.push(file);
+    else if (entry.isFile() && entry.name.endsWith('.html') && entry.name !== 'google47366a80744746e8.html') pageFiles.push(file);
   }
 }
 function fail(message) { errors.push(message); }
