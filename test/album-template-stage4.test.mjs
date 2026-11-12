@@ -61,7 +61,7 @@ test('Album page preserves the amber hero, quote, Spotify embed and canonical UR
   assert.match(html, /album-hero-window/);
   assert.match(html, /intro-quote/);
   assert.match(html, /open\.spotify\.com\/embed\/album/);
-  assert.match(html, /https:\/\/fsfm\.port82\.net\/the-early-bird\.html/);
+  assert.match(html, /https:\/\/fsfm\.port82\.net\/albums\/the-early-bird\//);
   assert.match(html, /\"image\":\"https:\/\/fsfm\.port82\.net\/media\/images\/cover\.png\"/);
   assert.match(html, /name="robots" content="noindex, nofollow"/);
 });
