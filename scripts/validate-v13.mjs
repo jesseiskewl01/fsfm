@@ -16,7 +16,7 @@ for (const dir of ['albums', 'vista-pages', 'editorial-pages']) {
 const pages = normalizePages(rawPages, readJson(path.join(contentRoot, 'site.json')));
 const errors = validateSite(pages, { root });
 if (errors.length) {
-  console.error(`V13 validation failed with ${errors.length} issue(s):`);
+  console.error(`V14 validation failed with ${errors.length} issue(s):`);
   for (const error of errors) console.error(`- ${error}`);
   process.exitCode = 1;
 } else {
