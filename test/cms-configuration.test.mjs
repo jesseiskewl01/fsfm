@@ -48,3 +48,19 @@ test('Every template gets an appropriate block editor', () => {
     assert.ok(config.includes(`- name: ${block}`), `missing shared building block ${block}`);
   }
 });
+
+
+test('CMS hides computed public routes and puts page-wide settings before the block editor', () => {
+  const identity = config.slice(config.indexOf('  identity:'), config.indexOf('  publishing:'));
+  assert.match(identity, /name: slug/);
+  assert.doesNotMatch(identity, /name: route/);
+  const albumStart = config.indexOf('  - name: albums');
+  const vistaStart = config.indexOf('  - name: vista-pages');
+  const albums = config.slice(albumStart, vistaStart);
+  assert.ok(albums.indexOf('component: identity') < albums.indexOf('component: appearance'));
+  assert.ok(albums.indexOf('component: appearance') < albums.indexOf('component: publishing'));
+  assert.ok(albums.indexOf('component: publishing') < albums.indexOf('component: seo'));
+  assert.ok(albums.indexOf('component: seo') < albums.indexOf('component: albumSections'));
+  assert.match(config, /PAGE LAYOUT · ALBUM BUILDING BLOCKS/);
+  assert.match(config, /The name visitors see in the page menu/);
+});
