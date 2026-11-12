@@ -1602,6 +1602,7 @@ content:
           type: object
           list:
             min: 0
+            default: []
             collapsible:
               collapsed: true
               summary: '{title}'
