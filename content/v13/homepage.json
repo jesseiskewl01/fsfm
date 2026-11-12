@@ -31,7 +31,7 @@
       "funWidgets": {
         "showBarrelRoll": false,
         "showBubbleSlider": true,
-        "showMusicPlayer": false,
+        "showMusicPlayer": true,
         "showPurblePlace": false
       },
       "visibility": {
@@ -85,8 +85,8 @@
   },
   "sections": [
     {
-      "id": "home-marquee",
       "type": "marquee",
+      "id": "home-marquee",
       "enabled": true,
       "presentation": {
         "variant": "vista-desktop"
@@ -104,8 +104,8 @@
       }
     },
     {
-      "id": "home-about",
       "type": "artist-statement",
+      "id": "home-about",
       "enabled": true,
       "group": {
         "id": "home-window-grid",
@@ -121,8 +121,8 @@
       }
     },
     {
-      "id": "home-spotify",
       "type": "embed-window",
+      "id": "home-spotify",
       "enabled": true,
       "group": {
         "id": "home-window-grid",
@@ -141,9 +141,13 @@
       }
     },
     {
-      "id": "home-events",
       "type": "bandsintown-events",
+      "id": "home-events",
       "enabled": true,
+      "group": {
+        "layout": "grid",
+        "columns": 2
+      },
       "presentation": {
         "variant": "vista-window",
         "windowTitle": "ON THE HORIZON"
@@ -161,16 +165,20 @@
         "followSectionAlignment": "center",
         "followSectionCtaText": "FOLLOW",
         "eventRsvpPosition": "hidden",
+        "eventRsvpOnlyShowIcon": true,
         "playMyCityPosition": "bottom",
         "playMyCityAlignment": "center",
-        "playMyCityCtaIcon": true,
-        "eventRsvpOnlyShowIcon": true
+        "playMyCityCtaIcon": true
       }
     },
     {
-      "id": "home-social-links",
       "type": "social-links",
+      "id": "home-social-links",
       "enabled": true,
+      "group": {
+        "layout": "grid",
+        "columns": 2
+      },
       "presentation": {
         "variant": "vista-window",
         "windowTitle": "FIND FSFM"
@@ -203,8 +211,7 @@
   ],
   "publishing": {
     "published": true,
-    "showInNavigation": false,
-    "navigationLabel": ""
+    "showInNavigation": false
   },
   "appearance": {
     "wallpaper": {
@@ -215,14 +222,16 @@
         "vista-solar-flare",
         "vista-rose-bloom"
       ],
-      "customImage": "",
       "initialSelection": "random",
       "cycle": {
         "enabled": false,
         "mode": "sequential",
         "intervalSeconds": 30,
         "manualControl": true
-      }
+      },
+      "preset": "vista-violet-haze",
+      "customFit": "cover",
+      "customPosition": "center"
     },
     "effects": {
       "backgroundEffects": true,
