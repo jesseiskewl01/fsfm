@@ -45,7 +45,7 @@ export function normalizePageRecord(page, site = {}) {
         const group = section.group && typeof section.group === 'object' ? { ...section.group } : section.group;
         if (group && typeof group === 'object') {
           if (typeof group.name === 'string' && group.name.trim()) {
-            group.id = group.name.trim().toLowerCase().normalize('NFKD').replace(/[\\u0300-\\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+            group.id = group.name.trim().toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
           }
         }
         return { ...section, id, ...(group ? { group } : {}) };
