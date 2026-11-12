@@ -53,4 +53,6 @@ test('V15 homepage widgets form the intended six-window frame with loose bonus p
   assert.match(js, /wrapRight - compactWidth - 22/);
   assert.match(js, /fsfm_gadget_positions_v2/);
   assert.match(js, /isLegacyDefault/);
+  assert.match(js, /function boxesOverlap/);
+  assert.match(js, /function resolveWidgetCollisions/);
 });

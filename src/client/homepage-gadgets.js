@@ -99,6 +99,56 @@
       defaultPositions[id] = [Number(pos[0]), Number(pos[1])];
     }
   });
+  resolveWidgetCollisions(defaultPositions);
+
+  var widgetById = {};
+  widgets.forEach(function(widget) { widgetById[widget.id] = widget; });
+
+  function boxesOverlap(a, b, gap) {
+    var spacing = Number(gap) || 0;
+    return a.x < b.x + b.width + spacing &&
+      a.x + a.width + spacing > b.x &&
+      a.y < b.y + b.height + spacing &&
+      a.y + a.height + spacing > b.y;
+  }
+
+  function resolveWidgetCollisions(layout) {
+    var occupied = [];
+    var primaryIds = [
+      'gadget-clock', 'gadget-now-playing', 'gadget-dates',
+      'gadget-calendar', 'gadget-photos', 'gadget-note'
+    ];
+    var bonusIds = [
+      'gadget-barrel-roll', 'gadget-bubbles', 'gadget-radio', 'gadget-purble'
+    ];
+
+    primaryIds.forEach(function(id) {
+      var widget = widgetById[id], point = layout[id];
+      if (!widget || !point) return;
+      occupied.push({ x:point[0], y:point[1], width:widget.offsetWidth, height:widget.offsetHeight });
+    });
+
+    bonusIds.forEach(function(id) {
+      var widget = widgetById[id], point = layout[id];
+      if (!widget || !point) return;
+      var candidate = { x:point[0], y:point[1], width:widget.offsetWidth, height:widget.offsetHeight };
+      var attempts = 0;
+      while (occupied.some(function(other) { return boxesOverlap(candidate, other, 12); }) && attempts < 24) {
+        candidate.y += 20;
+        if (candidate.y + candidate.height > window.innerHeight - 8) {
+          candidate.y = Math.max(48, point[1] - 36);
+          candidate.x += 24;
+        }
+        if (candidate.x + candidate.width > window.innerWidth - 8) {
+          candidate.x = Math.max(8, point[0] - 24);
+        }
+        attempts += 1;
+      }
+      layout[id] = [candidate.x, candidate.y];
+      occupied.push(candidate);
+    });
+    return layout;
+  }
 
   widgets.forEach(function(widget) {
     var saved = storedPositions[widget.id];
