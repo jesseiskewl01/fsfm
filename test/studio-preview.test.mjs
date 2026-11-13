@@ -26,6 +26,6 @@ test('tablet and mobile previews use fixed CSS viewport dimensions inside device
 
 test('desktop preview remains fitted to the Studio workspace', () => {
   assert.match(studio, /desktop:\{width:'100%',height:'100%',label:'Desktop · Workspace width'/);
-  assert.match(studio, /maxWidth:size==='desktop'\?'100%':'none'/);
+  assert.match(studio, /maxWidth=size==='desktop'\?'100%':'none'/);
   assert.match(studio, /LOCAL PREVIEW/);
 });
