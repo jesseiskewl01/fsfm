@@ -23,6 +23,122 @@ dialog.lyrics-dialog{width:min(760px,94vw);max-height:88vh;background:#211f2b;co
 @media(max-width:1100px){.workspace{grid-template-columns:205px minmax(390px,520px) minmax(280px,1fr)}.brand{min-width:155px}.topmeta{display:none}.publishhint{max-width:145px}}
 @media(max-width:850px){.app{height:auto;min-height:100vh;overflow:visible;grid-template-rows:auto auto}.topbar{height:64px;position:sticky;top:0;z-index:10}.workspace{grid-template-columns:175px minmax(0,1fr);grid-template-rows:auto auto}.sidebar{grid-row:1/3;position:sticky;top:64px;height:calc(100vh - 64px)}.preview{grid-column:2;min-height:600px;border-top:1px solid var(--line)}}
 @media(max-width:600px){.preview-dimensions{display:none}.brand{min-width:0}.brand small,.topmeta,.savehint,.publishhint{display:none}.topbar{padding:0 9px;gap:6px}.btn{padding:8px 9px;font-size:9px}.workspace{display:flex;flex-direction:column}.sidebar{position:relative;top:auto;height:auto;border-right:0;border-bottom:1px solid var(--line)}.sidebar-foot{display:none}.page-list{display:grid;grid-template-columns:1fr 1fr}.editor{overflow:visible}.preview{min-height:520px}.json-object-inner{grid-template-columns:1fr}.json-object-inner>.field.full,.json-object-inner>.array-box,.json-object-inner>.json-object{grid-column:1}.editor-body{padding:10px 9px 40px}}
+
+/* V16 Studio design system: shared surfaces, controls and interaction states. */
+:root{
+  color-scheme:dark;
+  --bg:#13111b;
+  --surface:#1d1a29;
+  --surface2:#282437;
+  --surface-raised:#252136;
+  --surface-hover:#302a42;
+  --line:#3c354c;
+  --line-strong:#594b70;
+  --text:#f5f0fa;
+  --muted:#aca3b8;
+  --accent:#c9aaff;
+  --accent-strong:#a47edb;
+  --green:#91d8b0;
+  --red:#e69ba6;
+  --shadow-soft:0 12px 32px #08070d44;
+  --shadow-deep:0 24px 70px #08070d70;
+}
+html,body{background:radial-gradient(ellipse at 12% -10%,#32254255 0%,transparent 38%),var(--bg)}
+.app{background:var(--bg)}
+.topbar{background:#171521ed;border-bottom-color:#3c354b;backdrop-filter:blur(20px);box-shadow:0 8px 28px #08070d22}
+.brandmark{background:linear-gradient(145deg,#e6d5ff 0%,#c29df7 52%,#8c6bc3 100%);box-shadow:0 4px 16px #b58bff30,inset 0 1px 0 #ffffff80}
+.brand strong{letter-spacing:.19em}
+.brand small{color:#9e95ad}
+.topmeta{letter-spacing:.09em}
+.side-label{color:#9a8fa9;letter-spacing:.17em}
+.sidebar{background:#191622;border-right-color:#393247}
+.navitem{border:1px solid transparent;transition:background .16s,border-color .16s,color .16s,transform .16s}
+.navitem:hover{background:#262234;border-color:#383148;color:#f3eaff;transform:translateX(2px)}
+.navitem.active{background:linear-gradient(100deg,#3d3152,#30283f);border-color:#5a486f;box-shadow:inset 3px 0 0 var(--accent);color:#f1e5ff}
+.side-divider{background:linear-gradient(90deg,transparent,#494057,transparent)}
+.page-item{border-color:transparent;transition:background .16s,border-color .16s,transform .16s}
+.page-item:hover{background:#282438;border-color:#3e3650;transform:translateX(2px)}
+.page-item.selected{background:linear-gradient(100deg,#39304b,#2a2638);border-color:#5a4a70;box-shadow:inset 3px 0 0 var(--accent)}
+.page-icon{background:linear-gradient(145deg,#393247,#2a2638);border:1px solid #4b405f;color:#ddc8ff;box-shadow:inset 0 1px 0 #ffffff08}
+.status-dot{box-shadow:0 0 0 3px #9aa3ad10}
+.status-dot.live{box-shadow:0 0 0 3px #91d8b022,0 0 12px #91d8b055}
+.editor{background:#191722;border-right-color:#3b3449}
+.editor-head{background:#1b1925ed;border-bottom-color:#40384f;backdrop-filter:blur(18px);box-shadow:0 8px 22px #09081118}
+.editor-head h1{font-weight:760;letter-spacing:-.045em}
+.eyebrow{color:#c5a5fa;letter-spacing:.19em}
+.subhead{color:#b4aabd}
+.route{padding:3px 7px;border:1px solid #443a56;border-radius:6px;background:#201b2d}
+.editor-body{gap:12px}
+.panel{background:linear-gradient(145deg,#211e2d,#1e1b29);border-color:#40394e;border-radius:14px;box-shadow:var(--shadow-soft);padding:14px;transition:border-color .16s,box-shadow .16s}
+.panel:hover{border-color:#514562;box-shadow:0 14px 34px #08070d50}
+.panel-head{padding-bottom:9px;border-bottom:1px solid #393247;margin-bottom:12px}
+.panel-title{font-size:11px;letter-spacing:.025em;color:#f2ebfa}
+.panel-note{font-size:8px;letter-spacing:.11em;color:#9a90a7}
+.panel-desc{color:#a49aae;line-height:1.6}
+.json-object{background:#211e2c;border-color:#40384e;border-radius:10px}
+.json-object>summary{padding:10px 11px;color:#e9e0f3;background:linear-gradient(100deg,#2a2538,#242130);border-radius:9px;transition:background .16s,color .16s}
+.json-object>summary:hover{background:#332b43;color:#fff}
+.json-object[open]>summary{border-bottom:1px solid #40384e;border-radius:9px 9px 0 0}
+.json-object-inner{padding:11px;gap:11px}
+.field{gap:6px}
+.field label{color:#c4b9d0;font-size:9px;letter-spacing:.025em}
+.field input,.field textarea,.field select{background:#15131e;border-color:#494158;border-radius:9px;color:#f6f1fb;padding:9px 10px;min-height:36px;transition:border-color .16s,box-shadow .16s,background .16s}
+.field textarea{min-height:84px}
+.field input:hover,.field textarea:hover,.field select:hover{border-color:#655477}
+.field input:focus,.field textarea:focus,.field select:focus{background:#191622;border-color:#b091e8;box-shadow:0 0 0 3px #b58bff24}
+.field input[readonly]{background:#201d2a;border-color:#3d364b;color:#9c92a8}
+.helper{color:#93899f}
+.toggle-field{background:#262233;border-color:#42394f;border-radius:9px;padding:8px 9px;transition:background .15s,border-color .15s}
+.toggle-field:hover{background:#2e2940;border-color:#584a6d}
+.toggle-field label{color:#e1d8eb}
+.switch{box-shadow:inset 0 1px 2px #0005}
+.switch:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.array-box{background:#211e2d;border-color:#494057;border-radius:11px;padding:10px}
+.array-head strong{color:#eee5f6;letter-spacing:.03em}
+.array-item{background:#1b1926;border-color:#40394d;border-radius:10px;padding:9px;transition:border-color .16s}
+.array-item:hover{border-color:#5a4c6e}
+.array-item-head span{color:#d8cde5}
+.mini{background:#302a3e;border-color:#514660;color:#e3d8ef;transition:background .15s,border-color .15s,transform .15s}
+.mini:hover:not(:disabled){background:#433653;border-color:#80699e;transform:translateY(-1px)}
+.add-item{border-color:#625178;color:#d7c4f4}
+.section-card{background:linear-gradient(145deg,#292536,#24212f);border-color:#4b425b;border-radius:13px;box-shadow:0 8px 22px #08070d20}
+.section-card>summary{padding:12px 11px;transition:background .16s}
+.section-card>summary:hover{background:#332d42}
+.section-card[open]>summary{border-bottom:1px solid #494057;background:linear-gradient(100deg,#30293e,#272333)}
+.section-title{color:#f0e8f7;letter-spacing:.02em}
+.section-meta{color:#a79bb5}
+.section-pill{background:#3c314f;color:#e4d3ff;border:1px solid #5a486f}
+.section-body{padding:11px;gap:10px}
+.section-tools{padding-bottom:7px;border-bottom:1px solid #3b3449}
+.add-component select{background:#171520;border-color:#4b425b;border-radius:9px}
+.warning{border-radius:10px}
+.btn{border-color:#4b4359;background:linear-gradient(180deg,#302b3d,#292536);color:#e9e0f2;border-radius:9px;box-shadow:0 2px 5px #08070d20;transition:background .16s,border-color .16s,transform .16s,box-shadow .16s}
+.btn:hover:not(:disabled){background:linear-gradient(180deg,#3b334c,#302a40);border-color:#75618f;box-shadow:0 5px 14px #08070d38;transform:translateY(-1px)}
+.btn:active:not(:disabled){transform:translateY(0);box-shadow:inset 0 2px 5px #08070d30}
+.btn.primary{background:linear-gradient(135deg,#dcc8ff,#b58ce8);border-color:#d2b4ff;color:#21182e;box-shadow:0 4px 16px #b58bff30}
+.btn.primary:hover:not(:disabled){background:linear-gradient(135deg,#eadcff,#c9a9f5);border-color:#ebd9ff;box-shadow:0 7px 20px #b58bff48}
+.btn:focus-visible,.navitem:focus-visible,.page-item:focus-visible,.device button:focus-visible,.mini:focus-visible{outline:2px solid #d3b8ff;outline-offset:3px}
+.device{background:#171521;border-color:#494057;border-radius:9px}
+.device button{padding:7px 10px;transition:background .15s,color .15s}
+.device button:hover{background:#2c2639;color:#e7d9f8}
+.device button.active{background:#49395e;color:#f0e2ff;box-shadow:inset 0 0 0 1px #70598d}
+.preview-head{background:#1b1925;border-bottom-color:#40394d}
+.preview-title{color:#f1e8f8;letter-spacing:.08em}
+.preview-sub{color:#9f95ac}
+.preview-dimensions{color:#b6a9c6}
+.preview-frame-wrap{background:radial-gradient(ellipse at top,#292239 0%,#17151f 72%)}
+.preview-loading{backdrop-filter:blur(6px);border:1px solid #67577d}
+.toast{background:linear-gradient(145deg,#302a3d,#242131);border-color:#655576;box-shadow:var(--shadow-deep);border-radius:12px}
+dialog.lyrics-dialog{background:linear-gradient(145deg,#262233,#1d1a28);border-color:#655575}
+.lyrics-head{background:#282438;border-bottom-color:#4a4059}
+.lyrics-body textarea{background:#15131e;border-color:#4b425b;border-radius:10px}
+.lyrics-body textarea:focus{border-color:#b091e8;box-shadow:0 0 0 3px #b58bff24;outline:none}
+.upload-pick{border-color:#76638e;color:#d7c1fa;border-radius:8px;transition:background .16s,border-color .16s}
+.upload-pick:hover{background:#342a44;border-color:#a58ac9}
+.empty{color:#aaa0b7}
+@media(max-width:850px){.preview-head{gap:7px;padding:0 10px}.preview-dimensions{max-width:110px}.sidebar{background:#191622}.editor{border-right:0}}
+@media(max-width:600px){.preview-head{gap:6px}.preview-dimensions{display:none}.panel{padding:11px}.panel-head{gap:6px}.section-card>summary{gap:6px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style>
 </head>
 <body>
@@ -192,7 +308,8 @@ function valueEditor(value,path,label,depth=0,options={}){
      const v=value[k],p=path+'.'+k,l=human(k);
      return valueEditor(v,p,l,depth+1);
    }).join('');
-   return '<details class="json-object depth-'+Math.min(depth,2)+'" open><summary>'+esc(label)+'</summary><div class="json-object-inner">'+inside+'</div></details>';
+   const openAttr=depth===0?' open':'';
+   return '<details class="json-object depth-'+Math.min(depth,2)+'"'+openAttr+'><summary>'+esc(label)+'</summary><div class="json-object-inner">'+inside+'</div></details>';
  }
  return primitiveEditor(value,path,label,depth);
 }
