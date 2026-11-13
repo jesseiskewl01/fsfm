@@ -234,12 +234,13 @@ function loginRateLimit(request) {
   const key = request.socket?.remoteAddress || 'local';
   const now = Date.now();
   let state = loginAttempts.get(key);
+  // Honour an active lockout before considering the rolling failure window.
+  if (state?.lockedUntil > now) {
+    return { blocked: true, retryAfter: Math.ceil((state.lockedUntil - now) / 1000) };
+  }
   if (!state || now - state.windowStarted > 15 * 60 * 1000) {
     state = { failures: 0, windowStarted: now, lockedUntil: 0 };
     loginAttempts.set(key, state);
-  }
-  if (state.lockedUntil > now) {
-    return { blocked: true, retryAfter: Math.ceil((state.lockedUntil - now) / 1000) };
   }
   return { blocked: false, key, state };
 }
