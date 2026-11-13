@@ -106,6 +106,8 @@ try {
 
   requireStatus(await fetch(api + '/albums'), 401, 'Unauthenticated album list');
   requireStatus(await fetch(api + '/albums/the-early-bird'), 401, 'Unauthenticated album detail');
+  requireStatus(await fetch(api + '/deploy/status'), 401, 'Unauthenticated deployment status');
+  requireStatus(await fetch(api + '/deploy', { method: 'POST' }), 401, 'Unauthenticated live deployment');
 
   const wrongOriginSetup = await fetch(api + '/auth/setup', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -153,6 +155,12 @@ try {
   const loginCookie = sessionCookie(login);
   const authHeaders = { Cookie: loginCookie };
   const saveHeaders = { 'Content-Type': 'application/json', Origin: baseUrl, Cookie: loginCookie };
+  const crossOriginDeploy = await fetch(api + '/deploy', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Cookie: loginCookie },
+    body: JSON.stringify({ confirmation: 'PUBLISH FSFM LIVE' }),
+  });
+  requireStatus(crossOriginDeploy, 403, 'Cross-origin live deployment');
 
   const albums = await fetch(api + '/albums', { headers: authHeaders });
   if (!albums.ok || !(await albums.json()).albums.some((item) => item.id === 'the-early-bird')) {

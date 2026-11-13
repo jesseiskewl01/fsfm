@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "repository": "jesseiskewl01/fsfm",
+  "targetBranch": "main",
+  "publishRoots": [
+    "content/v13",
+    "media",
+    "audio",
+    "lyrics"
+  ],
+  "deploymentWorkflow": ".github/workflows/deploy-pages.yml",
+  "verification": [
+    "npm run check:all",
+    "npm run predeploy-check"
+  ]
+}

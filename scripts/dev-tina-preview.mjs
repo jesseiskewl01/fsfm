@@ -5,6 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { createStudioPublisher } from './studio-publisher.mjs';
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const previewRoot = path.join(projectRoot, 'preview-v13');
@@ -22,6 +23,7 @@ if (!['127.0.0.1', 'localhost', '::1'].includes(host)) {
 // Credentials stay in the current OS user's profile, outside the repository.
 const authDataDir = path.resolve(process.env.FSFM_STUDIO_DATA_DIR || path.join(os.homedir(), '.fsfm-studio'));
 const authFilePath = path.join(authDataDir, 'auth.json');
+const publisher = createStudioPublisher({ projectRoot, dataDir: authDataDir });
 const sessionCookieName = 'fsfm_studio_session';
 const sessionLifetimeMs = 8 * 60 * 60 * 1000;
 const sessions = new Map();
@@ -350,6 +352,42 @@ async function handleApi(request, response, pathname) {
     return;
   }
 
+  if (pathname === '/__fsfm/api/deploy/status') {
+    if (!['GET', 'HEAD'].includes(request.method || '')) {
+      response.writeHead(405, { Allow: 'GET, HEAD' });
+      response.end();
+      return;
+    }
+    try {
+      sendJson(response, 200, await publisher.getStatus(), request.method);
+    } catch (error) {
+      sendJson(response, error.statusCode || 500, { error: error.message || 'Could not inspect live publishing status.' });
+    }
+    return;
+  }
+
+  if (pathname === '/__fsfm/api/deploy') {
+    if (request.method !== 'POST') {
+      response.writeHead(405, { Allow: 'POST' });
+      response.end();
+      return;
+    }
+    if (!hasExpectedOrigin(request)) {
+      sendJson(response, 403, { error: 'Live publishing requests must come from this local FSFM Studio origin.' });
+      return;
+    }
+    try {
+      const body = await readRequestJson(request, 8192);
+      const result = await publisher.deploy({ confirmation: body?.confirmation });
+      sendJson(response, 200, result);
+    } catch (error) {
+      sendJson(response, error.statusCode || 500, {
+        error: error.statusCode ? error.message : 'Live publishing failed. Your local files were kept.',
+      });
+    }
+    return;
+  }
+
   if (pathname === '/__fsfm/api/albums') {
     if (!['GET', 'HEAD'].includes(request.method || '')) {
       response.writeHead(405, { Allow: 'GET, HEAD' });
@@ -437,6 +475,18 @@ async function handleApi(request, response, pathname) {
     const tempPath = filePath + '.studio-' + process.pid + '-' + Date.now() + '.tmp';
     fs.writeFileSync(tempPath, nextRaw, { flag: 'wx' });
     fs.renameSync(tempPath, filePath);
+    try {
+      publisher.recordSavedFile(
+        path.relative(projectRoot, filePath).split(path.sep).join('/'),
+        nextRaw,
+      );
+    } catch (error) {
+      // Keep the local save and publishing queue atomic: if queueing fails, restore the prior file.
+      const rollbackPath = filePath + '.studio-rollback-' + process.pid + '-' + Date.now() + '.tmp';
+      fs.writeFileSync(rollbackPath, currentRaw, { flag: 'wx' });
+      fs.renameSync(rollbackPath, filePath);
+      throw error;
+    }
 
     scheduleRebuild();
     sendJson(response, 200, {
