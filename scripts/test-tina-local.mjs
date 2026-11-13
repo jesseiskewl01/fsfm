@@ -103,6 +103,45 @@ try {
     throw new Error('Studio album API did not return The Early Bird.');
   }
 
+  // Verify the save safeguards using requests that must be rejected.
+  const albumResponse = await fetch(baseUrl + '/__fsfm/api/albums/the-early-bird');
+  if (!albumResponse.ok) throw new Error('Studio album detail API failed.');
+  const albumData = await albumResponse.json();
+  const saveUrl = baseUrl + '/__fsfm/api/albums/the-early-bird';
+  const saveHeaders = {
+    'Content-Type': 'application/json',
+    Origin: baseUrl,
+  };
+
+  const crossSiteSave = await fetch(saveUrl, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ revision: albumData.revision, record: albumData.record }),
+  });
+  if (crossSiteSave.status !== 403) {
+    throw new Error('Studio accepted a save without its same-origin header.');
+  }
+
+  const staleSave = await fetch(saveUrl, {
+    method: 'PUT',
+    headers: saveHeaders,
+    body: JSON.stringify({ revision: 'deliberately-stale-revision', record: albumData.record }),
+  });
+  if (staleSave.status !== 409) {
+    throw new Error('Studio did not reject a stale album revision.');
+  }
+
+  const changedSlugRecord = JSON.parse(JSON.stringify(albumData.record));
+  changedSlugRecord.identity.slug = 'not-the-original-slug';
+  const slugChange = await fetch(saveUrl, {
+    method: 'PUT',
+    headers: saveHeaders,
+    body: JSON.stringify({ revision: albumData.revision, record: changedSlugRecord }),
+  });
+  if (slugChange.status !== 422) {
+    throw new Error('Studio did not reject an album slug change.');
+  }
+
   console.log('');
   console.log('TinaCMS + FSFM Studio local smoke test passed:');
   console.log('  Admin:    HTTP ' + admin.status + ', ' + admin.bytes + ' bytes');
