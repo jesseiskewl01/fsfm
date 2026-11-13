@@ -14,6 +14,10 @@ const albumsRoot = path.join(contentRoot, 'albums');
 const port = Number(process.env.PORT || 3000);
 const host = process.env.HOST || '127.0.0.1';
 
+if (!['127.0.0.1', 'localhost', '::1'].includes(host)) {
+  throw new Error('FSFM Studio must bind to a loopback host. Do not expose the local editor on your network.');
+}
+
 const mimeTypes = {
   '.html': 'text/html; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
@@ -214,6 +218,14 @@ async function handleApi(request, response, pathname) {
   if (request.method !== 'PUT') {
     response.writeHead(405, { Allow: 'GET, HEAD, PUT' });
     response.end();
+    return;
+  }
+
+  // Only accept editor writes from this exact local Studio origin.
+  // This blocks cross-site browser requests from unrelated websites.
+  const expectedOrigin = 'http://' + host + ':' + port;
+  if (request.headers.origin !== expectedOrigin) {
+    sendJson(response, 403, { error: 'Studio saves must come from this local FSFM Studio page.' });
     return;
   }
 
