@@ -300,6 +300,10 @@ const server = http.createServer((request, response) => {
     return;
   }
 
+  if (fs.existsSync(filePath) && fs.statSync(filePath).isDirectory()) {
+    filePath = path.join(filePath, 'index.html');
+  }
+
   if (isStudio && pathname === '/studio') {
     response.writeHead(302, { Location: '/studio/', 'Cache-Control': 'no-store' });
     response.end();
