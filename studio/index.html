@@ -1,65 +1,470 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#17151f"><title>FSFM Studio</title>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#17151f">
+<title>FSFM Studio</title>
 <style>
-:root{color-scheme:dark;--bg:#17151f;--surface:#211f2b;--surface2:#292634;--line:#3b3747;--text:#f4f0f8;--muted:#aaa3b5;--accent:#c7a8ff;--green:#91d8b0}
+:root{color-scheme:dark;--bg:#17151f;--surface:#211f2b;--surface2:#292634;--line:#3b3747;--text:#f4f0f8;--muted:#aaa3b5;--accent:#c7a8ff;--green:#91d8b0;--red:#e69ba6}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font:14px/1.45 Inter,ui-sans-serif,system-ui,sans-serif}button,input,textarea,select{font:inherit}button{cursor:pointer}
-.app{height:100vh;min-height:680px;display:grid;grid-template-rows:66px minmax(0,1fr);overflow:hidden}.topbar{display:flex;align-items:center;gap:18px;padding:0 20px;border-bottom:1px solid var(--line);background:#1b1924}.brand{display:flex;align-items:center;gap:11px;min-width:210px}.brandmark{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,#e0c9ff,#9873d6);display:grid;place-items:center;color:#211832;font-weight:900}.brand strong{font-size:13px;letter-spacing:.16em}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:.1em}.topmeta{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:11px}.dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 4px #91d8b018}.spacer{flex:1}.savehint{color:var(--muted);font-size:11px;min-width:110px;text-align:right}.publishhint{color:var(--muted);font-size:10px;max-width:210px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.publishhint a{color:var(--accent);text-decoration:none}.publishhint a:hover{text-decoration:underline}
-.btn{border:1px solid var(--line);background:var(--surface2);color:#ded7e7;border-radius:9px;padding:9px 13px;font-weight:650;font-size:11px;display:inline-flex;align-items:center;justify-content:center;gap:7px}.btn:hover{background:#393445;border-color:#625874}.btn.primary{background:var(--accent);color:#21182e;border-color:var(--accent);font-weight:800}.btn:disabled{opacity:.4;cursor:not-allowed}
-.workspace{min-height:0;display:grid;grid-template-columns:210px minmax(390px,500px) minmax(390px,1fr)}.sidebar{min-height:0;border-right:1px solid var(--line);background:#1c1a25;padding:18px 12px;display:flex;flex-direction:column;gap:18px}.side-label{font-size:10px;letter-spacing:.15em;font-weight:800;color:#827b8e;padding:0 9px;text-transform:uppercase;margin-bottom:8px}.navitem{border:0;background:transparent;color:#c9c3d1;padding:10px;border-radius:9px;display:flex;gap:10px;align-items:center;width:100%;text-align:left;font-size:12px}.navitem.active{background:#3a3149;color:#ebdcff}.side-divider{height:1px;background:var(--line)}.album-list{display:flex;flex-direction:column;gap:5px}.album-item{border:1px solid transparent;background:transparent;color:#d4cedb;text-align:left;padding:9px;border-radius:10px;display:flex;gap:9px;align-items:center;width:100%}.album-item:hover{background:#292634}.album-item.selected{background:#322b40;border-color:#514365}.thumb{width:36px;height:36px;flex:none;border-radius:7px;object-fit:cover;background:#44394b}.album-copy{min-width:0;flex:1}.album-copy strong{font-size:11px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.album-copy small{font-size:9px;color:var(--muted)}.pill{font-size:8px;border-radius:20px;padding:3px 6px;background:#2d463b;color:#a4e3bf}.sidebar-foot{margin-top:auto;color:#777184;font-size:10px;line-height:1.6;padding:0 9px}
-.editor{min-height:0;overflow:auto;border-right:1px solid var(--line);background:#201e29}.editor-head{padding:20px 19px 14px;position:sticky;top:0;background:#201e29ed;backdrop-filter:blur(14px);z-index:3;border-bottom:1px solid #353140}.eyebrow{font-size:10px;letter-spacing:.15em;color:var(--accent);font-weight:800}h1{font-size:22px;letter-spacing:-.04em;margin:4px 0}.subhead{font-size:10px;color:var(--muted)}.editor-body{padding:15px 16px 46px;display:flex;flex-direction:column;gap:11px}.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:13px}.panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px;gap:10px}.panel-title{font-weight:800;font-size:12px}.panel-note{font-size:9px;color:var(--muted)}.fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field{display:flex;flex-direction:column;gap:5px;min-width:0}.field.full{grid-column:1/-1}.field label{font-size:10px;color:#b7b0c1;font-weight:650}.field input,.field textarea,.field select{width:100%;background:#17151f;border:1px solid #474151;color:#f5f0fa;border-radius:8px;padding:8px 9px;outline:none;min-width:0;font-size:11px}.field textarea{min-height:74px;resize:vertical;line-height:1.5}.field input:focus,.field textarea:focus,.field select:focus{border-color:#9471d5;box-shadow:0 0 0 3px #b58bff1a}.helper{font-size:9px;color:#837c8f;line-height:1.4}.art-row{display:flex;gap:12px;align-items:center}.art-preview{width:72px;height:72px;object-fit:cover;background:#302a39;border-radius:9px;border:1px solid var(--line);flex:none}.art-fields{flex:1;min-width:0}.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:7px 0;border-top:1px solid #393543}.toggle-row:first-child{border-top:0;padding-top:0}.toggle-row span{font-size:11px;color:#d6cfdf}.toggle-row small{display:block;color:#857e91;font-size:9px}.switch{appearance:none;width:34px;height:19px;background:#514b5b;border-radius:20px;position:relative;cursor:pointer;flex:none}.switch:before{content:"";position:absolute;width:13px;height:13px;top:3px;left:3px;background:#fff;border-radius:50%;transition:.18s}.switch:checked{background:#9f7bd8}.switch:checked:before{left:18px}
-.track-list{display:flex;flex-direction:column;gap:8px}.track{border:1px solid #413b4c;background:#272430;border-radius:10px;padding:9px}.track-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}.track-num{font-size:10px;color:#9c91aa;width:20px}.track-name{flex:1;min-width:0;font-weight:700;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.icon-btn{border:1px solid #4b4556;background:#302c39;color:#c9c1d2;width:25px;height:25px;border-radius:7px}.icon-btn:disabled{opacity:.3}.track-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.track-grid .field input{padding:7px}.track-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:8px}.checklabel{font-size:10px;color:#bdb5c8;display:flex;align-items:center;gap:7px}.track-actions{display:flex;gap:4px}.add-track{width:100%;margin-top:8px;border-style:dashed;background:transparent}
-.preview{min-width:0;min-height:0;background:#191720;display:grid;grid-template-rows:56px minmax(0,1fr)}.preview-head{display:flex;align-items:center;gap:10px;padding:0 15px;border-bottom:1px solid var(--line)}.preview-title{font-size:11px;font-weight:800}.preview-sub{font-size:9px;color:var(--muted);margin-left:7px}.device{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}.device button{border:0;background:transparent;color:#9b93a6;padding:6px 9px;font-size:10px}.device button.active{background:#40364f;color:#e9ddff}.preview-frame-wrap{padding:12px;min-height:0;position:relative}.preview-frame{width:100%;height:100%;border:1px solid #494354;border-radius:9px;background:#fff;box-shadow:0 20px 60px #08070c66}.preview-loading{position:absolute;inset:12px;display:none;align-items:center;justify-content:center;background:#17151fd9;border-radius:9px;color:#d5cade;font-size:12px;pointer-events:none}.preview-loading.show{display:flex}.toast{position:fixed;bottom:20px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#292536;border:1px solid #5b516b;color:#f4effa;padding:11px 15px;border-radius:10px;box-shadow:0 20px 60px #08070c66;z-index:20;font-size:12px;transition:.22s}.toast.show{opacity:1;transform:translate(-50%,0)}.toast.error{border-color:#a45e69}.empty{padding:22px;color:var(--muted);text-align:center;font-size:11px}
-@media(max-width:1080px){.workspace{grid-template-columns:185px minmax(360px,450px) minmax(320px,1fr)}.editor-body{padding-inline:12px}.topmeta{display:none}.publishhint{max-width:160px}}
-@media(max-width:850px){.app{height:auto;min-height:100vh;overflow:visible;grid-template-rows:auto auto}.topbar{height:64px;position:sticky;top:0;z-index:10}.workspace{grid-template-columns:165px minmax(0,1fr);grid-template-rows:auto auto}.sidebar{grid-row:1/3;position:sticky;top:64px;height:calc(100vh - 64px)}.preview{grid-column:2;min-height:600px;border-top:1px solid var(--line)}}
-@media(max-width:600px){.brand{min-width:0}.brand small,.topmeta,.savehint,.publishhint{display:none}.topbar{padding:0 10px}.workspace{display:flex;flex-direction:column}.sidebar{position:relative;top:auto;height:auto;border-right:0;border-bottom:1px solid var(--line)}.sidebar-foot{display:none}.album-list{flex-direction:row;overflow:auto}.album-item{min-width:180px}.editor{overflow:visible}.preview{min-height:520px}.fields{grid-template-columns:1fr}.field.full{grid-column:auto}}
-</style></head>
-<body><div class="app">
-<header class="topbar"><div class="brand"><div class="brandmark">F.</div><div><strong>FSFM STUDIO</strong><small>YOUR SITE, IN THE WORKSHOP</small></div></div><div class="topmeta"><span class="dot"></span>LOCAL WORKSPACE · V16 PROTOTYPE</div><div class="spacer"></div><div class="savehint" id="saveHint">All changes saved</div><div class="publishhint" id="publishHint">Checking live publishing…</div><button class="btn" id="reloadButton">↻ Reload</button><button class="btn" id="saveButton" disabled>Save local</button><button class="btn primary" id="deployButton" disabled>Save &amp; deploy live</button><button class="btn" id="logoutButton">Log out</button></header>
+.app{height:100vh;min-height:700px;display:grid;grid-template-rows:66px minmax(0,1fr);overflow:hidden}.topbar{display:flex;align-items:center;gap:12px;padding:0 18px;border-bottom:1px solid var(--line);background:#1b1924;z-index:5}.brand{display:flex;align-items:center;gap:11px;min-width:190px}.brandmark{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,#e0c9ff,#9873d6);display:grid;place-items:center;color:#211832;font-weight:900}.brand strong{font-size:13px;letter-spacing:.16em}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:.1em}.topmeta{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:10px}.dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 4px #91d8b018}.spacer{flex:1}.savehint{color:var(--muted);font-size:10px;min-width:80px;text-align:right}.publishhint{color:var(--muted);font-size:10px;max-width:210px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.publishhint a{color:var(--accent);text-decoration:none}.publishhint a:hover{text-decoration:underline}
+.btn{border:1px solid var(--line);background:var(--surface2);color:#ded7e7;border-radius:9px;padding:9px 12px;font-weight:650;font-size:10px;display:inline-flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap}.btn:hover{background:#393445;border-color:#625874}.btn.primary{background:var(--accent);color:#21182e;border-color:var(--accent);font-weight:800}.btn:disabled{opacity:.4;cursor:not-allowed}.btn.small{padding:6px 9px;font-size:9px}
+.workspace{min-height:0;display:grid;grid-template-columns:230px minmax(420px,560px) minmax(320px,1fr)}.sidebar{min-height:0;border-right:1px solid var(--line);background:#1c1a25;padding:16px 11px;display:flex;flex-direction:column;gap:16px;overflow:auto}.side-label{font-size:9px;letter-spacing:.15em;font-weight:800;color:#827b8e;padding:0 9px;text-transform:uppercase;margin:0 0 7px}.navitem{border:0;background:transparent;color:#c9c3d1;padding:9px 10px;border-radius:9px;display:flex;gap:9px;align-items:center;width:100%;text-align:left;font-size:11px}.navitem:hover{background:#292634}.navitem.active{background:#3a3149;color:#ebdcff}.side-divider{height:1px;background:var(--line)}.page-list{display:flex;flex-direction:column;gap:4px}.page-item{border:1px solid transparent;background:transparent;color:#d4cedb;text-align:left;padding:8px;border-radius:10px;display:flex;gap:8px;align-items:center;width:100%;min-width:0}.page-item:hover{background:#292634}.page-item.selected{background:#322b40;border-color:#514365}.page-icon{width:32px;height:32px;flex:none;border-radius:8px;display:grid;place-items:center;background:#34303e;color:#c9b0f7;font-weight:800;font-size:10px}.page-copy{min-width:0;flex:1}.page-copy strong{font-size:10px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.page-copy small{font-size:9px;color:var(--muted)}.status-dot{width:7px;height:7px;border-radius:50%;background:#77818a;flex:none}.status-dot.live{background:var(--green)}.sidebar-foot{margin-top:auto;color:#777184;font-size:9px;line-height:1.6;padding:0 9px}
+.editor{min-height:0;overflow:auto;border-right:1px solid var(--line);background:#201e29}.editor-head{padding:18px 18px 13px;position:sticky;top:0;background:#201e29ed;backdrop-filter:blur(14px);z-index:3;border-bottom:1px solid #353140}.eyebrow{font-size:9px;letter-spacing:.15em;color:var(--accent);font-weight:800}h1{font-size:22px;letter-spacing:-.04em;margin:4px 0}.subhead{font-size:10px;color:var(--muted);display:flex;gap:9px;align-items:center;flex-wrap:wrap}.route{color:#a99bbd;font-family:ui-monospace,monospace;font-size:9px}.editor-body{padding:14px 14px 60px;display:flex;flex-direction:column;gap:10px}.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px}.panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:10px}.panel-title{font-weight:800;font-size:11px}.panel-note{font-size:9px;color:var(--muted)}.panel-desc{font-size:9px;color:#8d8699;margin:-5px 0 10px;line-height:1.5}
+.json-object{border:1px solid #383342;border-radius:9px;background:#25222f;margin:7px 0;overflow:hidden}.json-object>summary{padding:9px 10px;cursor:pointer;font-size:10px;font-weight:750;color:#e2d9eb;list-style:none;display:flex;align-items:center;gap:8px}.json-object>summary::-webkit-details-marker{display:none}.json-object>summary:before{content:"›";font-size:16px;color:var(--accent);transition:transform .15s}.json-object[open]>summary:before{transform:rotate(90deg)}.json-object-inner{padding:0 10px 10px;display:grid;grid-template-columns:1fr 1fr;gap:9px}.json-object-inner>.field.full,.json-object-inner>.array-box,.json-object-inner>.json-object{grid-column:1/-1}.json-object.depth-0{margin:0;background:transparent;border:0}.json-object.depth-0>summary{display:none}.json-object.depth-0>.json-object-inner{padding:0;gap:10px}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}.field.full{grid-column:1/-1}.field label{font-size:9px;color:#b7b0c1;font-weight:650}.field input,.field textarea,.field select{width:100%;background:#17151f;border:1px solid #474151;color:#f5f0fa;border-radius:8px;padding:8px 9px;outline:none;min-width:0;font-size:10px}.field textarea{min-height:68px;resize:vertical;line-height:1.5}.field input:focus,.field textarea:focus,.field select:focus{border-color:#9471d5;box-shadow:0 0 0 3px #b58bff1a}.field input[readonly]{color:#8e8799;background:#201e29;cursor:not-allowed}.helper{font-size:8px;color:#837c8f;line-height:1.4}
+.toggle-field{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:7px 8px;border:1px solid #393543;border-radius:8px;background:#26232f;min-height:38px}.toggle-field label{font-size:9px;color:#d6cfdf}.toggle-field small{display:block;color:#857e91;font-size:8px}.switch{appearance:none;width:34px;height:19px;background:#514b5b;border-radius:20px;position:relative;cursor:pointer;flex:none}.switch:before{content:"";position:absolute;width:13px;height:13px;top:3px;left:3px;background:#fff;border-radius:50%;transition:.18s}.switch:checked{background:#9f7bd8}.switch:checked:before{left:18px}
+.array-box{border:1px solid #454050;border-radius:9px;background:#25222e;padding:9px;grid-column:1/-1;min-width:0}.array-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}.array-head strong{font-size:9px;color:#d9d1e3}.array-item{border:1px solid #393543;background:#201e29;border-radius:8px;padding:8px;margin:7px 0;min-width:0}.array-item-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px}.array-item-head span{font-size:9px;color:#b9afc9;font-weight:700}.array-item-controls{display:flex;gap:4px}.mini{border:1px solid #4b4556;background:#302c39;color:#c9c1d2;width:23px;height:22px;border-radius:6px;font-size:11px}.mini:disabled{opacity:.3}.array-item>.json-object{margin:0}.array-item>.json-object>summary{padding:5px}.add-item{width:100%;margin-top:5px;border-style:dashed;background:transparent}
+.section-card{border:1px solid #494252;border-radius:11px;background:#26232f;overflow:hidden}.section-card>summary{list-style:none;cursor:pointer;padding:10px;display:flex;align-items:center;gap:8px}.section-card>summary::-webkit-details-marker{display:none}.section-card>summary:before{content:"›";font-size:16px;color:var(--accent)}.section-card[open]>summary:before{transform:rotate(90deg)}.section-title{font-size:10px;font-weight:800;flex:1;min-width:0}.section-meta{font-size:8px;color:#958da1}.section-body{padding:0 10px 10px;display:flex;flex-direction:column;gap:8px}.section-actions{display:flex;gap:4px}.section-tools{display:flex;align-items:center;justify-content:space-between;gap:8px}.section-pill{background:#3a3149;color:#dfceff;border-radius:20px;padding:3px 7px;font-size:8px}.add-component{display:flex;gap:7px;margin-top:10px}.add-component select{flex:1;min-width:0;background:#17151f;border:1px solid #474151;color:#f5f0fa;border-radius:8px;padding:8px;font-size:10px}.empty{padding:22px;color:var(--muted);text-align:center;font-size:11px}.warning{padding:10px;border:1px solid #765b36;background:#392e21;border-radius:8px;color:#f1d6aa;font-size:9px;line-height:1.5}
+.preview{min-width:0;min-height:0;background:#191720;display:grid;grid-template-rows:56px minmax(0,1fr)}.preview-head{display:flex;align-items:center;gap:10px;padding:0 14px;border-bottom:1px solid var(--line)}.preview-title{font-size:10px;font-weight:800}.preview-sub{font-size:9px;color:var(--muted);margin-left:7px}.device{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}.device button{border:0;background:transparent;color:#9b93a6;padding:6px 9px;font-size:10px}.device button.active{background:#40364f;color:#e9ddff}.preview-frame-wrap{padding:12px;min-height:0;position:relative}.preview-frame{width:100%;height:100%;border:1px solid #494354;border-radius:9px;background:#fff;box-shadow:0 20px 60px #08070c66}.preview-loading{position:absolute;inset:12px;display:none;align-items:center;justify-content:center;background:#17151fd9;border-radius:9px;color:#d5cade;font-size:12px;pointer-events:none}.preview-loading.show{display:flex}
+.toast{position:fixed;bottom:20px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#292536;border:1px solid #5b516b;color:#f4effa;padding:11px 15px;border-radius:10px;box-shadow:0 20px 60px #08070c66;z-index:20;font-size:11px;transition:.22s;max-width:min(620px,90vw)}.toast.show{opacity:1;transform:translate(-50%,0)}.toast.error{border-color:#a45e69}
+dialog.lyrics-dialog{width:min(760px,94vw);max-height:88vh;background:#211f2b;color:var(--text);border:1px solid #625874;border-radius:14px;padding:0;box-shadow:0 28px 90px #000b}dialog.lyrics-dialog::backdrop{background:#09070dd9;backdrop-filter:blur(5px)}.lyrics-head{padding:15px 17px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}.lyrics-head strong{font-size:12px}.lyrics-body{padding:14px 16px}.lyrics-body textarea{width:100%;min-height:52vh;resize:vertical;background:#17151f;border:1px solid #474151;color:#f5f0fa;border-radius:8px;padding:12px;outline:none;font:11px/1.65 ui-monospace,Consolas,monospace}.lyrics-foot{padding:12px 16px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px}
+@media(max-width:1100px){.workspace{grid-template-columns:205px minmax(390px,520px) minmax(280px,1fr)}.brand{min-width:155px}.topmeta{display:none}.publishhint{max-width:145px}}
+@media(max-width:850px){.app{height:auto;min-height:100vh;overflow:visible;grid-template-rows:auto auto}.topbar{height:64px;position:sticky;top:0;z-index:10}.workspace{grid-template-columns:175px minmax(0,1fr);grid-template-rows:auto auto}.sidebar{grid-row:1/3;position:sticky;top:64px;height:calc(100vh - 64px)}.preview{grid-column:2;min-height:600px;border-top:1px solid var(--line)}}
+@media(max-width:600px){.brand{min-width:0}.brand small,.topmeta,.savehint,.publishhint{display:none}.topbar{padding:0 9px;gap:6px}.btn{padding:8px 9px;font-size:9px}.workspace{display:flex;flex-direction:column}.sidebar{position:relative;top:auto;height:auto;border-right:0;border-bottom:1px solid var(--line)}.sidebar-foot{display:none}.page-list{display:grid;grid-template-columns:1fr 1fr}.editor{overflow:visible}.preview{min-height:520px}.json-object-inner{grid-template-columns:1fr}.json-object-inner>.field.full,.json-object-inner>.array-box,.json-object-inner>.json-object{grid-column:1}.editor-body{padding:10px 9px 40px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+  <div class="brand"><div class="brandmark">F.</div><div><strong>FSFM STUDIO</strong><small>YOUR SITE, IN THE WORKSHOP</small></div></div>
+  <div class="topmeta"><span class="dot"></span>LOCAL WORKSPACE · V16</div>
+  <div class="spacer"></div>
+  <div class="savehint" id="saveHint">All changes saved</div>
+  <div class="publishhint" id="publishHint">Checking live publishing…</div>
+  <button class="btn" id="reloadButton">↻ Reload</button>
+  <button class="btn" id="saveButton" disabled>Save local</button>
+  <button class="btn primary" id="deployButton" disabled>Save &amp; deploy live</button>
+  <button class="btn" id="logoutButton">Log out</button>
+</header>
 <div class="workspace">
-<aside class="sidebar"><div><div class="side-label">Workspace</div><button class="navitem active">◫ &nbsp; Content studio</button><button class="navitem" id="openPreviewNav">↗ &nbsp; Open website</button></div><div class="side-divider"></div><div><div class="side-label">Your content <span id="albumCount"></span></div><div class="album-list" id="albumList"><div class="empty">Loading albums…</div></div></div><div class="sidebar-foot">FSFM STUDIO · V16.3<br>Changes are saved to your local repository only. Nothing is published automatically.</div></aside>
-<main class="editor"><div class="editor-head"><div class="eyebrow">ALBUM WORKSPACE</div><h1 id="albumHeading">Loading your album…</h1><div class="subhead" id="albumSubhead">Your content, arranged in one place.</div></div><div class="editor-body" id="editorBody"><div class="empty">Connecting to your local FSFM content…</div></div></main>
-<section class="preview"><div class="preview-head"><div><span class="preview-title">LOCAL PREVIEW</span><span class="preview-sub">Saved version</span></div><div class="spacer"></div><div class="device"><button class="active" data-size="desktop">▰</button><button data-size="tablet">▯</button><button data-size="mobile">▯</button></div><button class="btn" id="refreshPreview">↻ Refresh</button><button class="btn" id="openPreview">↗</button></div><div class="preview-frame-wrap"><iframe class="preview-frame" id="previewFrame" title="Live FSFM page preview"></iframe><div class="preview-loading" id="previewLoading">Rebuilding your preview…</div></div></section>
-</div></div><div class="toast" id="toast" role="status"></div>
+<aside class="sidebar">
+  <div>
+    <div class="side-label">Your website</div>
+    <button class="navitem active" data-special="homepage">⌂ &nbsp; Homepage</button>
+    <button class="navitem" data-special="site">⚙ &nbsp; Site settings</button>
+    <button class="navitem" data-special="wallpapers">▧ &nbsp; Wallpaper catalogue</button>
+  </div>
+  <div class="side-divider"></div>
+  <div>
+    <div class="side-label">Pages <span id="pageCount"></span></div>
+    <div class="page-list" id="pageList"><div class="empty">Loading your pages…</div></div>
+    <button class="btn add-item" id="newPageButton">＋ Create a page</button>
+  </div>
+  <div class="sidebar-foot">FSFM STUDIO · V16.4<br>All page and block edits use the real FSFM content model and renderer. Local saves never publish automatically.</div>
+</aside>
+<main class="editor">
+  <div class="editor-head">
+    <div class="eyebrow" id="editorEyebrow">WEBSITE CONTENT</div>
+    <h1 id="editorHeading">Loading your website…</h1>
+    <div class="subhead"><span id="editorSubhead">Your content, arranged in one place.</span><span class="route" id="editorRoute"></span></div>
+  </div>
+  <div class="editor-body" id="editorBody"><div class="empty">Connecting to your local FSFM content…</div></div>
+</main>
+<section class="preview">
+  <div class="preview-head">
+    <div><span class="preview-title">LOCAL PREVIEW</span><span class="preview-sub">Last saved version</span></div>
+    <div class="spacer"></div>
+    <div class="device"><button class="active" data-size="desktop">▰</button><button data-size="tablet">▯</button><button data-size="mobile">▯</button></div>
+    <button class="btn" id="refreshPreview">↻ Refresh</button>
+    <button class="btn" id="openPreview">↗</button>
+  </div>
+  <div class="preview-frame-wrap"><iframe class="preview-frame" id="previewFrame" title="FSFM local website preview"></iframe><div class="preview-loading" id="previewLoading">Rebuilding your preview…</div></div>
+</section>
+</div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<dialog class="lyrics-dialog" id="lyricsDialog" aria-labelledby="lyricsDialogTitle">
+  <div class="lyrics-head"><strong id="lyricsDialogTitle">Synced lyrics</strong><button class="btn small" id="closeLyricsButton" type="button">Close</button></div>
+  <div class="lyrics-body"><div class="helper" id="lyricsFileLabel"></div><textarea id="lyricsText" spellcheck="false" aria-label="Synced lyrics text"></textarea></div>
+  <div class="lyrics-foot"><button class="btn" id="cancelLyricsButton" type="button">Cancel</button><button class="btn primary" id="saveLyricsButton" type="button">Save lyrics locally</button></div>
+</dialog>
 <script>
 (function(){
-const $=function(s,r){return (r||document).querySelector(s)},$$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
-const S={albums:[],id:null,record:null,revision:null,dirty:false,saving:false,deploying:false,publishStatus:null,route:'/',toastTimer:null},api='/__fsfm/api',body=$('#editorBody');
-function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
-function get(o,p,d){return p.split('.').reduce(function(v,k){return v==null?undefined:v[k]},o)==null?d:p.split('.').reduce(function(v,k){return v==null?undefined:v[k]},o)}
-function set(o,p,v){var a=p.split('.'),t=o;for(var i=0;i<a.length-1;i++){if(!t[a[i]]||typeof t[a[i]]!=='object')t[a[i]]={};t=t[a[i]]}t[a[a.length-1]]=v}
-function toast(m,e){var t=$('#toast');t.textContent=m;t.classList.toggle('error',!!e);t.classList.add('show');clearTimeout(S.toastTimer);S.toastTimer=setTimeout(function(){t.classList.remove('show')},3200)}
-function updateDeployButton(){var p=S.publishStatus;$('#deployButton').disabled=S.saving||S.deploying||!p||!p.mainReady||!!(p.conflicts&&p.conflicts.length)||(!S.dirty&&!(p.pendingCount>0))}function renderPublishStatus(p){S.publishStatus=p;var hint=$('#publishHint');hint.textContent=p.reason||((p.pendingCount||0)+' saved file(s) ready to publish to main.');if(p.mainReady&&p.pendingCount===0&&!S.dirty)hint.textContent='No saved changes waiting to publish.';updateDeployButton()}async function refreshPublishStatus(){try{var res=await fetch(api+'/deploy/status');if(res.status===401){window.location='/studio/login.html';return}var data=await res.json();if(!res.ok)throw Error(data.error||'Could not check live publishing');renderPublishStatus(data)}catch(err){$('#publishHint').textContent='Live publishing status unavailable';S.publishStatus=null;updateDeployButton()}}function dirty(){S.dirty=true;$('#saveButton').disabled=false;$('#saveHint').textContent='Unsaved changes';updateDeployButton()}
-function syncHeader(){$('#albumHeading').textContent=get(S.record,'identity.name','Untitled album');$('#albumSubhead').textContent=get(S.record,'identity.route','')+' · '+(get(S.record,'templateData.player.tracks',[]).length)+' tracks'}
-function renderList(){$('#albumCount').textContent='('+S.albums.length+')';$('#albumList').innerHTML=S.albums.map(function(a){return '<button class="album-item '+(a.id===S.id?'selected':'')+'" data-album="'+esc(a.id)+'"><img class="thumb" src="'+esc(a.artwork)+'" alt="" onerror="this.style.opacity=.25"><span class="album-copy"><strong>'+esc(a.name)+'</strong><small>'+a.trackCount+' tracks · '+(a.published?'Published':'Draft')+'</small></span>'+(a.published?'<span class="pill">LIVE</span>':'')+'</button>'}).join('')||'<div class="empty">No albums found.</div>'}
-function field(label,path,value,opts){opts=opts||{};var cls='field'+(opts.full?' full':'');var readonly=opts.readonly?' readonly aria-readonly="true"':'';var input=opts.type==='textarea'?'<textarea data-path="'+path+'">'+esc(value)+'</textarea>':opts.type==='select'?'<select data-path="'+path+'">'+opts.options.map(function(x){return '<option '+(value===x?'selected':'')+' value="'+esc(x)+'">'+esc(x)+'</option>'}).join('')+'</select>':'<input data-path="'+path+'" type="text" value="'+esc(value)+'"'+readonly+'>';return '<div class="'+cls+'"><label>'+label+'</label>'+input+(opts.help?'<span class="helper">'+opts.help+'</span>':'')+'</div>'}
-function toggle(label,path,value,note){return '<div class="toggle-row"><span>'+label+(note?'<small>'+note+'</small>':'')+'</span><input class="switch" type="checkbox" data-path="'+path+'" '+(value?'checked':'')+'></div>'}
-function panel(title,note,content){return '<section class="panel"><div class="panel-head"><span class="panel-title">'+title+'</span><span class="panel-note">'+note+'</span></div>'+content+'</section>'}
-function statement(){return S.record.sections.find(function(x){return x.type==='artist-statement'})}
-function tracksMarkup(){var a=S.record.templateData.player.tracks;if(!a.length)return '<div class="empty">No tracks yet. Add the first one below.</div>';return '<div class="track-list">'+a.map(function(t,i){return '<div class="track"><div class="track-top"><span class="track-num">'+String(i+1).padStart(2,'0')+'</span><span class="track-name">'+esc(t.title||'Untitled track')+'</span><div class="track-actions"><button class="icon-btn" data-move="'+i+'" data-dir="-1" '+(i===0?'disabled':'')+'>↑</button><button class="icon-btn" data-move="'+i+'" data-dir="1" '+(i===a.length-1?'disabled':'')+'>↓</button><button class="icon-btn" data-remove="'+i+'">×</button></div></div><div class="track-grid"><div class="field full"><label>Track title</label><input data-track-path="'+i+'.title" value="'+esc(t.title)+'"></div><div class="field"><label>Audio URL</label><input data-track-path="'+i+'.audioUrl" value="'+esc(t.audioUrl||'')+'"></div><div class="field"><label>Audio file path</label><input data-track-path="'+i+'.audioFile" value="'+esc(t.audioFile||'')+'"></div><div class="field full"><label>Synced lyrics file</label><input data-track-path="'+i+'.lyricsFile" value="'+esc(t.lyricsFile||'')+'"></div></div><div class="track-bottom"><label class="checklabel"><input type="checkbox" data-track-path="'+i+'.instrumental" '+(t.instrumental?'checked':'')+'> Instrumental</label><span class="helper">'+esc(t.id||('track-'+(i+1)))+'</span></div></div>'}).join('')+'</div>'}
-function renderEditor(){var r=S.record,a=r.templateData.album,s=statement(),tracks=r.templateData.player.tracks,wall=['template-default','album-amber','vista-violet-haze','vista-aqua-glass','vista-solar-flare','vista-rose-bloom','aurora','custom','cycle'];body.innerHTML=
-panel('Identity','ALBUM + URL','<div class="fields">'+field('Album name','identity.name',get(r,'identity.name'))+field('Navigation order','identity.order',get(r,'identity.order',0))+field('URL slug','identity.slug',get(r,'identity.slug'),{readonly:true,help:'Locked because this slug determines the content filename and page URL.'})+field('Navigation label','publishing.navigationLabel',get(r,'publishing.navigationLabel'))+'</div>')+
-panel('Artwork & presentation','WHAT PEOPLE SEE FIRST','<div class="art-row"><img class="art-preview" id="artPreview" src="'+esc(a.artwork)+'" onerror="this.style.opacity=.25"><div class="art-fields">'+field('Artwork path','templateData.album.artwork',a.artwork,{full:true,help:'Repository path, e.g. /media/images/cover.png'})+field('Small release label','templateData.album.eyebrow',get(a,'eyebrow'))+'</div></div><div class="fields" style="margin-top:12px">'+field('Displayed album title','templateData.album.title',get(a,'title'))+field('Window title','templateData.album.windowTitle',get(a,'windowTitle'))+field('Artist line','templateData.album.artistLine',get(a,'artistLine'),{full:true})+'</div>')+
-panel('Artist statement','YOUR WORDS',s?field('Statement text','__statement.'+s.id,get(s,'content.body'),{type:'textarea',full:true}):'<div class="helper">No artist statement block exists.</div>')+
-panel('Music player','PLAYER SETTINGS','<div class="fields">'+field('Player window title','templateData.player.windowTitle',get(r,'templateData.player.windowTitle'))+field('Player artist name','templateData.player.artistName',get(r,'templateData.player.artistName'))+'</div><div style="margin-top:12px">'+toggle('Automatically advance tracks','templateData.player.behaviour.autoAdvance',get(r,'templateData.player.behaviour.autoAdvance',false))+toggle('Highlight the full lyric line','templateData.player.behaviour.lineWideLyricHighlight',get(r,'templateData.player.behaviour.lineWideLyricHighlight',false))+'</div>')+
-panel('Tracklist',tracks.length+' TRACKS · REORDER WITH ↑ ↓',tracksMarkup()+'<button class="btn add-track" id="addTrack">＋ Add a track</button>')+
-panel('Spotify embed','OPTIONAL EXTERNAL PLAYER','<div class="fields">'+field('Embed label','templateData.spotify.label',get(r,'templateData.spotify.label'))+field('Embed height (px)','templateData.spotify.height',get(r,'templateData.spotify.height',352))+field('Spotify embed URL','templateData.spotify.embedUrl',get(r,'templateData.spotify.embedUrl'),{full:true})+'</div>')+
-panel('Appearance','PAGE ATMOSPHERE','<div class="fields">'+field('Wallpaper style','appearance.wallpaper.choice',get(r,'appearance.wallpaper.choice','template-default'),{type:'select',options:wall})+field('Custom wallpaper path','appearance.wallpaper.customImage',get(r,'appearance.wallpaper.customImage'))+field('Image fit','appearance.wallpaper.customFit',get(r,'appearance.wallpaper.customFit','cover'),{type:'select',options:['cover','contain']})+field('Image position','appearance.wallpaper.customPosition',get(r,'appearance.wallpaper.customPosition','center'),{type:'select',options:['center','top','bottom','left','right']})+'</div><div style="margin-top:12px">'+toggle('Background effects','appearance.effects.backgroundEffects',get(r,'appearance.effects.backgroundEffects',false))+toggle('Page transition','appearance.effects.pageTransition',get(r,'appearance.effects.pageTransition',false))+toggle('Respect reduced motion','appearance.effects.respectReducedMotion',get(r,'appearance.effects.respectReducedMotion',true))+'</div>')+
-panel('Publishing & search','LOCAL CONTENT SETTINGS','<div>'+toggle('Published','publishing.published',get(r,'publishing.published',false),'Controls production build visibility.')+toggle('Show in navigation','publishing.showInNavigation',get(r,'publishing.showInNavigation',false))+toggle('Allow search indexing','seo.allowIndexing',get(r,'seo.allowIndexing',false))+'</div><div class="fields" style="margin-top:12px">'+field('SEO title','seo.title',get(r,'seo.title'))+field('Canonical URL','seo.canonical',get(r,'seo.canonical'))+field('Search description','seo.description',get(r,'seo.description'),{type:'textarea',full:true})+field('Social image path','seo.socialImage',get(r,'seo.socialImage'),{full:true})+'</div>')+
-'<div class="helper" style="text-align:center">Save local keeps your work on this computer. Save &amp; deploy live publishes only Studio-saved content files after production checks pass.</div>';syncHeader()}
-async function loadAlbums(){var res=await fetch(api+'/albums');if(!res.ok)throw Error('Could not load album list');var data=await res.json();S.albums=data.albums||[];renderList();if(S.albums.length&&!S.id)await loadAlbum(S.albums[0].id)}
-async function loadAlbum(id){var res=await fetch(api+'/albums/'+encodeURIComponent(id)),data=await res.json();if(!res.ok)throw Error(data.error||'Could not load album');S.id=id;S.record=data.record;S.revision=data.revision;S.dirty=false;$('#saveButton').disabled=true;$('#saveHint').textContent='All changes saved';S.route=data.record.identity.route||'/';renderList();renderEditor();loadPreview();updateDeployButton()}
-function loadPreview(){$('#previewFrame').src=S.route+(S.route.indexOf('?')<0?'?':'&')+'studioPreview='+Date.now()}
-function applyChange(e){var p=e.dataset.path,v=e.type==='checkbox'?e.checked:e.value;if(p){if(p==='identity.order'||p==='templateData.spotify.height')v=Number(v);if(p.indexOf('__statement.')===0){var id=p.slice(12),st=S.record.sections.find(function(x){return x.id===id});if(st)st.content.body=v}else set(S.record,p,v);if(p==='identity.name')syncHeader();if(p==='templateData.album.artwork')$('#artPreview').src=v}if(e.dataset.trackPath){var bits=e.dataset.trackPath.split('.'),tr=S.record.templateData.player.tracks[Number(bits[0])];tr[bits[1]]=e.type==='checkbox'?e.checked:e.value;if(bits[1]==='title')$('.track-name',e.closest('.track')).textContent=e.value;syncHeader()}dirty()}
-async function save(){if(!S.dirty||S.saving)return false;S.saving=true;$('#saveButton').disabled=true;$('#deployButton').disabled=true;$('#saveButton').textContent='Saving…';$('#saveHint').textContent='Writing local file…';try{var res=await fetch(api+'/albums/'+encodeURIComponent(S.id),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({revision:S.revision,record:S.record})});if(res.status===401){window.location='/studio/login.html';return false}var data=await res.json();if(res.status===409)throw Error(data.error+' Reload before trying again.');if(!res.ok)throw Error(data.error||'Save failed');S.revision=data.revision;S.dirty=false;$('#saveHint').textContent='Saved locally';toast('Saved locally. Rebuilding page preview…');$('#previewLoading').classList.add('show');setTimeout(function(){loadPreview();$('#previewLoading').classList.remove('show')},1200);await loadAlbums();await refreshPublishStatus();return true}catch(err){toast(err.message,true);$('#saveHint').textContent='Save needs attention';return false}finally{S.saving=false;$('#saveButton').textContent='Save local';$('#saveButton').disabled=!S.dirty;updateDeployButton()}}
-async function deployLive(){if(S.deploying||S.saving)return;if(!S.publishStatus||!S.publishStatus.mainReady){toast(S.publishStatus&&S.publishStatus.reason?S.publishStatus.reason:'Live publishing is not ready.',true);return}if(!S.dirty&&!(S.publishStatus.pendingCount>0)){toast('Save a local change before publishing.',true);return}if(!confirm('Publish your saved FSFM content to the live website? Studio will create one commit on main. GitHub Actions will run the production checks and deploy only if they pass.'))return;if(S.dirty){var saved=await save();if(!saved||S.dirty)return}S.deploying=true;$('#deployButton').textContent='Publishing…';$('#saveHint').textContent='Preparing production build…';updateDeployButton();try{var res=await fetch(api+'/deploy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({confirmation:'PUBLISH FSFM LIVE'})});if(res.status===401){window.location='/studio/login.html';return}var data=await res.json();if(!res.ok)throw Error(data.error||'Live publishing failed');$('#saveHint').textContent=data.noChanges?'Already up to date':'Sent to GitHub';toast(data.message||'Publication request completed.');if(data.actionsUrl){var hint=$('#publishHint');hint.textContent='Pushed to main · ';var link=document.createElement('a');link.href=data.actionsUrl;link.target='_blank';link.rel='noopener';link.textContent='View GitHub Actions';hint.appendChild(link)}await refreshPublishStatus()}catch(err){toast(err.message,true);$('#saveHint').textContent='Live publishing needs attention'}finally{S.deploying=false;$('#deployButton').textContent='Save & deploy live';updateDeployButton()}}
-body.addEventListener('input',function(e){if(e.target.matches('[data-path],[data-track-path]'))applyChange(e.target)});
-body.addEventListener('change',function(e){if(e.target.matches('[data-path],[data-track-path]'))applyChange(e.target)});
-body.addEventListener('click',function(e){var m=e.target.closest('[data-move]'),x=e.target.closest('[data-remove]');if(m){var a=S.record.templateData.player.tracks,i=Number(m.dataset.move),j=i+Number(m.dataset.dir);if(j>=0&&j<a.length){var tmp=a[i];a[i]=a[j];a[j]=tmp;renderEditor();dirty()}}if(x){var k=Number(x.dataset.remove),t=S.record.templateData.player.tracks[k];if(confirm('Remove '+(t.title||'this track')+'?')){S.record.templateData.player.tracks.splice(k,1);renderEditor();dirty()}}if(e.target.closest('#addTrack')){var a=S.record.templateData.player.tracks,used={};a.forEach(function(t){var match=/^track-(\\d+)$/.exec(t.id||'');if(match)used[Number(match[1])]=true});var n=1;while(used[n])n++;a.push({id:'track-'+String(n).padStart(2,'0'),title:'New track',audioUrl:'',audioFile:'',lyricsFile:'',instrumental:false});renderEditor();dirty()}});
-$('#albumList').addEventListener('click',async function(e){var b=e.target.closest('[data-album]');if(!b||b.dataset.album===S.id)return;if(S.dirty&&!confirm('Discard unsaved changes and open another album?'))return;try{await loadAlbum(b.dataset.album)}catch(err){toast(err.message,true)}});
-$('#saveButton').addEventListener('click',save);$('#deployButton').addEventListener('click',deployLive);$('#logoutButton').addEventListener('click',async function(){try{await fetch(api+'/auth/logout',{method:'POST'});window.location='/studio/login.html'}catch(e){toast('Could not sign out. Try again.',true)}});$('#reloadButton').addEventListener('click',async function(){if(S.dirty&&!confirm('Discard unsaved changes and reload this album?'))return;try{await loadAlbum(S.id);toast('Reloaded from local files')}catch(e){toast(e.message,true)}});
-$('#refreshPreview').addEventListener('click',function(){loadPreview();toast('Preview refreshed')});$('#openPreview').addEventListener('click',function(){window.open(S.route,'_blank','noopener')});$('#openPreviewNav').addEventListener('click',function(){window.open('/','_blank','noopener')});
-$$('[data-size]').forEach(function(b){b.addEventListener('click',function(){var w={desktop:'100%',tablet:'768px',mobile:'390px'}[b.dataset.size],f=$('#previewFrame');f.style.width=w;f.style.maxWidth='100%';f.style.margin=b.dataset.size==='desktop'?'0':'0 auto';$$('[data-size]').forEach(function(x){x.classList.toggle('active',x===b)})})});
-window.addEventListener('beforeunload',function(e){if(S.dirty){e.preventDefault();e.returnValue=''}});
-fetch(api+'/health').then(function(r){if(!r.ok)throw Error('Local server unavailable');return r.json()}).then(loadAlbums).then(refreshPublishStatus).catch(function(e){body.innerHTML='<div class="empty">'+esc(e.message)+'<br>Make sure your V16 server is running, then reload.</div>';toast(e.message,true)});
+'use strict';
+const $=(s,r)=> (r||document).querySelector(s);
+const $$=(s,r)=> Array.from((r||document).querySelectorAll(s));
+const api='/__fsfm/api';
+const S={items:[],catalog:null,key:null,resource:null,record:null,revision:null,dirty:false,saving:false,deploying:false,publishStatus:null,route:'/',toastTimer:null};
+const body=$('#editorBody');
+const COMPONENT_LABELS={
+'site-header':'Site header','hero':'Hero','marquee':'Marquee','artist-statement':'Artist statement',
+'embed-window':'Embed window','bandsintown-events':'Bandsintown events','social-links':'Social links',
+'featured-release':'Featured release','rich-text':'Rich text','image':'Image','gallery':'Image gallery',
+'quote':'Quote','link-button':'Link or button','divider':'Divider','spacer':'Spacer',
+'album-header':'Album header','album-player':'FSFM media player','spotify-embed':'Spotify album embed'
+};
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function human(v){return String(v).replace(/([a-z0-9])([A-Z])/g,'$1 $2').replace(/[-_]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());}
+function get(o,p,d){const v=p.split('.').reduce((x,k)=>x==null?undefined:x[k],o);return v==null?d:v;}
+function set(o,p,v){const bits=p.split('.');let target=o;for(let i=0;i<bits.length-1;i++){const k=bits[i];if(!target[k]||typeof target[k]!=='object')target[k]={};target=target[k];}target[bits[bits.length-1]]=v;}
+function toast(message,error=false){const t=$('#toast');t.textContent=message;t.classList.toggle('error',error);t.classList.add('show');clearTimeout(S.toastTimer);S.toastTimer=setTimeout(()=>t.classList.remove('show'),4200);}
+function dirty(){S.dirty=true;$('#saveButton').disabled=false;$('#saveHint').textContent='Unsaved changes';updateDeployButton();}
+function updateDeployButton(){const p=S.publishStatus;$('#deployButton').disabled=S.saving||S.deploying||!p||!p.mainReady||!!(p.conflicts&&p.conflicts.length)||(!S.dirty&&!(p.pendingCount>0));}
+function renderPublishStatus(p){S.publishStatus=p;const hint=$('#publishHint');hint.textContent=p.reason||((p.pendingCount||0)+' saved file(s) ready to publish to main.');if(p.mainReady&&p.pendingCount===0&&!S.dirty)hint.textContent='No saved changes waiting to publish.';updateDeployButton();}
+async function refreshPublishStatus(){try{const res=await fetch(api+'/deploy/status');if(res.status===401){location.href='/studio/login.html';return;}const data=await res.json();if(!res.ok)throw Error(data.error||'Could not check live publishing');renderPublishStatus(data);}catch(error){$('#publishHint').textContent='Live publishing status unavailable';S.publishStatus=null;updateDeployButton();}}
+function setHeader(eyebrow,title,sub,route=''){ $('#editorEyebrow').textContent=eyebrow;$('#editorHeading').textContent=title;$('#editorSubhead').textContent=sub||'';$('#editorRoute').textContent=route; }
+function iconFor(template){return template==='homepage'?'⌂':template==='album'?'♫':template==='vista-window'?'▣':'¶';}
+function renderPageList(){
+ const pages=S.items.filter(x=>x.template!=='homepage');
+ $('#pageCount').textContent='('+pages.length+')';
+ const groups=[['album','Albums'],['vista-window','Vista pages'],['editorial','Editorial pages']];
+ let html='';
+ for(const [template,label] of groups){
+   const entries=pages.filter(x=>x.template===template);
+   html+='<div class="side-label" style="padding:8px 8px 2px">'+label+'</div>';
+   html+=entries.map(item=>'<button class="page-item '+(S.key===item.key?'selected':'')+'" data-key="'+esc(item.key)+'"><span class="page-icon">'+iconFor(item.template)+'</span><span class="page-copy"><strong>'+esc(item.name)+'</strong><small>'+esc(item.route)+'</small></span><span class="status-dot '+(item.published?'live':'')+'" title="'+(item.published?'Published':'Draft')+'"></span></button>').join('');
+   if(!entries.length)html+='<div class="helper" style="padding:4px 9px">No '+label.toLowerCase()+' yet.</div>';
+ }
+ $('#pageList').innerHTML=html;
+ $$('[data-special]').forEach(button=>button.classList.toggle('active',button.dataset.special===S.key));
+}
+function resourceUrl(key){return api+'/content/'+key.split('/').map(encodeURIComponent).join('/');}
+function routeForKey(key){const item=S.items.find(x=>x.key===key);return item?.route||'/';}
+function componentMeta(type){return S.catalog?.components?.[type]||{};}
+function templateMeta(){return S.catalog?.templates?.[S.record?.template]||{};}
+function componentAllowed(type){return (templateMeta().allowedComponentTypes||[]).includes(type);}
+function componentCount(type){return (S.record?.sections||[]).filter(x=>x.type===type).length;}
+function isRequiredComponent(type){return Number(templateMeta().requiredComponents?.[type]||0)>0;}
+function maxComponents(type){return templateMeta().maximumComponents?.[type]||(componentMeta(type).singleton?1:Infinity);}
+function defaultComponent(type){
+ const base={id:type+'-'+Math.random().toString(36).slice(2,8),type,enabled:true,presentation:{variant:S.record.template==='homepage'?'vista-window':S.record.template==='album'?'amber-editorial':S.record.template==='editorial'?'editorial':'vista-window'},content:{}};
+ const data={
+ 'site-header':{name:'Fake Space Fog Machine',handle:'@mirrorlesssmoke',logo:''},
+ hero:{eyebrow:'',title:'New heading',subtitle:'',image:'',imageAlt:'',linkText:'',linkUrl:''},
+ marquee:{messages:['NEW MESSAGE']},
+ 'artist-statement':{body:'Write your statement here.'},
+ 'embed-window':{provider:'spotify',url:'https://open.spotify.com/embed/',title:'External media embed',height:352},
+ 'bandsintown-events':{artistName:'',appId:'',displayDetails:true,displayLineup:true,displayStartTime:true,displayLocalDates:true,localDatesPosition:'tab',font:'Segoe UI',followSectionPosition:'hidden',followSectionAlignment:'center',followSectionCtaText:'FOLLOW',eventRsvpPosition:'hidden',eventRsvpOnlyShowIcon:true,playMyCityPosition:'bottom',playMyCityAlignment:'center',playMyCityCtaIcon:true},
+ 'social-links':{links:[{label:'Instagram',url:'https://instagram.com/'}]},
+ 'featured-release':{title:'New release',description:'',artwork:'',artworkAlt:'',url:'https://',linkText:'Listen'},
+ 'rich-text':{heading:'',body:'Write your text here.'},
+ image:{src:'/media/images/',alt:'',caption:''},
+ gallery:{images:['/media/images/'],altText:'Gallery image',caption:''},
+ quote:{text:'Add a quotation.',attribution:''},
+ 'link-button':{label:'Learn more',url:'/',style:'primary'},
+ divider:{style:'solid'},spacer:{size:32},
+ 'album-header':{source:'templateData.album'},
+ 'album-player':{source:'templateData.player'},
+ 'spotify-embed':{source:'templateData.spotify'}
+ };
+ base.content=data[type]||{};
+ if(S.record.template==='homepage'&&type!=='marquee')base.presentation.windowTitle=COMPONENT_LABELS[type]||human(type);
+ return base;
+}
+function defaultArrayItem(path,array){
+ const key=path.split('.').pop();
+ if(key==='links')return {label:'New link',url:'https://'};
+ if(key==='dates')return {title:'New date',date:''};
+ if(key==='tracks'){
+   const used=new Set(array.map(x=>Number(String(x?.id||'').replace('track-',''))).filter(Number.isFinite));
+   let i=1;while(used.has(i))i++;
+   return {id:'track-'+String(i).padStart(2,'0'),title:'New track',audioUrl:'',audioFile:'',lyricsFile:'',instrumental:false};
+ }
+ if(key==='presets'&&array[0]&&typeof array[0]==='object')return {...JSON.parse(JSON.stringify(array[0])),id:'new-wallpaper-'+(array.length+1),name:'New wallpaper preset'};
+ if(key==='presets')return 'vista-violet-haze';
+ if(key==='images'||key==='photos'||key==='messages')return key==='messages'?'NEW MESSAGE':'/media/images/';
+ if(array.length&&array[0]&&typeof array[0]==='object')return JSON.parse(JSON.stringify(array[0]));
+ if(array.length&&typeof array[0]==='number')return 0;
+ if(array.length&&typeof array[0]==='boolean')return false;
+ return '';
+}
+function valueEditor(value,path,label,depth=0,options={}){
+ const key=path.split('.').pop();
+ if(Array.isArray(value)){
+   const items=value.map((item,index)=>{
+     const itemPath=path+'.'+index;
+     let inner;
+     if(item&&typeof item==='object')inner=valueEditor(item,itemPath, label+' '+(index+1),depth+1);
+     else inner=primitiveEditor(item,itemPath,label+' '+(index+1),depth+1);
+     const lyricTool=path==='templateData.player.tracks'&&item&&typeof item==='object'&&item.lyricsFile?'<button class="btn small" data-edit-lyrics="'+index+'">♫ Edit synced lyrics</button>':'';
+     return '<div class="array-item"><div class="array-item-head"><span>'+esc(label)+' '+(index+1)+'</span><div class="array-item-controls"><button class="mini" data-remove-array="'+esc(path)+'" data-index="'+index+'" title="Remove item">×</button></div></div>'+inner+lyricTool+'</div>';
+   }).join('');
+   return '<div class="array-box"><div class="array-head"><strong>'+esc(label)+' · '+value.length+'</strong><span class="helper">Ordered list</span></div>'+items+'<button class="btn add-item" data-add-array="'+esc(path)+'">＋ Add '+esc(label.replace(/s$/,''))+'</button></div>';
+ }
+ if(value&&typeof value==='object'){
+   const keys=Object.keys(value);
+   if(!keys.length)return '<div class="helper">No settings have been added to '+esc(label.toLowerCase())+' yet.</div>';
+   const inside=keys.map(k=>{
+     if(options.hide?.includes(k))return '';
+     const v=value[k],p=path+'.'+k,l=human(k);
+     return valueEditor(v,p,l,depth+1);
+   }).join('');
+   return '<details class="json-object depth-'+Math.min(depth,2)+'" open><summary>'+esc(label)+'</summary><div class="json-object-inner">'+inside+'</div></details>';
+ }
+ return primitiveEditor(value,path,label,depth);
+}
+function primitiveEditor(value,path,label,depth=0){
+ const type=typeof value;
+ if(type==='boolean')return '<div class="toggle-field"><label>'+esc(label)+'</label><input class="switch" type="checkbox" data-path="'+esc(path)+'" '+(value?'checked':'')+'></div>';
+ if(type==='number')return '<div class="field"><label>'+esc(label)+'</label><input type="number" step="any" data-path="'+esc(path)+'" value="'+esc(value)+'"></div>';
+ const long=String(value??'').length>100||/(body|description|sticky|caption|message|subtitle|footerText|shutdown)/i.test(path.split('.').pop());
+ const control=long?'<textarea data-path="'+esc(path)+'">'+esc(value??'')+'</textarea>':'<input type="text" data-path="'+esc(path)+'" value="'+esc(value??'')+'">';
+ return '<div class="field"><label>'+esc(label)+'</label>'+control+'</div>';
+}
+function pageFields(){
+ const r=S.record;
+ const identity=Object.assign({},r.identity||{});
+ delete identity.slug;delete identity.route;
+ return '<section class="panel"><div class="panel-head"><span class="panel-title">Page identity</span><span class="panel-note">NAME · ORDER · URL</span></div>'+valueEditor(identity,'identity','Identity')+'<div class="field" style="margin-top:8px"><label>URL slug · fixed after creation</label><input readonly value="'+esc(r.identity?.slug||'home')+'"><span class="helper">The slug determines the filename and public route. Create a new page to use a different URL.</span></div></section>'+
+ '<section class="panel"><div class="panel-head"><span class="panel-title">Publishing</span><span class="panel-note">VISIBILITY</span></div>'+valueEditor(r.publishing||{},'publishing','Publishing')+'</section>'+
+ '<section class="panel"><div class="panel-head"><span class="panel-title">Appearance</span><span class="panel-note">WALLPAPER · EFFECTS</span></div>'+valueEditor(r.appearance||{},'appearance','Appearance')+'</section>'+
+ '<section class="panel"><div class="panel-head"><span class="panel-title">Search &amp; social preview</span><span class="panel-note">SEO</span></div>'+valueEditor(r.seo||{},'seo','SEO')+'</section>';
+}
+function renderSections(){
+ const sections=S.record.sections||[];
+ const blocks=sections.map((section,index)=>{
+   const required=isRequiredComponent(section.type);
+   const meta=componentMeta(section.type);
+   const move='<button class="mini" data-move-section="'+index+'" data-dir="-1" '+(index===0?'disabled':'')+'>↑</button><button class="mini" data-move-section="'+index+'" data-dir="1" '+(index===sections.length-1?'disabled':'')+'>↓</button>';
+   const remove=required?'<button class="mini" disabled title="Required component">×</button>':'<button class="mini" data-remove-section="'+index+'" title="Remove block">×</button>';
+   const content=valueEditor(section.content||{},'sections.'+index+'.content','Content');
+   const presentation=valueEditor(section.presentation||{variant:'',windowTitle:''},'sections.'+index+'.presentation','Presentation');
+   const group=valueEditor(section.group||{id:'',layout:'grid',columns:2},'sections.'+index+'.group','Layout group');
+   return '<details class="section-card" open><summary><span class="section-title">'+esc(COMPONENT_LABELS[section.type]||human(section.type))+'</span><span class="section-pill">'+esc(section.type)+'</span><span class="section-meta">'+(section.enabled?'Enabled':'Disabled')+'</span><div class="section-actions">'+move+remove+'</div></summary><div class="section-body"><div class="section-tools"><span class="helper">Block ID: '+esc(section.id)+'</span><div class="toggle-field" style="padding:4px 7px;min-height:28px"><label>Enabled</label><input class="switch" type="checkbox" data-path="sections.'+index+'.enabled" '+(section.enabled?'checked':'')+'></div></div>'+presentation+group+content+'</div></details>';
+ }).join('');
+ const allowed=(templateMeta().allowedComponentTypes||[]).filter(type=>componentCount(type)<maxComponents(type));
+ const options=allowed.map(type=>'<option value="'+esc(type)+'">'+esc(COMPONENT_LABELS[type]||human(type))+'</option>').join('');
+ return '<section class="panel"><div class="panel-head"><span class="panel-title">Page building blocks</span><span class="panel-note">'+sections.length+' BLOCKS · ORDERED</span></div><p class="panel-desc">Every block can be enabled, rearranged and configured. The fields below come directly from the FSFM renderer’s content model.</p>'+blocks+(options?'<div class="add-component"><select id="newComponentType"><option value="">Choose a building block…</option>'+options+'</select><button class="btn primary" id="addComponentButton">＋ Add block</button></div>':'<div class="helper">All available blocks are already added or are reserved for this page type.</div>')+'</section>';
+}
+function renderPageEditor(){
+ const template=S.record.template;
+ const templateName=templateMeta().label||human(template);
+ const isHome=template==='homepage';
+ const summary=isHome?'Your desktop, homepage gadgets, hero and content windows.':S.record.identity?.name||'Untitled page';
+ setHeader(templateName.toUpperCase()+' WORKSPACE',summary,templateName+' · '+(S.record.sections||[]).length+' building blocks',S.route);
+ body.innerHTML=pageFields()+
+ '<section class="panel"><div class="panel-head"><span class="panel-title">'+(isHome?'Homepage desktop &amp; gadgets':template==='album'?'Album &amp; player settings':'Template settings')+'</span><span class="panel-note">TEMPLATE DATA</span></div><p class="panel-desc">'+(isHome?'Every configurable part of the custom desktop is editable here, including gadgets, labels, featured release, photos, important dates, radio and shutdown behaviour.':'These are the template-specific settings used by the real FSFM page renderer.')+'</p>'+valueEditor(S.record.templateData||{},'templateData','Template data')+'</section>'+
+ renderSections();
+}
+function renderGlobalEditor(){
+ if(S.key==='site'){
+   setHeader('GLOBAL SETTINGS','Site settings','Identity, default metadata, social profiles and global footer.','GLOBAL');
+   body.innerHTML='<section class="panel"><div class="panel-head"><span class="panel-title">Site-wide configuration</span><span class="panel-note">SITE.JSON</span></div>'+valueEditor(S.record,'ROOT','Site settings')+'</section>';
+ }else{
+   setHeader('DESIGN ASSETS','Wallpaper catalogue','Every preset, image URL and colour palette.','WALLPAPERS');
+   body.innerHTML='<section class="panel"><div class="panel-head"><span class="panel-title">Wallpaper presets</span><span class="panel-note">'+(S.record.presets||[]).length+' PRESETS</span></div><p class="panel-desc">Edit preset names, remote image sources, families and individual palette values. Page wallpaper settings are edited on the page itself.</p>'+valueEditor(S.record,'ROOT','Wallpaper catalogue')+'</section>';
+ }
+}
+function renderEditor(){
+ if(!S.record)return;
+ if(S.key==='site'||S.key==='wallpapers')renderGlobalEditor();
+ else renderPageEditor();
+ renderPageList();
+}
+async function loadIndex(){
+ const [index,catalog]=await Promise.all([fetch(api+'/content'),fetch(api+'/catalog')]);
+ if(index.status===401||catalog.status===401){location.href='/studio/login.html';return;}
+ if(!index.ok||!catalog.ok)throw Error('Could not load the FSFM content catalogue.');
+ S.items=(await index.json()).items||[];
+ S.catalog=await catalog.json();
+ renderPageList();
+ if(!S.key)await loadRecord('homepage');
+}
+async function loadRecord(key){
+ const response=await fetch(resourceUrl(key));
+ const data=await response.json();
+ if(response.status===401){location.href='/studio/login.html';return;}
+ if(!response.ok)throw Error(data.error||'Could not load this content record.');
+ S.key=key;S.record=data.record;S.revision=data.revision;
+ S.resource=key==='site'?'site':key==='wallpapers'?'wallpapers':'page';
+ S.dirty=false;$('#saveButton').disabled=true;$('#saveHint').textContent='All changes saved';
+ S.route=S.resource==='page'?routeForKey(key):'/';
+ renderEditor();loadPreview();updateDeployButton();
+}
+function loadPreview(){
+ const frame=$('#previewFrame');
+ const path=S.route||'/';
+ frame.src=path+(path.includes('?')?'&':'?')+'studioPreview='+Date.now();
+}
+function saveUrl(){return resourceUrl(S.key);}
+async function saveLocal(){
+ if(!S.dirty||S.saving)return false;
+ S.saving=true;$('#saveButton').disabled=true;$('#deployButton').disabled=true;$('#saveButton').textContent='Saving…';$('#saveHint').textContent='Checking content…';
+ try{
+   const response=await fetch(saveUrl(),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({revision:S.revision,record:S.record})});
+   if(response.status===401){location.href='/studio/login.html';return false;}
+   const data=await response.json();
+   if(response.status===409)throw Error(data.error+' Reload before trying again.');
+   if(!response.ok)throw Error(data.error||'Local save failed.');
+   S.record=data.record||S.record;S.revision=data.revision;S.dirty=false;
+   $('#saveHint').textContent='Saved locally';toast('Saved locally. Rebuilding the FSFM preview…');
+   $('#previewLoading').classList.add('show');
+   setTimeout(()=>{$('#previewLoading').classList.remove('show');loadPreview();},1100);
+   const index=await fetch(api+'/content');if(index.ok)S.items=(await index.json()).items||[];
+   renderEditor();await refreshPublishStatus();return true;
+ }catch(error){toast(error.message,true);$('#saveHint').textContent='Save needs attention';return false;}
+ finally{S.saving=false;$('#saveButton').textContent='Save local';$('#saveButton').disabled=!S.dirty;updateDeployButton();}
+}
+async function deployLive(){
+ if(S.deploying||S.saving)return;
+ if(!S.publishStatus||!S.publishStatus.mainReady){toast(S.publishStatus?.reason||'Live publishing is not ready.',true);return;}
+ if(!S.dirty&&!(S.publishStatus.pendingCount>0)){toast('Save a local change before publishing.',true);return;}
+ if(!confirm('Publish your saved FSFM content to the live website? Studio will create one commit on main. GitHub Actions will run the production checks and deploy only if they pass.'))return;
+ if(S.dirty){const saved=await saveLocal();if(!saved||S.dirty)return;}
+ S.deploying=true;$('#deployButton').textContent='Publishing…';$('#saveHint').textContent='Preparing production build…';updateDeployButton();
+ try{
+   const response=await fetch(api+'/deploy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({confirmation:'PUBLISH FSFM LIVE'})});
+   if(response.status===401){location.href='/studio/login.html';return;}
+   const data=await response.json();if(!response.ok)throw Error(data.error||'Live publishing failed.');
+   $('#saveHint').textContent=data.noChanges?'Already up to date':'Sent to GitHub';toast(data.message||'Publication request completed.');
+   if(data.actionsUrl){const hint=$('#publishHint');hint.textContent='Pushed to main · ';const link=document.createElement('a');link.href=data.actionsUrl;link.target='_blank';link.rel='noopener';link.textContent='View GitHub Actions';hint.appendChild(link);}
+   await refreshPublishStatus();
+ }catch(error){toast(error.message,true);$('#saveHint').textContent='Live publishing needs attention';}
+ finally{S.deploying=false;$('#deployButton').textContent='Save & deploy live';updateDeployButton();}
+}
+function defaultKeyForType(type){
+ const page=S.record;
+ const base=(page.template==='homepage'?'home':page.identity.slug);
+ return base+'-'+type.replace(/[^a-z0-9]+/gi,'-')+'-'+String((page.sections||[]).length+1);
+}
+function addComponent(){
+ const select=$('#newComponentType');const type=select?.value;
+ if(!type||!componentAllowed(type))return;
+ if(componentCount(type)>=maxComponents(type)){toast('This page already has the maximum number of that block.',true);return;}
+ const block=defaultComponent(type);block.id=defaultKeyForType(type);
+ S.record.sections=S.record.sections||[];S.record.sections.push(block);dirty();renderEditor();
+}
+function actualPath(path){return path.indexOf('ROOT.')===0?path.slice(5):path;}
+function addArrayItem(path){
+ const target=actualPath(path),array=get(S.record,target,[]);
+ if(!Array.isArray(array))return;
+ array.push(defaultArrayItem(target,array));dirty();renderEditor();
+}
+function changePath(path,element){
+ let value;
+ if(element.type==='checkbox')value=element.checked;
+ else if(element.type==='number')value=element.value===''?0:Number(element.value);
+ else value=element.value;
+ set(S.record,actualPath(path),value);
+ dirty();
+}
+function removeArrayItem(path,index){
+ const array=get(S.record,actualPath(path),[]);
+ if(!Array.isArray(array)||index<0||index>=array.length)return;
+ array.splice(index,1);dirty();renderEditor();
+}
+function removeSection(index){
+ const section=S.record.sections[index];
+ if(!section||isRequiredComponent(section.type)){toast('This component is required by the page template.',true);return;}
+ if(!confirm('Remove '+(COMPONENT_LABELS[section.type]||section.type)+' from this page?'))return;
+ S.record.sections.splice(index,1);dirty();renderEditor();
+}
+function moveSection(index,direction){
+ const target=index+direction,sections=S.record.sections;
+ if(target<0||target>=sections.length)return;
+ [sections[index],sections[target]]=[sections[target],sections[index]];dirty();renderEditor();
+}
+async function createPage(){
+ const template=prompt('Create which page type? Enter album, vista-window or editorial.','editorial');
+ if(!template)return;
+ if(!['album','vista-window','editorial'].includes(template)){toast('Choose album, vista-window or editorial.',true);return;}
+ const name=prompt('What should the page be called?','New '+(template==='album'?'Album':template==='vista-window'?'Vista Page':'Editorial Page'));
+ if(!name||!name.trim())return;
+ const slug=prompt('URL slug (lowercase letters, numbers and hyphens). Leave blank to generate it from the name.','');
+ try{
+   const response=await fetch(api+'/content/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({template,name,slug:slug||undefined})});
+   const data=await response.json();if(!response.ok)throw Error(data.error||'Could not create page.');
+   toast('Created a draft '+template+' page.');await loadIndex();await loadRecord(data.key);await refreshPublishStatus();
+ }catch(error){toast(error.message,true);}
+}
+
+let activeLyrics={file:'',revision:''};
+async function openLyricsEditor(index){
+ const track=get(S.record,'templateData.player.tracks.'+index,null);
+ if(!track||typeof track.lyricsFile!=='string'||!track.lyricsFile.startsWith('lyrics/')){
+   toast('This track does not point to a lyrics file inside the lyrics folder.',true);return;
+ }
+ const filename=track.lyricsFile.slice('lyrics/'.length);
+ if(!/^[a-z0-9]+(?:-[a-z0-9]+)*\.lrc$/.test(filename)){
+   toast('This lyrics file path is not supported by Studio.',true);return;
+ }
+ try{
+   const response=await fetch(api+'/lyrics/'+encodeURIComponent(filename));
+   const data=await response.json();if(!response.ok)throw Error(data.error||'Could not open lyrics.');
+   activeLyrics={file:filename,revision:data.revision};
+   $('#lyricsDialogTitle').textContent=track.title||'Synced lyrics';
+   $('#lyricsFileLabel').textContent=data.file+' · LRC timestamped text';
+   $('#lyricsText').value=data.content;
+   $('#saveLyricsButton').disabled=false;$('#saveLyricsButton').textContent='Save lyrics locally';
+   $('#lyricsDialog').showModal();
+ }catch(error){toast(error.message,true);}
+}
+async function saveLyrics(){
+ if(!activeLyrics.file)return;
+ $('#saveLyricsButton').disabled=true;$('#saveLyricsButton').textContent='Saving…';
+ try{
+   const response=await fetch(api+'/lyrics/'+encodeURIComponent(activeLyrics.file),{
+     method:'PUT',headers:{'Content-Type':'application/json'},
+     body:JSON.stringify({revision:activeLyrics.revision,content:$('#lyricsText').value})
+   });
+   const data=await response.json();if(!response.ok)throw Error(data.error||'Could not save lyrics.');
+   activeLyrics.revision=data.revision;$('#lyricsDialog').close();
+   toast('Synced lyrics saved locally.');await refreshPublishStatus();
+ }catch(error){toast(error.message,true);}
+ finally{$('#saveLyricsButton').disabled=false;$('#saveLyricsButton').textContent='Save lyrics locally';}
+}
+function bindEvents(){
+ body.addEventListener('input',event=>{
+   const field=event.target.closest('[data-path]');
+   if(field)changePath(field.dataset.path,field);
+ });
+ body.addEventListener('change',event=>{
+   const field=event.target.closest('[data-path]');
+   if(field)changePath(field.dataset.path,field);
+ });
+ body.addEventListener('click',event=>{
+   const add=event.target.closest('[data-add-array]');
+   const remove=event.target.closest('[data-remove-array]');
+   const removeBlock=event.target.closest('[data-remove-section]');
+   const move=event.target.closest('[data-move-section]');
+   const lyrics=event.target.closest('[data-edit-lyrics]');
+   if(lyrics){openLyricsEditor(Number(lyrics.dataset.editLyrics));return;}
+   if(add){addArrayItem(add.dataset.addArray);return;}
+   if(remove){removeArrayItem(remove.dataset.removeArray,Number(remove.dataset.index));return;}
+   if(removeBlock){removeSection(Number(removeBlock.dataset.removeSection));return;}
+   if(move){moveSection(Number(move.dataset.moveSection),Number(move.dataset.dir));return;}
+   if(event.target.closest('#addComponentButton')){addComponent();return;}
+ });
+ $('#pageList').addEventListener('click',async event=>{
+   const item=event.target.closest('[data-key]');if(!item||item.dataset.key===S.key)return;
+   if(S.dirty&&!confirm('Discard unsaved changes and open another page?'))return;
+   try{await loadRecord(item.dataset.key);}catch(error){toast(error.message,true);}
+ });
+ $$('[data-special]').forEach(button=>button.addEventListener('click',async()=>{
+   const key=button.dataset.special;if(key===S.key)return;
+   if(S.dirty&&!confirm('Discard unsaved changes and open another workspace?'))return;
+   try{await loadRecord(key);}catch(error){toast(error.message,true);}
+ }));
+ $('#saveLyricsButton').addEventListener('click',saveLyrics);
+ $('#closeLyricsButton').addEventListener('click',()=>$('#lyricsDialog').close());
+ $('#cancelLyricsButton').addEventListener('click',()=>$('#lyricsDialog').close());
+ $('#saveButton').addEventListener('click',saveLocal);
+ $('#deployButton').addEventListener('click',deployLive);
+ $('#newPageButton').addEventListener('click',createPage);
+ $('#logoutButton').addEventListener('click',async()=>{try{await fetch(api+'/auth/logout',{method:'POST'});location.href='/studio/login.html';}catch(error){toast('Could not sign out. Try again.',true);}});
+ $('#reloadButton').addEventListener('click',async()=>{if(S.dirty&&!confirm('Discard unsaved changes and reload this record?'))return;try{await loadRecord(S.key);toast('Reloaded from local files.');}catch(error){toast(error.message,true);}});
+ $('#refreshPreview').addEventListener('click',()=>{loadPreview();toast('Local preview refreshed.');});
+ $('#openPreview').addEventListener('click',()=>window.open(S.route||'/','_blank','noopener'));
+ $$('[data-size]').forEach(button=>button.addEventListener('click',()=>{
+   const width={desktop:'100%',tablet:'768px',mobile:'390px'}[button.dataset.size],frame=$('#previewFrame');
+   frame.style.width=width;frame.style.maxWidth='100%';frame.style.margin=button.dataset.size==='desktop'?'0':'0 auto';
+   $$('[data-size]').forEach(item=>item.classList.toggle('active',item===button));
+ }));
+ window.addEventListener('beforeunload',event=>{if(S.dirty){event.preventDefault();event.returnValue='';}});
+}
+async function start(){
+ bindEvents();
+ try{
+   await fetch(api+'/health').then(response=>{if(!response.ok)throw Error('Local server unavailable.');return response.json();});
+   await loadIndex();await refreshPublishStatus();
+ }catch(error){
+   body.innerHTML='<div class="empty">'+esc(error.message)+'<br>Make sure your V16 server is running, then reload.</div>';toast(error.message,true);
+ }
+}
+start();
 })();
-</script></body></html>
+</script>
+</body>
+</html>

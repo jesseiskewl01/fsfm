@@ -6,6 +6,11 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { createStudioPublisher } from './studio-publisher.mjs';
+import { createNewPage } from './create-page-v13.mjs';
+import { validateSite } from '../src/core/page-validator.mjs';
+import { normalizePageRecord, normalizePages, routeForPage } from '../src/core/page-routes.mjs';
+import { COMPONENTS } from '../src/components/registry.mjs';
+import { TEMPLATES } from '../src/templates/registry.mjs';
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const previewRoot = path.join(projectRoot, 'preview-v13');
@@ -129,6 +134,147 @@ function albumSummary(fileName, record) {
     published: record?.publishing?.published !== false,
     trackCount: Array.isArray(tracks) ? tracks.length : 0,
   };
+}
+
+function readStoredPages() {
+  const records = [JSON.parse(fs.readFileSync(path.join(contentRoot, 'homepage.json'), 'utf8'))];
+  for (const directory of ['albums', 'vista-pages', 'editorial-pages']) {
+    const folder = path.join(contentRoot, directory);
+    if (!fs.existsSync(folder)) continue;
+    for (const filename of fs.readdirSync(folder).filter((name) => name.endsWith('.json')).sort()) {
+      records.push(JSON.parse(fs.readFileSync(path.join(folder, filename), 'utf8')));
+    }
+  }
+  return records;
+}
+
+function contentResource(pathname) {
+  if (pathname === '/__fsfm/api/content/homepage') return { kind: 'page', key: 'homepage', filePath: path.join(contentRoot, 'homepage.json') };
+  if (pathname === '/__fsfm/api/content/site') return { kind: 'site', key: 'site', filePath: path.join(contentRoot, 'site.json') };
+  if (pathname === '/__fsfm/api/content/wallpapers') return { kind: 'wallpapers', key: 'wallpapers', filePath: path.join(contentRoot, 'wallpapers.json') };
+  const match = pathname.match(/^\/__fsfm\/api\/content\/(albums|vista-pages|editorial-pages)\/([a-z0-9]+(?:-[a-z0-9]+)*)$/);
+  if (!match) return null;
+  return {
+    kind: 'page',
+    key: match[1] + '/' + match[2],
+    template: match[1] === 'albums' ? 'album' : match[1] === 'vista-pages' ? 'vista-window' : 'editorial',
+    filePath: path.join(contentRoot, match[1], match[2] + '.json'),
+  };
+}
+
+function contentIndex() {
+  const pages = readStoredPages();
+  return pages.map((page) => {
+    const directory = page.template === 'homepage' ? 'homepage' : page.template === 'album' ? 'albums' : page.template === 'vista-window' ? 'vista-pages' : 'editorial-pages';
+    const key = page.template === 'homepage' ? 'homepage' : directory + '/' + page.identity.slug;
+    let route = '/';
+    try { route = routeForPage(page); } catch { /* The validator reports malformed routes on save. */ }
+    return {
+      key,
+      template: page.template,
+      name: page.identity?.name || 'Untitled page',
+      slug: page.identity?.slug || 'home',
+      route,
+      order: Number(page.identity?.order) || 0,
+      published: page.publishing?.published !== false,
+      showInNavigation: page.publishing?.showInNavigation === true,
+      artwork: page.templateData?.album?.artwork || '',
+      trackCount: Array.isArray(page.templateData?.player?.tracks) ? page.templateData.player.tracks.length : 0,
+    };
+  }).sort((a, b) => {
+    if (a.template === 'homepage') return -1;
+    if (b.template === 'homepage') return 1;
+    return (Number(a.order) || 0) - (Number(b.order) || 0) || a.name.localeCompare(b.name);
+  });
+}
+
+function validateSiteSettings(record) {
+  if (!record || typeof record !== 'object' || Array.isArray(record)) return 'Site settings must be a JSON object.';
+  if (record.schemaVersion !== 1) return 'Site settings schemaVersion must be 1.';
+  if (typeof record.siteName !== 'string' || !record.siteName.trim()) return 'Site name cannot be empty.';
+  if (typeof record.baseUrl !== 'string' || !/^https:\/\/[^/]+\/?$/i.test(record.baseUrl)) return 'Base URL must be an HTTPS site origin.';
+  for (const key of ['favicon', 'description', 'footerText']) {
+    if (typeof record[key] !== 'string') return 'Site setting ' + key + ' must be text.';
+  }
+  if (!record.seoDefaults || typeof record.seoDefaults !== 'object' || Array.isArray(record.seoDefaults)) return 'Default SEO settings are required.';
+  for (const key of ['title', 'description', 'socialImage']) {
+    if (typeof record.seoDefaults[key] !== 'string') return 'Default SEO ' + key + ' must be text.';
+  }
+  if (!Array.isArray(record.socialProfiles)) return 'Social profiles must be a list.';
+  for (const [index, profile] of record.socialProfiles.entries()) {
+    if (!profile || typeof profile.label !== 'string' || !profile.label.trim()) return 'Social profile ' + (index + 1) + ' needs a label.';
+    if (typeof profile.url !== 'string' || !/^https:\/\/\S+$/i.test(profile.url)) return 'Social profile ' + (index + 1) + ' needs an HTTPS URL.';
+  }
+  return null;
+}
+
+function validateWallpaperCatalogue(record) {
+  if (!record || typeof record !== 'object' || Array.isArray(record)) return 'Wallpaper settings must be a JSON object.';
+  if (!Array.isArray(record.presets) || record.presets.length === 0) return 'At least one wallpaper preset is required.';
+  const ids = new Set();
+  for (const [index, preset] of record.presets.entries()) {
+    if (!preset || typeof preset !== 'object' || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(preset.id || '') || !preset.name?.trim()) {
+      return 'Wallpaper preset ' + (index + 1) + ' needs a valid ID and name.';
+    }
+    if (ids.has(preset.id)) return 'Wallpaper preset IDs must be unique.';
+    ids.add(preset.id);
+    if (preset.imageUrl && !/^https:\/\//i.test(preset.imageUrl)) return 'Wallpaper image URLs must use HTTPS.';
+    if (preset.palette && (typeof preset.palette !== 'object' || Array.isArray(preset.palette))) return 'Wallpaper palettes must be objects.';
+  }
+  if (!record.customImage || typeof record.customImage !== 'object') return 'Custom wallpaper settings are required.';
+  return null;
+}
+
+function readContentFile(resource) {
+  if (!resource || !fs.existsSync(resource.filePath) || !fs.statSync(resource.filePath).isFile()) return null;
+  const raw = fs.readFileSync(resource.filePath, 'utf8');
+  return { key: resource.key, revision: hashContent(raw), record: JSON.parse(raw) };
+}
+
+function writeContentFile(resource, currentRaw, record) {
+  const nextRaw = JSON.stringify(record, null, 2) + '\n';
+  const tempPath = resource.filePath + '.studio-' + process.pid + '-' + Date.now() + '.tmp';
+  fs.writeFileSync(tempPath, nextRaw, { flag: 'wx' });
+  fs.renameSync(tempPath, resource.filePath);
+  try {
+    publisher.recordSavedFile(
+      path.relative(projectRoot, resource.filePath).split(path.sep).join('/'),
+      nextRaw,
+    );
+  } catch (error) {
+    const rollbackPath = resource.filePath + '.studio-rollback-' + process.pid + '-' + Date.now() + '.tmp';
+    fs.writeFileSync(rollbackPath, currentRaw, { flag: 'wx' });
+    fs.renameSync(rollbackPath, resource.filePath);
+    throw error;
+  }
+  scheduleRebuild();
+  return { ok: true, revision: hashContent(nextRaw), savedAt: new Date().toISOString() };
+}
+
+function validatePageForSave(resource, record) {
+  const existing = JSON.parse(fs.readFileSync(resource.filePath, 'utf8'));
+  if (record?.template !== existing.template) return 'A page template cannot be changed after creation.';
+  if (record?.identity?.slug !== existing.identity?.slug) return 'The URL slug is locked because it determines the page filename and route.';
+  let normalized;
+  try {
+    const site = JSON.parse(fs.readFileSync(path.join(contentRoot, 'site.json'), 'utf8'));
+    normalized = normalizePageRecord(record, site);
+  } catch (error) {
+    return error.message || 'The page identity or URL is invalid.';
+  }
+  const allPages = readStoredPages();
+  const index = allPages.findIndex((page) =>
+    page.template === existing.template && page.identity?.slug === existing.identity?.slug);
+  if (index < 0) return 'The page could not be located in the site content index.';
+  allPages[index] = normalized;
+  let normalizedSite;
+  try {
+    normalizedSite = normalizePages(allPages, JSON.parse(fs.readFileSync(path.join(contentRoot, 'site.json'), 'utf8')));
+  } catch (error) {
+    return error.message || 'The site pages could not be normalized.';
+  }
+  const errors = validateSite(normalizedSite, { root: projectRoot });
+  return errors.length ? errors.slice(0, 30).join('\n') : normalized;
 }
 
 async function readRequestJson(request, limit = 2 * 1024 * 1024) {
@@ -383,6 +529,213 @@ async function handleApi(request, response, pathname) {
     } catch (error) {
       sendJson(response, error.statusCode || 500, {
         error: error.statusCode ? error.message : 'Live publishing failed. Your local files were kept.',
+      });
+    }
+    return;
+  }
+
+
+
+  const lyricsMatch = pathname.match(/^\/__fsfm\/api\/lyrics\/([a-z0-9]+(?:-[a-z0-9]+)*\.lrc)$/);
+  if (lyricsMatch) {
+    const filename = lyricsMatch[1];
+    const filePath = path.join(projectRoot, 'lyrics', filename);
+    if (!fs.existsSync(filePath) || !fs.statSync(filePath).isFile()) {
+      sendJson(response, 404, { error: 'Synced lyrics file not found.' }, request.method);
+      return;
+    }
+    if (request.method === 'GET' || request.method === 'HEAD') {
+      const raw = fs.readFileSync(filePath, 'utf8');
+      sendJson(response, 200, {
+        file: 'lyrics/' + filename,
+        revision: hashContent(raw),
+        content: raw,
+      }, request.method);
+      return;
+    }
+    if (request.method !== 'PUT') {
+      response.writeHead(405, { Allow: 'GET, HEAD, PUT' });
+      response.end();
+      return;
+    }
+    if (!hasExpectedOrigin(request)) {
+      sendJson(response, 403, { error: 'Lyrics saves must come from this local FSFM Studio page.' });
+      return;
+    }
+    try {
+      const body = await readRequestJson(request, 2 * 1024 * 1024);
+      const currentRaw = fs.readFileSync(filePath, 'utf8');
+      if (typeof body?.content !== 'string' || typeof body?.revision !== 'string') {
+        sendJson(response, 400, { error: 'A revision and lyrics text are required.' });
+        return;
+      }
+      if (body.revision !== hashContent(currentRaw)) {
+        sendJson(response, 409, { error: 'These lyrics changed on disk after you opened them. Reload before saving.' });
+        return;
+      }
+      const nextRaw = body.content.replace(/\r\n/g, '\n');
+      const temporary = filePath + '.studio-' + process.pid + '-' + Date.now() + '.tmp';
+      fs.writeFileSync(temporary, nextRaw, { flag: 'wx' });
+      fs.renameSync(temporary, filePath);
+      try {
+        publisher.recordSavedFile('lyrics/' + filename, nextRaw);
+      } catch (error) {
+        const rollback = filePath + '.studio-rollback-' + process.pid + '-' + Date.now() + '.tmp';
+        fs.writeFileSync(rollback, currentRaw, { flag: 'wx' });
+        fs.renameSync(rollback, filePath);
+        throw error;
+      }
+      scheduleRebuild();
+      sendJson(response, 200, {
+        ok: true,
+        file: 'lyrics/' + filename,
+        revision: hashContent(nextRaw),
+        savedAt: new Date().toISOString(),
+      });
+    } catch (error) {
+      sendJson(response, error.statusCode || 500, {
+        error: error.statusCode ? error.message : 'Could not save synced lyrics.',
+      });
+    }
+    return;
+  }
+
+  if (pathname === '/__fsfm/api/catalog') {
+    if (!['GET', 'HEAD'].includes(request.method || '')) {
+      response.writeHead(405, { Allow: 'GET, HEAD' });
+      response.end();
+      return;
+    }
+    sendJson(response, 200, { components: COMPONENTS, templates: TEMPLATES }, request.method);
+    return;
+  }
+
+  if (pathname === '/__fsfm/api/content') {
+    if (!['GET', 'HEAD'].includes(request.method || '')) {
+      response.writeHead(405, { Allow: 'GET, HEAD' });
+      response.end();
+      return;
+    }
+    sendJson(response, 200, { items: contentIndex() }, request.method);
+    return;
+  }
+
+  if (pathname === '/__fsfm/api/content/create') {
+    if (request.method !== 'POST') {
+      response.writeHead(405, { Allow: 'POST' });
+      response.end();
+      return;
+    }
+    if (!hasExpectedOrigin(request)) {
+      sendJson(response, 403, { error: 'Page creation must come from this local FSFM Studio origin.' });
+      return;
+    }
+    try {
+      const body = await readRequestJson(request, 16 * 1024);
+      const created = createNewPage({
+        root: projectRoot,
+        template: body?.template,
+        name: body?.name,
+        slug: body?.slug,
+        published: false,
+        showInNavigation: body?.showInNavigation !== false,
+      });
+      const relativePath = path.relative(projectRoot, created.path).split(path.sep).join('/');
+      try {
+        publisher.recordSavedFile(relativePath, fs.readFileSync(created.path));
+      } catch (error) {
+        fs.rmSync(created.path, { force: true });
+        throw error;
+      }
+      scheduleRebuild();
+      sendJson(response, 201, {
+        ok: true,
+        key: (created.page.template === 'album' ? 'albums' : created.page.template === 'vista-window' ? 'vista-pages' : 'editorial-pages') + '/' + created.page.identity.slug,
+        page: created.page,
+        revision: hashContent(fs.readFileSync(created.path)),
+      });
+    } catch (error) {
+      sendJson(response, error.statusCode || 422, { error: error.message || 'Could not create the page.' });
+    }
+    return;
+  }
+
+  if (pathname.startsWith('/__fsfm/api/content/')) {
+    const resource = contentResource(pathname);
+    if (!resource) {
+      sendJson(response, 404, { error: 'Studio content record not found.' }, request.method);
+      return;
+    }
+    if (request.method === 'GET' || request.method === 'HEAD') {
+      const result = readContentFile(resource);
+      if (!result) {
+        sendJson(response, 404, { error: 'Studio content record not found.' }, request.method);
+        return;
+      }
+      sendJson(response, 200, result, request.method);
+      return;
+    }
+    if (request.method !== 'PUT') {
+      response.writeHead(405, { Allow: 'GET, HEAD, PUT' });
+      response.end();
+      return;
+    }
+    if (!hasExpectedOrigin(request)) {
+      sendJson(response, 403, { error: 'Studio saves must come from this local FSFM Studio page.' });
+      return;
+    }
+    try {
+      const body = await readRequestJson(request);
+      if (!body || typeof body.revision !== 'string' || !body.record) {
+        sendJson(response, 400, { error: 'A revision and content record are required.' });
+        return;
+      }
+      const currentRaw = fs.readFileSync(resource.filePath, 'utf8');
+      if (body.revision !== hashContent(currentRaw)) {
+        sendJson(response, 409, { error: 'This content changed on disk after you opened it. Reload before saving to avoid overwriting newer work.' });
+        return;
+      }
+      let record = body.record;
+      if (resource.kind === 'page') {
+        if (resource.template && record?.template !== resource.template) {
+          sendJson(response, 422, { error: 'This record does not match its page template.' });
+          return;
+        }
+        const validation = validatePageForSave(resource, record);
+        if (typeof validation === 'string') {
+          sendJson(response, 422, { error: validation });
+          return;
+        }
+        record = validation;
+      } else if (resource.kind === 'site') {
+        const error = validateSiteSettings(record);
+        if (error) {
+          sendJson(response, 422, { error });
+          return;
+        }
+        try {
+          const pages = normalizePages(readStoredPages(), record);
+          const pageErrors = validateSite(pages, { root: projectRoot });
+          if (pageErrors.length) {
+            sendJson(response, 422, { error: pageErrors.slice(0, 30).join('\n') });
+            return;
+          }
+        } catch (error) {
+          sendJson(response, 422, { error: error.message || 'Site settings could not be applied.' });
+          return;
+        }
+      } else if (resource.kind === 'wallpapers') {
+        const error = validateWallpaperCatalogue(record);
+        if (error) {
+          sendJson(response, 422, { error });
+          return;
+        }
+      }
+      const saved = writeContentFile(resource, currentRaw, record);
+      sendJson(response, 200, { ...saved, record });
+    } catch (error) {
+      sendJson(response, error.statusCode || 500, {
+        error: error.statusCode ? error.message : 'Could not save this content record.',
       });
     }
     return;

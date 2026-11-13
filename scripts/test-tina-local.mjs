@@ -108,6 +108,12 @@ try {
   requireStatus(await fetch(api + '/albums/the-early-bird'), 401, 'Unauthenticated album detail');
   requireStatus(await fetch(api + '/deploy/status'), 401, 'Unauthenticated deployment status');
   requireStatus(await fetch(api + '/deploy', { method: 'POST' }), 401, 'Unauthenticated live deployment');
+  requireStatus(await fetch(api + '/content'), 401, 'Unauthenticated content index');
+  requireStatus(await fetch(api + '/catalog'), 401, 'Unauthenticated component catalogue');
+  requireStatus(await fetch(api + '/content/homepage'), 401, 'Unauthenticated homepage record');
+  requireStatus(await fetch(api + '/content/site'), 401, 'Unauthenticated site settings');
+  requireStatus(await fetch(api + '/content/wallpapers'), 401, 'Unauthenticated wallpaper catalogue');
+  requireStatus(await fetch(api + '/lyrics/05-goodnight.lrc'), 401, 'Unauthenticated synced lyrics');
 
   const wrongOriginSetup = await fetch(api + '/auth/setup', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -162,6 +168,66 @@ try {
   });
   requireStatus(crossOriginDeploy, 403, 'Cross-origin live deployment');
 
+  const contentIndexResponse = await fetch(api + '/content', { headers: authHeaders });
+  if (!contentIndexResponse.ok) throw new Error('Authenticated content index failed.');
+  const contentIndex = await contentIndexResponse.json();
+  for (const key of ['homepage', 'albums/the-early-bird', 'vista-pages/vistatest']) {
+    if (!contentIndex.items.some((item) => item.key === key)) throw new Error('Content index is missing ' + key + '.');
+  }
+  const catalogueResponse = await fetch(api + '/catalog', { headers: authHeaders });
+  if (!catalogueResponse.ok) throw new Error('Component catalogue request failed.');
+  const catalogue = await catalogueResponse.json();
+  if (Object.keys(catalogue.components || {}).length !== 18) throw new Error('Studio catalogue should expose all 18 registered building blocks.');
+  if (!['homepage', 'album', 'vista-window', 'editorial'].every((template) => catalogue.templates?.[template])) {
+    throw new Error('Studio catalogue is missing one or more page templates.');
+  }
+
+  const homepageContent = await fetch(api + '/content/homepage', { headers: authHeaders });
+  if (!homepageContent.ok) throw new Error('Homepage editor did not load.');
+  const homepageData = await homepageContent.json();
+  if (!homepageData.record.templateData.gadgets) throw new Error('Homepage editor did not receive the complete desktop gadget settings.');
+  const siteContent = await fetch(api + '/content/site', { headers: authHeaders });
+  if (!siteContent.ok) throw new Error('Site-wide settings did not load.');
+  const siteData = await siteContent.json();
+  if (!siteData.record.socialProfiles) throw new Error('Site-wide social profiles did not load.');
+  const wallpaperContent = await fetch(api + '/content/wallpapers', { headers: authHeaders });
+  if (!wallpaperContent.ok) throw new Error('Wallpaper catalogue did not load.');
+  const wallpaperData = await wallpaperContent.json();
+  if (!wallpaperData.record.presets?.length) throw new Error('Wallpaper presets did not load.');
+  const vistaContent = await fetch(api + '/content/vista-pages/vistatest', { headers: authHeaders });
+  if (!vistaContent.ok || (await vistaContent.json()).record.template !== 'vista-window') throw new Error('Vista page editor did not load.');
+  const invalidPageRecord = JSON.parse(JSON.stringify(homepageData.record));
+  invalidPageRecord.identity.slug = 'attempted-route-change';
+  const invalidPageSave = await fetch(api + '/content/homepage', {
+    method: 'PUT', headers: saveHeaders,
+    body: JSON.stringify({ revision: homepageData.revision, record: invalidPageRecord }),
+  });
+  requireStatus(invalidPageSave, 422, 'Generic page slug protection');
+
+  const invalidSite = JSON.parse(JSON.stringify(siteData.record));
+  invalidSite.siteName = '';
+  const invalidSiteSave = await fetch(api + '/content/site', {
+    method: 'PUT', headers: saveHeaders,
+    body: JSON.stringify({ revision: siteData.revision, record: invalidSite }),
+  });
+  requireStatus(invalidSiteSave, 422, 'Global site settings validation');
+
+  const lyricResponse = await fetch(api + '/lyrics/05-goodnight.lrc', { headers: authHeaders });
+  if (!lyricResponse.ok) throw new Error('Synced lyrics editor could not read the existing LRC file.');
+  const lyricData = await lyricResponse.json();
+  if (!lyricData.content.includes('[00:')) throw new Error('Synced lyrics response does not contain timestamped LRC text.');
+  const crossOriginLyrics = await fetch(api + '/lyrics/05-goodnight.lrc', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', Cookie: loginCookie },
+    body: JSON.stringify({ revision: lyricData.revision, content: lyricData.content }),
+  });
+  requireStatus(crossOriginLyrics, 403, 'Cross-origin synced lyrics save');
+  const staleLyrics = await fetch(api + '/lyrics/05-goodnight.lrc', {
+    method: 'PUT', headers: saveHeaders,
+    body: JSON.stringify({ revision: 'stale-lyrics-revision', content: lyricData.content }),
+  });
+  requireStatus(staleLyrics, 409, 'Stale synced lyrics protection');
+
   const albums = await fetch(api + '/albums', { headers: authHeaders });
   if (!albums.ok || !(await albums.json()).albums.some((item) => item.id === 'the-early-bird')) {
     throw new Error('Authenticated album list did not return The Early Bird.');
@@ -215,7 +281,8 @@ try {
   console.log('  Album:    HTTP ' + album.status + ', ' + album.bytes + ' bytes');
   console.log('  Login:    HTTP ' + loginPage.status + ', ' + loginPage.bytes + ' bytes');
   console.log('  Studio:   HTTP ' + studioWithSession.status + ', ' + studioWithSession.bytes + ' bytes');
-  console.log('  API:      protected; password hashing, session, logout, lockout and CSRF verified');
+  console.log('  API:      authentication, content index, all page templates, 18 blocks, global settings and validation verified');
+  console.log('  Lyrics:   protected LRC read, cross-origin and stale-revision checks verified');
 } catch (error) {
   console.error('[Tina smoke test]', error);
   process.exitCode = 1;
