@@ -34,6 +34,7 @@
     "audit:v14": "node scripts/audit-v13-release.mjs",
     "check:v14": "node --check src/core/page-routes.mjs && node --check src/core/page-validator.mjs && node --check scripts/build-v13.mjs && node --check scripts/create-page-v13.mjs && node --check src/render/page.mjs && node --check src/render/homepage.mjs && node --check src/client/album-atmosphere.js",
     "dev:tina": "npx --yes @tinacms/cli@4.0.5 dev -c \"node scripts/dev-tina-preview.mjs\"",
-    "check:tina": "node --check tina/config.js && node --check scripts/dev-tina-preview.mjs && npx --yes @tinacms/cli@4.0.5 audit"
+    "check:tina": "node --check tina/config.js && node --check scripts/dev-tina-preview.mjs && npx --yes @tinacms/cli@4.0.5 audit",
+    "test:tina:local": "node scripts/test-tina-local.mjs"
   }
 }
