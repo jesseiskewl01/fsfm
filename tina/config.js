@@ -193,6 +193,14 @@ export default {
 
           objectField('appearance', 'Appearance', [
             objectField('wallpaper', 'Wallpaper', [
+              hidden('mode', 'Wallpaper mode'),
+              hidden('preset', 'Wallpaper preset'),
+              objectField('cycle', 'Wallpaper rotation', [
+                { type: 'boolean', name: 'enabled', label: 'Enable wallpaper rotation' },
+                { type: 'string', name: 'mode', label: 'Rotation order', options: ['sequential', 'random'] },
+                { type: 'number', name: 'intervalSeconds', label: 'Interval (seconds)' },
+                { type: 'boolean', name: 'manualControl', label: 'Allow manual wallpaper selection' },
+              ]),
               {
                 type: 'string',
                 name: 'choice',
