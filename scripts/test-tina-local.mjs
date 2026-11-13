@@ -91,12 +91,25 @@ try {
   const admin = await check(baseUrl + '/admin/index.html', 'Tina');
   const homepage = await check(baseUrl + '/', 'Fake Space Fog Machine');
   const album = await check(baseUrl + '/albums/the-early-bird/', 'The Early Bird');
+  const studio = await check(baseUrl + '/studio/', 'FSFM STUDIO');
+  const healthResponse = await fetch(baseUrl + '/__fsfm/api/health');
+  if (!healthResponse.ok || !(await healthResponse.json()).ok) {
+    throw new Error('Studio API health check failed.');
+  }
+  const albumsResponse = await fetch(baseUrl + '/__fsfm/api/albums');
+  if (!albumsResponse.ok) throw new Error('Studio album API failed.');
+  const albumsData = await albumsResponse.json();
+  if (!albumsData.albums.some((item) => item.id === 'the-early-bird')) {
+    throw new Error('Studio album API did not return The Early Bird.');
+  }
 
   console.log('');
-  console.log('TinaCMS local smoke test passed:');
+  console.log('TinaCMS + FSFM Studio local smoke test passed:');
   console.log('  Admin:    HTTP ' + admin.status + ', ' + admin.bytes + ' bytes');
   console.log('  Homepage: HTTP ' + homepage.status + ', ' + homepage.bytes + ' bytes');
   console.log('  Album:    HTTP ' + album.status + ', ' + album.bytes + ' bytes');
+  console.log('  Studio:   HTTP ' + studio.status + ', ' + studio.bytes + ' bytes');
+  console.log('  API:      HTTP ' + healthResponse.status + ', ' + albumsData.albums.length + ' album(s) indexed');
 } catch (error) {
   console.error('[Tina smoke test]', error);
   process.exitCode = 1;
