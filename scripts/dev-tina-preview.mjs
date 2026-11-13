@@ -305,7 +305,7 @@ const server = http.createServer((request, response) => {
 
   if (!relativePath) relativePath = 'index.html';
 
-  const filePath = safeFilePath(base, relativePath);
+  let filePath = safeFilePath(base, relativePath);
   if (!filePath) {
     response.writeHead(403);
     response.end('Forbidden');
