@@ -218,7 +218,12 @@ function validateWallpaperCatalogue(record) {
     }
     if (ids.has(preset.id)) return 'Wallpaper preset IDs must be unique.';
     ids.add(preset.id);
-    if (preset.imageUrl && !/^https:\/\//i.test(preset.imageUrl)) return 'Wallpaper image URLs must use HTTPS.';
+    if (preset.imageUrl) {
+      const remoteImage = /^https:\/\//i.test(preset.imageUrl);
+      const localMatch = /^\/media\/images\/([a-z0-9][a-z0-9._-]{0,100})$/i.exec(preset.imageUrl);
+      const localImage = localMatch && fs.existsSync(path.join(projectRoot, 'media', 'images', localMatch[1]));
+      if (!remoteImage && !localImage) return 'Wallpaper images must use HTTPS or an existing file inside /media/images/.';
+    }
     if (preset.palette && (typeof preset.palette !== 'object' || Array.isArray(preset.palette))) return 'Wallpaper palettes must be objects.';
   }
   if (!record.customImage || typeof record.customImage !== 'object') return 'Custom wallpaper settings are required.';
@@ -535,6 +540,114 @@ async function handleApi(request, response, pathname) {
   }
 
 
+
+
+  if (pathname === '/__fsfm/api/assets') {
+    if (request.method === 'GET' || request.method === 'HEAD') {
+      const list = (folder, kind, prefix) => {
+        const directory = path.join(projectRoot, folder);
+        if (!fs.existsSync(directory)) return [];
+        return fs.readdirSync(directory).filter((name) => {
+          const full = path.join(directory, name);
+          return fs.existsSync(full) && fs.statSync(full).isFile();
+        }).sort().map((name) => ({
+          name,
+          kind,
+          path: prefix + '/' + name,
+          size: fs.statSync(path.join(directory, name)).size,
+        }));
+      };
+      sendJson(response, 200, {
+        images: list('media/images', 'image', '/media/images'),
+        audio: list('media/audio', 'audio', '/media/audio'),
+      }, request.method);
+      return;
+    }
+    if (request.method !== 'POST') {
+      response.writeHead(405, { Allow: 'GET, HEAD, POST' });
+      response.end();
+      return;
+    }
+    if (!hasExpectedOrigin(request)) {
+      sendJson(response, 403, { error: 'Asset uploads must come from this local FSFM Studio page.' });
+      return;
+    }
+    try {
+      const body = await readRequestJson(request, 42 * 1024 * 1024);
+      const kind = body?.kind;
+      const filename = body?.filename;
+      const encoded = body?.contentBase64;
+      if (!['image', 'audio'].includes(kind)) {
+        sendJson(response, 422, { error: 'Choose an image or audio asset type.' });
+        return;
+      }
+      if (typeof filename !== 'string' || !/^[a-z0-9][a-z0-9._-]{0,100}$/.test(filename)) {
+        sendJson(response, 422, { error: 'Filename must use lowercase letters, numbers, dots, hyphens or underscores.' });
+        return;
+      }
+      const extension = path.extname(filename).toLowerCase();
+      const allowed = kind === 'image' ? ['.png', '.jpg', '.jpeg', '.webp', '.gif'] : ['.mp3', '.ogg', '.wav'];
+      if (!allowed.includes(extension)) {
+        sendJson(response, 422, { error: 'That file type is not supported for this asset category.' });
+        return;
+      }
+      if (typeof encoded !== 'string' || encoded.length === 0 || encoded.length > 42 * 1024 * 1024 ||
+          !/^[A-Za-z0-9+/]+={0,2}$/.test(encoded)) {
+        sendJson(response, 422, { error: 'The uploaded file data is invalid or too large.' });
+        return;
+      }
+      const bytes = Buffer.from(encoded, 'base64');
+      if (bytes.length === 0 || bytes.length > 30 * 1024 * 1024 || bytes.toString('base64') !== encoded) {
+        sendJson(response, 422, { error: 'Asset uploads must be between 1 byte and 30 MB.' });
+        return;
+      }
+      const signatures = {
+        '.png': bytes.length >= 8 && bytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])),
+        '.jpg': bytes.length >= 3 && bytes[0] === 255 && bytes[1] === 216 && bytes[2] === 255,
+        '.jpeg': bytes.length >= 3 && bytes[0] === 255 && bytes[1] === 216 && bytes[2] === 255,
+        '.gif': bytes.length >= 6 && ['GIF87a', 'GIF89a'].includes(bytes.subarray(0, 6).toString('ascii')),
+        '.webp': bytes.length >= 12 && bytes.subarray(0, 4).toString('ascii') === 'RIFF' && bytes.subarray(8, 12).toString('ascii') === 'WEBP',
+        '.mp3': bytes.length >= 3 && (bytes.subarray(0, 3).toString('ascii') === 'ID3' || (bytes[0] === 255 && (bytes[1] & 224) === 224)),
+        '.ogg': bytes.length >= 4 && bytes.subarray(0, 4).toString('ascii') === 'OggS',
+        '.wav': bytes.length >= 12 && bytes.subarray(0, 4).toString('ascii') === 'RIFF' && bytes.subarray(8, 12).toString('ascii') === 'WAVE',
+      };
+      if (!signatures[extension]) {
+        sendJson(response, 422, { error: 'The file contents do not match the selected file extension.' });
+        return;
+      }
+      const directory = path.join(projectRoot, 'media', kind === 'image' ? 'images' : 'audio');
+      fs.mkdirSync(directory, { recursive: true });
+      const filePath = path.join(directory, filename);
+      if (fs.existsSync(filePath)) {
+        sendJson(response, 409, { error: 'A file with that name already exists. Rename the upload rather than overwriting an existing asset.' });
+        return;
+      }
+      const temporary = filePath + '.studio-' + process.pid + '-' + Date.now() + '.tmp';
+      fs.writeFileSync(temporary, bytes, { flag: 'wx' });
+      fs.renameSync(temporary, filePath);
+      const relativePath = path.relative(projectRoot, filePath).split(path.sep).join('/');
+      try {
+        publisher.recordSavedFile(relativePath, bytes);
+      } catch (error) {
+        fs.rmSync(filePath, { force: true });
+        throw error;
+      }
+      const publicPath = (kind === 'image' ? '/media/images/' : '/media/audio/') + filename;
+      sendJson(response, 201, {
+        ok: true,
+        kind,
+        filename,
+        path: publicPath,
+        size: bytes.length,
+        savedAt: new Date().toISOString(),
+      });
+    } catch (error) {
+      sendJson(response, error.statusCode || 500, {
+        error: error.statusCode ? error.message : 'Could not save this asset locally.',
+      });
+    }
+    return;
+  }
 
   const lyricsMatch = pathname.match(/^\/__fsfm\/api\/lyrics\/([a-z0-9]+(?:-[a-z0-9]+)*\.lrc)$/);
   if (lyricsMatch) {

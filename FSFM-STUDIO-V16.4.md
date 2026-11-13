@@ -9,6 +9,7 @@
 - The wallpaper catalogue, including presets, image sources, families and colour palettes.
 - All 18 registered building blocks, with their enabled state, presentation, layout group and renderer-specific content fields.
 - Synced LRC lyrics files linked to album tracks.
+- Local image and audio uploads into the site's media library, with filename, size and file-signature checks. Uploaded images and audio are saved locally and queued for deliberate publication.
 
 ## Page and block editing
 
@@ -22,7 +23,11 @@ Page slugs are read-only after creation because they determine the content filen
 
 All JSON page saves are normalized using the shared route model and checked against the complete site with `validateSite`. This checks template constraints, component compatibility, required blocks, duplicate IDs, route/slug collisions, album tracks, audio references and lyrics files before the content is written.
 
-Global site settings and wallpaper catalogues have dedicated validation. Revision hashes reject stale edits. Local saves update only the local repository working tree and add the saved content file to the Stage 2 publishing queue.
+Global site settings and wallpaper catalogues have dedicated validation. Wallpaper image sources may be HTTPS URLs or existing files inside `/media/images/`. Revision hashes reject stale edits. Local saves update only the local repository working tree and add the saved content file to the Stage 2 publishing queue.
+
+## Media uploads
+
+Image fields and album `audioFile` fields include a local file picker. Images are stored under `media/images/`; audio is stored under `media/audio/`, which is the local path format expected by the FSFM album player. Uploads reject unsupported extensions, mismatched file signatures, duplicate names and files larger than 30 MB. Uploading an asset saves that file locally and queues it for deployment; the page or track still needs its own **Save local** action to store the asset path in the content record.
 
 ## Lyrics editing
 

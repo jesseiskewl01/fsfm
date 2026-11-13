@@ -19,7 +19,7 @@
 .section-card{border:1px solid #494252;border-radius:11px;background:#26232f;overflow:hidden}.section-card>summary{list-style:none;cursor:pointer;padding:10px;display:flex;align-items:center;gap:8px}.section-card>summary::-webkit-details-marker{display:none}.section-card>summary:before{content:"›";font-size:16px;color:var(--accent)}.section-card[open]>summary:before{transform:rotate(90deg)}.section-title{font-size:10px;font-weight:800;flex:1;min-width:0}.section-meta{font-size:8px;color:#958da1}.section-body{padding:0 10px 10px;display:flex;flex-direction:column;gap:8px}.section-actions{display:flex;gap:4px}.section-tools{display:flex;align-items:center;justify-content:space-between;gap:8px}.section-pill{background:#3a3149;color:#dfceff;border-radius:20px;padding:3px 7px;font-size:8px}.add-component{display:flex;gap:7px;margin-top:10px}.add-component select{flex:1;min-width:0;background:#17151f;border:1px solid #474151;color:#f5f0fa;border-radius:8px;padding:8px;font-size:10px}.empty{padding:22px;color:var(--muted);text-align:center;font-size:11px}.warning{padding:10px;border:1px solid #765b36;background:#392e21;border-radius:8px;color:#f1d6aa;font-size:9px;line-height:1.5}
 .preview{min-width:0;min-height:0;background:#191720;display:grid;grid-template-rows:56px minmax(0,1fr)}.preview-head{display:flex;align-items:center;gap:10px;padding:0 14px;border-bottom:1px solid var(--line)}.preview-title{font-size:10px;font-weight:800}.preview-sub{font-size:9px;color:var(--muted);margin-left:7px}.device{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}.device button{border:0;background:transparent;color:#9b93a6;padding:6px 9px;font-size:10px}.device button.active{background:#40364f;color:#e9ddff}.preview-frame-wrap{padding:12px;min-height:0;position:relative}.preview-frame{width:100%;height:100%;border:1px solid #494354;border-radius:9px;background:#fff;box-shadow:0 20px 60px #08070c66}.preview-loading{position:absolute;inset:12px;display:none;align-items:center;justify-content:center;background:#17151fd9;border-radius:9px;color:#d5cade;font-size:12px;pointer-events:none}.preview-loading.show{display:flex}
 .toast{position:fixed;bottom:20px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#292536;border:1px solid #5b516b;color:#f4effa;padding:11px 15px;border-radius:10px;box-shadow:0 20px 60px #08070c66;z-index:20;font-size:11px;transition:.22s;max-width:min(620px,90vw)}.toast.show{opacity:1;transform:translate(-50%,0)}.toast.error{border-color:#a45e69}
-dialog.lyrics-dialog{width:min(760px,94vw);max-height:88vh;background:#211f2b;color:var(--text);border:1px solid #625874;border-radius:14px;padding:0;box-shadow:0 28px 90px #000b}dialog.lyrics-dialog::backdrop{background:#09070dd9;backdrop-filter:blur(5px)}.lyrics-head{padding:15px 17px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}.lyrics-head strong{font-size:12px}.lyrics-body{padding:14px 16px}.lyrics-body textarea{width:100%;min-height:52vh;resize:vertical;background:#17151f;border:1px solid #474151;color:#f5f0fa;border-radius:8px;padding:12px;outline:none;font:11px/1.65 ui-monospace,Consolas,monospace}.lyrics-foot{padding:12px 16px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px}
+dialog.lyrics-dialog{width:min(760px,94vw);max-height:88vh;background:#211f2b;color:var(--text);border:1px solid #625874;border-radius:14px;padding:0;box-shadow:0 28px 90px #000b}dialog.lyrics-dialog::backdrop{background:#09070dd9;backdrop-filter:blur(5px)}.lyrics-head{padding:15px 17px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}.lyrics-head strong{font-size:12px}.lyrics-body{padding:14px 16px}.lyrics-body textarea{width:100%;min-height:52vh;resize:vertical;background:#17151f;border:1px solid #474151;color:#f5f0fa;border-radius:8px;padding:12px;outline:none;font:11px/1.65 ui-monospace,Consolas,monospace}.lyrics-foot{padding:12px 16px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px}.upload-pick{display:inline-flex;align-items:center;gap:6px;width:max-content;max-width:100%;padding:5px 8px;border:1px dashed #665b78;border-radius:7px;color:#ccb6f0;font-size:8px;cursor:pointer}.upload-pick:hover{background:#392f49}.upload-pick input{display:none}
 @media(max-width:1100px){.workspace{grid-template-columns:205px minmax(390px,520px) minmax(280px,1fr)}.brand{min-width:155px}.topmeta{display:none}.publishhint{max-width:145px}}
 @media(max-width:850px){.app{height:auto;min-height:100vh;overflow:visible;grid-template-rows:auto auto}.topbar{height:64px;position:sticky;top:0;z-index:10}.workspace{grid-template-columns:175px minmax(0,1fr);grid-template-rows:auto auto}.sidebar{grid-row:1/3;position:sticky;top:64px;height:calc(100vh - 64px)}.preview{grid-column:2;min-height:600px;border-top:1px solid var(--line)}}
 @media(max-width:600px){.brand{min-width:0}.brand small,.topmeta,.savehint,.publishhint{display:none}.topbar{padding:0 9px;gap:6px}.btn{padding:8px 9px;font-size:9px}.workspace{display:flex;flex-direction:column}.sidebar{position:relative;top:auto;height:auto;border-right:0;border-bottom:1px solid var(--line)}.sidebar-foot{display:none}.page-list{display:grid;grid-template-columns:1fr 1fr}.editor{overflow:visible}.preview{min-height:520px}.json-object-inner{grid-template-columns:1fr}.json-object-inner>.field.full,.json-object-inner>.array-box,.json-object-inner>.json-object{grid-column:1}.editor-body{padding:10px 9px 40px}}
@@ -199,9 +199,13 @@ function primitiveEditor(value,path,label,depth=0){
  const type=typeof value;
  if(type==='boolean')return '<div class="toggle-field"><label>'+esc(label)+'</label><input class="switch" type="checkbox" data-path="'+esc(path)+'" '+(value?'checked':'')+'></div>';
  if(type==='number')return '<div class="field"><label>'+esc(label)+'</label><input type="number" step="any" data-path="'+esc(path)+'" value="'+esc(value)+'"></div>';
- const long=String(value??'').length>100||/(body|description|sticky|caption|message|subtitle|footerText|shutdown)/i.test(path.split('.').pop());
+ const fieldKey=path.split('.').pop();
+ const long=String(value??'').length>100||/(body|description|sticky|caption|message|subtitle|footerText|shutdown)/i.test(fieldKey);
  const control=long?'<textarea data-path="'+esc(path)+'">'+esc(value??'')+'</textarea>':'<input type="text" data-path="'+esc(path)+'" value="'+esc(value??'')+'">';
- return '<div class="field"><label>'+esc(label)+'</label>'+control+'</div>';
+ const imageFields=['artwork','logo','image','src','socialImage','favicon','customImage'];
+ const assetKind=fieldKey==='audioFile'?'audio':imageFields.includes(fieldKey)||(/\.(images|photos)\.\d+$/.test(path))||(fieldKey==='imageUrl'&&path.indexOf('ROOT.presets.')===0)?'image':'';
+ const picker=assetKind?'<label class="upload-pick">↑ Upload '+(assetKind==='image'?'image':'audio')+'<input type="file" data-asset-kind="'+assetKind+'" data-upload-path="'+esc(path)+'" accept="'+(assetKind==='image'?'.png,.jpg,.jpeg,.webp,.gif':'.mp3,.ogg,.wav')+'"></label>':'';
+ return '<div class="field"><label>'+esc(label)+'</label>'+control+picker+'</div>';
 }
 function pageFields(){
  const r=S.record;
@@ -222,7 +226,7 @@ function renderSections(){
    const content=valueEditor(section.content||{},'sections.'+index+'.content','Content');
    const presentation=valueEditor(section.presentation||{variant:'',windowTitle:''},'sections.'+index+'.presentation','Presentation');
    const group=valueEditor(section.group||{id:'',layout:'grid',columns:2},'sections.'+index+'.group','Layout group');
-   return '<details class="section-card" open><summary><span class="section-title">'+esc(COMPONENT_LABELS[section.type]||human(section.type))+'</span><span class="section-pill">'+esc(section.type)+'</span><span class="section-meta">'+(section.enabled?'Enabled':'Disabled')+'</span><div class="section-actions">'+move+remove+'</div></summary><div class="section-body"><div class="section-tools"><span class="helper">Block ID: '+esc(section.id)+'</span><div class="toggle-field" style="padding:4px 7px;min-height:28px"><label>Enabled</label><input class="switch" type="checkbox" data-path="sections.'+index+'.enabled" '+(section.enabled?'checked':'')+'></div></div>'+presentation+group+content+'</div></details>';
+   return '<details class="section-card" open><summary><span class="section-title">'+esc(COMPONENT_LABELS[section.type]||human(section.type))+'</span><span class="section-pill">'+esc(section.type)+'</span><span class="section-meta">'+(section.enabled?'Enabled':'Disabled')+'</span><div class="section-actions">'+move+remove+'</div></summary><div class="section-body"><div class="section-tools"><span class="helper">Block ID: '+esc(section.id)+'</span><div class="toggle-field" style="padding:4px 7px;min-height:28px"><label>Enabled</label><input class="switch" type="checkbox" data-path="sections.'+index+'.enabled" '+(section.enabled?'checked':'')+(required?' disabled':'')+'></div></div>'+presentation+group+content+'</div></details>';
  }).join('');
  const allowed=(templateMeta().allowedComponentTypes||[]).filter(type=>componentCount(type)<maxComponents(type));
  const options=allowed.map(type=>'<option value="'+esc(type)+'">'+esc(COMPONENT_LABELS[type]||human(type))+'</option>').join('');
@@ -405,12 +409,36 @@ async function saveLyrics(){
  }catch(error){toast(error.message,true);}
  finally{$('#saveLyricsButton').disabled=false;$('#saveLyricsButton').textContent='Save lyrics locally';}
 }
+
+async function uploadAsset(input){
+ const file=input.files&&input.files[0];if(!file)return;
+ if(file.size>30*1024*1024){toast('Choose a file smaller than 30 MB.',true);input.value='';return;}
+ const kind=input.dataset.assetKind;
+ let filename=file.name.normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9._-]+/g,'-').replace(/^-+|-+$/g,'');
+ if(!filename){toast('That filename is not valid.',true);input.value='';return;}
+ const bytes=new Uint8Array(await file.arrayBuffer());let binary='';
+ for(let i=0;i<bytes.length;i+=0x8000)binary+=String.fromCharCode(...bytes.subarray(i,Math.min(i+0x8000,bytes.length)));
+ const field=input.closest('.field');const picker=input.closest('.upload-pick');
+ if(picker)picker.textContent='Uploading…';
+ try{
+   const response=await fetch(api+'/assets',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({kind,filename,contentBase64:btoa(binary)})});
+   const data=await response.json();if(!response.ok)throw Error(data.error||'Asset upload failed.');
+   set(S.record,actualPath(input.dataset.uploadPath),data.path);
+   const textInput=field?.querySelector('[data-path]');
+   if(textInput)textInput.value=data.path;
+   dirty();toast('Saved '+data.filename+' to the local asset library. Save the page to use it in the preview.');
+   await refreshPublishStatus();
+ }catch(error){toast(error.message,true);}
+ finally{input.value='';if(picker)picker.textContent='↑ Upload '+(kind==='image'?'image':'audio');}
+}
 function bindEvents(){
  body.addEventListener('input',event=>{
    const field=event.target.closest('[data-path]');
    if(field)changePath(field.dataset.path,field);
  });
  body.addEventListener('change',event=>{
+   const upload=event.target.closest('[data-asset-kind]');
+   if(upload){void uploadAsset(upload);return;}
    const field=event.target.closest('[data-path]');
    if(field)changePath(field.dataset.path,field);
  });

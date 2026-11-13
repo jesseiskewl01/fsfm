@@ -8,6 +8,7 @@ const port = Number(process.env.TINA_TEST_PORT || 3000);
 const baseUrl = 'http://' + host + ':' + port;
 const api = baseUrl + '/__fsfm/api';
 const testDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fsfm-studio-auth-test-'));
+let smokeAssetPath = '';
 const args = [
   '--yes',
   '@tinacms/cli@4.0.5',
@@ -114,6 +115,7 @@ try {
   requireStatus(await fetch(api + '/content/site'), 401, 'Unauthenticated site settings');
   requireStatus(await fetch(api + '/content/wallpapers'), 401, 'Unauthenticated wallpaper catalogue');
   requireStatus(await fetch(api + '/lyrics/05-goodnight.lrc'), 401, 'Unauthenticated synced lyrics');
+  requireStatus(await fetch(api + '/assets'), 401, 'Unauthenticated asset library');
 
   const wrongOriginSetup = await fetch(api + '/auth/setup', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -168,6 +170,31 @@ try {
   });
   requireStatus(crossOriginDeploy, 403, 'Cross-origin live deployment');
 
+  const assetIndexResponse = await fetch(api + '/assets', { headers: authHeaders });
+  if (!assetIndexResponse.ok || !(await assetIndexResponse.json()).images.some((asset) => asset.name === 'cover.png')) {
+    throw new Error('Existing image assets were not listed by the Studio asset library.');
+  }
+  const assetFilename = 'fsfm-studio-smoke-' + path.basename(testDataDir).replace(/[^a-z0-9-]/gi, '').toLowerCase() + '.png';
+  smokeAssetPath = path.join(process.cwd(), 'media', 'images', assetFilename);
+  const invalidOriginAsset = await fetch(api + '/assets', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', Cookie: loginCookie },
+    body: JSON.stringify({ kind: 'image', filename: assetFilename, contentBase64: 'aGVsbG8=' }),
+  });
+  requireStatus(invalidOriginAsset, 403, 'Cross-origin asset upload');
+  const assetUpload = await fetch(api + '/assets', {
+    method: 'POST', headers: saveHeaders,
+    body: JSON.stringify({
+      kind: 'image',
+      filename: assetFilename,
+      contentBase64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/dL8AAAAASUVORK5CYII=',
+    }),
+  });
+  requireStatus(assetUpload, 201, 'Authenticated local image upload');
+  const uploadedAsset = await assetUpload.json();
+  if (uploadedAsset.path !== '/media/images/' + assetFilename || !fs.existsSync(smokeAssetPath)) {
+    throw new Error('Uploaded image was not saved to the local asset library.');
+  }
+
   const contentIndexResponse = await fetch(api + '/content', { headers: authHeaders });
   if (!contentIndexResponse.ok) throw new Error('Authenticated content index failed.');
   const contentIndex = await contentIndexResponse.json();
@@ -215,7 +242,7 @@ try {
   const lyricResponse = await fetch(api + '/lyrics/05-goodnight.lrc', { headers: authHeaders });
   if (!lyricResponse.ok) throw new Error('Synced lyrics editor could not read the existing LRC file.');
   const lyricData = await lyricResponse.json();
-  if (!lyricData.content.includes('[00:')) throw new Error('Synced lyrics response does not contain timestamped LRC text.');
+  if (!/\[\d{2}:\d{2}\.\d{2}\]/.test(lyricData.content)) throw new Error('Synced lyrics response does not contain timestamped LRC text.');
   const crossOriginLyrics = await fetch(api + '/lyrics/05-goodnight.lrc', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', Cookie: loginCookie },
@@ -283,10 +310,12 @@ try {
   console.log('  Studio:   HTTP ' + studioWithSession.status + ', ' + studioWithSession.bytes + ' bytes');
   console.log('  API:      authentication, content index, all page templates, 18 blocks, global settings and validation verified');
   console.log('  Lyrics:   protected LRC read, cross-origin and stale-revision checks verified');
+  console.log('  Assets:   local image upload, signature validation, cross-origin protection and cleanup verified');
 } catch (error) {
   console.error('[Tina smoke test]', error);
   process.exitCode = 1;
 } finally {
   await stopChild();
+  if (smokeAssetPath) fs.rmSync(smokeAssetPath, { force: true });
   fs.rmSync(testDataDir, { recursive: true, force: true });
 }

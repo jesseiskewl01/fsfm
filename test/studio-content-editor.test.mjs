@@ -41,10 +41,20 @@ test('Studio exposes homepage, global settings, wallpaper, and all page template
   assert.match(server, /validateSite\(/);
 });
 
+test('local media uploads are exposed in Studio and restricted to approved media folders', () => {
+  assert.match(studio, /async function uploadAsset/);
+  assert.match(studio, /data-asset-kind/);
+  assert.match(server, /__fsfm\/api\/assets/);
+  assert.match(server, /media\/images/);
+  assert.match(server, /media\/audio/);
+  assert.match(server, /contentBase64/);
+  assert.match(server, /maximum file size|30 \* 1024 \* 1024/i);
+});
+
 test('synced lyrics have a separate protected local editing route', () => {
   assert.match(studio, /Edit synced lyrics/);
   assert.match(studio, /async function openLyricsEditor/);
-  assert.match(server, /__fsfm\/api\/lyrics/);
+  assert.match(server, /const lyricsMatch = pathname\.match/);
   assert.match(server, /publisher\.recordSavedFile\('lyrics\//);
 });
 
