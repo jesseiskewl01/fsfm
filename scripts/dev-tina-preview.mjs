@@ -259,6 +259,9 @@ function writeContentFile(resource, currentRaw, record) {
 function validatePageForSave(resource, record) {
   const existing = JSON.parse(fs.readFileSync(resource.filePath, 'utf8'));
   if (record?.template !== existing.template) return 'A page template cannot be changed after creation.';
+  if (existing.template === 'homepage' && record?.publishing?.published === false) {
+    return 'The homepage cannot be deactivated.';
+  }
   if (record?.identity?.slug !== existing.identity?.slug) return 'The URL slug is locked because it determines the page filename and route.';
   let normalized;
   try {

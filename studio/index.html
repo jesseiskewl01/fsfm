@@ -136,6 +136,7 @@ dialog.lyrics-dialog{background:linear-gradient(145deg,#262233,#1d1a28);border-c
 .upload-pick{border-color:#76638e;color:#d7c1fa;border-radius:8px;transition:background .16s,border-color .16s}
 .upload-pick:hover{background:#342a44;border-color:#a58ac9}
 .empty{color:#aaa0b7}
+.page-state{display:inline-flex;align-items:center;justify-content:center;padding:3px 6px;border-radius:6px;font-size:7px;letter-spacing:.07em;font-weight:800;white-space:nowrap;border:1px solid #494057;background:#292536;color:#aaa0b7}.page-state.active{background:#20382f;border-color:#416e5b;color:#a6e4c2}.page-state.inactive{background:#2b2733;border-color:#4c4357;color:#b5aabd}.page-activation-row{display:flex;align-items:center;justify-content:space-between;gap:12px}.page-activation-copy{min-width:0;flex:1}.page-activation-copy strong{display:block;font-size:11px;color:#eee6f5}.page-activation-copy p{margin:4px 0 0;font-size:9px;line-height:1.55;color:#a49aae}.page-activation-footer{margin-top:10px;padding-top:9px;border-top:1px solid #3c354b;font-size:8px;color:#988ea4}
 @media(max-width:850px){.preview-head{gap:7px;padding:0 10px}.preview-dimensions{max-width:110px}.sidebar{background:#191622}.editor{border-right:0}}
 @media(max-width:600px){.preview-head{gap:6px}.preview-dimensions{display:none}.panel{padding:11px}.panel-head{gap:6px}.section-card>summary{gap:6px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
@@ -231,7 +232,7 @@ function renderPageList(){
  for(const [template,label] of groups){
    const entries=pages.filter(x=>x.template===template);
    html+='<div class="side-label" style="padding:8px 8px 2px">'+label+'</div>';
-   html+=entries.map(item=>'<button class="page-item '+(S.key===item.key?'selected':'')+'" data-key="'+esc(item.key)+'"><span class="page-icon">'+iconFor(item.template)+'</span><span class="page-copy"><strong>'+esc(item.name)+'</strong><small>'+esc(item.route)+'</small></span><span class="status-dot '+(item.published?'live':'')+'" title="'+(item.published?'Published':'Draft')+'"></span></button>').join('');
+   html+=entries.map(item=>'<button class="page-item '+(S.key===item.key?'selected':'')+'" data-key="'+esc(item.key)+'"><span class="page-icon">'+iconFor(item.template)+'</span><span class="page-copy"><strong>'+esc(item.name)+'</strong><small>'+esc(item.route)+'</small></span><span class="page-state '+(item.published?'active':'inactive')+'" title="'+(item.published?'Included in the next production build':'Excluded from the next production build')+'">'+(item.published?'ACTIVE':'INACTIVE')+'</span></button>').join('');
    if(!entries.length)html+='<div class="helper" style="padding:4px 9px">No '+label.toLowerCase()+' yet.</div>';
  }
  $('#pageList').innerHTML=html;
@@ -325,11 +326,37 @@ function primitiveEditor(value,path,label,depth=0){
  const picker=assetKind?'<label class="upload-pick">↑ Upload '+(assetKind==='image'?'image':'audio')+'<input type="file" data-asset-kind="'+assetKind+'" data-upload-path="'+esc(path)+'" accept="'+(assetKind==='image'?'.png,.jpg,.jpeg,.webp,.gif':'.mp3,.ogg,.wav')+'"></label>':'';
  return '<div class="field"><label>'+esc(label)+'</label>'+control+picker+'</div>';
 }
+function pageActivationPanel(){
+ const r=S.record;
+ if(r.template==='homepage')return '';
+ const active=r.publishing?.published!==false;
+ const title=active?'Page is active':'Page is inactive';
+ const description=active
+   ?'This page is included in the production build. Deactivating it will remove the page from the public site on the next deployment.'
+   :'This page is currently excluded from the production build. Reactivating it will restore the page on the next deployment.';
+ return '<section class="panel"><div class="panel-head"><span class="panel-title">Page availability</span><span class="panel-note">PUBLICATION STATE</span></div><div class="page-activation-row"><div class="page-activation-copy"><strong>'+title+'</strong><p>'+description+'</p></div><button class="btn '+(active?'':'primary')+'" id="pageActivationButton" type="button">'+(active?'Deactivate page':'Reactivate page')+'</button></div><div class="page-activation-footer">This changes your local record first. The public site changes only after <strong>Save &amp; deploy live</strong>.</div></section>';
+}
+function togglePageActivation(){
+ if(!S.record||S.record.template==='homepage')return;
+ const active=S.record.publishing?.published!==false;
+ const next=!active;
+ const message=next
+   ?'Reactivate this page? It will be included in the next production build after you deploy.'
+   :'Deactivate this page? It will be excluded from the next production build after you deploy.';
+ if(!confirm(message))return;
+ if(!S.record.publishing||typeof S.record.publishing!=='object')S.record.publishing={};
+ S.record.publishing.published=next;
+ const item=S.items.find(entry=>entry.key===S.key);
+ if(item)item.published=next;
+ dirty();
+ renderEditor();
+ toast(next?'Page reactivated locally. Save local, then deploy to make it public.':'Page deactivated locally. Save local, then deploy to remove it from the public site.');
+}
 function pageFields(){
  const r=S.record;
  const identity=Object.assign({},r.identity||{});
  delete identity.slug;delete identity.route;
- return '<section class="panel"><div class="panel-head"><span class="panel-title">Page identity</span><span class="panel-note">NAME · ORDER · URL</span></div>'+valueEditor(identity,'identity','Identity')+'<div class="field" style="margin-top:8px"><label>URL slug · fixed after creation</label><input readonly value="'+esc(r.identity?.slug||'home')+'"><span class="helper">The slug determines the filename and public route. Create a new page to use a different URL.</span></div></section>'+
+ return '<section class="panel"><div class="panel-head"><span class="panel-title">Page identity</span><span class="panel-note">NAME · ORDER · URL</span></div>'+valueEditor(identity,'identity','Identity')+'<div class="field" style="margin-top:8px"><label>URL slug · fixed after creation</label><input readonly value="'+esc(r.identity?.slug||'home')+'"><span class="helper">The slug determines the filename and public route. Create a new page to use a different URL.</span></div></section>'+pageActivationPanel()+
  '<section class="panel"><div class="panel-head"><span class="panel-title">Publishing</span><span class="panel-note">VISIBILITY</span></div>'+valueEditor(r.publishing||{},'publishing','Publishing')+'</section>'+
  '<section class="panel"><div class="panel-head"><span class="panel-title">Appearance</span><span class="panel-note">WALLPAPER · EFFECTS</span></div>'+valueEditor(r.appearance||{},'appearance','Appearance')+'</section>'+
  '<section class="panel"><div class="panel-head"><span class="panel-title">Search &amp; social preview</span><span class="panel-note">SEO</span></div>'+valueEditor(r.seo||{},'seo','SEO')+'</section>';
@@ -579,6 +606,7 @@ function bindEvents(){
    const move=event.target.closest('[data-move-section]');
    const lyrics=event.target.closest('[data-edit-lyrics]');
    if(lyrics){openLyricsEditor(Number(lyrics.dataset.editLyrics));return;}
+   if(event.target.closest('#pageActivationButton')){togglePageActivation();return;}
    if(add){addArrayItem(add.dataset.addArray);return;}
    if(moveArray){moveArrayItem(moveArray.dataset.moveArray,Number(moveArray.dataset.index),Number(moveArray.dataset.dir));return;}
    if(remove){removeArrayItem(remove.dataset.removeArray,Number(remove.dataset.index));return;}

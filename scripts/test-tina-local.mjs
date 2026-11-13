@@ -9,6 +9,7 @@ const baseUrl = 'http://' + host + ':' + port;
 const api = baseUrl + '/__fsfm/api';
 const testDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fsfm-studio-auth-test-'));
 let smokeAssetPath = '';
+let smokeCreatedPagePath = '';
 const args = [
   '--yes',
   '@tinacms/cli@4.0.5',
@@ -195,6 +196,53 @@ try {
     throw new Error('Uploaded image was not saved to the local asset library.');
   }
 
+  const createSmokePage = await fetch(api + '/content/create', {
+    method: 'POST', headers: saveHeaders,
+    body: JSON.stringify({
+      template: 'editorial',
+      name: 'FSFM Studio Activation Smoke Test',
+      slug: 'fsfm-studio-activation-smoke-test',
+      showInNavigation: true,
+    }),
+  });
+  requireStatus(createSmokePage, 201, 'Create unpublished activation smoke-test page');
+  const createdSmokePage = await createSmokePage.json();
+  smokeCreatedPagePath = path.join(
+    process.cwd(), 'content', 'v13', 'editorial-pages', 'fsfm-studio-activation-smoke-test.json',
+  );
+  if (!fs.existsSync(smokeCreatedPagePath)) throw new Error('Activation smoke-test page was not written locally.');
+
+  const createdSmokePageResponse = await fetch(api + '/content/editorial-pages/fsfm-studio-activation-smoke-test', { headers: authHeaders });
+  if (!createdSmokePageResponse.ok) throw new Error('Could not read the newly created activation smoke-test page.');
+  const createdSmokePageData = await createdSmokePageResponse.json();
+  if (createdSmokePageData.record.publishing?.published !== false) {
+    throw new Error('New pages must start inactive.');
+  }
+
+  const activeSmokeRecord = JSON.parse(JSON.stringify(createdSmokePageData.record));
+  activeSmokeRecord.publishing.published = true;
+  const activateSmokePage = await fetch(api + '/content/editorial-pages/fsfm-studio-activation-smoke-test', {
+    method: 'PUT', headers: saveHeaders,
+    body: JSON.stringify({ revision: createdSmokePageData.revision, record: activeSmokeRecord }),
+  });
+  requireStatus(activateSmokePage, 200, 'Reactivate smoke-test page');
+  const activatedSmokeData = await activateSmokePage.json();
+  if (activatedSmokeData.record.publishing?.published !== true) {
+    throw new Error('Reactivation did not persist the active publication state.');
+  }
+
+  const inactiveSmokeRecord = JSON.parse(JSON.stringify(activatedSmokeData.record));
+  inactiveSmokeRecord.publishing.published = false;
+  const deactivateSmokePage = await fetch(api + '/content/editorial-pages/fsfm-studio-activation-smoke-test', {
+    method: 'PUT', headers: saveHeaders,
+    body: JSON.stringify({ revision: activatedSmokeData.revision, record: inactiveSmokeRecord }),
+  });
+  requireStatus(deactivateSmokePage, 200, 'Deactivate smoke-test page');
+  const deactivatedSmokeData = await deactivateSmokePage.json();
+  if (deactivatedSmokeData.record.publishing?.published !== false) {
+    throw new Error('Deactivation did not persist the inactive publication state.');
+  }
+
   const contentIndexResponse = await fetch(api + '/content', { headers: authHeaders });
   if (!contentIndexResponse.ok) throw new Error('Authenticated content index failed.');
   const contentIndex = await contentIndexResponse.json();
@@ -223,6 +271,14 @@ try {
   if (!wallpaperData.record.presets?.length) throw new Error('Wallpaper presets did not load.');
   const vistaContent = await fetch(api + '/content/vista-pages/vistatest', { headers: authHeaders });
   if (!vistaContent.ok || (await vistaContent.json()).record.template !== 'vista-window') throw new Error('Vista page editor did not load.');
+  const deactivateHomepage = JSON.parse(JSON.stringify(homepageData.record));
+  deactivateHomepage.publishing.published = false;
+  const homepageDeactivation = await fetch(api + '/content/homepage', {
+    method: 'PUT', headers: saveHeaders,
+    body: JSON.stringify({ revision: homepageData.revision, record: deactivateHomepage }),
+  });
+  requireStatus(homepageDeactivation, 422, 'Homepage deactivation protection');
+
   const invalidPageRecord = JSON.parse(JSON.stringify(homepageData.record));
   invalidPageRecord.identity.slug = 'attempted-route-change';
   const invalidPageSave = await fetch(api + '/content/homepage', {
@@ -311,11 +367,13 @@ try {
   console.log('  API:      authentication, content index, all page templates, 18 blocks, global settings and validation verified');
   console.log('  Lyrics:   protected LRC read, cross-origin and stale-revision checks verified');
   console.log('  Assets:   local image upload, signature validation, cross-origin protection and cleanup verified');
+  console.log('  Pages:    create draft, activate, deactivate and homepage protection verified');
 } catch (error) {
   console.error('[Tina smoke test]', error);
   process.exitCode = 1;
 } finally {
   await stopChild();
   if (smokeAssetPath) fs.rmSync(smokeAssetPath, { force: true });
+  if (smokeCreatedPagePath) fs.rmSync(smokeCreatedPagePath, { force: true });
   fs.rmSync(testDataDir, { recursive: true, force: true });
 }
