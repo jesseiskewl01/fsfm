@@ -648,13 +648,13 @@ function bindEvents(){
    frame.style.maxWidth=size==='desktop'?'100%':'none';
    frame.style.margin='0 auto';
    $('#previewDimensions').textContent=preset.label;
-   $('[data-size]').forEach(item=>{
+   $$('[data-size]').forEach(item=>{
      const active=item.dataset.size===size;
      item.classList.toggle('active',active);
      item.setAttribute('aria-pressed',String(active));
    });
  }
- $('[data-size]').forEach(button=>button.addEventListener('click',()=>setPreviewSize(button.dataset.size)));
+ $$('[data-size]').forEach(button=>button.addEventListener('click',()=>setPreviewSize(button.dataset.size)));
  setPreviewSize('desktop');
  window.addEventListener('beforeunload',event=>{if(S.dirty){event.preventDefault();event.returnValue='';}});
 }
