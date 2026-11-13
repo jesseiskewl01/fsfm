@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#17151f">
+<title>Unlock FSFM Studio</title>
+<style>
+:root{color-scheme:dark;--bg:#17151f;--line:#3b3747;--text:#f4f0f8;--muted:#aaa3b5;--accent:#c7a8ff}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(ellipse at 50% 0%,#3a2c50 0,transparent 48%),var(--bg);color:var(--text);font:14px/1.5 Inter,ui-sans-serif,system-ui,sans-serif}
+.card{width:min(100%,420px);padding:34px;border:1px solid var(--line);border-radius:22px;background:#211f2bee;box-shadow:0 28px 90px #09070d88}
+.mark{width:43px;height:43px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(135deg,#e0c9ff,#9873d6);color:#211832;font-weight:900;font-size:20px}
+.eyebrow{margin:24px 0 7px;color:var(--accent);font-size:10px;font-weight:800;letter-spacing:.18em}
+h1{margin:0;font-size:27px;letter-spacing:-.045em}.intro{margin:10px 0 25px;color:var(--muted);font-size:12px}
+label{display:block;margin:15px 0 7px;color:#c9c1d2;font-size:11px;font-weight:700}
+input{width:100%;padding:13px 14px;border:1px solid #494354;border-radius:10px;background:#17151f;color:var(--text);font:inherit;outline:none}
+input:focus{border-color:#a987e5;box-shadow:0 0 0 3px #c7a8ff20}
+button{width:100%;margin-top:22px;padding:13px;border:0;border-radius:10px;background:var(--accent);color:#21182e;font:700 12px Inter,ui-sans-serif,system-ui,sans-serif;cursor:pointer}
+button:disabled{opacity:.55;cursor:wait}.hint{margin:14px 0 0;color:#8d8598;font-size:10px}.error{min-height:18px;margin:12px 0 0;color:#f0a8b2;font-size:11px}.foot{margin-top:27px;padding-top:18px;border-top:1px solid var(--line);color:#797284;font-size:10px}
+</style>
+</head>
+<body>
+<main class="card">
+  <div class="mark">F.</div>
+  <div class="eyebrow">PRIVATE WORKSPACE · LOCAL ONLY</div>
+  <h1 id="heading">Unlock your Studio</h1>
+  <p class="intro" id="intro">Your FSFM editing workspace is protected. Sign in to continue.</p>
+  <form id="authForm">
+    <label for="password">Studio password</label>
+    <input id="password" name="password" type="password" autocomplete="current-password" required maxlength="1024" autofocus>
+    <div id="confirmWrap" hidden>
+      <label for="confirmPassword">Confirm password</label>
+      <input id="confirmPassword" name="confirmPassword" type="password" autocomplete="new-password" maxlength="1024">
+    </div>
+    <p class="hint" id="hint">Your session lasts up to eight hours, or until the local server restarts.</p>
+    <p class="error" id="error" role="alert"></p>
+    <button id="submit" type="submit">Unlock FSFM Studio</button>
+  </form>
+  <div class="foot">The password hash is stored in your Windows user profile, outside the FSFM repository.</div>
+</main>
+<script>
+(function(){
+  const $=function(id){return document.getElementById(id)};
+  let setup=false;
+  async function initialise(){
+    try{
+      const response=await fetch('/__fsfm/api/auth/status',{cache:'no-store'});
+      const data=await response.json();
+      if(!response.ok)throw new Error(data.error||'Could not check Studio authentication.');
+      setup=!data.configured;
+      $('heading').textContent=setup?'Create your Studio password':'Welcome back';
+      $('intro').textContent=setup?'This is the first launch. Create a password to protect your private editing workspace.':'Your FSFM editing workspace is protected. Sign in to continue.';
+      $('confirmWrap').hidden=!setup;
+      $('password').autocomplete=setup?'new-password':'current-password';
+      $('hint').textContent=setup?'Use at least 12 characters. A unique passphrase is a good choice.':'Your session lasts up to eight hours, or until the local server restarts.';
+      $('submit').textContent=setup?'Create password':'Unlock FSFM Studio';
+    }catch(error){$('error').textContent=error.message;$('submit').disabled=true}
+  }
+  $('authForm').addEventListener('submit',async function(event){
+    event.preventDefault();
+    $('error').textContent='';
+    const password=$('password').value;
+    if(setup&&password!==$('confirmPassword').value){$('error').textContent='The passwords do not match.';return}
+    $('submit').disabled=true;
+    $('submit').textContent=setup?'Creating…':'Checking…';
+    try{
+      const response=await fetch('/__fsfm/api/auth/'+(setup?'setup':'login'),{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({password})
+      });
+      const data=await response.json();
+      if(!response.ok)throw new Error(data.error||'Could not sign in.');
+      window.location.replace('/studio/');
+    }catch(error){
+      $('error').textContent=error.message;
+      $('submit').disabled=false;
+      $('submit').textContent=setup?'Create password':'Unlock FSFM Studio';
+    }
+  });
+  initialise();
+})();
+</script>
+</body>
+</html>

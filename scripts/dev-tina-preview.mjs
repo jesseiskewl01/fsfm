@@ -1,6 +1,7 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import http from 'node:http';
+import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -17,6 +18,15 @@ const host = process.env.HOST || '127.0.0.1';
 if (!['127.0.0.1', 'localhost', '::1'].includes(host)) {
   throw new Error('FSFM Studio must bind to a loopback host. Do not expose the local editor on your network.');
 }
+
+// Credentials stay in the current OS user's profile, outside the repository.
+const authDataDir = path.resolve(process.env.FSFM_STUDIO_DATA_DIR || path.join(os.homedir(), '.fsfm-studio'));
+const authFilePath = path.join(authDataDir, 'auth.json');
+const sessionCookieName = 'fsfm_studio_session';
+const sessionLifetimeMs = 8 * 60 * 60 * 1000;
+const sessions = new Map();
+const loginAttempts = new Map();
+const passwordHashOptions = { N: 16384, r: 8, p: 1, maxmem: 64 * 1024 * 1024 };
 
 const mimeTypes = {
   '.html': 'text/html; charset=utf-8',
@@ -156,6 +166,171 @@ function validateAlbumRecord(id, record) {
   return null;
 }
 
+
+function expectedStudioOrigin() {
+  return 'http://' + host + ':' + port;
+}
+
+function hasExpectedOrigin(request) {
+  return request.headers.origin === expectedStudioOrigin();
+}
+
+function readSessionToken(request) {
+  const cookieHeader = request.headers.cookie || '';
+  for (const part of cookieHeader.split(';')) {
+    const separator = part.indexOf('=');
+    if (separator < 0) continue;
+    if (part.slice(0, separator).trim() === sessionCookieName) return part.slice(separator + 1).trim();
+  }
+  return '';
+}
+
+function hasStudioSession(request) {
+  const token = readSessionToken(request);
+  if (!/^[a-f0-9]{64}$/.test(token)) return false;
+  const session = sessions.get(token);
+  if (!session) return false;
+  if (session.expiresAt <= Date.now()) {
+    sessions.delete(token);
+    return false;
+  }
+  return true;
+}
+
+function issueStudioSession(response) {
+  const token = crypto.randomBytes(32).toString('hex');
+  sessions.set(token, { expiresAt: Date.now() + sessionLifetimeMs });
+  response.setHeader('Set-Cookie', sessionCookieName + '=' + token +
+    '; Path=/; HttpOnly; SameSite=Strict; Max-Age=' + Math.floor(sessionLifetimeMs / 1000));
+}
+
+function clearStudioSession(request, response) {
+  const token = readSessionToken(request);
+  if (token) sessions.delete(token);
+  response.setHeader('Set-Cookie', sessionCookieName + '=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0');
+}
+
+function derivePasswordHash(password, salt) {
+  return crypto.scryptSync(password, salt, 64, passwordHashOptions).toString('base64');
+}
+
+function readAuthConfig() {
+  if (!fs.existsSync(authFilePath)) return null;
+  const config = JSON.parse(fs.readFileSync(authFilePath, 'utf8'));
+  if (config?.version !== 1 || typeof config.salt !== 'string' || typeof config.passwordHash !== 'string') {
+    throw new Error('Studio authentication configuration is invalid.');
+  }
+  return config;
+}
+
+function passwordMatches(password, config) {
+  if (typeof password !== 'string' || Buffer.byteLength(password, 'utf8') > 1024) return false;
+  const expected = Buffer.from(config.passwordHash, 'base64');
+  const actual = Buffer.from(derivePasswordHash(password, Buffer.from(config.salt, 'base64')), 'base64');
+  return expected.length === actual.length && crypto.timingSafeEqual(expected, actual);
+}
+
+function loginRateLimit(request) {
+  const key = request.socket?.remoteAddress || 'local';
+  const now = Date.now();
+  let state = loginAttempts.get(key);
+  if (!state || now - state.windowStarted > 15 * 60 * 1000) {
+    state = { failures: 0, windowStarted: now, lockedUntil: 0 };
+    loginAttempts.set(key, state);
+  }
+  if (state.lockedUntil > now) {
+    return { blocked: true, retryAfter: Math.ceil((state.lockedUntil - now) / 1000) };
+  }
+  return { blocked: false, key, state };
+}
+
+async function handleAuthApi(request, response, pathname) {
+  if (pathname === '/__fsfm/api/auth/status') {
+    if (!['GET', 'HEAD'].includes(request.method || '')) {
+      response.writeHead(405, { Allow: 'GET, HEAD' });
+      response.end();
+      return true;
+    }
+    sendJson(response, 200, { configured: fs.existsSync(authFilePath) }, request.method);
+    return true;
+  }
+
+  const routes = ['/__fsfm/api/auth/setup', '/__fsfm/api/auth/login', '/__fsfm/api/auth/logout'];
+  if (!routes.includes(pathname)) return false;
+  if (request.method !== 'POST') {
+    response.writeHead(405, { Allow: 'POST' });
+    response.end();
+    return true;
+  }
+  if (!hasExpectedOrigin(request)) {
+    sendJson(response, 403, { error: 'Authentication requests must come from this local FSFM Studio origin.' });
+    return true;
+  }
+  if (pathname === '/__fsfm/api/auth/logout') {
+    clearStudioSession(request, response);
+    sendJson(response, 200, { ok: true });
+    return true;
+  }
+
+  try {
+    const body = await readRequestJson(request, 8192);
+    if (pathname === '/__fsfm/api/auth/setup') {
+      if (fs.existsSync(authFilePath)) {
+        sendJson(response, 409, { error: 'A Studio password has already been configured.' });
+        return true;
+      }
+      const password = body?.password;
+      if (typeof password !== 'string' || [...password].length < 12 || Buffer.byteLength(password, 'utf8') > 1024) {
+        sendJson(response, 422, { error: 'Choose a password with at least 12 characters.' });
+        return true;
+      }
+      const salt = crypto.randomBytes(16);
+      const config = {
+        version: 1,
+        algorithm: 'scrypt',
+        salt: salt.toString('base64'),
+        passwordHash: derivePasswordHash(password, salt),
+        createdAt: new Date().toISOString(),
+      };
+      fs.mkdirSync(authDataDir, { recursive: true, mode: 0o700 });
+      fs.writeFileSync(authFilePath, JSON.stringify(config, null, 2) + '\n', { flag: 'wx', mode: 0o600 });
+      try { fs.chmodSync(authFilePath, 0o600); } catch {
+        // Windows permissions are inherited from the private user-profile directory.
+      }
+      issueStudioSession(response);
+      sendJson(response, 201, { ok: true });
+      return true;
+    }
+
+    const limit = loginRateLimit(request);
+    if (limit.blocked) {
+      response.setHeader('Retry-After', String(limit.retryAfter));
+      sendJson(response, 429, { error: 'Too many login attempts. Try again after the lockout period.' });
+      return true;
+    }
+    const config = readAuthConfig();
+    if (!config) {
+      sendJson(response, 409, { error: 'Set up your Studio password before logging in.' });
+      return true;
+    }
+    if (!passwordMatches(body?.password, config)) {
+      limit.state.failures += 1;
+      if (limit.state.failures >= 5) limit.state.lockedUntil = Date.now() + 15 * 60 * 1000;
+      sendJson(response, 401, { error: 'That password was not recognised.' });
+      return true;
+    }
+    loginAttempts.delete(limit.key);
+    issueStudioSession(response);
+    sendJson(response, 200, { ok: true });
+    return true;
+  } catch (error) {
+    sendJson(response, error.statusCode || 500, {
+      error: error.statusCode ? error.message : 'Studio authentication could not be completed.',
+    });
+    return true;
+  }
+}
+
 async function handleApi(request, response, pathname) {
   if (pathname === '/__fsfm/api/health') {
     if (!['GET', 'HEAD'].includes(request.method || '')) {
@@ -164,6 +339,13 @@ async function handleApi(request, response, pathname) {
       return;
     }
     sendJson(response, 200, { ok: true, app: 'FSFM Studio', mode: 'local' }, request.method);
+    return;
+  }
+
+  if (await handleAuthApi(request, response, pathname)) return;
+
+  if (!hasStudioSession(request)) {
+    sendJson(response, 401, { error: 'Your FSFM Studio session is missing or has expired. Please sign in again.' });
     return;
   }
 
@@ -296,6 +478,19 @@ const server = http.createServer((request, response) => {
 
   const isAdmin = pathname === '/admin' || pathname.startsWith('/admin/');
   const isStudio = pathname === '/studio' || pathname.startsWith('/studio/');
+  if (isStudio && pathname === '/studio') {
+    response.writeHead(302, { Location: '/studio/', 'Cache-Control': 'no-store' });
+    response.end();
+    return;
+  }
+
+  const isStudioLogin = isStudio && pathname === '/studio/login.html';
+  if (isStudio && !isStudioLogin && !hasStudioSession(request)) {
+    response.writeHead(302, { Location: '/studio/login.html', 'Cache-Control': 'no-store' });
+    response.end();
+    return;
+  }
+
   const base = isAdmin ? adminRoot : isStudio ? studioRoot : previewRoot;
   let relativePath = isAdmin
     ? pathname.replace(/^\/admin\/?/, '')
@@ -314,12 +509,6 @@ const server = http.createServer((request, response) => {
 
   if (fs.existsSync(filePath) && fs.statSync(filePath).isDirectory()) {
     filePath = path.join(filePath, 'index.html');
-  }
-
-  if (isStudio && pathname === '/studio') {
-    response.writeHead(302, { Location: '/studio/', 'Cache-Control': 'no-store' });
-    response.end();
-    return;
   }
 
   if (isAdmin && pathname === '/admin') {
