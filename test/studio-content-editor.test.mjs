@@ -51,6 +51,12 @@ test('local media uploads are exposed in Studio and restricted to approved media
   assert.match(server, /maximum file size|30 \* 1024 \* 1024/i);
 });
 
+test('nested lists can be reordered and new block IDs remain unique after deletion', () => {
+  assert.match(studio, /data-move-array/);
+  assert.match(studio, /function moveArrayItem\(/);
+  assert.match(studio, /while\(used\.has\(prefix\+index\)\)/);
+});
+
 test('synced lyrics have a separate protected local editing route', () => {
   assert.match(studio, /Edit synced lyrics/);
   assert.match(studio, /async function openLyricsEditor/);

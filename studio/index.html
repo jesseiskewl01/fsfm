@@ -179,7 +179,7 @@ function valueEditor(value,path,label,depth=0,options={}){
      if(item&&typeof item==='object')inner=valueEditor(item,itemPath, label+' '+(index+1),depth+1);
      else inner=primitiveEditor(item,itemPath,label+' '+(index+1),depth+1);
      const lyricTool=path==='templateData.player.tracks'&&item&&typeof item==='object'&&item.lyricsFile?'<button class="btn small" data-edit-lyrics="'+index+'">♫ Edit synced lyrics</button>':'';
-     return '<div class="array-item"><div class="array-item-head"><span>'+esc(label)+' '+(index+1)+'</span><div class="array-item-controls"><button class="mini" data-remove-array="'+esc(path)+'" data-index="'+index+'" title="Remove item">×</button></div></div>'+inner+lyricTool+'</div>';
+     return '<div class="array-item"><div class="array-item-head"><span>'+esc(label)+' '+(index+1)+'</span><div class="array-item-controls"><button class="mini" data-move-array="'+esc(path)+'" data-index="'+index+'" data-dir="-1" title="Move up" '+(index===0?'disabled':'')+'>↑</button><button class="mini" data-move-array="'+esc(path)+'" data-index="'+index+'" data-dir="1" title="Move down" '+(index===value.length-1?'disabled':'')+'>↓</button><button class="mini" data-remove-array="'+esc(path)+'" data-index="'+index+'" title="Remove item">×</button></div></div>'+inner+lyricTool+'</div>';
    }).join('');
    return '<div class="array-box"><div class="array-head"><strong>'+esc(label)+' · '+value.length+'</strong><span class="helper">Ordered list</span></div>'+items+'<button class="btn add-item" data-add-array="'+esc(path)+'">＋ Add '+esc(label.replace(/s$/,''))+'</button></div>';
  }
@@ -321,7 +321,11 @@ async function deployLive(){
 function defaultKeyForType(type){
  const page=S.record;
  const base=(page.template==='homepage'?'home':page.identity.slug);
- return base+'-'+type.replace(/[^a-z0-9]+/gi,'-')+'-'+String((page.sections||[]).length+1);
+ const prefix=base+'-'+type.replace(/[^a-z0-9]+/gi,'-')+'-';
+ const used=new Set((page.sections||[]).map(section=>section.id));
+ let index=1;
+ while(used.has(prefix+index))index++;
+ return prefix+index;
 }
 function addComponent(){
  const select=$('#newComponentType');const type=select?.value;
@@ -343,6 +347,13 @@ function changePath(path,element){
  else value=element.value;
  set(S.record,actualPath(path),value);
  dirty();
+}
+function moveArrayItem(path,index,direction){
+ const array=get(S.record,actualPath(path),[]);
+ const target=index+direction;
+ if(!Array.isArray(array)||index<0||index>=array.length||target<0||target>=array.length)return;
+ [array[index],array[target]]=[array[target],array[index]];
+ dirty();renderEditor();
 }
 function removeArrayItem(path,index){
  const array=get(S.record,actualPath(path),[]);
@@ -444,12 +455,14 @@ function bindEvents(){
  });
  body.addEventListener('click',event=>{
    const add=event.target.closest('[data-add-array]');
+   const moveArray=event.target.closest('[data-move-array]');
    const remove=event.target.closest('[data-remove-array]');
    const removeBlock=event.target.closest('[data-remove-section]');
    const move=event.target.closest('[data-move-section]');
    const lyrics=event.target.closest('[data-edit-lyrics]');
    if(lyrics){openLyricsEditor(Number(lyrics.dataset.editLyrics));return;}
    if(add){addArrayItem(add.dataset.addArray);return;}
+   if(moveArray){moveArrayItem(moveArray.dataset.moveArray,Number(moveArray.dataset.index),Number(moveArray.dataset.dir));return;}
    if(remove){removeArrayItem(remove.dataset.removeArray,Number(remove.dataset.index));return;}
    if(removeBlock){removeSection(Number(removeBlock.dataset.removeSection));return;}
    if(move){moveSection(Number(move.dataset.moveSection),Number(move.dataset.dir));return;}
