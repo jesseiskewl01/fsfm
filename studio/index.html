@@ -755,6 +755,9 @@ function fieldOptions(path){
   ['top left','Top left'],['top right','Top right'],['bottom left','Bottom left'],['bottom right','Bottom right']
  ];
  if(clean.endsWith('.appearance.wallpaper.customFit')||clean.endsWith('.appearance.wallpaper.fit'))return [['cover','Fill the background'],['contain','Fit the whole image']];
+ if(/^ROOT\.presets\.\d+\.family$/.test(clean))return [...new Set((S.wallpaperPresets||[]).map(item=>item.family).filter(Boolean))].map(value=>[value,human(value)]);
+ if(/^ROOT\.presets\.\d+\.colour$/.test(clean))return [...new Set((S.wallpaperPresets||[]).map(item=>item.colour).filter(Boolean))].map(value=>[value,human(value)]);
+ if(/^ROOT\.presets\.\d+\.kind$/.test(clean))return [...new Set((S.wallpaperPresets||[]).map(item=>item.kind).filter(Boolean))].map(value=>[value,human(value)]);
  if(/\.appearance\.wallpaper\.(preset|presets\.\d+|initialSelection)$/.test(clean)){
   const presets=(S.wallpaperPresets||[]).map(item=>[item.id,item.name||human(item.id)]);
   return clean.endsWith('.initialSelection')?[['random','Choose randomly'],...presets]:presets;

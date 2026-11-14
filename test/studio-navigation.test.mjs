@@ -22,7 +22,7 @@ test('the selected page is visibly and accessibly marked in the navigation list'
 });
 
 test('the live page list remains grouped by page template', () => {
-  for (const group of ["['album','Albums']", "['vista-window','Vista pages']", "['editorial','Editorial pages']"]) {
+  for (const group of ["['album','Albums']", "['vista-window','Vista']", "['editorial','Editorial pages']"]) {
     assert.ok(studio.includes(group), `Missing page group ${group}`);
   }
 });

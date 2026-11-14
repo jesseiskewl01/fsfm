@@ -9,6 +9,8 @@ test('Studio exposes valid dropdown choices for common design settings',()=>{
  for(const item of ['function fieldOptions(path)',"['vista-window','Vista Window']","['grid','Grid']","['template-default','Use template default']","['sequential','In order']","['cover','Fill the background']","['primary','Primary button']"])assert.ok(studio.includes(item),item);
  assert.match(studio,/<select data-path=/);
  assert.match(studio,/S\.wallpaperPresets/);
+ assert.match(studio,/ROOT\\\.presets\\\.\\d\+\\\.family/);
+ assert.match(studio,/ROOT\\\.presets\\\.\\d\+\\\.colour/);
 });
 test('page creation uses a guided form instead of browser prompts',()=>{
  assert.match(studio,/id="createPageForm"/);
