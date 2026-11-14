@@ -23,16 +23,32 @@ function defaultVariant(section, context = {}) {
   return 'plain';
 }
 
+function vistaWindowTitle(section) {
+  const labels = {
+    'site-header': 'SITE IDENTITY', hero: 'FEATURED WINDOW',
+    'artist-statement': 'ABOUT', 'embed-window': 'MEDIA PLAYER',
+    'bandsintown-events': 'EVENTS', 'social-links': 'SOCIAL LINKS',
+    'featured-release': 'FEATURED RELEASE', 'rich-text': 'NOTES',
+    image: 'IMAGE VIEWER', gallery: 'IMAGE GALLERY', quote: 'QUOTE', 'link-button': 'LINK'
+  };
+  return (section.presentation?.windowTitle || labels[section.type] || String(section.type || 'FSFM WINDOW').replace(/[-_]/g, ' ').toUpperCase()).trim();
+}
+
 function windowWrap(section, inner, extraClass = '', context = {}) {
   const presentation = section.presentation || {};
   const variant = defaultVariant(section, context);
+  const isVistaWindow = context.page?.template === 'vista-window' && ['vista-window', 'vista-desktop'].includes(variant) && !['divider', 'spacer', 'marquee'].includes(section.type);
   const title = ['album-header', 'album-player'].includes(section.type) ? '' : (presentation.windowTitle || '').trim();
-  const classes = ['content-section', `variant-${variant}`, extraClass].filter(Boolean).join(' ');
-  const titlebar = title
-    ? `<div class="component-titlebar"><span class="component-title">${escapeHtml(title)}</span></div>`
-    : '';
-  const groupId = section.group?.id ? ` data-layout-group="${escapeHtml(section.group.id)}"` : '';
-  return `<section class="${classes}" id="section-${escapeHtml(section.id || section.type)}" data-component="${escapeHtml(section.type)}"${groupId}>${titlebar}<div class="component-body">${inner}</div></section>`;
+  const windowTitle = isVistaWindow ? vistaWindowTitle(section) : title;
+  const classes = ['content-section', 'variant-' + variant, isVistaWindow ? 'vista-window-frame' : '', extraClass].filter(Boolean).join(' ');
+  const titlebar = isVistaWindow
+    ? '<div class="vista-window-titlebar" data-vista-drag-handle tabindex="0" aria-label="Move ' + escapeHtml(windowTitle) + ' window" title="Drag to move · Use arrow keys to nudge"><span class="vista-window-icon" aria-hidden="true">✧</span><span class="vista-window-title">' + escapeHtml(windowTitle) + '</span><span class="vista-window-controls"><button type="button" class="vista-window-button minimize" data-vista-window-action="minimize" aria-label="Minimize ' + escapeHtml(windowTitle) + '" title="Minimize">−</button><button type="button" class="vista-window-button close" data-vista-window-action="close" aria-label="Close ' + escapeHtml(windowTitle) + '" title="Close">×</button></span></div>'
+    : title
+      ? '<div class="component-titlebar"><span class="component-title">' + escapeHtml(title) + '</span></div>'
+      : '';
+  const groupId = section.group?.id ? ' data-layout-group="' + escapeHtml(section.group.id) + '"' : '';
+  const vistaAttributes = isVistaWindow ? ' data-vista-window data-vista-window-id="' + escapeHtml(section.id || section.type) + '" data-vista-window-title="' + escapeHtml(windowTitle) + '"' : '';
+  return '<section class="' + classes + '" id="section-' + escapeHtml(section.id || section.type) + '" data-component="' + escapeHtml(section.type) + '"' + groupId + vistaAttributes + '>' + titlebar + '<div class="component-body">' + inner + '</div></section>';
 }
 
 function renderMarquee(content = {}) {

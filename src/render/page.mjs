@@ -130,6 +130,7 @@ export function renderSiteShell({ page, site, pages = [], wallpapers, bodyHtml, 
   if (scripts.includes('bandsintown')) scriptsToLoad.add('bandsintown.js');
   if (scripts.includes('album-player')) scriptsToLoad.add('album-player.js');
   if (page.template === 'album') scriptsToLoad.add('album-atmosphere.js');
+  if (page.template === 'vista-window') scriptsToLoad.add('vista-windows.js');
   if (homepageMode) {
     for (const name of ['homepage-desktop.js','homepage-interactions.js','homepage-gadgets.js']) scriptsToLoad.add(name);
   }

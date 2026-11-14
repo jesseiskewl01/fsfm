@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#09070f">
+<title>Unlock FSFM Studio</title>
+<style>
+:root{color-scheme:dark;--bg:#17151f;--line:#3b3747;--text:#f4f0f8;--muted:#aaa3b5;--accent:#c7a8ff}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(ellipse at 50% 0%,#3a2c50 0,transparent 48%),var(--bg);color:var(--text);font:14px/1.5 Inter,ui-sans-serif,system-ui,sans-serif}
+.card{width:min(100%,420px);padding:34px;border:1px solid var(--line);border-radius:22px;background:#211f2bee;box-shadow:0 28px 90px #09070d88}
+.mark{width:43px;height:43px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(135deg,#e0c9ff,#9873d6);color:#211832;font-weight:900;font-size:20px}
+.eyebrow{margin:24px 0 7px;color:var(--accent);font-size:10px;font-weight:800;letter-spacing:.18em}
+h1{margin:0;font-size:27px;letter-spacing:-.045em}.intro{margin:10px 0 25px;color:var(--muted);font-size:12px}
+label{display:block;margin:15px 0 7px;color:#c9c1d2;font-size:11px;font-weight:700}
+input{width:100%;padding:13px 14px;border:1px solid #494354;border-radius:10px;background:#17151f;color:var(--text);font:inherit;outline:none}
+input:focus{border-color:#a987e5;box-shadow:0 0 0 3px #c7a8ff20}
+button{width:100%;margin-top:22px;padding:13px;border:0;border-radius:10px;background:var(--accent);color:#21182e;font:700 12px Inter,ui-sans-serif,system-ui,sans-serif;cursor:pointer}
+button:disabled{opacity:.55;cursor:wait}.hint{margin:14px 0 0;color:#8d8598;font-size:10px}.error{min-height:18px;margin:12px 0 0;color:#f0a8b2;font-size:11px}.foot{margin-top:27px;padding-top:18px;border-top:1px solid var(--line);color:#797284;font-size:10px}
+
+/* FSFM Studio V16.8 · matching Night Workshop sign-in surface */
+:root{
+  color-scheme:dark;
+  --bg:#09070f;
+  --line:#3a2c49;
+  --text:#f6f0ff;
+  --muted:#b2a5c4;
+  --accent:#bd91ff;
+}
+body{
+  position:relative;isolation:isolate;overflow-x:hidden;
+  min-height:100svh;
+  background:
+    radial-gradient(ellipse at 50% -15%,#67428a66 0,transparent 48%),
+    radial-gradient(ellipse at 0% 100%,#24133499 0,transparent 42%),
+    #09070f;
+}
+body::before,body::after{
+  content:"";position:fixed;z-index:-1;pointer-events:none;border-radius:50%;
+  filter:blur(1px);opacity:.6;
+}
+body::before{width:420px;height:420px;top:-250px;right:-160px;border:1px solid #a77bd322;box-shadow:0 0 100px #8a5db522}
+body::after{width:300px;height:300px;bottom:-220px;left:-120px;border:1px solid #a77bd322;box-shadow:0 0 90px #8a5db522}
+.card{
+  position:relative;width:min(100%,460px);padding:clamp(25px,6vw,40px);
+  overflow:hidden;border:1px solid #4a365e;border-radius:23px;
+  background:linear-gradient(145deg,#1b1428f5,#100c18f7 70%);
+  box-shadow:0 34px 110px #000c,inset 0 1px #ffffff0c;
+}
+.card::before{
+  content:"";position:absolute;inset:0 0 auto;height:2px;
+  background:linear-gradient(90deg,transparent,#d4b2ff,#8f62c3,transparent);
+}
+.mark{
+  width:47px;height:47px;border-radius:15px;
+  background:linear-gradient(145deg,#e8d7ff 0%,#c49aff 54%,#7951a6 100%);
+  color:#170e23;font-size:21px;box-shadow:0 7px 26px #a879e844,inset 0 1px #ffffffb8;
+}
+.eyebrow{margin-top:28px;color:#c9a9f4;font-size:9px;letter-spacing:.2em}
+h1{font-size:clamp(26px,6vw,32px);font-weight:730;color:#fff}
+.intro{margin:11px 0 28px;color:#b7a9c8;font-size:12px;line-height:1.7}
+label{margin:17px 0 8px;color:#d7cbe4;font-size:11px}
+input{
+  min-height:47px;padding:12px 14px;border:1px solid #493755;border-radius:11px;
+  background:#0c0913;color:#f7f1ff;font-size:13px;
+  transition:border-color .16s,box-shadow .16s,background .16s;
+}
+input:hover{border-color:#705386}
+input:focus{border-color:#bd91ff;background:#130e1c;box-shadow:0 0 0 3px #bd91ff26}
+button{
+  min-height:47px;margin-top:24px;border:1px solid #d1adff;border-radius:11px;
+  background:linear-gradient(135deg,#e1caff,#b78ae9);color:#1b1028;
+  font:800 12px Inter,ui-sans-serif,system-ui,sans-serif;letter-spacing:.015em;
+  box-shadow:0 6px 23px #9c6bdc44;
+  transition:transform .16s,filter .16s,box-shadow .16s;
+}
+button:hover:not(:disabled){transform:translateY(-1px);filter:brightness(1.08);box-shadow:0 10px 29px #a879e866}
+button:active:not(:disabled){transform:translateY(0)}
+button:disabled{opacity:.5;cursor:wait;box-shadow:none}
+.hint{margin-top:13px;color:#a090b3;font-size:10px;line-height:1.6}
+.error{color:#f0a4b3;font-size:11px;line-height:1.5}
+.foot{margin-top:27px;padding-top:17px;border-top:1px solid #382943;color:#9385a5;font-size:10px;line-height:1.7}
+:focus-visible{outline:2px solid #d7bcff;outline-offset:3px}
+@media(max-width:480px){body{padding:16px}.card{padding:27px 22px;border-radius:19px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}}
+
+</style>
+</head>
+<body>
+<main class="card">
+  <div class="mark">F.</div>
+  <div class="eyebrow">PRIVATE WORKSPACE · LOCAL ONLY</div>
+  <h1 id="heading">Unlock your Studio</h1>
+  <p class="intro" id="intro">Your FSFM editing workspace is protected. Sign in to continue.</p>
+  <form id="authForm">
+    <label for="password">Studio password</label>
+    <input id="password" name="password" type="password" autocomplete="current-password" required maxlength="1024" autofocus>
+    <div id="confirmWrap" hidden>
+      <label for="confirmPassword">Confirm password</label>
+      <input id="confirmPassword" name="confirmPassword" type="password" autocomplete="new-password" maxlength="1024">
+    </div>
+    <p class="hint" id="hint">Your session lasts up to eight hours, or until the local server restarts.</p>
+    <p class="error" id="error" role="alert"></p>
+    <button id="submit" type="submit">Unlock FSFM Studio</button>
+  </form>
+  <div class="foot">The password hash is stored in your Windows user profile, outside the FSFM repository.</div>
+</main>
+<script>
+(function(){
+  const $=function(id){return document.getElementById(id)};
+  let setup=false;
+  async function initialise(){
+    try{
+      const response=await fetch('/__fsfm/api/auth/status',{cache:'no-store'});
+      const data=await response.json();
+      if(!response.ok)throw new Error(data.error||'Could not check Studio authentication.');
+      setup=!data.configured;
+      $('heading').textContent=setup?'Create your Studio password':'Welcome back';
+      $('intro').textContent=setup?'This is the first launch. Create a password to protect your private editing workspace.':'Your FSFM editing workspace is protected. Sign in to continue.';
+      $('confirmWrap').hidden=!setup;
+      $('password').autocomplete=setup?'new-password':'current-password';
+      $('hint').textContent=setup?'Use at least 12 characters. A unique passphrase is a good choice.':'Your session lasts up to eight hours, or until the local server restarts.';
+      $('submit').textContent=setup?'Create password':'Unlock FSFM Studio';
+    }catch(error){$('error').textContent=error.message;$('submit').disabled=true}
+  }
+  $('authForm').addEventListener('submit',async function(event){
+    event.preventDefault();
+    $('error').textContent='';
+    const password=$('password').value;
+    if(setup&&password!==$('confirmPassword').value){$('error').textContent='The passwords do not match.';return}
+    $('submit').disabled=true;
+    $('submit').textContent=setup?'Creating…':'Checking…';
+    try{
+      const response=await fetch('/__fsfm/api/auth/'+(setup?'setup':'login'),{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({password})
+      });
+      const data=await response.json();
+      if(!response.ok)throw new Error(data.error||'Could not sign in.');
+      window.location.replace('/studio/');
+    }catch(error){
+      $('error').textContent=error.message;
+      $('submit').disabled=false;
+      $('submit').textContent=setup?'Create password':'Unlock FSFM Studio';
+    }
+  });
+  initialise();
+})();
+</script>
+</body>
+</html>

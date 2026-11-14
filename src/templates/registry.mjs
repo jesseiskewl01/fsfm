@@ -13,7 +13,7 @@ export const TEMPLATES = Object.freeze({
     features: ['album-player','synchronised-lyrics','album-amber-atmosphere']
   },
   'vista-window': {
-    label: 'Vista Window Page', oneOfOne: false, routePattern: '/pages/{slug}/',
+    label: 'Vista', oneOfOne: false, routePattern: '/pages/{slug}/',
     allowedComponentTypes: ['site-header','hero','marquee','artist-statement','embed-window','bandsintown-events','social-links','featured-release','rich-text','image','gallery','quote','link-button','divider','spacer'],
     features: ['vista-windows','wallpaper-engine']
   },
