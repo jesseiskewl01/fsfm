@@ -9,7 +9,7 @@ const login = fs.readFileSync(path.join(root, 'studio/login.html'), 'utf8');
 
 test('the sign-in and first-run setup screens share the V16.8 Night Workshop identity', () => {
   assert.match(login, /name="theme-color" content="#09070f"/);
-  assert.match(login, /background:#09070f/);
+  assert.match(login, /--bg:#09070f/);
   assert.match(login, /#4a365e/);
   assert.match(login, /linear-gradient\(145deg,#e8d7ff 0%,#c49aff 54%,#7951a6 100%\)/);
   assert.match(login, /@media\(max-width:480px\)/);
