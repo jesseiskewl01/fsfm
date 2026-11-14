@@ -458,6 +458,68 @@ button,input,textarea,select{font-family:inherit}
   *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
 
+
+/* V16.9 Night Workshop refinement. */
+:root{--bg:#100d18;--surface:#1d1828;--surface2:#292238;--surface-raised:#292337;--surface-hover:#352b47;--line:#493b5d;--line-strong:#6b5684;--text:#f7f1fc;--muted:#b6a9c4;--accent:#d6b9ff;--accent-strong:#ad84e8}
+html,body{background:radial-gradient(ellipse at 14% -16%,rgba(126,76,168,.22),transparent 37%),radial-gradient(ellipse at 90% 100%,rgba(59,36,87,.17),transparent 36%),var(--bg)}
+.topbar{background:linear-gradient(100deg,rgba(24,19,34,.98),rgba(31,23,43,.96));border-bottom-color:#534368;box-shadow:0 10px 32px rgba(0,0,0,.32)}
+.btn{min-height:34px;border-color:#554567;background:linear-gradient(180deg,#383047,#292336);box-shadow:0 3px 10px rgba(0,0,0,.2)}
+.btn.primary{background:linear-gradient(135deg,#e3d1ff,#b88eea 62%,#9871c9);border-color:#eadbff;box-shadow:0 5px 18px rgba(173,132,232,.27),inset 0 1px rgba(255,255,255,.7)}
+.sidebar{background:linear-gradient(180deg,rgba(29,23,40,.98),rgba(23,19,32,.99));border-right-color:#493b5c}
+.side-label,.eyebrow{color:#c6a5ec}
+.page-search{width:100%;min-height:37px;margin:0 0 10px;padding:8px 10px;border:1px solid #514360;border-radius:9px;outline:none;color:#f7f1fc;background:#171320;font-size:10px}
+.page-search:focus{border-color:#c5a0f2;box-shadow:0 0 0 3px rgba(190,150,242,.15)}
+.page-group{margin-bottom:13px}
+.page-group .side-label{display:flex;justify-content:space-between;align-items:center;padding-top:4px}
+.page-group .side-label span{color:#a18fae;font-variant-numeric:tabular-nums}
+.page-item{min-height:52px;padding:7px;border-radius:10px}
+.page-item.selected{background:linear-gradient(100deg,#49365c,#32283f);border-color:#765a92;box-shadow:inset 3px 0 #d0adff,0 7px 18px rgba(0,0,0,.16)}
+.page-icon{width:35px;height:35px;background:linear-gradient(145deg,#463553,#282235)}
+.page-copy small{color:#b3a5c2}
+.sidebar-foot{color:#9d8cac;border-top:1px solid #41364f;padding-top:13px}
+.editor{background:linear-gradient(180deg,rgba(28,23,39,.96),rgba(21,18,30,.98))}
+.editor-head{background:rgba(29,24,40,.94);border-bottom-color:#4c3e5e}
+.editor-head h1{font-size:25px;letter-spacing:-.055em}
+.editor-body{padding:17px 16px 68px;gap:14px}
+.panel{position:relative;overflow:hidden;border:1px solid #514260;border-radius:15px;background:linear-gradient(145deg,rgba(43,34,57,.98),rgba(29,24,40,.98) 72%);box-shadow:0 13px 34px rgba(3,2,8,.26),inset 0 1px 0 rgba(255,255,255,.035);padding:15px;transition:border-color .18s,box-shadow .18s}
+.panel:hover{border-color:#71598a;box-shadow:0 18px 42px rgba(3,2,8,.34)}
+.panel-head{padding-bottom:10px;border-bottom:1px solid rgba(179,144,215,.17)}
+.panel-note{color:#ad9bbd}
+.panel-desc,.page-activation-copy p{color:#b7a9c3;line-height:1.65}
+.json-object{background:rgba(17,14,25,.38);border-color:#51435f}
+.json-object>summary{background:linear-gradient(100deg,#342941,#292235)}
+.json-object-inner{padding:12px;gap:12px}
+.field label{color:#d1c3de;font-size:10px;font-weight:700}
+.field input,.field textarea,.field select{border-color:#554765;border-radius:9px;background:#16121f;color:#fbf8ff;padding:10px 11px;min-height:39px;font-size:11px;box-shadow:inset 0 1px 4px rgba(0,0,0,.18)}
+.field textarea{min-height:100px;line-height:1.6}
+.field input:hover,.field textarea:hover,.field select:hover{border-color:#79608f}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:#d0adff;background:#1b1526;box-shadow:0 0 0 3px rgba(195,157,241,.17)}
+.field select{appearance:auto;cursor:pointer}
+.field select option,.create-page-form select option{background:#211a2d;color:#f8f2ff}
+.helper{color:#a99bb5;font-size:9px;line-height:1.5}
+.toggle-field{background:linear-gradient(100deg,#30283c,#282235);border-color:#51435f;min-height:42px}
+.array-box{background:rgba(23,18,32,.62);border-color:#5a496b}
+.array-item{background:linear-gradient(145deg,#282133,#201b2b);border-color:#4b3e5b}
+.section-card{background:linear-gradient(145deg,#30273c,#24202f);border-color:#59496c}
+.section-card>summary{min-height:46px}
+.section-body{padding:13px}
+.preview{background:#16131e}
+.preview-head{background:linear-gradient(90deg,#211a2c,#191622);border-bottom-color:#4b3c5d}
+.preview-frame-wrap{background:radial-gradient(ellipse at top,#312540 0%,#191520 68%)}
+.preview-frame{box-shadow:0 24px 75px rgba(0,0,0,.56)}
+.page-activation-footer{color:#a99bb5}
+.toast{max-width:min(680px,92vw);padding:13px 17px;border-radius:12px;border-color:#746087;background:linear-gradient(145deg,#352a45,#211a2d);box-shadow:0 18px 60px rgba(0,0,0,.5);line-height:1.55}
+.toast.error{border-color:#c57882;background:linear-gradient(145deg,#482b3b,#2c1d2c);color:#fff0f2}
+.create-page-dialog{width:min(520px,94vw);max-height:88vh}
+.create-page-form{display:grid;gap:15px;padding:17px}
+.create-page-form .field{display:flex;flex-direction:column;align-items:stretch}
+.create-page-form .field>span:first-child{color:#e8dff0;font-size:10px;font-weight:750}
+.create-page-form input,.create-page-form select{width:100%;min-height:40px;padding:9px 11px;color:#fff;background:#171320;border:1px solid #59486b;border-radius:9px;outline:none}
+.create-page-form input:focus,.create-page-form select:focus{border-color:#d0adff;box-shadow:0 0 0 3px rgba(195,157,241,.17)}
+.create-page-actions{display:flex;justify-content:flex-end;gap:8px;padding-top:5px}
+@media(max-width:850px){.editor-head h1{font-size:22px}.editor-body{padding-bottom:45px}}
+@media(max-width:600px){.page-item{min-height:48px}.create-page-actions{flex-direction:column-reverse}.create-page-actions .btn{width:100%}}
+
 </style>
 </head>
 <body>
@@ -488,7 +550,7 @@ button,input,textarea,select{font-family:inherit}
     <div class="page-list" id="pageList"><div class="empty">Loading your pages…</div></div>
     <button class="btn add-item" id="newPageButton">＋ Create a page</button>
   </div>
-  <div class="sidebar-foot">FSFM STUDIO · V16.8<br>All page and block edits use the real FSFM content model and renderer. Local saves never publish automatically.</div>
+  <div class="sidebar-foot">FSFM STUDIO · V16.9<br>All page and block edits use the real FSFM content model and renderer. Local saves never publish automatically.</div>
 </aside>
 <main class="editor">
   <div class="editor-head">
@@ -517,6 +579,15 @@ button,input,textarea,select{font-family:inherit}
   <div class="lyrics-body"><div class="helper" id="lyricsFileLabel"></div><textarea id="lyricsText" spellcheck="false" aria-label="Synced lyrics text"></textarea></div>
   <div class="lyrics-foot"><button class="btn" id="cancelLyricsButton" type="button">Cancel</button><button class="btn primary" id="saveLyricsButton" type="button">Save lyrics locally</button></div>
 </dialog>
+<dialog class="lyrics-dialog create-page-dialog" id="createPageDialog" aria-labelledby="createPageTitle">
+ <div class="lyrics-head"><strong id="createPageTitle">Create a page</strong><button class="btn small" id="closeCreatePageButton" type="button">Close</button></div>
+ <form id="createPageForm" class="create-page-form">
+  <label class="field"><span>Page type</span><select id="createPageTemplate" name="template" required><option value="vista-window">Vista</option><option value="album">Album</option><option value="editorial">Editorial page</option></select><span class="helper">Choose a starting layout. You can add and arrange its building blocks afterwards.</span></label>
+  <label class="field"><span>Page name</span><input id="createPageName" name="name" type="text" maxlength="100" placeholder="e.g. About the project" required></label>
+  <label class="field"><span>URL slug <span class="helper">(optional)</span></span><input id="createPageSlug" name="slug" type="text" maxlength="80" pattern="[a-z0-9]+(-[a-z0-9]+)*" placeholder="about-the-project"><span class="helper">Lowercase letters, numbers and single hyphens. Leave blank to generate it from the name.</span></label>
+  <div class="create-page-actions"><button class="btn" id="cancelCreatePageButton" type="button">Cancel</button><button class="btn primary" id="submitCreatePageButton" type="submit">Create draft page</button></div>
+ </form>
+</dialog>
 <script type="module">
 import { getPagePublicationState, setPagePublished } from './page-state.mjs';
 (function(){
@@ -524,7 +595,7 @@ import { getPagePublicationState, setPagePublished } from './page-state.mjs';
 const $=(s,r)=> (r||document).querySelector(s);
 const $$=(s,r)=> Array.from((r||document).querySelectorAll(s));
 const api='/__fsfm/api';
-const S={items:[],catalog:null,key:null,resource:null,record:null,revision:null,dirty:false,saving:false,deploying:false,publishStatus:null,route:'/',toastTimer:null,pageSearch:''};
+const S={items:[],catalog:null,wallpaperPresets:[],key:null,resource:null,record:null,revision:null,dirty:false,saving:false,deploying:false,publishStatus:null,route:'/',toastTimer:null,pageSearch:''};
 const body=$('#editorBody');
 const COMPONENT_LABELS={
 'site-header':'Site header','hero':'Hero','marquee':'Marquee','artist-statement':'Artist statement',
@@ -537,7 +608,28 @@ function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;',
 function human(v){return String(v).replace(/([a-z0-9])([A-Z])/g,'$1 $2').replace(/[-_]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());}
 function get(o,p,d){const v=p.split('.').reduce((x,k)=>x==null?undefined:x[k],o);return v==null?d:v;}
 function set(o,p,v){const bits=p.split('.');let target=o;for(let i=0;i<bits.length-1;i++){const k=bits[i];if(!target[k]||typeof target[k]!=='object')target[k]={};target=target[k];}target[bits[bits.length-1]]=v;}
-function toast(message,error=false){const t=$('#toast');t.textContent=message;t.classList.toggle('error',error);t.classList.add('show');clearTimeout(S.toastTimer);S.toastTimer=setTimeout(()=>t.classList.remove('show'),4200);}
+function toast(message,error=false){
+ const t=$('#toast');t.textContent=message;t.classList.toggle('error',error);
+ t.setAttribute('role',error?'alert':'status');t.setAttribute('aria-live',error?'assertive':'polite');
+ t.classList.add('show');clearTimeout(S.toastTimer);S.toastTimer=setTimeout(()=>t.classList.remove('show'),error?8500:4600);
+}
+function apiError(response,data,action){
+ const detail=String(data?.error||'').trim();
+ if(response.status===409)return 'This page changed on disk after you opened it. Studio protected the newer version, so your edits were not saved. Reload the page, then reapply any changes you still need.';
+ if(response.status===422)return 'FSFM could not '+action+' because one or more settings are invalid. '+(detail||'Review the values and try again.');
+ if(response.status===404)return 'Studio could not find the page or file needed to '+action+'. Refresh the page list and check that it still exists.';
+ if(response.status===413)return 'That upload is too large for Studio. Choose a smaller file and try again.';
+ if(response.status>=500)return 'The local FSFM server hit a problem while trying to '+action+'. '+(detail||'Check the terminal for the technical details, then retry.');
+ return detail||'Studio could not '+action+'. Please try again.';
+}
+function friendlyError(error){
+ const message=String(error?.message||error||'').trim();
+ if(!message||/^(failed to fetch|networkerror|load failed)$/i.test(message))return 'Studio could not reach the local FSFM server. Check that the terminal running npm run dev:tina is still open, then refresh the page.';
+ if(/revision|changed on disk|stale save|reload before trying/i.test(message))return 'This content changed on disk after you opened it. Your edits were not saved. Reload to get the latest version, then reapply any changes you still need.';
+ if(/ENOENT|no such file|not found/i.test(message))return 'Studio could not find that file or page. It may have been renamed or removed. Refresh the page list and try again.';
+ if(/EACCES|EPERM|permission denied/i.test(message))return 'Windows blocked access to that file. Check that the project folder is writable and that the file is not locked by another program.';
+ return message||'Something went wrong while working with your FSFM content. Try again, and reload the page if the problem continues.';
+}
 function dirty(){S.dirty=true;$('#saveButton').disabled=false;$('#saveHint').textContent='Unsaved changes';updateDeployButton();}
 function updateDeployButton(){const p=S.publishStatus;$('#deployButton').disabled=S.saving||S.deploying||!p||!p.mainReady||!!(p.conflicts&&p.conflicts.length)||(!S.dirty&&!(p.pendingCount>0));}
 function renderPublishStatus(p){S.publishStatus=p;const hint=$('#publishHint');hint.textContent=p.reason||((p.pendingCount||0)+' saved file(s) ready to publish to main.');if(p.mainReady&&p.pendingCount===0&&!S.dirty)hint.textContent='No saved changes waiting to publish.';updateDeployButton();}
@@ -548,7 +640,7 @@ function renderPageList(){
  const pages=S.items.filter(item=>item.template!=='homepage');
  const query=S.pageSearch.trim().toLowerCase();
  $('#pageCount').textContent='('+pages.length+')';
- const groups=[['album','Albums'],['vista-window','Vista pages'],['editorial','Editorial pages']];
+ const groups=[['album','Albums'],['vista-window','Vista'],['editorial','Editorial pages']];
  let html='',matched=0;
  for(const [template,label] of groups){
    const entries=pages.filter(item=>item.template===template&&(!query||(String(item.name||'')+' '+String(item.route||'')).toLowerCase().includes(query)));
@@ -647,13 +739,49 @@ function valueEditor(value,path,label,depth=0,options={}){
  }
  return primitiveEditor(value,path,label,depth);
 }
+function fieldOptions(path){
+ const clean=path.replace(/^ROOT\./,'');
+ if(clean.endsWith('.presentation.variant'))return [
+  ['','Use template default'],['vista-window','Vista Window'],['vista-desktop','Vista Desktop'],
+  ['editorial','Editorial'],['amber-editorial','Amber Editorial'],['amber-player','Amber Player'],['plain','Plain']
+ ];
+ if(clean.endsWith('.group.layout'))return [['grid','Grid'],['stack','Stack'],['columns','Columns']];
+ if(clean.endsWith('.appearance.wallpaper.mode'))return [
+  ['template-default','Use template default'],['preset','Single wallpaper preset'],['custom','Custom image'],['cycle','Rotate between presets']
+ ];
+ if(clean.endsWith('.appearance.wallpaper.cycle.mode'))return [['sequential','In order'],['random','Random order']];
+ if(clean.endsWith('.appearance.wallpaper.customPosition')||clean.endsWith('.appearance.wallpaper.position'))return [
+  ['center','Centre'],['top','Top'],['right','Right'],['bottom','Bottom'],['left','Left'],
+  ['top left','Top left'],['top right','Top right'],['bottom left','Bottom left'],['bottom right','Bottom right']
+ ];
+ if(clean.endsWith('.appearance.wallpaper.customFit')||clean.endsWith('.appearance.wallpaper.fit'))return [['cover','Fill the background'],['contain','Fit the whole image']];
+ if(/\.appearance\.wallpaper\.(preset|presets\.\d+|initialSelection)$/.test(clean)){
+  const presets=(S.wallpaperPresets||[]).map(item=>[item.id,item.name||human(item.id)]);
+  return clean.endsWith('.initialSelection')?[['random','Choose randomly'],...presets]:presets;
+ }
+ if(clean.endsWith('.content.style')){
+  const match=clean.match(/^sections\.(\d+)\.content\.style$/);
+  const type=match?S.record?.sections?.[Number(match[1])]?.type:'';
+  if(type==='link-button')return [['primary','Primary button'],['secondary','Secondary button'],['text','Text link']];
+  if(type==='divider')return [['solid','Line'],['star','Star ornament']];
+ }
+ if(clean.endsWith('.content.followSectionAlignment')||clean.endsWith('.content.playMyCityAlignment'))return [['left','Left'],['center','Centre'],['right','Right']];
+ return null;
+}
+function enumEditor(value,path,options){
+ const current=String(value??''),available=options.slice();
+ if(current&&!available.some(option=>option[0]===current))available.unshift([current,'Current value · '+current]);
+ const html=available.map(option=>'<option value="'+esc(option[0])+'" '+(String(option[0])===current?'selected':'')+'>'+esc(option[1])+'</option>').join('');
+ return '<select data-path="'+esc(path)+'" aria-label="'+esc(human(path.split('.').pop()))+'">'+html+'</select>';
+}
 function primitiveEditor(value,path,label,depth=0){
  const type=typeof value;
  if(type==='boolean')return '<div class="toggle-field"><label>'+esc(label)+'</label><input class="switch" type="checkbox" data-path="'+esc(path)+'" '+(value?'checked':'')+'></div>';
  if(type==='number')return '<div class="field"><label>'+esc(label)+'</label><input type="number" step="any" data-path="'+esc(path)+'" value="'+esc(value)+'"></div>';
  const fieldKey=path.split('.').pop();
  const long=String(value??'').length>100||/(body|description|sticky|caption|message|subtitle|footerText|shutdown)/i.test(fieldKey);
- const control=long?'<textarea data-path="'+esc(path)+'">'+esc(value??'')+'</textarea>':'<input type="text" data-path="'+esc(path)+'" value="'+esc(value??'')+'">';
+ const choices=fieldOptions(path);
+ const control=choices?enumEditor(value,path,choices):long?'<textarea data-path="'+esc(path)+'">'+esc(value??'')+'</textarea>':'<input type="text" data-path="'+esc(path)+'" value="'+esc(value??'')+'">';
  const imageFields=['artwork','logo','image','src','socialImage','favicon','customImage'];
  const assetKind=fieldKey==='audioFile'?'audio':imageFields.includes(fieldKey)||(/\.(images|photos)\.\d+$/.test(path))||(fieldKey==='imageUrl'&&path.indexOf('ROOT.presets.')===0)?'image':'';
  const picker=assetKind?'<label class="upload-pick">↑ Upload '+(assetKind==='image'?'image':'audio')+'<input type="file" data-asset-kind="'+assetKind+'" data-upload-path="'+esc(path)+'" accept="'+(assetKind==='image'?'.png,.jpg,.jpeg,.webp,.gif':'.mp3,.ogg,.wav')+'"></label>':'';
@@ -665,7 +793,7 @@ function pageActivationPanel(){
  const state=getPagePublicationState(r);
  const description=state.active
    ?'This page is included in the next production build. Deactivating it removes it from the public site after you deploy.'
-   :'This page is currently excluded from the production build. Reactivating it includes it again after you deploy.';
+   :'This page is currently excluded from the production build. Activating it includes it again after you deploy.';
  return '<section class="panel page-availability"><div class="panel-head"><span class="panel-title">Page availability</span><span class="panel-note">PUBLICATION STATE</span></div><div class="page-activation-row"><div class="page-activation-copy"><span class="page-state '+(state.active?'active':'inactive')+'">'+state.statusLabel+'</span><strong>'+ (state.active?'This page is active':'This page is inactive')+'</strong><p>'+description+'</p></div><button class="btn '+(state.active?'':'primary')+'" id="pageActivationButton" data-page-action="'+state.action+'" type="button">'+state.buttonLabel+'</button></div><div class="page-activation-footer">Changes are local until you choose <strong>Save local</strong>, then explicitly <strong>Save &amp; deploy live</strong>.</div></section>';
 }
 function togglePageActivation(action){
@@ -676,9 +804,9 @@ function togglePageActivation(action){
    toast('The page state changed. The action has been refreshed; nothing was changed.',true);
    return;
  }
- const next=action==='reactivate';
+ const next=action==='activate';
  const message=next
-   ?'Reactivate this page? It will be included in the next production build after you save and deploy.'
+   ?'Activate this page? It will be included in the next production build after you save and deploy.'
    :'Deactivate this page? It will be excluded from the next production build after you save and deploy.';
  if(!confirm(message))return;
  if(!setPagePublished(S.record,next))return;
@@ -686,7 +814,7 @@ function togglePageActivation(action){
  if(item)item.published=next;
  dirty();
  renderEditor();
- toast(next?'Page reactivated locally. Save local, then deploy to make it public.':'Page deactivated locally. Save local, then deploy to remove it from the public site.');
+ toast(next?'Page activated locally. Save local, then deploy to make it public.':'Page deactivated locally. Save local, then deploy to remove it from the public site.');
 }
 function pageFields(){
  const r=S.record;
@@ -741,11 +869,13 @@ function renderEditor(){
  renderPageList();
 }
 async function loadIndex(){
- const [index,catalog]=await Promise.all([fetch(api+'/content'),fetch(api+'/catalog')]);
- if(index.status===401||catalog.status===401){location.href='/studio/login.html';return;}
- if(!index.ok||!catalog.ok)throw Error('Could not load the FSFM content catalogue.');
+ const [index,catalog,wallpaperResponse]=await Promise.all([fetch(api+'/content'),fetch(api+'/catalog'),fetch(api+'/content/wallpapers')]);
+ if(index.status===401||catalog.status===401||wallpaperResponse.status===401){location.href='/studio/login.html';return;}
+ if(!index.ok||!catalog.ok||!wallpaperResponse.ok)throw Error('Studio could not load the page list, editing rules or wallpaper choices. Check that the local server is running, then refresh.');
  S.items=(await index.json()).items||[];
  S.catalog=await catalog.json();
+ const wallpaperData=await wallpaperResponse.json();
+ S.wallpaperPresets=wallpaperData.record?.presets||wallpaperData.presets||[];
  renderPageList();
  if(!S.key)await loadRecord('homepage');
 }
@@ -753,7 +883,7 @@ async function loadRecord(key){
  const response=await fetch(resourceUrl(key));
  const data=await response.json();
  if(response.status===401){location.href='/studio/login.html';return;}
- if(!response.ok)throw Error(data.error||'Could not load this content record.');
+ if(!response.ok)throw Error(apiError(response,data,'load this content'));
  S.key=key;S.record=data.record;S.revision=data.revision;
  S.resource=key==='site'?'site':key==='wallpapers'?'wallpapers':'page';
  if(S.resource==='page'){
@@ -777,15 +907,15 @@ async function saveLocal(){
    const response=await fetch(saveUrl(),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({revision:S.revision,record:S.record})});
    if(response.status===401){location.href='/studio/login.html';return false;}
    const data=await response.json();
-   if(response.status===409)throw Error(data.error+' Reload before trying again.');
-   if(!response.ok)throw Error(data.error||'Local save failed.');
+   if(response.status===409)throw Error(apiError(response,data,'save this page'));
+   if(!response.ok)throw Error(apiError(response,data,'save this page'));
    S.record=data.record||S.record;S.revision=data.revision;S.dirty=false;
    $('#saveHint').textContent='Saved locally';toast('Saved locally. Rebuilding the FSFM preview…');
    $('#previewLoading').classList.add('show');
    setTimeout(()=>{$('#previewLoading').classList.remove('show');loadPreview();},1100);
    const index=await fetch(api+'/content');if(index.ok)S.items=(await index.json()).items||[];
    renderEditor();await refreshPublishStatus();return true;
- }catch(error){toast(error.message,true);$('#saveHint').textContent='Save needs attention';return false;}
+ }catch(error){toast(friendlyError(error),true);$('#saveHint').textContent='Save needs attention';return false;}
  finally{S.saving=false;$('#saveButton').textContent='Save local';$('#saveButton').disabled=!S.dirty;updateDeployButton();}
 }
 async function deployLive(){
@@ -798,11 +928,11 @@ async function deployLive(){
  try{
    const response=await fetch(api+'/deploy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({confirmation:'PUBLISH FSFM LIVE'})});
    if(response.status===401){location.href='/studio/login.html';return;}
-   const data=await response.json();if(!response.ok)throw Error(data.error||'Live publishing failed.');
+   const data=await response.json();if(!response.ok)throw Error(apiError(response,data,'publish the website'));
    $('#saveHint').textContent=data.noChanges?'Already up to date':'Sent to GitHub';toast(data.message||'Publication request completed.');
    if(data.actionsUrl){const hint=$('#publishHint');hint.textContent='Pushed to main · ';const link=document.createElement('a');link.href=data.actionsUrl;link.target='_blank';link.rel='noopener';link.textContent='View GitHub Actions';hint.appendChild(link);}
    await refreshPublishStatus();
- }catch(error){toast(error.message,true);$('#saveHint').textContent='Live publishing needs attention';}
+ }catch(error){toast(friendlyError(error),true);$('#saveHint').textContent='Live publishing needs attention';}
  finally{S.deploying=false;$('#deployButton').textContent='Save & deploy live';updateDeployButton();}
 }
 function defaultKeyForType(type){
@@ -858,18 +988,25 @@ function moveSection(index,direction){
  if(target<0||target>=sections.length)return;
  [sections[index],sections[target]]=[sections[target],sections[index]];dirty();renderEditor();
 }
-async function createPage(){
- const template=prompt('Create which page type? Enter album, vista-window or editorial.','editorial');
- if(!template)return;
- if(!['album','vista-window','editorial'].includes(template)){toast('Choose album, vista-window or editorial.',true);return;}
- const name=prompt('What should the page be called?','New '+(template==='album'?'Album':template==='vista-window'?'Vista Page':'Editorial Page'));
- if(!name||!name.trim())return;
- const slug=prompt('URL slug (lowercase letters, numbers and hyphens). Leave blank to generate it from the name.','');
+function createPage(){
+ $('#createPageForm').reset();$('#createPageDialog').showModal();$('#createPageName').focus();
+}
+async function submitCreatePage(event){
+ event.preventDefault();
+ const template=$('#createPageTemplate').value,name=$('#createPageName').value.trim(),slug=$('#createPageSlug').value.trim();
+ if(!name){toast('Give the page a name before creating it.',true);$('#createPageName').focus();return;}
+ if(slug&&!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)){
+  toast('The URL slug needs lowercase letters and numbers, with single hyphens between words. No spaces or punctuation.',true);$('#createPageSlug').focus();return;
+ }
+ const submit=$('#submitCreatePageButton');submit.disabled=true;submit.textContent='Creating…';
  try{
-   const response=await fetch(api+'/content/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({template,name,slug:slug||undefined})});
-   const data=await response.json();if(!response.ok)throw Error(data.error||'Could not create page.');
-   toast('Created a draft '+template+' page.');await loadIndex();await loadRecord(data.key);await refreshPublishStatus();
- }catch(error){toast(error.message,true);}
+  const response=await fetch(api+'/content/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({template,name,slug:slug||undefined})});
+  const data=await response.json();if(!response.ok)throw Error(apiError(response,data,'create this page'));
+  $('#createPageDialog').close();
+  toast('Your '+(template==='vista-window'?'Vista':template)+' page is now a local draft. It is not public until you save and deploy.');
+  await loadIndex();await loadRecord(data.key);await refreshPublishStatus();
+ }catch(error){toast(friendlyError(error),true);}
+ finally{submit.disabled=false;submit.textContent='Create draft page';}
 }
 
 let activeLyrics={file:'',revision:''};
@@ -884,14 +1021,14 @@ async function openLyricsEditor(index){
  }
  try{
    const response=await fetch(api+'/lyrics/'+encodeURIComponent(filename));
-   const data=await response.json();if(!response.ok)throw Error(data.error||'Could not open lyrics.');
+   const data=await response.json();if(!response.ok)throw Error(apiError(response,data,'open these lyrics'));
    activeLyrics={file:filename,revision:data.revision};
    $('#lyricsDialogTitle').textContent=track.title||'Synced lyrics';
    $('#lyricsFileLabel').textContent=data.file+' · LRC timestamped text';
    $('#lyricsText').value=data.content;
    $('#saveLyricsButton').disabled=false;$('#saveLyricsButton').textContent='Save lyrics locally';
    $('#lyricsDialog').showModal();
- }catch(error){toast(error.message,true);}
+ }catch(error){toast(friendlyError(error),true);}
 }
 async function saveLyrics(){
  if(!activeLyrics.file)return;
@@ -901,10 +1038,10 @@ async function saveLyrics(){
      method:'PUT',headers:{'Content-Type':'application/json'},
      body:JSON.stringify({revision:activeLyrics.revision,content:$('#lyricsText').value})
    });
-   const data=await response.json();if(!response.ok)throw Error(data.error||'Could not save lyrics.');
+   const data=await response.json();if(!response.ok)throw Error(apiError(response,data,'save these lyrics'));
    activeLyrics.revision=data.revision;$('#lyricsDialog').close();
    toast('Synced lyrics saved locally.');await refreshPublishStatus();
- }catch(error){toast(error.message,true);}
+ }catch(error){toast(friendlyError(error),true);}
  finally{$('#saveLyricsButton').disabled=false;$('#saveLyricsButton').textContent='Save lyrics locally';}
 }
 
@@ -920,13 +1057,13 @@ async function uploadAsset(input){
  if(picker)picker.textContent='Uploading…';
  try{
    const response=await fetch(api+'/assets',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({kind,filename,contentBase64:btoa(binary)})});
-   const data=await response.json();if(!response.ok)throw Error(data.error||'Asset upload failed.');
+   const data=await response.json();if(!response.ok)throw Error(apiError(response,data,'upload this file'));
    set(S.record,actualPath(input.dataset.uploadPath),data.path);
    const textInput=field?.querySelector('[data-path]');
    if(textInput)textInput.value=data.path;
    dirty();toast('Saved '+data.filename+' to the local asset library. Save the page to use it in the preview.');
    await refreshPublishStatus();
- }catch(error){toast(error.message,true);}
+ }catch(error){toast(friendlyError(error),true);}
  finally{input.value='';if(picker)picker.textContent='↑ Upload '+(kind==='image'?'image':'audio');}
 }
 function bindEvents(){
@@ -961,12 +1098,12 @@ function bindEvents(){
  $('#pageList').addEventListener('click',async event=>{
    const item=event.target.closest('[data-key]');if(!item||item.dataset.key===S.key)return;
    if(S.dirty&&!confirm('Discard unsaved changes and open another page?'))return;
-   try{await loadRecord(item.dataset.key);}catch(error){toast(error.message,true);}
+   try{await loadRecord(item.dataset.key);}catch(error){toast(friendlyError(error),true);}
  });
  $$('[data-special]').forEach(button=>button.addEventListener('click',async()=>{
    const key=button.dataset.special;if(key===S.key)return;
    if(S.dirty&&!confirm('Discard unsaved changes and open another workspace?'))return;
-   try{await loadRecord(key);}catch(error){toast(error.message,true);}
+   try{await loadRecord(key);}catch(error){toast(friendlyError(error),true);}
  }));
  $('#saveLyricsButton').addEventListener('click',saveLyrics);
  $('#closeLyricsButton').addEventListener('click',()=>$('#lyricsDialog').close());
@@ -974,8 +1111,11 @@ function bindEvents(){
  $('#saveButton').addEventListener('click',saveLocal);
  $('#deployButton').addEventListener('click',deployLive);
  $('#newPageButton').addEventListener('click',createPage);
+ $('#createPageForm').addEventListener('submit',submitCreatePage);
+ $('#closeCreatePageButton').addEventListener('click',()=>$('#createPageDialog').close());
+ $('#cancelCreatePageButton').addEventListener('click',()=>$('#createPageDialog').close());
  $('#logoutButton').addEventListener('click',async()=>{try{await fetch(api+'/auth/logout',{method:'POST'});location.href='/studio/login.html';}catch(error){toast('Could not sign out. Try again.',true);}});
- $('#reloadButton').addEventListener('click',async()=>{if(S.dirty&&!confirm('Discard unsaved changes and reload this record?'))return;try{await loadRecord(S.key);toast('Reloaded from local files.');}catch(error){toast(error.message,true);}});
+ $('#reloadButton').addEventListener('click',async()=>{if(S.dirty&&!confirm('Discard unsaved changes and reload this record?'))return;try{await loadRecord(S.key);toast('Reloaded from local files.');}catch(error){toast(friendlyError(error),true);}});
  $('#refreshPreview').addEventListener('click',()=>{loadPreview();toast('Local preview refreshed.');});
  $('#openPreview').addEventListener('click',()=>window.open(S.route||'/','_blank','noopener'));
  function setPreviewSize(size){
@@ -1008,7 +1148,7 @@ async function start(){
    await fetch(api+'/health').then(response=>{if(!response.ok)throw Error('Local server unavailable.');return response.json();});
    await loadIndex();await refreshPublishStatus();
  }catch(error){
-   body.innerHTML='<div class="empty">'+esc(error.message)+'<br>Make sure your V16 server is running, then reload.</div>';toast(error.message,true);
+   body.innerHTML='<div class="empty">'+esc(error.message)+'<br>Make sure your V16 server is running, then reload.</div>';toast(friendlyError(error),true);
  }
 }
 start();
