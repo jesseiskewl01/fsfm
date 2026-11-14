@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const studio = fs.readFileSync(path.join(root, 'studio/index.html'), 'utf8');
+const homepageStyles = fs.readFileSync(path.join(root, 'src/styles/homepage-vista.css'), 'utf8');
 
 test('preview offers accessible desktop, tablet and mobile viewport controls', () => {
   for (const viewport of ['desktop', 'tablet', 'mobile']) {
@@ -16,16 +17,23 @@ test('preview offers accessible desktop, tablet and mobile viewport controls', (
   assert.match(studio, /aria-pressed/);
 });
 
-test('tablet and mobile previews use fixed CSS viewport dimensions inside device frames', () => {
+test('desktop preview uses a true desktop-sized CSS viewport that crosses the homepage gadget breakpoint', () => {
+  assert.match(studio, /desktop:\{width:'1442px',height:'902px',label:'Desktop · 1440 × 900 px'/);
+  assert.match(studio, /frame\.style\.maxWidth='none'/);
+  assert.match(studio, /device-desktop/);
+  assert.match(homepageStyles, /@media \(min-width: 1320px\) and \(min-height: 700px\)/);
+  assert.match(studio, /preview-frame-wrap\{[^}]*overflow:auto/);
+});
+
+test('tablet and mobile previews retain their intended content viewport dimensions', () => {
   assert.match(studio, /width:'784px',height:'1040px',label:'Tablet · 768 × 1024 px'/);
   assert.match(studio, /width:'406px',height:'860px',label:'Mobile · 390 × 844 px'/);
   assert.match(studio, /device-tablet/);
   assert.match(studio, /device-mobile/);
-  assert.match(studio, /preview-frame-wrap\{[^}]*overflow:auto/);
 });
 
-test('desktop preview remains fitted to the Studio workspace', () => {
-  assert.match(studio, /desktop:\{width:'100%',height:'100%',label:'Desktop · Workspace width'/);
-  assert.match(studio, /maxWidth=size==='desktop'\?'100%':'none'/);
-  assert.match(studio, /LOCAL PREVIEW/);
+test('preview controls and external preview actions have accessible labels', () => {
+  assert.match(studio, /aria-label="Preview viewport size"/);
+  assert.match(studio, /aria-label="Open preview in a new tab"/);
+  assert.match(studio, /title="Refresh the local preview"/);
 });
