@@ -22,6 +22,7 @@ test('responsive layouts cover desktop, tablet, mobile and narrow-phone widths',
     assert.ok(studio.includes(`@media(max-width:${breakpoint})`), `Missing responsive breakpoint ${breakpoint}`);
   }
   assert.match(studio, /\.workspace\{display:flex;flex-direction:column;gap:0\}/);
+  assert.match(studio, /\\.preview\\{height:min\\(76vh,760px\\);min-height:540px;grid-template-rows:auto minmax\\(0,1fr\\)/);
   assert.match(studio, /\.page-list\{grid-template-columns:minmax\(0,1fr\)\}/);
 });
 
