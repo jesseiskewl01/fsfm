@@ -3,8 +3,8 @@ export function getPagePublicationState(record) {
 
   return {
     active,
-    action: active ? 'deactivate' : 'reactivate',
-    buttonLabel: active ? 'Deactivate page' : 'Reactivate page',
+    action: active ? 'deactivate' : 'activate',
+    buttonLabel: active ? 'Deactivate page' : 'Activate page',
     statusLabel: active ? 'ACTIVE' : 'INACTIVE',
   };
 }

@@ -9,7 +9,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const studio = fs.readFileSync(path.join(root, 'studio/index.html'), 'utf8');
 const server = fs.readFileSync(path.join(root, 'scripts/dev-tina-preview.mjs'), 'utf8');
 
-test('an inactive Vista page explicitly offers reactivation, then offers deactivation after activation', () => {
+test('an inactive Vista page explicitly offers activation, then offers deactivation after activation', () => {
   const vistatest = {
     template: 'vista-window',
     publishing: { published: false },
@@ -17,8 +17,8 @@ test('an inactive Vista page explicitly offers reactivation, then offers deactiv
 
   assert.deepEqual(getPagePublicationState(vistatest), {
     active: false,
-    action: 'reactivate',
-    buttonLabel: 'Reactivate page',
+    action: 'activate',
+    buttonLabel: 'Activate page',
     statusLabel: 'INACTIVE',
   });
 
@@ -31,7 +31,7 @@ test('an inactive Vista page explicitly offers reactivation, then offers deactiv
   });
 
   assert.equal(setPagePublished(vistatest, false), true);
-  assert.equal(getPagePublicationState(vistatest).action, 'reactivate');
+  assert.equal(getPagePublicationState(vistatest).action, 'activate');
 });
 
 test('missing published state keeps the existing default-active behaviour', () => {
