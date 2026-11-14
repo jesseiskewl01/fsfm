@@ -13,6 +13,7 @@ V16.8 is a full interface and usability refinement of the local FSFM Studio. It 
 - Changed building-block disclosure so the first block opens initially and the remaining blocks stay collapsed until needed.
 - Added responsive layouts for full desktop, compact desktop/tablet, mobile and narrow phones.
 - Preserved keyboard focus visibility and reduced-motion preferences.
+- Restyled the protected sign-in and first-run password screens to match the same visual identity without changing authentication behaviour.
 
 ## Preview
 
