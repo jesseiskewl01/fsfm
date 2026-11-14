@@ -691,9 +691,11 @@ function togglePageActivation(action){
 function pageFields(){
  const r=S.record;
  const identity=Object.assign({},r.identity||{});
+ const publishingSettings=Object.assign({},r.publishing||{});
  delete identity.slug;delete identity.route;
+ delete publishingSettings.published;
  return '<section class="panel"><div class="panel-head"><span class="panel-title">Page identity</span><span class="panel-note">NAME · ORDER · URL</span></div>'+valueEditor(identity,'identity','Identity')+'<div class="field" style="margin-top:8px"><label>URL slug · fixed after creation</label><input readonly value="'+esc(r.identity?.slug||'home')+'"><span class="helper">The slug determines the filename and public route. Create a new page to use a different URL.</span></div></section>'+pageActivationPanel()+
- '<section class="panel"><div class="panel-head"><span class="panel-title">Publishing</span><span class="panel-note">VISIBILITY</span></div>'+valueEditor(r.publishing||{},'publishing','Publishing')+'</section>'+
+ '<section class="panel"><div class="panel-head"><span class="panel-title">Publishing</span><span class="panel-note">NAVIGATION · VISIBILITY</span></div>'+valueEditor(publishingSettings,'publishing','Publishing')+'</section>'+
  '<section class="panel"><div class="panel-head"><span class="panel-title">Appearance</span><span class="panel-note">WALLPAPER · EFFECTS</span></div>'+valueEditor(r.appearance||{},'appearance','Appearance')+'</section>'+
  '<section class="panel"><div class="panel-head"><span class="panel-title">Search &amp; social preview</span><span class="panel-note">SEO</span></div>'+valueEditor(r.seo||{},'seo','SEO')+'</section>';
 }
