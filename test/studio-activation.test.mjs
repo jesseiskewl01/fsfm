@@ -45,6 +45,8 @@ test('the Studio UI derives labels and explicit actions from the shared page-sta
   assert.match(studio, /togglePageActivation\(activation\.dataset\.pageAction\)/);
   assert.match(studio, /if\(action!==state\.action\)/);
   assert.match(studio, /getPagePublicationState\(S\.record\)/);
+  assert.match(studio, /delete publishingSettings\.published/);
+  assert.match(studio, /valueEditor\(publishingSettings,'publishing','Publishing'\)/);
 });
 
 test('the homepage is protected from activation changes in both the UI and local API', () => {
