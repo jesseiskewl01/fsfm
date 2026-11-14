@@ -140,6 +140,324 @@ dialog.lyrics-dialog{background:linear-gradient(145deg,#262233,#1d1a28);border-c
 @media(max-width:850px){.preview-head{gap:7px;padding:0 10px}.preview-dimensions{max-width:110px}.sidebar{background:#191622}.editor{border-right:0}}
 @media(max-width:600px){.preview-head{gap:6px}.preview-dimensions{display:none}.panel{padding:11px}.panel-head{gap:6px}.section-card>summary{gap:6px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   FSFM STUDIO V16.8 · NIGHT WORKSHOP
+   A darker, calmer, responsive workspace with clear hierarchy and controls.
+   ───────────────────────────────────────────────────────────────────────── */
+:root{
+  color-scheme:dark;
+  --bg:#09070f;
+  --bg-glow:#171022;
+  --surface:#14101d;
+  --surface-2:#1b1627;
+  --surface-3:#241c33;
+  --surface-hover:#2d2240;
+  --line:#30263f;
+  --line-strong:#53406d;
+  --text:#f6f0ff;
+  --muted:#b2a5c4;
+  --muted-strong:#d0c4df;
+  --accent:#bd91ff;
+  --accent-bright:#d3b6ff;
+  --accent-ink:#160d23;
+  --green:#8fe0b4;
+  --red:#f0a1b0;
+  --amber:#e8c18a;
+  --shadow-soft:0 12px 30px #03020870;
+  --shadow-deep:0 24px 70px #030208b8;
+  --radius:15px;
+}
+html,body{background:radial-gradient(ellipse at 18% -15%,#38204f55,transparent 42%),radial-gradient(ellipse at 100% 18%,#21173833,transparent 32%),var(--bg);color:var(--text)}
+body{font-size:14px;line-height:1.55}
+.app{height:100vh;min-height:740px;grid-template-rows:74px minmax(0,1fr);background:transparent}
+.topbar{
+  min-width:0;gap:14px;padding:0 22px;
+  background:#0d0a14f2;border-bottom:1px solid #342642;
+  box-shadow:0 10px 32px #03020870;backdrop-filter:blur(22px);
+}
+.brand{min-width:216px;gap:12px}
+.brandmark{
+  width:40px;height:40px;border-radius:13px;
+  background:linear-gradient(145deg,#e8d7ff 0%,#c49aff 54%,#7951a6 100%);
+  color:#170e23;font-size:18px;box-shadow:0 5px 24px #a879e844,inset 0 1px #ffffffb8;
+}
+.brand strong{font-size:13px;letter-spacing:.2em;color:#fff}
+.brand small{margin-top:3px;color:#a99abf;font-size:9px;letter-spacing:.16em}
+.topmeta{padding:7px 10px;border:1px solid #392b4c;border-radius:99px;background:#181222;color:#c2b1d7;font-size:9px;letter-spacing:.1em}
+.dot{background:var(--green);box-shadow:0 0 0 4px #8fe0b41c,0 0 16px #8fe0b477}
+.savehint{min-width:100px;color:#c4b7d4;font-size:10px}
+.publishhint{max-width:220px;color:#a99bb9;font-size:9px}
+.btn{
+  min-height:36px;padding:9px 13px;border:1px solid #493859;border-radius:10px;
+  background:linear-gradient(180deg,#211a2d,#191323);color:#e9def6;
+  font-size:11px;font-weight:650;letter-spacing:.01em;
+  box-shadow:0 3px 10px #03020855;
+  transition:transform .16s ease,border-color .16s ease,background .16s ease,box-shadow .16s ease;
+}
+.btn:hover:not(:disabled){transform:translateY(-1px);border-color:#8265a3;background:linear-gradient(180deg,#302440,#241b34);box-shadow:0 7px 18px #03020888}
+.btn:active:not(:disabled){transform:translateY(0)}
+.btn.primary{
+  border-color:#d1adff;background:linear-gradient(135deg,#e1caff,#b78ae9);
+  color:#1b1028;box-shadow:0 5px 20px #9c6bdc45;font-weight:800;
+}
+.btn.primary:hover:not(:disabled){border-color:#f0e3ff;background:linear-gradient(135deg,#f0e5ff,#cca8fa);box-shadow:0 8px 24px #a879e866}
+.btn:disabled{opacity:.38;filter:saturate(.55);box-shadow:none}
+.btn.small{min-height:29px;padding:6px 9px}
+.workspace{grid-template-columns:258px minmax(430px,610px) minmax(500px,1fr);min-width:0}
+.sidebar{
+  padding:22px 15px 18px;gap:18px;overflow:auto;
+  background:linear-gradient(180deg,#100c18,#0d0a14 72%);
+  border-right:1px solid #30233e;
+}
+.side-label{display:flex;align-items:center;justify-content:space-between;padding:0 10px;margin:0 0 9px;color:#9e8db6;font-size:9px;letter-spacing:.19em}
+.side-label span{color:#756488;font-size:9px;letter-spacing:.06em}
+.navitem{
+  min-height:42px;padding:10px 12px;gap:11px;border:1px solid transparent;border-radius:11px;
+  color:#c7bbd6;font-size:12px;font-weight:550;transition:background .16s,border-color .16s,color .16s,transform .16s;
+}
+.navitem:hover{background:#1d1729;border-color:#342642;color:#fff;transform:translateX(2px)}
+.navitem.active{
+  color:#f1e7ff;background:linear-gradient(100deg,#38264d,#21192f);
+  border-color:#59406f;box-shadow:inset 3px 0 var(--accent),0 6px 18px #03020855;
+}
+.side-divider{height:1px;background:linear-gradient(90deg,transparent,#463354,transparent)}
+.page-search{
+  display:block;width:100%;height:39px;margin:0 0 11px;padding:0 12px;
+  border:1px solid #3c2e4e;border-radius:10px;background:#110d19;color:#f4edff;
+  outline:none;font-size:11px;transition:border-color .16s,box-shadow .16s,background .16s;
+}
+.page-search::placeholder{color:#88799d}
+.page-search:hover{border-color:#614a7b}
+.page-search:focus{border-color:#b28be6;background:#171021;box-shadow:0 0 0 3px #bd91ff26}
+.page-list{display:flex;flex-direction:column;gap:12px}
+.page-group{display:flex;flex-direction:column;gap:4px}
+.page-group .side-label{padding:4px 8px 5px;margin:0;color:#8e7da4;font-size:8px;letter-spacing:.16em}
+.page-item{
+  min-height:57px;padding:8px 9px;gap:9px;border:1px solid transparent;border-radius:11px;
+  color:#d9d0e4;transition:background .15s,border-color .15s,transform .15s;
+}
+.page-item:hover{background:#1b1626;border-color:#382a48;transform:translateX(2px)}
+.page-item.selected{background:linear-gradient(105deg,#30213f,#1d172b);border-color:#644b7d;box-shadow:inset 3px 0 var(--accent)}
+.page-icon{width:36px;height:36px;border:1px solid #443354;border-radius:10px;background:linear-gradient(145deg,#2d213c,#191323);color:#d9bcff;font-size:13px}
+.page-copy strong{font-size:11px;font-weight:700;color:#f1eaf8}
+.page-copy small{margin-top:2px;color:#9f91b2;font-size:9px}
+.page-state{padding:4px 7px;border-radius:99px;font-size:7px;letter-spacing:.1em}
+.page-state.active{background:#193326;border-color:#315c44;color:#a5ecc5}
+.page-state.inactive{background:#211b2a;border-color:#473953;color:#c0b1d0}
+.page-empty{padding:14px 8px;font-size:10px;color:#9c8cac}
+.sidebar-foot{padding:14px 9px 0;border-top:1px solid #2a2036;color:#7f718f;font-size:9px;line-height:1.8;letter-spacing:.025em}
+.editor{background:#0e0b15;border-right:1px solid #30233e;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable}
+.editor-head{
+  padding:23px 25px 19px;background:#110d19ed;border-bottom:1px solid #352740;
+  box-shadow:0 10px 24px #03020844;backdrop-filter:blur(20px);
+}
+.eyebrow{font-size:9px;letter-spacing:.2em;color:#c4a0f1}
+h1{margin:7px 0 5px;font-size:clamp(22px,2vw,29px);font-weight:720;letter-spacing:-.045em;line-height:1.13;color:#fff}
+.subhead{gap:10px;color:#b8a9c9;font-size:11px}
+.route{padding:4px 8px;border:1px solid #382a49;border-radius:7px;background:#171021;color:#c1abd9;font-size:9px}
+.editor-body{padding:19px 21px 70px;gap:15px}
+.panel{
+  padding:17px 18px;border:1px solid #35283f;border-radius:var(--radius);
+  background:linear-gradient(150deg,#191323,#120e1a 78%);
+  box-shadow:var(--shadow-soft);transition:border-color .18s,box-shadow .18s;
+}
+.panel:hover{border-color:#514063;box-shadow:0 15px 34px #03020888}
+.panel-head{margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #30243a}
+.panel-title{font-size:12px;font-weight:760;letter-spacing:.015em;color:#f4edfc}
+.panel-note{font-size:8px;letter-spacing:.15em;color:#a391b7}
+.panel-desc{margin:-5px 0 13px;color:#a99ab9;font-size:10px;line-height:1.65}
+.json-object{margin:8px 0;border:1px solid #352940;border-radius:11px;background:#181222}
+.json-object>summary{padding:11px 13px;background:linear-gradient(100deg,#21182d,#191322);color:#e7dcf3;font-size:11px}
+.json-object>summary:hover{background:#2a1e3a;color:#fff}
+.json-object[open]>summary{border-bottom:1px solid #382a47}
+.json-object-inner{padding:13px;gap:13px}
+.field{gap:7px}
+.field label{color:#c9bbd9;font-size:10px;font-weight:650}
+.field input,.field textarea,.field select,.add-component select{
+  min-height:40px;padding:10px 11px;border:1px solid #42324f;border-radius:10px;
+  background:#0e0b15;color:#f7f1ff;font-size:12px;line-height:1.45;
+  transition:border-color .16s,background .16s,box-shadow .16s;
+}
+.field textarea{min-height:104px;line-height:1.6}
+.field input:hover,.field textarea:hover,.field select:hover,.add-component select:hover{border-color:#665078}
+.field input:focus,.field textarea:focus,.field select:focus,.add-component select:focus{border-color:#bd91ff;background:#15101e;box-shadow:0 0 0 3px #bd91ff24;outline:none}
+.field input[readonly]{background:#17121f;border-color:#34283f;color:#9889a8}
+.helper{color:#9b8eaa;font-size:9px;line-height:1.55}
+.toggle-field{min-height:43px;padding:9px 11px;border:1px solid #3b2d49;border-radius:10px;background:#1b1526}
+.toggle-field:hover{background:#211931;border-color:#624a78}
+.toggle-field label{color:#e5d9f2;font-size:10px}
+.toggle-field small{color:#9a8baa;font-size:9px}
+.switch{width:39px;height:22px;background:#51445f}
+.switch:before{width:16px;height:16px;top:3px;left:3px}
+.switch:checked{background:#a67ada}
+.switch:checked:before{left:20px}
+.array-box{padding:12px;border:1px solid #3b2d49;border-radius:12px;background:#171221}
+.array-head{margin-bottom:10px}
+.array-head strong{color:#eadff5;font-size:10px;letter-spacing:.04em}
+.array-item{margin:8px 0;padding:11px;border:1px solid #34283f;border-radius:11px;background:#100d18}
+.array-item-head span{color:#ddcfe9;font-size:10px}
+.array-item-controls{gap:5px}
+.mini{width:28px;height:27px;border:1px solid #493759;border-radius:8px;background:#21182d;color:#e1d2f0;transition:background .15s,border-color .15s,transform .15s}
+.mini:hover:not(:disabled){background:#382449;border-color:#8463a3;transform:translateY(-1px)}
+.add-item{min-height:38px;border-style:dashed;border-color:#6a5183;background:#191224;color:#d9c3f5}
+.section-card{margin:9px 0;border:1px solid #43324f;border-radius:13px;background:linear-gradient(145deg,#1d1729,#15101e);box-shadow:0 8px 20px #03020844}
+.section-card>summary{min-height:58px;padding:12px 13px;gap:10px}
+.section-card>summary:before{font-size:20px}
+.section-card[open]>summary{background:#241a32;border-bottom:1px solid #43324f}
+.section-title{font-size:11px;font-weight:750;color:#f3eafb}
+.section-meta{font-size:9px;color:#b8a9c9}
+.section-pill{padding:4px 8px;border:1px solid #513b67;border-radius:99px;background:#2a1d3a;color:#d8c0f4;font-size:8px}
+.section-body{padding:13px;gap:12px}
+.section-tools{padding-bottom:9px;border-bottom:1px solid #30243b}
+.section-tools .helper{overflow-wrap:anywhere}
+.add-component{gap:9px;margin-top:15px}
+.add-component select{flex:1;min-width:0}
+.warning{padding:12px;border:1px solid #785b36;border-radius:11px;background:#2c2117;color:#f3d9ad;font-size:10px;line-height:1.6}
+.page-availability{border-color:#55406e;background:linear-gradient(145deg,#20172f,#15101f)}
+.page-activation-row{align-items:center;gap:16px}
+.page-activation-copy{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:7px 10px}
+.page-activation-copy>.page-state{grid-column:1/-1;width:max-content}
+.page-activation-copy strong{font-size:13px;color:#f6efff}
+.page-activation-copy p{grid-column:1/-1;margin:0;color:#b7a8c8;font-size:10px;line-height:1.6}
+.page-activation-row .btn{flex:none;min-width:136px;min-height:42px}
+.page-activation-footer{margin-top:14px;padding-top:12px;border-top:1px solid #3a2b49;color:#a998bc;font-size:9px;line-height:1.6}
+.preview{background:#0c0912;grid-template-rows:64px minmax(0,1fr);border-left:1px solid #30233e}
+.preview-head{min-width:0;gap:10px;padding:0 17px;background:#110d19;border-bottom:1px solid #352740}
+.preview-title{font-size:10px;letter-spacing:.13em;color:#f0e6fb}
+.preview-sub{display:block;margin:3px 0 0;color:#9788a9;font-size:9px}
+.device{flex:none;padding:3px;border:1px solid #443450;border-radius:10px;background:#171021}
+.device button{min-width:35px;min-height:31px;padding:6px 9px;border-radius:7px;color:#b4a5c5;font-size:11px}
+.device button:hover{background:#2b2039;color:white}
+.device button.active{background:#4a3263;color:#f5eaff;box-shadow:inset 0 0 0 1px #8060a0}
+.preview-dimensions{max-width:155px;color:#b6a6c7;font-size:9px;letter-spacing:.025em}
+.preview-frame-wrap{
+  min-width:0;min-height:0;padding:22px;overflow:auto;overscroll-behavior:contain;
+  background:radial-gradient(ellipse at 50% 0%,#261a35 0%,#0d0a13 55%,#09070f 100%);
+  scrollbar-color:#58436d #120e19;scrollbar-width:thin;
+}
+.preview-frame{border:1px solid #4b3c58;border-radius:10px;background:#fff;box-shadow:0 25px 70px #000b}
+.preview-frame.device-desktop{width:1442px;height:902px;max-width:none;border:1px solid #62516f;border-radius:10px;box-shadow:0 28px 80px #000b}
+.preview-frame.device-tablet{width:784px;height:1040px;border:8px solid #574768;border-radius:25px;box-shadow:0 28px 75px #000c}
+.preview-frame.device-mobile{width:406px;height:860px;border:8px solid #574768;border-radius:38px;box-shadow:0 28px 75px #000c}
+.preview-loading{inset:22px;border:1px solid #655078;border-radius:12px;background:#09070fdf;color:#e8ddf6;font-size:12px;backdrop-filter:blur(8px)}
+.toast{bottom:24px;max-width:min(620px,calc(100vw - 32px));padding:13px 17px;border:1px solid #6e5686;border-radius:13px;background:linear-gradient(145deg,#30213f,#1a1325);box-shadow:var(--shadow-deep);color:#f7f0ff;font-size:11px}
+.toast.error{border-color:#a45d6c}
+dialog.lyrics-dialog{border-color:#71598b;border-radius:17px;background:linear-gradient(145deg,#21182e,#100c18);box-shadow:0 35px 110px #000e}
+.lyrics-head{padding:17px 20px;background:#1a1326;border-bottom-color:#493655}
+.lyrics-head strong{font-size:13px;color:#f6efff}
+.lyrics-body{padding:18px 20px}
+.lyrics-body textarea{min-height:48vh;padding:14px;border-color:#493655;background:#0b0811;color:#f6efff;font-size:12px}
+.lyrics-foot{padding:14px 20px;border-top-color:#493655}
+.upload-pick{padding:7px 10px;border-color:#775994;border-radius:9px;color:#dfcafa;font-size:9px}
+.upload-pick:hover{background:#30213f;border-color:#b38de0}
+.empty{padding:24px;color:#a99bb8;font-size:11px}
+.page-state{padding:4px 8px;font-size:8px}
+:focus-visible{outline:2px solid #d7bcff!important;outline-offset:3px}
+button,input,textarea,select{font-family:inherit}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:#100c17}
+::-webkit-scrollbar-thumb{border:2px solid #100c17;border-radius:99px;background:#493858}
+::-webkit-scrollbar-thumb:hover{background:#705387}
+@media(max-width:1370px) and (min-width:1021px){
+  .workspace{grid-template-columns:236px minmax(400px,540px) minmax(430px,1fr)}
+  .topbar{padding:0 16px;gap:10px}
+  .brand{min-width:190px}
+  .publishhint{max-width:155px}
+}
+@media(max-width:1150px) and (min-width:1021px){
+  .workspace{grid-template-columns:220px minmax(380px,1fr) minmax(390px,1fr)}
+  .editor-head{padding:19px 18px 16px}
+  .editor-body{padding:16px 14px 60px}
+  .preview-head{gap:7px;padding:0 10px}
+  .preview-dimensions{display:none}
+}
+@media(max-width:1020px){
+  .app{height:auto;min-height:100vh;overflow:visible;grid-template-rows:70px auto}
+  .workspace{display:grid;grid-template-columns:230px minmax(0,1fr);grid-template-rows:minmax(620px,auto) minmax(560px,72vh);overflow:visible}
+  .sidebar{grid-column:1;grid-row:1/3;position:sticky;top:70px;height:calc(100vh - 70px);min-height:520px}
+  .editor{grid-column:2;grid-row:1;min-height:620px;border-right:0}
+  .preview{grid-column:2;grid-row:2;min-height:560px;border-top:1px solid #352740;border-left:0}
+  .topmeta{display:none}
+  .publishhint{max-width:180px}
+}
+@media(max-width:760px){
+  .app{display:block;height:auto;min-height:100vh;overflow:visible}
+  .topbar{position:sticky;top:0;z-index:30;min-height:68px;height:auto;padding:12px 14px;flex-wrap:wrap;gap:8px}
+  .brand{min-width:0;flex:1 1 auto}
+  .brandmark{width:36px;height:36px}
+  .brand small{font-size:8px}
+  .spacer{display:none}
+  .savehint{order:4;min-width:0;flex:1 1 100%;text-align:left}
+  .publishhint{display:none}
+  #reloadButton{margin-left:auto}
+  #saveButton,#deployButton,#logoutButton{min-height:34px;padding:7px 9px;font-size:10px}
+  .workspace{display:flex;flex-direction:column;gap:0}
+  .sidebar{position:relative;top:auto;height:auto;min-height:0;max-height:none;padding:13px 12px 12px;border-right:0;border-bottom:1px solid #352740;overflow:visible}
+  .sidebar>div:first-child{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+  .sidebar>div:first-child .side-label{width:100%;margin-bottom:2px}
+  .navitem{width:auto;min-height:36px;padding:7px 10px;font-size:10px}
+  .side-divider{display:none}
+  .sidebar>div:nth-of-type(2){min-width:0}
+  .sidebar>div:nth-of-type(2)>.side-label{margin:5px 0 7px}
+  .page-search{height:38px;margin-bottom:8px}
+  .page-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:8px}
+  .page-group{min-width:0;gap:4px}
+  .page-group .side-label{padding:4px 7px}
+  .page-item{min-height:52px;padding:7px}
+  .sidebar-foot{display:none}
+  .editor{min-height:0;max-height:none;overflow:visible;border:0}
+  .editor-head{position:relative;top:auto;padding:19px 17px 15px}
+  .editor-body{padding:14px 12px 38px;gap:12px}
+  .preview{height:min(76vh,760px);min-height:540px;border-top:1px solid #352740}
+  .preview-head{min-height:60px;flex-wrap:wrap;padding:10px 12px;gap:7px}
+  .preview-head>div:first-child{min-width:110px}
+  .preview-head>.spacer{display:block;flex:1}
+  .preview-frame-wrap{padding:14px}
+  .preview-loading{inset:14px}
+  .page-activation-row{align-items:flex-start;flex-direction:column}
+  .page-activation-row .btn{width:100%}
+  .page-activation-copy{width:100%}
+  .panel{padding:14px}
+  .json-object-inner{grid-template-columns:1fr}
+  .json-object-inner>.field.full,.json-object-inner>.array-box,.json-object-inner>.json-object{grid-column:1}
+  .section-card>summary{flex-wrap:wrap}
+  .section-title{min-width:90px}
+}
+@media(max-width:480px){
+  .topbar{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:7px;padding:10px}
+  .brand{grid-column:1;grid-row:1;min-width:0}
+  #reloadButton{grid-column:2;grid-row:1;margin:0}
+  #logoutButton{grid-column:3;grid-row:1}
+  #saveButton{grid-column:2;grid-row:2}
+  #deployButton{grid-column:3;grid-row:2}
+  .savehint{display:none}
+  .btn{min-height:34px;padding:7px 9px;font-size:10px}
+  .workspace{min-width:0}
+  .sidebar{padding:11px 9px}
+  .navitem{font-size:9px;padding:7px 8px}
+  .page-list{grid-template-columns:minmax(0,1fr)}
+  .editor-head{padding:17px 13px 13px}
+  .editor-body{padding:11px 9px 32px}
+  .panel{padding:12px;border-radius:12px}
+  .panel-head{align-items:flex-start}
+  .panel-note{max-width:45%;text-align:right}
+  .json-object-inner{padding:10px}
+  .array-item{padding:8px}
+  .section-card>summary{gap:7px}
+  .section-actions{margin-left:auto}
+  .section-pill{max-width:100%;overflow:hidden;text-overflow:ellipsis}
+  .preview{height:68vh;min-height:500px}
+  .preview-head{gap:6px}
+  .preview-sub{display:none}
+  .device button{min-width:31px;padding:5px}
+  .preview-dimensions{max-width:112px;font-size:8px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+
 </style>
 </head>
 <body>
@@ -166,6 +484,7 @@ dialog.lyrics-dialog{background:linear-gradient(145deg,#262233,#1d1a28);border-c
   <div class="side-divider"></div>
   <div>
     <div class="side-label">Pages <span id="pageCount"></span></div>
+    <input class="page-search" id="pageSearch" type="search" placeholder="Find a page…" aria-label="Search pages by name or URL" autocomplete="off">
     <div class="page-list" id="pageList"><div class="empty">Loading your pages…</div></div>
     <button class="btn add-item" id="newPageButton">＋ Create a page</button>
   </div>
@@ -183,12 +502,12 @@ dialog.lyrics-dialog{background:linear-gradient(145deg,#262233,#1d1a28);border-c
   <div class="preview-head">
     <div><span class="preview-title">LOCAL PREVIEW</span><span class="preview-sub">Last saved version</span></div>
     <div class="spacer"></div>
-    <div class="device" role="group" aria-label="Preview viewport size"><button class="active" data-size="desktop" type="button" title="Desktop viewport" aria-label="Desktop viewport" aria-pressed="true">▰</button><button data-size="tablet" type="button" title="Tablet viewport, 768 by 1024" aria-label="Tablet viewport, 768 by 1024" aria-pressed="false">▯</button><button data-size="mobile" type="button" title="Mobile viewport, 390 by 844" aria-label="Mobile viewport, 390 by 844" aria-pressed="false">▯</button></div>
+    <div class="device" role="group" aria-label="Preview viewport size"><button class="active" data-size="desktop" type="button" title="Desktop viewport" aria-label="Desktop viewport, 1440 by 900" aria-pressed="true">▰</button><button data-size="tablet" type="button" title="Tablet viewport, 768 by 1024" aria-label="Tablet viewport, 768 by 1024" aria-pressed="false">▯</button><button data-size="mobile" type="button" title="Mobile viewport, 390 by 844" aria-label="Mobile viewport, 390 by 844" aria-pressed="false">▯</button></div>
     <span class="preview-dimensions" id="previewDimensions" aria-live="polite">Desktop · Workspace width</span>
-    <button class="btn" id="refreshPreview">↻ Refresh</button>
-    <button class="btn" id="openPreview">↗</button>
+    <button class="btn" id="refreshPreview" type="button" title="Refresh the local preview">↻ Refresh</button>
+    <button class="btn" id="openPreview" type="button" title="Open this page in a new tab" aria-label="Open preview in a new tab">↗</button>
   </div>
-  <div class="preview-frame-wrap"><iframe class="preview-frame" id="previewFrame" title="FSFM local website preview"></iframe><div class="preview-loading" id="previewLoading">Rebuilding your preview…</div></div>
+  <div class="preview-frame-wrap"><iframe class="preview-frame device-desktop" id="previewFrame" title="FSFM local website preview"></iframe><div class="preview-loading" id="previewLoading">Rebuilding your preview…</div></div>
 </section>
 </div>
 </div>
@@ -198,13 +517,14 @@ dialog.lyrics-dialog{background:linear-gradient(145deg,#262233,#1d1a28);border-c
   <div class="lyrics-body"><div class="helper" id="lyricsFileLabel"></div><textarea id="lyricsText" spellcheck="false" aria-label="Synced lyrics text"></textarea></div>
   <div class="lyrics-foot"><button class="btn" id="cancelLyricsButton" type="button">Cancel</button><button class="btn primary" id="saveLyricsButton" type="button">Save lyrics locally</button></div>
 </dialog>
-<script>
+<script type="module">
+import { getPagePublicationState, setPagePublished } from './page-state.mjs';
 (function(){
 'use strict';
 const $=(s,r)=> (r||document).querySelector(s);
 const $$=(s,r)=> Array.from((r||document).querySelectorAll(s));
 const api='/__fsfm/api';
-const S={items:[],catalog:null,key:null,resource:null,record:null,revision:null,dirty:false,saving:false,deploying:false,publishStatus:null,route:'/',toastTimer:null};
+const S={items:[],catalog:null,key:null,resource:null,record:null,revision:null,dirty:false,saving:false,deploying:false,publishStatus:null,route:'/',toastTimer:null,pageSearch:''};
 const body=$('#editorBody');
 const COMPONENT_LABELS={
 'site-header':'Site header','hero':'Hero','marquee':'Marquee','artist-statement':'Artist statement',
@@ -225,16 +545,29 @@ async function refreshPublishStatus(){try{const res=await fetch(api+'/deploy/sta
 function setHeader(eyebrow,title,sub,route=''){ $('#editorEyebrow').textContent=eyebrow;$('#editorHeading').textContent=title;$('#editorSubhead').textContent=sub||'';$('#editorRoute').textContent=route; }
 function iconFor(template){return template==='homepage'?'⌂':template==='album'?'♫':template==='vista-window'?'▣':'¶';}
 function renderPageList(){
- const pages=S.items.filter(x=>x.template!=='homepage');
+ const pages=S.items.filter(item=>item.template!=='homepage');
+ const query=S.pageSearch.trim().toLowerCase();
  $('#pageCount').textContent='('+pages.length+')';
  const groups=[['album','Albums'],['vista-window','Vista pages'],['editorial','Editorial pages']];
- let html='';
+ let html='',matched=0;
  for(const [template,label] of groups){
-   const entries=pages.filter(x=>x.template===template);
-   html+='<div class="side-label" style="padding:8px 8px 2px">'+label+'</div>';
-   html+=entries.map(item=>'<button class="page-item '+(S.key===item.key?'selected':'')+'" data-key="'+esc(item.key)+'"><span class="page-icon">'+iconFor(item.template)+'</span><span class="page-copy"><strong>'+esc(item.name)+'</strong><small>'+esc(item.route)+'</small></span><span class="page-state '+(item.published?'active':'inactive')+'" title="'+(item.published?'Included in the next production build':'Excluded from the next production build')+'">'+(item.published?'ACTIVE':'INACTIVE')+'</span></button>').join('');
-   if(!entries.length)html+='<div class="helper" style="padding:4px 9px">No '+label.toLowerCase()+' yet.</div>';
+   const entries=pages.filter(item=>item.template===template&&(!query||(String(item.name||'')+' '+String(item.route||'')).toLowerCase().includes(query)));
+   if(query&&!entries.length)continue;
+   html+='<div class="page-group"><div class="side-label">'+label+' <span>'+entries.length+'</span></div>';
+   html+=entries.map(item=>{
+     const active=S.key===item.key&&S.record?getPagePublicationState(S.record).active:item.published!==false;
+     const selected=S.key===item.key;
+     matched++;
+     return '<button class="page-item '+(selected?'selected':'')+'" data-key="'+esc(item.key)+'" aria-current="'+(selected?'page':'false')+'" aria-label="'+esc(item.name)+', '+(active?'active':'inactive')+' page">'+
+       '<span class="page-icon" aria-hidden="true">'+iconFor(item.template)+'</span>'+
+       '<span class="page-copy"><strong>'+esc(item.name)+'</strong><small>'+esc(item.route)+'</small></span>'+
+       '<span class="page-state '+(active?'active':'inactive')+'" title="'+(active?'Included in the next production build':'Excluded from the next production build')+'">'+(active?'ACTIVE':'INACTIVE')+'</span></button>';
+   }).join('');
+   if(!entries.length&&!query)html+='<div class="helper page-empty">No '+label.toLowerCase()+' yet.</div>';
+   html+='</div>';
  }
+ if(query&&!matched)html='<div class="empty page-empty">No pages match “'+esc(S.pageSearch.trim())+'”.</div>';
+ if(!pages.length)html='<div class="empty page-empty">Your pages will appear here. Create one when you’re ready.</div>';
  $('#pageList').innerHTML=html;
  $$('[data-special]').forEach(button=>button.classList.toggle('active',button.dataset.special===S.key));
 }
@@ -329,23 +662,26 @@ function primitiveEditor(value,path,label,depth=0){
 function pageActivationPanel(){
  const r=S.record;
  if(r.template==='homepage')return '';
- const active=r.publishing?.published!==false;
- const title=active?'Page is active':'Page is inactive';
- const description=active
-   ?'This page is included in the production build. Deactivating it will remove the page from the public site on the next deployment.'
-   :'This page is currently excluded from the production build. Reactivating it will restore the page on the next deployment.';
- return '<section class="panel"><div class="panel-head"><span class="panel-title">Page availability</span><span class="panel-note">PUBLICATION STATE</span></div><div class="page-activation-row"><div class="page-activation-copy"><strong>'+title+'</strong><p>'+description+'</p></div><button class="btn '+(active?'':'primary')+'" id="pageActivationButton" type="button">'+(active?'Deactivate page':'Reactivate page')+'</button></div><div class="page-activation-footer">This changes your local record first. The public site changes only after <strong>Save &amp; deploy live</strong>.</div></section>';
+ const state=getPagePublicationState(r);
+ const description=state.active
+   ?'This page is included in the next production build. Deactivating it removes it from the public site after you deploy.'
+   :'This page is currently excluded from the production build. Reactivating it includes it again after you deploy.';
+ return '<section class="panel page-availability"><div class="panel-head"><span class="panel-title">Page availability</span><span class="panel-note">PUBLICATION STATE</span></div><div class="page-activation-row"><div class="page-activation-copy"><span class="page-state '+(state.active?'active':'inactive')+'">'+state.statusLabel+'</span><strong>'+ (state.active?'This page is active':'This page is inactive')+'</strong><p>'+description+'</p></div><button class="btn '+(state.active?'':'primary')+'" id="pageActivationButton" data-page-action="'+state.action+'" type="button">'+state.buttonLabel+'</button></div><div class="page-activation-footer">Changes are local until you choose <strong>Save local</strong>, then explicitly <strong>Save &amp; deploy live</strong>.</div></section>';
 }
-function togglePageActivation(){
+function togglePageActivation(action){
  if(!S.record||S.record.template==='homepage')return;
- const active=S.record.publishing?.published!==false;
- const next=!active;
+ const state=getPagePublicationState(S.record);
+ if(action!==state.action){
+   renderEditor();
+   toast('The page state changed. The action has been refreshed; nothing was changed.',true);
+   return;
+ }
+ const next=action==='reactivate';
  const message=next
-   ?'Reactivate this page? It will be included in the next production build after you deploy.'
-   :'Deactivate this page? It will be excluded from the next production build after you deploy.';
+   ?'Reactivate this page? It will be included in the next production build after you save and deploy.'
+   :'Deactivate this page? It will be excluded from the next production build after you save and deploy.';
  if(!confirm(message))return;
- if(!S.record.publishing||typeof S.record.publishing!=='object')S.record.publishing={};
- S.record.publishing.published=next;
+ if(!setPagePublished(S.record,next))return;
  const item=S.items.find(entry=>entry.key===S.key);
  if(item)item.published=next;
  dirty();
@@ -371,7 +707,7 @@ function renderSections(){
    const content=valueEditor(section.content||{},'sections.'+index+'.content','Content');
    const presentation=valueEditor(section.presentation||{variant:'',windowTitle:''},'sections.'+index+'.presentation','Presentation');
    const group=valueEditor(section.group||{id:'',layout:'grid',columns:2},'sections.'+index+'.group','Layout group');
-   return '<details class="section-card" open><summary><span class="section-title">'+esc(COMPONENT_LABELS[section.type]||human(section.type))+'</span><span class="section-pill">'+esc(section.type)+'</span><span class="section-meta">'+(section.enabled?'Enabled':'Disabled')+'</span><div class="section-actions">'+move+remove+'</div></summary><div class="section-body"><div class="section-tools"><span class="helper">Block ID: '+esc(section.id)+'</span><div class="toggle-field" style="padding:4px 7px;min-height:28px"><label>Enabled</label><input class="switch" type="checkbox" data-path="sections.'+index+'.enabled" '+(section.enabled?'checked':'')+(required?' disabled':'')+'></div></div>'+presentation+group+content+'</div></details>';
+   return '<details class="section-card"'+(index===0?' open':'')+'><summary><span class="section-title">'+esc(COMPONENT_LABELS[section.type]||human(section.type))+'</span><span class="section-pill">'+esc(section.type)+'</span><span class="section-meta">'+(section.enabled?'Enabled':'Disabled')+'</span><div class="section-actions">'+move+remove+'</div></summary><div class="section-body"><div class="section-tools"><span class="helper">Block ID: '+esc(section.id)+'</span><div class="toggle-field" style="padding:4px 7px;min-height:28px"><label>Enabled</label><input class="switch" type="checkbox" data-path="sections.'+index+'.enabled" '+(section.enabled?'checked':'')+(required?' disabled':'')+'></div></div>'+presentation+group+content+'</div></details>';
  }).join('');
  const allowed=(templateMeta().allowedComponentTypes||[]).filter(type=>componentCount(type)<maxComponents(type));
  const options=allowed.map(type=>'<option value="'+esc(type)+'">'+esc(COMPONENT_LABELS[type]||human(type))+'</option>').join('');
@@ -418,6 +754,10 @@ async function loadRecord(key){
  if(!response.ok)throw Error(data.error||'Could not load this content record.');
  S.key=key;S.record=data.record;S.revision=data.revision;
  S.resource=key==='site'?'site':key==='wallpapers'?'wallpapers':'page';
+ if(S.resource==='page'){
+   const pageItem=S.items.find(item=>item.key===key);
+   if(pageItem)pageItem.published=getPagePublicationState(S.record).active;
+ }
  S.dirty=false;$('#saveButton').disabled=true;$('#saveHint').textContent='All changes saved';
  S.route=S.resource==='page'?routeForKey(key):'/';
  renderEditor();loadPreview();updateDeployButton();
@@ -606,7 +946,8 @@ function bindEvents(){
    const move=event.target.closest('[data-move-section]');
    const lyrics=event.target.closest('[data-edit-lyrics]');
    if(lyrics){openLyricsEditor(Number(lyrics.dataset.editLyrics));return;}
-   if(event.target.closest('#pageActivationButton')){togglePageActivation();return;}
+   const activation=event.target.closest('[data-page-action]');
+   if(activation){togglePageActivation(activation.dataset.pageAction);return;}
    if(add){addArrayItem(add.dataset.addArray);return;}
    if(moveArray){moveArrayItem(moveArray.dataset.moveArray,Number(moveArray.dataset.index),Number(moveArray.dataset.dir));return;}
    if(remove){removeArrayItem(remove.dataset.removeArray,Number(remove.dataset.index));return;}
@@ -614,6 +955,7 @@ function bindEvents(){
    if(move){moveSection(Number(move.dataset.moveSection),Number(move.dataset.dir));return;}
    if(event.target.closest('#addComponentButton')){addComponent();return;}
  });
+ $('#pageSearch').addEventListener('input',event=>{S.pageSearch=event.target.value;renderPageList();});
  $('#pageList').addEventListener('click',async event=>{
    const item=event.target.closest('[data-key]');if(!item||item.dataset.key===S.key)return;
    if(S.dirty&&!confirm('Discard unsaved changes and open another page?'))return;
@@ -637,15 +979,15 @@ function bindEvents(){
  function setPreviewSize(size){
    const frame=$('#previewFrame');
    const presets={
-     desktop:{width:'100%',height:'100%',label:'Desktop · Workspace width',className:''},
+     desktop:{width:'1442px',height:'902px',label:'Desktop · 1440 × 900 px',className:'device-desktop'},
      tablet:{width:'784px',height:'1040px',label:'Tablet · 768 × 1024 px',className:'device-tablet'},
      mobile:{width:'406px',height:'860px',label:'Mobile · 390 × 844 px',className:'device-mobile'}
    };
    const preset=presets[size]||presets.desktop;
-   frame.classList.remove('device-tablet','device-mobile');
-   if(preset.className)frame.classList.add(preset.className);
+   frame.classList.remove('device-desktop','device-tablet','device-mobile');
+   frame.classList.add(preset.className);
    frame.style.width=preset.width;frame.style.height=preset.height;
-   frame.style.maxWidth=size==='desktop'?'100%':'none';
+   frame.style.maxWidth='none';
    frame.style.margin='0 auto';
    $('#previewDimensions').textContent=preset.label;
    $$('[data-size]').forEach(item=>{
