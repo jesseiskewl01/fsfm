@@ -17,7 +17,7 @@ test('page navigation can search page names and routes without replacing the sea
 
 test('the selected page is visibly and accessibly marked in the navigation list', () => {
   assert.match(studio, /aria-current=/);
-  assert.match(studio, /S\.key===item\.key\?getPagePublicationState\(S\.record\)\.active:item\.published!==false/);
+  assert.ok(studio.includes('const active=S.key===item.key&&S.record?getPagePublicationState(S.record).active:item.published!==false;'));
   assert.match(studio, /class="page-state '\+\(active\?'active':'inactive'\)/);
 });
 
