@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#17151f">
+<meta name="theme-color" content="#09070f">
 <title>Unlock FSFM Studio</title>
 <style>
 :root{color-scheme:dark;--bg:#17151f;--line:#3b3747;--text:#f4f0f8;--muted:#aaa3b5;--accent:#c7a8ff}
@@ -17,6 +17,73 @@ input{width:100%;padding:13px 14px;border:1px solid #494354;border-radius:10px;b
 input:focus{border-color:#a987e5;box-shadow:0 0 0 3px #c7a8ff20}
 button{width:100%;margin-top:22px;padding:13px;border:0;border-radius:10px;background:var(--accent);color:#21182e;font:700 12px Inter,ui-sans-serif,system-ui,sans-serif;cursor:pointer}
 button:disabled{opacity:.55;cursor:wait}.hint{margin:14px 0 0;color:#8d8598;font-size:10px}.error{min-height:18px;margin:12px 0 0;color:#f0a8b2;font-size:11px}.foot{margin-top:27px;padding-top:18px;border-top:1px solid var(--line);color:#797284;font-size:10px}
+
+/* FSFM Studio V16.8 · matching Night Workshop sign-in surface */
+:root{
+  color-scheme:dark;
+  --bg:#09070f;
+  --line:#3a2c49;
+  --text:#f6f0ff;
+  --muted:#b2a5c4;
+  --accent:#bd91ff;
+}
+body{
+  position:relative;isolation:isolate;overflow-x:hidden;
+  min-height:100svh;
+  background:
+    radial-gradient(ellipse at 50% -15%,#67428a66 0,transparent 48%),
+    radial-gradient(ellipse at 0% 100%,#24133499 0,transparent 42%),
+    #09070f;
+}
+body::before,body::after{
+  content:"";position:fixed;z-index:-1;pointer-events:none;border-radius:50%;
+  filter:blur(1px);opacity:.6;
+}
+body::before{width:420px;height:420px;top:-250px;right:-160px;border:1px solid #a77bd322;box-shadow:0 0 100px #8a5db522}
+body::after{width:300px;height:300px;bottom:-220px;left:-120px;border:1px solid #a77bd322;box-shadow:0 0 90px #8a5db522}
+.card{
+  position:relative;width:min(100%,460px);padding:clamp(25px,6vw,40px);
+  overflow:hidden;border:1px solid #4a365e;border-radius:23px;
+  background:linear-gradient(145deg,#1b1428f5,#100c18f7 70%);
+  box-shadow:0 34px 110px #000c,inset 0 1px #ffffff0c;
+}
+.card::before{
+  content:"";position:absolute;inset:0 0 auto;height:2px;
+  background:linear-gradient(90deg,transparent,#d4b2ff,#8f62c3,transparent);
+}
+.mark{
+  width:47px;height:47px;border-radius:15px;
+  background:linear-gradient(145deg,#e8d7ff 0%,#c49aff 54%,#7951a6 100%);
+  color:#170e23;font-size:21px;box-shadow:0 7px 26px #a879e844,inset 0 1px #ffffffb8;
+}
+.eyebrow{margin-top:28px;color:#c9a9f4;font-size:9px;letter-spacing:.2em}
+h1{font-size:clamp(26px,6vw,32px);font-weight:730;color:#fff}
+.intro{margin:11px 0 28px;color:#b7a9c8;font-size:12px;line-height:1.7}
+label{margin:17px 0 8px;color:#d7cbe4;font-size:11px}
+input{
+  min-height:47px;padding:12px 14px;border:1px solid #493755;border-radius:11px;
+  background:#0c0913;color:#f7f1ff;font-size:13px;
+  transition:border-color .16s,box-shadow .16s,background .16s;
+}
+input:hover{border-color:#705386}
+input:focus{border-color:#bd91ff;background:#130e1c;box-shadow:0 0 0 3px #bd91ff26}
+button{
+  min-height:47px;margin-top:24px;border:1px solid #d1adff;border-radius:11px;
+  background:linear-gradient(135deg,#e1caff,#b78ae9);color:#1b1028;
+  font:800 12px Inter,ui-sans-serif,system-ui,sans-serif;letter-spacing:.015em;
+  box-shadow:0 6px 23px #9c6bdc44;
+  transition:transform .16s,filter .16s,box-shadow .16s;
+}
+button:hover:not(:disabled){transform:translateY(-1px);filter:brightness(1.08);box-shadow:0 10px 29px #a879e866}
+button:active:not(:disabled){transform:translateY(0)}
+button:disabled{opacity:.5;cursor:wait;box-shadow:none}
+.hint{margin-top:13px;color:#a090b3;font-size:10px;line-height:1.6}
+.error{color:#f0a4b3;font-size:11px;line-height:1.5}
+.foot{margin-top:27px;padding-top:17px;border-top:1px solid #382943;color:#9385a5;font-size:10px;line-height:1.7}
+:focus-visible{outline:2px solid #d7bcff;outline-offset:3px}
+@media(max-width:480px){body{padding:16px}.card{padding:27px 22px;border-radius:19px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}}
+
 </style>
 </head>
 <body>
