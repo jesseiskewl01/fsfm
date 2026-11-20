@@ -1,6 +1,6 @@
 # FSFM Project State
 
- > Last updated: 2026-11-20  
+> Last updated: 2026-11-20  
 > This is the current project handover and source of truth. The chronological record of meaningful changes and decisions is in [PROJECT_LOG.md](./PROJECT_LOG.md).
 
 ## At a glance
@@ -31,7 +31,9 @@ The engineering should become more coherent without making those experiences loo
 
 - The Firefox chunk-upload branch is `firefox-recording-chunks`.
 - Chunk commit: [`260e1c46099bda1f8256abb45bd44f3d6828f303`](https://github.com/jesseiskewl01/fsfm/commit/260e1c46099bda1f8256abb45bd44f3d6828f303).
-- GitHub comparison on 2026-11-20 confirmed that this branch is one commit ahead of `main`, with the 23 chunk files added.
+- The initial upload commit added the 23 chunk files; subsequent commits on this branch maintain these handover documents and record the profiler analysis. The diagnostic branch has not been merged into `main`.
+- The canonical `PROJECT_STATE.md` and `PROJECT_LOG.md` updates in this handover are on `firefox-recording-chunks`, not `main` or `v16-tinacms-prototype`.
+- A separate, unvalidated experiment exists on `performance/early-bird-canvas-no-blur` (commit `5c116236ebdf378d1d0bf006fc93ee91064b5e2e`). It removes the two per-frame curtain blur filters, but has not been safely previewed, benchmarked or deployed.
 - Its base was `main` at `43066f6d1cb1cac1022b260761d975b2f6ecb0d6`.
 - **Important:** the Stage 1 implementation audit was performed against `v16-tinacms-prototype`. The Firefox chunk branch is an evidence-transfer branch based on `main`; do not assume those are the same code snapshot. Re-check the intended implementation branch before making architectural changes.
 - The remote commit is verified. The local working-tree status has not been independently checked by this document.
