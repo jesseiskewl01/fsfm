@@ -92,3 +92,28 @@ GitHub verification on 2026-11-20 confirmed that the branch exists and is one co
 **Separate experimental branch:** `performance/early-bird-canvas-no-blur` contains a test change that removes the two per-frame curtain blur filters. It is not a validated benchmark result and is not deployed. Keep it separate until a preview or controlled test can compare it against the production source.
 
 **Next work:** Finish Stage 2 by correlating the long-task intervals with usable task/stack evidence, identifying the most likely owner of the Skia blur work, and setting up a repeatable A/B measurement path. Test canvas visibility, curtain blur, grain and bloom independently; record frame/input responsiveness and profiler results. Do not merge speculative changes into `main`. Once the evidence is sufficiently closed, proceed to Stage 3: shared design foundations.
+
+
+## 2026-11-20: Second-pass Early Bird canvas stack attribution
+
+**Purpose:** Follow up the initial profiler pass by traversing parent stacks correctly and checking the sampled work against the actual source implementation.
+
+**Detailed observations:**
+
+- The Early Bird site content thread has 13,726 samples across approximately 37.74 seconds. The relevant page context is the Early Bird route, inner-window ID 8300024299535.
+- The site's drawAurora function appears in 11,481 sampled stacks (83.6%); drawCurtain appears in 10,786 (78.6%).
+- Firefox's native Skia ThreeBoxApproxPass::blurSegment function appears in 3,679 sampled stacks (26.8%). Representative parent chains are: native blurSegment lambda → native blurSegment → site's drawCurtain → site's drawAurora. This links the native raster/blur work to the Early Bird canvas rendering path much more directly than the first-pass native symbol list did.
+- Sample-weighted inclusive totals were approximately 28.6 seconds under drawAurora, 26.8 seconds under drawCurtain and 9.2 seconds under the native blur routine. Inclusive stack weights overlap; these are not independent CPU totals.
+- The same site thread's sample-level eventDelay field has p50 110.2 ms, p95 336.1 ms, p99 397.5 ms and maximum 875.5 ms. This is a different profiler field from the page DOMEvent-marker latency distribution in the first-pass entry (Early Bird p95 127.6 ms). Preserve both labels and do not compare them as if they were the same metric.
+- In the separate Homepage capture, drawAeroScene appears in 805 stacks with approximately 2.25 seconds of inclusive sample weight across 45.98 seconds. The Homepage site thread's sample-level eventDelay p95 is 4.9 ms, p99 18.1 ms and maximum 108.5 ms; the DOMEvent-marker p95 in the first pass is 25.1 ms. Again, these are separate measures.
+
+**Source correlation:**
+
+- The inspected src/client/album-atmosphere.js blob is identical on main and v16-tinacms-prototype (SHA 97ed887246f3c414dff3279f72a2ee9e4d89a416).
+- drawCurtain() sets CanvasRenderingContext2D.filter to blur(13px) and then blur(4px) on successive fill passes. drawAurora() calls drawCurtain() for each curtain on the repeating animation cycle, with the frame loop throttled to approximately 32 ms.
+- The direct sampled call chain, the source's two per-curtain blur passes, and the user's manual observation that hiding the atmosphere canvas substantially improves responsiveness reinforce one another. The best current explanation is that the repeated canvas curtain blur is a major contributor on the Early Bird page.
+- This is still not a controlled performance comparison. Function-level stacks show the native blur inside drawCurtain(), but do not establish an exact per-API CPU cost or rule out other simultaneous work.
+
+**Experiment boundary:** The performance/early-bird-canvas-no-blur branch removes the two blur filters while leaving the animation loop and other scene elements in place. It remains unpreviewed, unbenchmarked and undeployed. The feature branch must not be merged merely to obtain a test URL.
+
+**Next action:** Build a safe preview/measurement route, then compare the current version and no-blur branch under the same Firefox profile and repeatable interaction sequence. Keep the broader Stage 2 Studio save/preview and publishing-status investigations open.
