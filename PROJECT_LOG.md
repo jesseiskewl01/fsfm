@@ -117,3 +117,40 @@ GitHub verification on 2026-11-20 confirmed that the branch exists and is one co
 **Experiment boundary:** The performance/early-bird-canvas-no-blur branch removes the two blur filters while leaving the animation loop and other scene elements in place. It remains unpreviewed, unbenchmarked and undeployed. The feature branch must not be merged merely to obtain a test URL.
 
 **Next action:** Build a safe preview/measurement route, then compare the current version and no-blur branch under the same Firefox profile and repeatable interaction sequence. Keep the broader Stage 2 Studio save/preview and publishing-status investigations open.
+
+
+## 2026-11-20: V16.9 Studio preview and publishing-path audit
+
+**Purpose:** Extend Stage 2 beyond the public-page recordings by tracing the local Studio save/preview and publishing-status paths identified in Stage 1.
+
+**Scope:** Read-only inspection of `studio/index.html`, `scripts/dev-tina-preview.mjs`, `scripts/build-v13.mjs`, `scripts/studio-publisher.mjs`, `package.json` and the related Studio tests on `v16-tinacms-prototype`. No code was modified.
+
+### Preview rebuild path
+
+- The browser saves content through a PUT to the local Studio API. The server validates the record, writes the JSON file atomically and calls `scheduleRebuild()`.
+- `scheduleRebuild()` debounces changes by 300 ms. The resulting `buildPreview()` spawns a separate Node process running `scripts/build-v13.mjs --preview --include-drafts`.
+- This is a full static preview build, not an incremental page-only rebuild. The build validates all page records, removes and recreates `preview-v13`, renders the preview pages, copies CSS/JS and media/lyrics, and writes sitemap and robots files.
+- After the PUT returns, the Studio frontend uses a hard-coded 1,100 ms timeout, then hides the loading overlay and changes the iframe URL by appending `studioPreview=Date.now()`. It does not wait for the server's build to complete, and the server does not expose an explicit preview-ready signal.
+- Because the server starts the rebuild after a 300 ms debounce, the frontend's fixed refresh can occur only about 800 ms after the expected build start. If the full build takes longer, the iframe can request files while the preview directory is still being rebuilt. If the build finishes sooner, the interface still waits for the full 1,100 ms. This is a **code-level race/latency risk**, not yet a measured incident.
+- The local server sends `Cache-Control: no-store` for every static file and JSON response. The timestamp query on every iframe refresh independently ensures a new document URL. This avoids stale previews but also prevents reuse of unchanged preview CSS/JS/assets. The actual bytes transferred and user-visible reload cost have not been measured.
+- The server binds to loopback only (127.0.0.1 by default and rejects non-loopback hosts). Preserve this security boundary.
+
+### Publishing-status path
+
+- The Studio calls `GET /__fsfm/api/deploy/status` through `refreshPublishStatus()`.
+- `publisher.getStatus()` invokes `inspectMain()`, which checks the local Git root/branch/remote and then performs `git fetch --no-tags origin +refs/heads/main:refs/remotes/origin/main`. The Git command timeout is 180 seconds.
+- The frontend invokes status refresh on initial startup, after a successful page save, after deployment, after creating a page, after saving lyrics and after uploading an asset. It is not a continuous polling loop.
+- A normal `saveLocal()` awaits `refreshPublishStatus()` before exiting its saving state. The file has already been saved locally, but the UI remains in its save flow until the remote status request returns.
+- Crucially, the actual `deploy()` operation calls `getStatus()` again before creating its temporary worktree and pushing to main. Therefore, a future optimization could decouple the UI's non-critical status display from the local-save completion path while preserving a fresh remote verification immediately before any production publication.
+- No actual Git-fetch latency was measured in this audit.
+
+### Existing test coverage
+
+- `test/studio-preview.test.mjs` covers desktop/tablet/mobile viewport dimensions and accessible preview controls.
+- `test/studio-browser-script.test.mjs` checks that the inline browser script parses and the shared page-state module is served with the expected JavaScript MIME type.
+- `test/studio-publisher.test.mjs` checks publishing safeguards, queued-file scope, branch preservation and failure behaviour.
+- These tests do not measure preview build time, the 1,100 ms refresh race, cache transfer cost or Git-fetch frequency/latency.
+
+**Stage 2 interpretation:** two additional measurable candidates are now identified. The preview path has a fixed-delay/readiness race and broad no-store caching; the publishing-status path performs a remote Git fetch on each UI status refresh and is awaited by save operations. Both are confirmed implementation behaviours, but neither is yet proven to be a user-visible performance bottleneck.
+
+**Recommended next validation:** instrument preview build duration and readiness; measure the Git fetch duration in the actual local environment; then design changes around measured results. Preserve a mandatory fresh publishing check inside the final deploy operation. No production code or deployment was changed.
