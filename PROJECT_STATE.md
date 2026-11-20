@@ -20,7 +20,7 @@ The engineering should become more coherent without making those experiences loo
 | Area | Status | Notes |
 |---|---|---|
 | Stage 1: architecture and design audit | **Complete** | Read-only audit; no implementation changes were made during the audit. |
-| Stage 2: performance and runtime investigation | **In progress** | All 23 chunks have been retrieved; both profiles reconstruct and parse. First comparative profiler pass is complete; task ownership and controlled A/B validation remain. |
+| Stage 2: performance and runtime investigation | **In progress** | Both Firefox profiles have been reconstructed and analysed; the Early Bird canvas/curtain blur is the leading bottleneck. A read-only V16.9 audit has also identified the Studio preview rebuild and per-refresh Git fetch paths. Controlled timings and A/B validation remain. |
 | Stage 3: shared design foundations | Not started | Depends on evidence and deliberate architecture planning. |
 | Stage 4: content architecture | Not started | Shared definitions for editor, validation and rendering. |
 | Stage 5: FSFM Studio | Not started | Develop the custom Studio as the primary editing application. |
@@ -101,11 +101,24 @@ Stage 2 must be evidence-led. The Stage 1 audit identified candidate areas to me
 
 | Investigation target | Why it was flagged | Current conclusion |
 |---|---|---|
-| Studio preview rebuilds | Content changes appeared to invoke a preview/draft build, followed by a fixed 1.1-second wait and iframe reload. | Candidate for measurement; not yet proven to be a bottleneck. |
-| Preview caching | The audited local preview server used `Cache-Control: no-store`. | Measure the network/reload cost before changing it. |
-| Publishing status | The audited publishing inspection performed a Git fetch against `origin/main`. | Establish how often it runs and its actual impact. |
+| Studio preview rebuilds | A content PUT schedules a full preview/draft build after a 300 ms debounce; the browser reloads the iframe after a fixed 1.1 seconds. | Confirmed code path; no build-duration measurement or completion handshake. A race is possible if the build outlasts the fixed delay. |
+| Preview caching | The local server sends `Cache-Control: no-store` for every static file and API response; each iframe reload also adds a timestamp query. | Confirmed cache-bypass behaviour; actual transfer/reload cost remains unmeasured. |
+| Publishing status | Every `/deploy/status` request runs `git fetch origin main`; the UI requests status at startup and after several editing actions, including local saves. | Confirmed code path; `saveLocal()` awaits the status refresh, so remote Git latency can delay the save UI. The final deploy independently rechecks status. Runtime duration remains unmeasured. |
 | Ambient animation | Homepage canvas and Early Bird atmosphere use separate animation loops and drawing work. | Profile frame cost and real-world impact; do not remove effects wholesale. |
 | Shared CSS | The audited `v13.css` was approximately 46 KB. | Size alone does not establish a performance problem. |
+
+### Studio preview and publishing path audit
+
+Read-only inspection of the audited V16.9 source on `v16-tinacms-prototype` confirmed:
+
+- `scripts/dev-tina-preview.mjs` builds the private preview by spawning `scripts/build-v13.mjs --preview --include-drafts`. Every content write schedules a full rebuild after a 300 ms debounce. The build removes and recreates `preview-v13`, validates the site, renders all preview pages, copies CSS/JS and media/lyrics, and writes sitemap/robots files.
+- The Studio frontend waits a fixed 1,100 ms after a successful save, then hides the preview loading overlay and reloads the iframe. The server does not return a build-completion token or expose an explicit preview-ready signal. Given the 300 ms debounce, only about 800 ms remain between scheduled build start and the iframe reload; a slower build can race the refresh, while a faster build still incurs the fixed wait.
+- The local server uses `Cache-Control: no-store` for static files and JSON responses. The iframe adds a new `studioPreview=Date.now()` query on each reload. This guarantees fresh responses but also prevents browser reuse of otherwise unchanged preview assets. The actual bytes transferred and reload cost have not been measured.
+- `/__fsfm/api/deploy/status` calls `publisher.getStatus()`; this calls `inspectMain()`, which performs a remote `git fetch` of `origin/main` with a 180-second command timeout. The Studio requests status on startup and after local page saves, page creation, lyric saves, asset uploads and publishing.
+- The normal `saveLocal()` path awaits `refreshPublishStatus()` before its `finally` block clears the saving state. The remote status check therefore sits on the local-save UI completion path, even though the content has already been written to disk.
+- The actual `deploy()` operation independently calls `getStatus()` again before creating a temporary worktree and pushing. This means the UI status can potentially use a short-lived cached/background check while preserving a fresh mandatory remote check at deployment time.
+
+This is confirmed source behaviour, not yet a measured performance result. The current preview and publisher tests verify viewport controls, browser script validity and publishing safety; they do not benchmark build duration, preview readiness races, cache transfer cost or remote fetch latency. The server's loopback-only binding should be preserved.
 
 ### Firefox recording evidence
 
@@ -137,17 +150,16 @@ The real Firefox profile remains the meaningful test case because it reflects th
 
 ## Immediate priority: NEXT ACTION
 
-**Close Stage 2 with page/task attribution and a repeatable performance comparison.**
+**Close Stage 2 with repeatable measurements and controlled validation.**
 
-1. Inspect the Early Bird `MainThreadLongTask` intervals and the available marker/stack context to establish which work belongs to the album page, the homepage, or shared browser/content-process activity. Keep process-wide evidence distinct from page-specific event markers.
-2. Identify whether the Skia `ThreeBoxApproxPass::blurSegment` samples are being driven by the atmosphere canvas filters, other CSS effects, or unrelated rendering work. The current source has two curtain blur filters per frame; this is a strong candidate, not proof of attribution.
-3. Establish a preview/testing route for feature branches. The existing Pages workflow deploys production from `main`; do not use the production site as a casual branch-preview target.
-4. Run separate, repeatable comparisons for the canvas, curtain blur, grain and bloom. Keep the test environment, browser and interaction sequence as consistent as possible, and record event latency, long tasks and sampled rendering work.
-5. Decide which changes are justified, retain visual quality where possible, and document the outcome before closing Stage 2.
+1. Establish a safe, non-production preview route for the no-blur Early Bird experiment. The current Pages workflow deploys only main; do not overwrite production or merge an unverified branch to get a test URL.
+2. Compare the current Early Bird page with the no-blur experiment in the same Firefox profile and on the same machine. Record event latency, long tasks, sampled blur/canvas work and visual quality.
+3. Instrument or time the Studio preview builder. Measure the full preview build duration and determine whether the fixed 1,100 ms iframe refresh can race the rebuild. Replace the fixed wait only after a repeatable completion signal is designed.
+4. Measure the cost of no-store preview asset delivery and evaluate selective revalidation/caching without allowing stale HTML or assets.
+5. Measure the remote Git fetch in Studio status refresh. Consider moving non-critical status refresh off the local-save critical path, while retaining the mandatory fresh getStatus() preflight inside deploy().
+6. Record Stage 2 conclusions and prioritised changes. Then begin Stage 3 shared design foundations, using the existing V16 registries and Stage 1 audit rather than rebuilding the content pipeline.
 
-The separate `performance/early-bird-canvas-no-blur` branch is an unvalidated experiment only. Do not merge it into `main` until a safe preview or controlled validation exists.
-
-**Next major programme after Stage 2:** Stage 3, shared design foundations. This is the substantial architecture task: establish a token/foundation layer and reusable primitives that support Vista, Early Bird and Editorial without flattening their identities. Stage 1's audit and the existing registries are the starting point; do not rebuild the content pipeline.
+The Early Bird canvas/curtain blur is the leading high-confidence performance candidate. The Studio preview race and status-fetch behaviour are confirmed code paths but have not yet been measured in runtime. No optimisation has been deployed.
 
 ## Working rules
 
