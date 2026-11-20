@@ -1,6 +1,6 @@
 # FSFM Project State
 
-> Last updated: 2026-11-20  
+ > Last updated: 2026-11-20  
 > This is the current project handover and source of truth. The chronological record of meaningful changes and decisions is in [PROJECT_LOG.md](./PROJECT_LOG.md).
 
 ## At a glance
@@ -20,7 +20,7 @@ The engineering should become more coherent without making those experiences loo
 | Area | Status | Notes |
 |---|---|---|
 | Stage 1: architecture and design audit | **Complete** | Read-only audit; no implementation changes were made during the audit. |
-| Stage 2: performance and runtime investigation | **In progress** | Firefox recordings have been chunked and pushed. The profiles still need to be retrieved, reconstructed and analysed. |
+| Stage 2: performance and runtime investigation | **In progress** | All 23 chunks have been retrieved; both profiles reconstruct and parse. First comparative profiler pass is complete; task ownership and controlled A/B validation remain. |
 | Stage 3: shared design foundations | Not started | Depends on evidence and deliberate architecture planning. |
 | Stage 4: content architecture | Not started | Shared definitions for editor, validation and rendering. |
 | Stage 5: FSFM Studio | Not started | Develop the custom Studio as the primary editing application. |
@@ -120,28 +120,32 @@ The originals were split locally into **23 binary chunks**, with a maximum targe
 
 The six originals were reconstructed locally from the chunks and their SHA-256 hashes were reported as matching across all six files. The original files were left untouched. The exact hash values were not recorded in the project log.
 
-**What is not done yet:**
+**Retrieval and first-pass analysis completed on 2026-11-20:**
 
-- The chunks have not yet been successfully retrieved into the analysis environment.
-- The six recordings have not yet been reconstructed and independently checked in the analysis environment.
-- The actual profiler data has not yet been inspected.
-- No performance bottlenecks have been confirmed.
-- No optimisation should be justified by the candidate list alone.
+- All 23 chunk blobs were retrieved through GitHub's Git Blobs endpoint and grouped in numeric order.
+- The three Early Bird parts and three Homepage parts were each concatenated into valid Firefox Profiler JSON. This analysis pass confirmed that both profiles parse. The user's earlier local SHA-256 comparisons remain the recorded integrity check; the analysis environment did not recompute those hashes.
+- The first separate analysis pass measured page-specific DOM event latency, site-process long-task markers, CSS animation properties and native sampled call names. The detailed observations and limitations are in `PROJECT_LOG.md`.
+- The Early Bird profile recorded 160 site-process `MainThreadLongTask` markers in 37.74 seconds; the Homepage profile recorded two in 45.98 seconds. These are separate, uncontrolled capture windows, not a formal A/B comparison.
+- The Early Bird page's DOM event p95 was 127.6 ms (174 events above 50 ms; 116 above 100 ms). The Homepage page's DOM event p95 was 25.1 ms in its separate capture.
+- The Early Bird process profile includes native Skia blur/raster samples. Combined with the user's A/B observation that hiding the atmosphere canvas substantially improved responsiveness, this makes canvas raster work the leading hypothesis. Exact element-to-stack attribution is not yet proven.
+- The captured `album-bloom-breathe` CSS animation used compositor-eligible `transform` and `opacity`; bloom is currently a lower-priority main-thread suspect.
+- No performance bottleneck has been declared fully confirmed and no performance change has been deployed.
 
-The real Firefox profile is a meaningful test case because it reflects the user's actual browser environment. Preserve that scenario. A clean-profile run may be useful as a comparison, but must not replace the real-profile evidence or be treated as the only valid test.
+The real Firefox profile remains the meaningful test case because it reflects the user's actual browser environment. Preserve that scenario. A clean-profile run may be useful as a comparison, but must not replace the real-profile evidence or be treated as the only valid test.
 
 ## Immediate priority: NEXT ACTION
 
-**Retrieve, reconstruct and inspect the Firefox recordings.**
+**Close Stage 2 with page/task attribution and a repeatable performance comparison.**
 
-1. Start with one small, known chunk from `firefox-recording-chunks`, using the GitHub file retrieval route with base64 encoding. Confirm that the returned payload contains the complete chunk bytes before attempting all 23.
-2. Retrieve all 23 chunks and group them by the six original recording names. Preserve numeric chunk order (001, 002, 003, and so on).
-3. Reconstruct each original as a byte-for-byte concatenation. Verify the reconstructed files with SHA-256 against the local originals or a freshly generated checksum manifest.
-4. Inspect the file headers and structure to establish the actual format before parsing. Do not assume a chunk is independently parseable.
-5. Analyse Early Bird and Homepage recordings separately, then compare them. Record observable timings, request activity, scripting, rendering, long tasks and other relevant profiler evidence where the recording format supports it.
-6. Keep **observations**, **hypotheses** and **confirmed bottlenecks** explicitly separate. Only then propose optimisations.
+1. Inspect the Early Bird `MainThreadLongTask` intervals and the available marker/stack context to establish which work belongs to the album page, the homepage, or shared browser/content-process activity. Keep process-wide evidence distinct from page-specific event markers.
+2. Identify whether the Skia `ThreeBoxApproxPass::blurSegment` samples are being driven by the atmosphere canvas filters, other CSS effects, or unrelated rendering work. The current source has two curtain blur filters per frame; this is a strong candidate, not proof of attribution.
+3. Establish a preview/testing route for feature branches. The existing Pages workflow deploys production from `main`; do not use the production site as a casual branch-preview target.
+4. Run separate, repeatable comparisons for the canvas, curtain blur, grain and bloom. Keep the test environment, browser and interaction sequence as consistent as possible, and record event latency, long tasks and sampled rendering work.
+5. Decide which changes are justified, retain visual quality where possible, and document the outcome before closing Stage 2.
 
-If the GitHub connector does not return usable chunk bytes, stop repeating the same failed retrieval attempt and switch to a reliable transfer method (for example, a repository archive or user-provided files).
+The separate `performance/early-bird-canvas-no-blur` branch is an unvalidated experiment only. Do not merge it into `main` until a safe preview or controlled validation exists.
+
+**Next major programme after Stage 2:** Stage 3, shared design foundations. This is the substantial architecture task: establish a token/foundation layer and reusable primitives that support Vista, Early Bird and Editorial without flattening their identities. Stage 1's audit and the existing registries are the starting point; do not rebuild the content pipeline.
 
 ## Working rules
 
