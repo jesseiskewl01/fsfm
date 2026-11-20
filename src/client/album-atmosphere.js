@@ -373,17 +373,23 @@ try {
       ctx.save();
       ctx.globalCompositeOperation = 'screen';
       ctx.fillStyle = vertical;
+
+      // Draw the broad curtain without expensive per-frame blur filters.
       ctx.globalAlpha = 0.76;
-      ctx.filter = 'blur(13px)';
-      ctx.fill(path);
-      ctx.globalAlpha = 0.48;
-      ctx.filter = 'blur(4px)';
-      ctx.fill(path);
-      ctx.globalAlpha = 0.24;
       ctx.filter = 'none';
+      ctx.fill(path);
+
+      // A softer second pass adds depth through transparency instead of blur.
+      ctx.globalAlpha = 0.28;
+      ctx.fill(path);
+
+      // Fine highlight along the curtain's edge.
+      ctx.globalAlpha = 0.24;
       ctx.strokeStyle = 'rgba(254,245,222,0.32)';
       ctx.lineWidth = 1.1;
       ctx.stroke(path);
+
+      ctx.restore();
 
       // Delicate vertical folds give the broad light curtains an aurora-like texture.
       ctx.globalAlpha = 0.18;
