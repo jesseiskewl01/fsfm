@@ -30,8 +30,8 @@
     }, 650);
   }
   function closeWindow(button){
-    var win=button.closest('.aero-window, .content-window');
-    if(!win) return;
+    var win=button.closest('.aero-window, .content-window, .vista-window');
+    if(!win || win.hasAttribute('data-vista-window')) return;
     if(win.classList.contains('hero-window')) { shutdownDesktop(); return; }
     if(win.id==='funWidgetMusic') {
       var player=document.getElementById('homeMusicAudio');
@@ -44,8 +44,8 @@
   });
   document.querySelectorAll('[data-window-action="minimize"]').forEach(function(button){
     button.addEventListener('click',function(){
-      var win=button.closest('.aero-window, .content-window');
-      if(!win) return;
+      var win=button.closest('.aero-window, .content-window, .vista-window');
+      if(!win || win.hasAttribute('data-vista-window')) return;
       var minimized=win.classList.toggle('window-minimized');
       button.textContent=minimized?'□':'−';
       button.setAttribute('aria-label',(minimized?'Restore ':'Minimize ')+(win.getAttribute('aria-label')||'window'));

@@ -35,22 +35,83 @@ function vistaWindowTitle(section) {
   return (section.presentation?.windowTitle || labels[section.type] || String(section.type || 'FSFM WINDOW').replace(/[-_]/g, ' ').toUpperCase()).trim();
 }
 
+/* ------------------------------------------------------------------ N2.3: canonical Vista window
+ * One shared Aero-window renderer used by homepage hero/content windows and
+ * vista-window template sections. Variants control behavior (draggable/dock,
+ * shutdown, in-place minimize) without creating separate window systems.
+ * Legacy class names are preserved as aliases for compatibility. [OpenCode, 2026-11-22]
+ */
+export function renderWindow({
+  tag = 'section',
+  id = '',
+  className = '',
+  ariaLabel = '',
+  title = '',
+  iconHtml = '<span class="window-mini-icon" aria-hidden="true">✧</span>',
+  controls = 'minimize-close',
+  draggable = false,
+  dataAttrs = '',
+  bodyClass = '',
+  bodyHtml = '',
+  titleId = '',
+} = {}) {
+  const safeTag = tag === 'div' ? 'div' : 'section';
+  const classTokens = [...new Set([...(className || '').split(/\s+/).filter(Boolean), 'vista-window'])];
+  const attrs = [
+    id ? `id="${escapeHtml(id)}"` : '',
+    `class="${escapeHtml(classTokens.join(' '))}"`,
+    ariaLabel ? `aria-label="${escapeHtml(ariaLabel)}"` : '',
+    dataAttrs,
+  ].filter(Boolean).join(' ');
+  const titlebarAttrs = draggable
+    ? ' class="titlebar vista-window-titlebar" data-vista-drag-handle tabindex="0" aria-label="Move ' + escapeHtml(title) + ' window" title="Drag to move · Use arrow keys to nudge"'
+    : ' class="titlebar"';
+  const icon = iconHtml || '<span class="window-mini-icon" aria-hidden="true">✧</span>';
+  const titleSpan = titleId
+    ? `<span id="${escapeHtml(titleId)}">${escapeHtml(title)}</span>`
+    : `<span>${escapeHtml(title)}</span>`;
+  const controlButtons = [];
+  if (controls === 'minimize-close' || controls === 'minimize') {
+    controlButtons.push(`<button type="button" class="caption-button vista-window-button minimize" data-window-action="minimize"${draggable ? ' data-vista-window-action="minimize"' : ''} aria-label="Minimize ${escapeHtml(title)} window" title="Minimize">−</button>`);
+  }
+  if (controls === 'minimize-close' || controls === 'close') {
+    controlButtons.push(`<button type="button" class="caption-button vista-window-button close" data-window-action="close"${draggable ? ' data-vista-window-action="close"' : ''} aria-label="Close ${escapeHtml(title)} window" title="Close">×</button>`);
+  }
+  const controlsHtml = controlButtons.length ? `<div class="caption-buttons vista-window-controls">${controlButtons.join('')}</div>` : '';
+  return `<${safeTag} ${attrs}><div${titlebarAttrs}><div class="window-title">${icon}${titleSpan}</div>${controlsHtml}</div><div class="window-body ${escapeHtml(bodyClass)}">${bodyHtml}</div></${safeTag}>`;
+}
+
 function windowWrap(section, inner, extraClass = '', context = {}) {
   const presentation = section.presentation || {};
   const variant = defaultVariant(section, context);
   const isVistaWindow = context.page?.template === 'vista-window' && ['vista-window', 'vista-desktop'].includes(variant) && !['divider', 'spacer', 'marquee'].includes(section.type);
   const title = ['album-header', 'album-player'].includes(section.type) ? '' : (presentation.windowTitle || '').trim();
   const windowTitle = isVistaWindow ? vistaWindowTitle(section) : title;
-  const classes = ['content-section', 'variant-' + variant, isVistaWindow ? 'vista-window-frame' : '', extraClass].filter(Boolean).join(' ');
-  const titlebar = isVistaWindow
-    ? '<div class="titlebar vista-window-titlebar" data-vista-drag-handle tabindex="0" aria-label="Move ' + escapeHtml(windowTitle) + ' window" title="Drag to move · Use arrow keys to nudge"><div class="window-title"><span class="window-mini-icon vista-window-icon" aria-hidden="true">✧</span><span class="vista-window-title">' + escapeHtml(windowTitle) + '</span></div><div class="caption-buttons vista-window-controls"><button type="button" class="caption-button vista-window-button minimize" data-window-action="minimize" data-vista-window-action="minimize" aria-label="Minimize ' + escapeHtml(windowTitle) + '" title="Minimize">−</button><button type="button" class="caption-button vista-window-button close" data-window-action="close" data-vista-window-action="close" aria-label="Close ' + escapeHtml(windowTitle) + '" title="Close">×</button></div></div>'
-    : title
-      ? '<div class="component-titlebar"><span class="component-title">' + escapeHtml(title) + '</span></div>'
-      : '';
   const groupId = section.group?.id ? ' data-layout-group="' + escapeHtml(section.group.id) + '"' : '';
-  const vistaAttributes = isVistaWindow ? ' data-vista-window data-vista-window-id="' + escapeHtml(section.id || section.type) + '" data-vista-window-title="' + escapeHtml(windowTitle) + '"' : '';
-  const bodyClass = isVistaWindow ? 'window-body component-body' : 'component-body';
-  return '<section class="' + classes + '" id="section-' + escapeHtml(section.id || section.type) + '" data-component="' + escapeHtml(section.type) + '"' + groupId + vistaAttributes + '>' + titlebar + '<div class="' + bodyClass + '">' + inner + '</div></section>';
+
+  if (isVistaWindow) {
+    const classes = ['content-section', 'variant-' + variant, 'vista-window-frame', extraClass].filter(Boolean).join(' ');
+    const dataAttrs = `data-component="${escapeHtml(section.type)}"${groupId} data-vista-window data-vista-window-id="${escapeHtml(section.id || section.type)}" data-vista-window-title="${escapeHtml(windowTitle)}"`;
+    return renderWindow({
+      id: 'section-' + (section.id || section.type),
+      className: classes,
+      ariaLabel: windowTitle,
+      title: windowTitle,
+      iconHtml: '<span class="window-mini-icon vista-window-icon" aria-hidden="true">✧</span>',
+      controls: 'minimize-close',
+      draggable: true,
+      dataAttrs,
+      bodyClass: 'component-body',
+      bodyHtml: inner,
+    });
+  }
+
+  const classes = ['content-section', 'variant-' + variant, extraClass].filter(Boolean).join(' ');
+  const titlebar = title
+    ? '<div class="component-titlebar"><span class="component-title">' + escapeHtml(title) + '</span></div>'
+    : '';
+  const bodyClass = 'component-body';
+  return '<section class="' + classes + '" id="section-' + escapeHtml(section.id || section.type) + '" data-component="' + escapeHtml(section.type) + '"' + groupId + '>' + titlebar + '<div class="' + bodyClass + '">' + inner + '</div></section>';
 }
 
 function renderMarquee(content = {}) {
@@ -125,7 +186,18 @@ function renderHomeWindow(section, inner, preview = false) {
       : type === 'social-links' ? renderHomeSocialLinks(section.content || {})
       : type === 'bandsintown-events' ? renderBandsintown(section.content || {}, preview)
       : inner;
-  return `<section class="reveal content-window ${extras[type] || 'home-component-window'}" id="${escapeHtml(id)}" aria-label="${escapeHtml(aria)}" data-component="${escapeHtml(type)}"><div class="titlebar"><div class="window-title">${homeTitleIcon(type)}<span>${escapeHtml(title)}</span></div><div class="caption-buttons"><button type="button" class="caption-button minimize" data-window-action="minimize" aria-label="Minimize ${escapeHtml(title)} window" title="Minimize">−</button><button type="button" class="caption-button close" data-window-action="close" aria-label="Close ${escapeHtml(title)} window" title="Close">×</button></div></div><div class="window-body ${bodyClass}">${body}</div></section>`;
+  return renderWindow({
+    id,
+    className: ['reveal', 'content-window', extras[type] || 'home-component-window'].filter(Boolean).join(' '),
+    ariaLabel: aria,
+    title,
+    iconHtml: homeTitleIcon(type),
+    controls: 'minimize-close',
+    draggable: false,
+    dataAttrs: `data-component="${escapeHtml(type)}"`,
+    bodyClass,
+    bodyHtml: body,
+  });
 }
 
 function renderFeaturedRelease(content = {}) {

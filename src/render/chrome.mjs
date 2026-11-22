@@ -9,6 +9,7 @@
 import { escapeHtml, safeImageUrl, safeJsonForHtml, safeRoute, safeUrl } from './html.mjs';
 import { wallpaperBackground } from './wallpaper.mjs';
 import { isChromePartEnabled } from '../core/parts.mjs';
+import { renderWindow } from './components.mjs';
 
 function safeImage(value) { return safeImageUrl(value) || ''; }
 function text(value, fallback = '') { return typeof value === 'string' ? value : fallback; }
@@ -81,7 +82,19 @@ export function renderDesktopHero(page, site) {
   const hero = page.templateData?.hero || {};
   const favicon = safeImage(site.favicon);
   const icon = favicon ? `<img class="hero-favicon" src="${escapeHtml(favicon)}" alt="" aria-hidden="true" width="14" height="14">` : '<span class="hero-favicon-fallback" aria-hidden="true">✧</span>';
-  return `<div class="aero-window hero-window" aria-label="Homepage hero window"><div class="titlebar"><div class="window-title">${icon}<span id="heroWindowTitle">${escapeHtml(text(hero.windowTitle, 'Homepage'))}</span></div><div class="caption-buttons"><button type="button" class="caption-button minimize" data-window-action="minimize" aria-label="Minimize homepage hero window" title="Minimize">−</button><button type="button" class="caption-button close" data-window-action="close" aria-label="Close homepage desktop" title="Close">×</button></div></div><div class="window-body"><header class="hero" id="heroSection"><div class="hero-badge" id="heroBadge">${escapeHtml(text(hero.badge, ':]'))}</div><div class="hero-mark" id="heroTitle">${escapeHtml(text(hero.title, page.identity?.name || 'Fake Space Fog Machine'))}</div><div class="hero-sub" id="heroSubtitle">${escapeHtml(text(hero.subtitle))}</div><div class="hero-handle" id="heroHandle">${escapeHtml(text(hero.handle))}</div></header></div></div>`;
+  const bodyHtml = `<header class="hero" id="heroSection"><div class="hero-badge" id="heroBadge">${escapeHtml(text(hero.badge, ':]'))}</div><div class="hero-mark" id="heroTitle">${escapeHtml(text(hero.title, page.identity?.name || 'Fake Space Fog Machine'))}</div><div class="hero-sub" id="heroSubtitle">${escapeHtml(text(hero.subtitle))}</div><div class="hero-handle" id="heroHandle">${escapeHtml(text(hero.handle))}</div></header>`;
+  return renderWindow({
+    tag: 'div',
+    className: 'aero-window hero-window',
+    ariaLabel: 'Homepage hero window',
+    title: text(hero.windowTitle, 'Homepage'),
+    titleId: 'heroWindowTitle',
+    iconHtml: icon,
+    controls: 'minimize-close',
+    draggable: false,
+    bodyClass: '',
+    bodyHtml,
+  });
 }
 
 /* ------------------------------------------------------------ overlays */

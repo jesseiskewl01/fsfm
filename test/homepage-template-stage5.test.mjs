@@ -24,7 +24,7 @@ const gadgets = [
 test('Homepage renders through the dedicated V13 Vista desktop shell', () => {
   assert.match(html, /<body class="template-homepage" data-template="homepage"/);
   assert.match(html, /class="taskbar"/);
-  assert.match(html, /class="aero-window hero-window"/);
+  assert.match(html, /class="[^"]*\baero-window hero-window\b[^"]*"/);
   assert.match(html, /id="fsfmBootScreen"/);
   assert.match(html, /id="wallA"/);
   assert.match(html, /id="wallB"/);

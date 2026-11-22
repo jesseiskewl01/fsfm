@@ -24,7 +24,7 @@ const MARKERS = {
   bubbleCanvas: 'id="bgCanvas"',
   desktopGadgets: 'id="fsfmGadgets"',
   desktopTaskbar: '<nav class="taskbar"',
-  desktopHero: 'class="aero-window hero-window"',
+  desktopHero: 'aero-window hero-window',
   purbleOverlay: 'id="purbleOverlay"',
   shutdownOverlay: 'id="fsfmShutdown"',
   themeEngine: 'window.__FSFM_THEME_CONFIG__'

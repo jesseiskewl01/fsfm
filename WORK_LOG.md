@@ -296,3 +296,13 @@ The architectural refurbishment itself: Roadmap Phases 3–5. Make homepage and 
 - `tina/tina-lock.json` changed locally (unstaged, not committed) during Studio localhost use. Diff indicates a Tina schema/lock regen: same version/collection, but “Building blocks” -> “Parts”, expanded part type options, group fields; ~74k -> ~105k.
 - Likely caused by running `npm run dev:tina` / Tina CLI dev, which can regenerate Tina artifacts. No harm observed, but per guardrails generated Tina artifacts are not committed casually.
 - **Action:** left unstaged intentionally. Do not commit without an explicit decision. If unwanted noise, restore with `git restore -- tina/tina-lock.json` (may reappear if `dev:tina` is run again).
+
+
+### N2.3 Vista window convergence **[OpenCode, 2026-11-22]**
+
+- Added canonical `renderWindow()` in `src/render/components.mjs`; homepage hero (`chrome.mjs`), homepage content windows (`renderHomeWindow`), and vista-window template sections (`windowWrap`) now render through shared Aero window chrome.
+- Canonical class `vista-window` added across window types; legacy aliases kept (`aero-window`, `content-window`, `vista-window-frame`, `vista-window-*`) for compatibility.
+- `homepage-interactions.js` now ignores `[data-vista-window]` so draggable/dock windows are handled only by `vista-windows.js`; in-place minimize/hero shutdown preserved for homepage windows.
+- `homepage-vista.css` selectors extended for canonical `.vista-window.content-window` alias. Vista template window CSS remains Aero-aligned in `v13.css`.
+- Tests: updated stale hero marker assertions in `test/homepage-template-stage5.test.mjs` and `test/parts-chrome.test.mjs` to accept canonical class order. `npm run build` pass, `npm run validate:v13` pass, `npm test` 183/170/13 (baseline).
+- `tina/tina-lock.json` remains unstaged local drift; not committed.

@@ -477,15 +477,16 @@ text-shadow: 0 1px 3px rgb(var(--deep-rgb)), 0 0 8px rgba(var(--deep-rgb), 0.8);
   display:grid; grid-template-columns:minmax(245px,.86fr) minmax(0,1.14fr);
   gap:18px; align-items:stretch; padding:20px 0 2px;
 }
-.content-window {
+/* Canonical Vista window base (homepage Aero family). .content-window kept as alias. [OpenCode, 2026-11-22] */
+.vista-window.content-window, .content-window {
   min-width:0; overflow:hidden; padding:0 6px 6px; border:1px solid rgba(var(--deep-rgb),.72);
   border-radius:7px 7px 4px 4px;
   background:linear-gradient(130deg,#effbff70 0%,#bfe9ff18 15%,#102c3e50 29%,#e7f8ff2f 30%,#6aa6b515 36%,#1a485451 60%,#e1f7ff45 82%,#8acde826 92%),rgba(var(--glass-rgb),.52);
   backdrop-filter:blur(14px) saturate(1.25);
   box-shadow:0 7px 23px rgba(0,0,0,.42),inset 0 0 0 1px #effbffc0;
 }
-.content-window .titlebar { height:30px; padding:0 4px; }
-.content-window .window-body { height:calc(100% - 30px); }
+.vista-window.content-window .titlebar, .content-window .titlebar { height:30px; padding:0 4px; }
+.vista-window.content-window .window-body, .content-window .window-body { height:calc(100% - 30px); }
 .window-mini-icon { width:17px; height:17px; display:inline-flex; align-items:center; justify-content:center; border-radius:4px; color:#164968; font:700 12px Georgia,serif; background:linear-gradient(145deg,#fff,#dff4ff 48%,#83bbd8 51%,#e9f8ff); border:1px solid rgba(36,95,130,.55); box-shadow:inset 0 1px 2px #fff,0 1px 2px #0003; }
 .window-mini-icon.music { font:700 13px Georgia,serif; }
 .window-mini-icon.calendar { font:700 12px Arial,sans-serif; }
