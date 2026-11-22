@@ -158,7 +158,10 @@
     "effects": {
       "backgroundEffects": true,
       "pageTransition": true,
-      "respectReducedMotion": true
+      "respectReducedMotion": true,
+      "albumAtmosphere": {
+        "mode": "full"
+      }
     }
   },
   "seo": {

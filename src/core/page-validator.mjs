@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { COMPONENTS } from '../components/registry.mjs';
 import { TEMPLATES } from '../templates/registry.mjs';
+import { EFFECTS } from './parts.mjs';
 import { routeForPage } from './page-routes.mjs';
 
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -53,6 +54,19 @@ export function validatePage(page, options = {}) {
           if (typeof cycle.enabled !== 'boolean') issue(problems, where, 'wallpaper.cycle.enabled must be boolean');
           if (!['sequential','random'].includes(cycle.mode)) issue(problems, where, 'wallpaper.cycle.mode must be sequential or random');
           if (!Number.isInteger(cycle.intervalSeconds) || cycle.intervalSeconds < 5 || cycle.intervalSeconds > 3600) issue(problems, where, 'wallpaper interval must be an integer between 5 and 3600 seconds');
+        }
+      }
+    }
+    // Effect modes are validated from the shared part definitions, so the
+    // editor choices and the build rules cannot disagree.
+    const effects = appearance?.effects || {};
+    if (isRecord(effects)) {
+      for (const [name, definition] of Object.entries(EFFECTS)) {
+        const value = effects[name];
+        if (value === undefined) continue;
+        const mode = typeof value === 'string' ? value : value?.mode;
+        if (!definition.modes.includes(mode)) {
+          issue(problems, where, `${definition.path} must be one of ${definition.modes.join(', ')}`);
         }
       }
     }

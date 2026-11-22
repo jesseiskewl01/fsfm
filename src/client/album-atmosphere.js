@@ -281,6 +281,9 @@ try {
   var canvas = document.getElementById('nebulaCanvas');
   var ctx = canvas && canvas.getContext('2d');
   if (canvas && ctx) {
+    // Rendering intensity is a content setting, not a template hardcode.
+    var mode = canvas.getAttribute('data-atmosphere-mode') || 'full';
+    var lite = mode === 'lite';
     var width = 0, height = 0, dpr = 1, compact = false, frameId = 0, lastFrame = -1000, pageVisible = !document.hidden;
     var motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
     var reduceMotion = motionPreference.matches;
@@ -289,6 +292,7 @@ try {
 
     function resizeAurora() {
       dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 640 ? 1 : 1.1);
+      if (lite) dpr = Math.min(window.devicePixelRatio || 1, 0.85);
       width = window.innerWidth;
       height = window.innerHeight;
       canvas.width = Math.round(width * dpr);
@@ -302,6 +306,7 @@ try {
       blooms = [];
       curtains = [];
       var starCount = Math.min(190, Math.max(70, Math.floor((width * height) / 9000)));
+      if (lite) starCount = Math.min(60, Math.max(24, Math.floor((width * height) / 18000)));
       compact = width < 640;
       for (var i = 0; i < starCount; i += 1) {
         var giant = i < Math.max(18, Math.floor(starCount * 0.075));
@@ -313,7 +318,7 @@ try {
           drift: random(-0.035, 0.035), giant: giant
         });
       }
-      for (var b = 0; b < 4; b += 1) {
+      for (var b = 0; b < (lite ? 2 : 4); b += 1) {
         blooms.push({
           x: random(width * 0.02, width * 0.98),
           y: random(height * 0.04, height * 0.98),
@@ -321,7 +326,7 @@ try {
           alpha: random(0.045, 0.095), phase: random(0, Math.PI * 2), speed: random(0.11, 0.24)
         });
       }
-      var curtainCount = Math.max(4, Math.min(7, Math.round(width / (compact ? 220 : 250)) + 2));
+      var curtainCount = lite ? Math.max(3, Math.min(4, Math.round(width / 520) + 1)) : Math.max(4, Math.min(7, Math.round(width / (compact ? 220 : 250)) + 2));
       for (var ci = 0; ci < curtainCount; ci += 1) {
         var fraction = -0.08 + (ci / Math.max(1, curtainCount - 1)) * 1.16;
         curtains.push({
@@ -341,6 +346,7 @@ try {
       var yTop = -height * (width < 640 ? 0.16 : 0.10);
       var yBottom = height * (compact ? Math.min(1.18, curtain.depth + 0.10) : Math.min(1.25, curtain.depth + 0.16));
       var steps = 22;
+      if (lite) steps = 12;
       var left = [], right = [];
       var driftTime = reduceMotion ? 0 : time;
       for (var i = 0; i <= steps; i += 1) {
@@ -373,14 +379,22 @@ try {
       ctx.save();
       ctx.globalCompositeOperation = 'screen';
       ctx.fillStyle = vertical;
-      ctx.globalAlpha = 0.76;
-      ctx.filter = 'blur(13px)';
-      ctx.fill(path);
-      ctx.globalAlpha = 0.48;
-      ctx.filter = 'blur(4px)';
-      ctx.fill(path);
-      ctx.globalAlpha = 0.24;
-      ctx.filter = 'none';
+      if (lite) {
+        // Keep the soft gradient silhouette; drop the two per-frame blur passes.
+        ctx.globalAlpha = 0.86;
+        ctx.filter = 'none';
+        ctx.fill(path);
+        ctx.globalAlpha = 0.24;
+      } else {
+        ctx.globalAlpha = 0.76;
+        ctx.filter = 'blur(13px)';
+        ctx.fill(path);
+        ctx.globalAlpha = 0.48;
+        ctx.filter = 'blur(4px)';
+        ctx.fill(path);
+        ctx.globalAlpha = 0.24;
+        ctx.filter = 'none';
+      }
       ctx.strokeStyle = 'rgba(254,245,222,0.32)';
       ctx.lineWidth = 1.1;
       ctx.stroke(path);
@@ -437,7 +451,7 @@ try {
       stars.forEach(function(star) {
         var shimmer = reduceMotion ? 0.78 : (Math.sin(clock * 0.001 * star.speed + star.phase) + 1) / 2;
         var alpha = star.alpha * (0.34 + shimmer * 0.82);
-        if (star.giant) {
+        if (star.giant && !lite) {
           var haloRadius = star.radius * (8 + shimmer * 6);
           var halo = ctx.createRadialGradient(star.x, star.y, 0, star.x, star.y, haloRadius);
           halo.addColorStop(0, 'rgba(254,245,222,' + (alpha * 0.80) + ')');

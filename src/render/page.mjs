@@ -1,6 +1,7 @@
 import { escapeHtml, safeCanonical, safeImageUrl, safeJsonForHtml, safeRoute, safeUrl } from './html.mjs';
 import { renderComponentList } from './components.mjs';
 import { renderWallpaperLayer } from './wallpaper.mjs';
+import { renderAtmosphere } from './effects.mjs';
 
 function siteNavigation(site, pages, currentPage) {
   const items = (pages || [])
@@ -129,7 +130,8 @@ export function renderSiteShell({ page, site, pages = [], wallpapers, bodyHtml, 
   const scriptsToLoad = homepageMode ? new Set() : new Set(['wallpaper-engine.js', 'runtime.js']);
   if (scripts.includes('bandsintown')) scriptsToLoad.add('bandsintown.js');
   if (scripts.includes('album-player')) scriptsToLoad.add('album-player.js');
-  if (page.template === 'album') scriptsToLoad.add('album-atmosphere.js');
+  const atmosphere = renderAtmosphere(page);
+  if (atmosphere.scripts.includes('album-atmosphere.js')) scriptsToLoad.add('album-atmosphere.js');
   if (page.template === 'vista-window') scriptsToLoad.add('vista-windows.js');
   if (homepageMode) {
     for (const name of ['homepage-desktop.js','homepage-interactions.js','homepage-gadgets.js']) scriptsToLoad.add(name);
@@ -140,7 +142,7 @@ export function renderSiteShell({ page, site, pages = [], wallpapers, bodyHtml, 
   const effects = page.appearance?.effects || {};
   const backgroundEffects = effects.backgroundEffects === false ? 'false' : 'true';
   const pageTransition = effects.pageTransition === false ? 'false' : 'true';
-  const albumAtmosphere = page.template === 'album' ? '<canvas id="nebulaCanvas" class="album-atmosphere" aria-hidden="true"></canvas><div class="bloom-vignette" aria-hidden="true"></div><div class="album-grain" aria-hidden="true"></div>' : '';
+  const albumAtmosphere = atmosphere.html;
   const siteChrome = homepageMode ? bodyHtml : `<div class="site-shell">${renderGlobalHeader(site, nav)}<main id="main-content" class="page-main template-main-${escapeHtml(template)}">${bodyHtml}</main>${renderFooter(site, page)}</div>`;
   return `<!doctype html>
 <html lang="en">
