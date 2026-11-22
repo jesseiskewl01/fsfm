@@ -32,43 +32,30 @@
 
   function computeDesktopLayout() {
     var hero = document.querySelector('.hero-window');
-    var wrap = document.querySelector('.wrap');
     var heroRect = hero ? hero.getBoundingClientRect() : null;
-    var wrapRect = wrap ? wrap.getBoundingClientRect() : null;
     var viewportWidth = window.innerWidth;
     var viewportHeight = window.innerHeight;
-    var wrapLeft = wrapRect ? wrapRect.left : (viewportWidth - 880) / 2;
-    var wrapRight = wrapRect ? wrapRect.right : (viewportWidth + 880) / 2;
     var heroTop = heroRect ? heroRect.top : 82;
-    var heroHeight = heroRect ? heroRect.height : Math.min(390, viewportHeight * 0.58);
     var topRow = Math.max(72, Math.round(heroTop));
-    var leftMiddle = Math.max(topRow + 180, Math.round(viewportHeight * 0.405));
-    var leftLower = Math.max(leftMiddle + 142, Math.round(viewportHeight * 0.63));
-    var rightMiddle = Math.max(topRow + 230, Math.round(viewportHeight * 0.48));
-    var rightLower = Math.max(rightMiddle + 150, Math.round(viewportHeight * 0.76));
+    var middleRow = Math.max(topRow + 170, Math.round(heroTop + 170));
+    var lowerRow = Math.max(middleRow + 170, Math.round(heroTop + 340));
     var mainWidth = 184;
-    var compactWidth = 176;
     var leftOuter = 16;
-    var leftInner = 34;
+    var leftInner = 46;
     var rightOuter = viewportWidth - mainWidth - 16;
-    var rightInner = viewportWidth - mainWidth - 34;
+    var rightInner = viewportWidth - mainWidth - 46;
 
+    // Gradated framing requested by Jesse [OpenCode, 2026-11-22]:
+    // 1==[hero]==4  (clock / calendar)
+    // =2=[hero]=5=  (featured / photo) - stepped inward
+    // 3==[hero]==6  (dates / note)
     return {
-      // The six primary windows frame the central homepage in three loose rows.
-      // The middle pair steps inward slightly, matching the intended Vista composition.
       'gadget-clock': [leftOuter, topRow],
-      'gadget-now-playing': [leftInner, leftMiddle],
-      'gadget-dates': [leftOuter, leftLower],
+      'gadget-now-playing': [leftInner, middleRow],
+      'gadget-dates': [leftOuter, lowerRow],
       'gadget-calendar': [rightOuter, topRow],
-      'gadget-photos': [rightInner, rightMiddle],
-      'gadget-note': [rightOuter, rightLower],
-
-      // The four optional controls sit in staggered pairs around the centre body.
-      // Their offsets intentionally avoid a rigid third column or a neat grid.
-      'gadget-barrel-roll': [wrapLeft + 22, heroTop + Math.max(48, heroHeight * 0.20)],
-      'gadget-bubbles': [wrapRight - compactWidth - 22, heroTop + Math.max(112, heroHeight * 0.34)],
-      'gadget-radio': [wrapLeft + 72, Math.max(leftMiddle + 62, heroTop + heroHeight * 0.62)],
-      'gadget-purble': [wrapRight - compactWidth - 72, Math.max(rightMiddle + 112, heroTop + heroHeight * 0.78)]
+      'gadget-photos': [rightInner, middleRow],
+      'gadget-note': [rightOuter, lowerRow]
     };
   }
 

@@ -17,7 +17,7 @@ export function renderHomepage(page, { site, pages = [], wallpapers, assets = '/
   const chrome = renderDesktopChrome(page, { site, pages, wallpapers });
 
   const bodyHtml = `${chrome.beforeMain}
-  <main class="wrap" id="main-content">${chrome.hero}${rendered.html}<footer class="site-footer" id="siteFooter">${escapeHtml(text(page.templateData?.footerText, site.footerText || ''))}</footer></main>
+  <main class="wrap" id="main-content">${chrome.hero}${rendered.html}<footer class="site-footer" id="siteFooter">${escapeHtml(text(page.templateData?.footerText, site.footerText || ''))}</footer>${chrome.belowFooter || ''}</main>
   ${chrome.afterMain}`;
 
   const pageWithData = {

@@ -44,13 +44,10 @@ test('V15 homepage widgets form the intended six-window frame with loose bonus p
     assert.match(js, new RegExp("'" + id + "':"));
   }
   assert.match(js, /var leftOuter = 16/);
-  assert.match(js, /var leftInner = 34/);
-  assert.match(js, /var rightInner = viewportWidth - mainWidth - 34/);
-  for (const id of ['gadget-barrel-roll', 'gadget-bubbles', 'gadget-radio', 'gadget-purble']) {
-    assert.match(js, new RegExp("'" + id + "':"));
-  }
-  assert.match(js, /wrapLeft \+ 22/);
-  assert.match(js, /wrapRight - compactWidth - 22/);
+  assert.match(js, /var leftInner = 46/);
+  assert.match(js, /var rightInner = viewportWidth - mainWidth - 46/);
+  // Extra widgets are rendered below footer, not in the fixed desktop gadget layout. [OpenCode, 2026-11-22]
+  assert.match(js, /Gradated framing requested by Jesse/);
   assert.match(js, /fsfm_gadget_positions_v2/);
   assert.match(js, /isLegacyDefault/);
   assert.match(js, /function boxesOverlap/);

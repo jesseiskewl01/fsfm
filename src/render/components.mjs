@@ -70,12 +70,13 @@ export function renderWindow({
   const titleSpan = titleId
     ? `<span id="${escapeHtml(titleId)}">${escapeHtml(title)}</span>`
     : `<span>${escapeHtml(title)}</span>`;
+  const vistaActions = draggable || /data-vista-window/.test(dataAttrs || '');
   const controlButtons = [];
   if (controls === 'minimize-close' || controls === 'minimize') {
-    controlButtons.push(`<button type="button" class="caption-button vista-window-button minimize" data-window-action="minimize"${draggable ? ' data-vista-window-action="minimize"' : ''} aria-label="Minimize ${escapeHtml(title)} window" title="Minimize">−</button>`);
+    controlButtons.push(`<button type="button" class="caption-button vista-window-button minimize" data-window-action="minimize"${vistaActions ? ' data-vista-window-action="minimize"' : ''} aria-label="Minimize ${escapeHtml(title)} window" title="Minimize">−</button>`);
   }
   if (controls === 'minimize-close' || controls === 'close') {
-    controlButtons.push(`<button type="button" class="caption-button vista-window-button close" data-window-action="close"${draggable ? ' data-vista-window-action="close"' : ''} aria-label="Close ${escapeHtml(title)} window" title="Close">×</button>`);
+    controlButtons.push(`<button type="button" class="caption-button vista-window-button close" data-window-action="close"${vistaActions ? ' data-vista-window-action="close"' : ''} aria-label="Close ${escapeHtml(title)} window" title="Close">×</button>`);
   }
   const controlsHtml = controlButtons.length ? `<div class="caption-buttons vista-window-controls">${controlButtons.join('')}</div>` : '';
   return `<${safeTag} ${attrs}><div${titlebarAttrs}><div class="window-title">${icon}${titleSpan}</div>${controlsHtml}</div><div class="window-body ${escapeHtml(bodyClass)}">${bodyHtml}</div></${safeTag}>`;
@@ -101,7 +102,7 @@ function windowWrap(section, inner, extraClass = '', context = {}) {
       title: windowTitle,
       iconHtml: vistaWindowIcon(section.type),
       controls: 'minimize-close',
-      draggable: true,
+      draggable: false,
       dataAttrs,
       bodyClass: 'component-body',
       bodyHtml: inner,

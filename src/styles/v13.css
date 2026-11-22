@@ -422,12 +422,11 @@ body.template-vista-window .vista-window{
 }
 body.template-vista-window .vista-window:hover{border-color:rgba(231,247,255,.92);box-shadow:0 10px 28px rgba(0,0,0,.46),inset 0 0 0 1px #effbffd8}
 body.template-vista-window .vista-window-titlebar{
- height:30px;min-height:30px;display:flex;align-items:center;justify-content:space-between;gap:6px;padding:0 4px;color:#081722;cursor:grab;user-select:none;touch-action:none;
+ height:30px;min-height:30px;display:flex;align-items:center;justify-content:space-between;gap:6px;padding:0 4px;color:#081722;cursor:default;user-select:none;
  background:transparent;border-bottom:0;box-shadow:none;text-shadow:0 0 4px #fff,0 0 9px #fff,0 0 12px #fff;
 }
 body.template-vista-window .vista-window .window-title{display:flex;align-items:center;gap:6px;flex:1;min-width:0;font:600 12px/1.2 "Segoe UI",Tahoma,Arial,sans-serif;color:#081722;text-shadow:0 0 4px #fff,0 0 9px #fff,0 0 12px #fff;}
 body.template-vista-window .vista-window .window-title > span:last-child{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-body.template-vista-window .vista-window-titlebar:active{cursor:grabbing}
 body.template-vista-window .vista-window-titlebar:focus-visible{outline:2px solid #fff;outline-offset:-3px}
 body.template-vista-window .vista-window-icon,.template-vista-window .window-mini-icon{
  display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;flex:0 0 17px;border:1px solid rgba(36,95,130,.55);border-radius:4px;
@@ -444,6 +443,10 @@ body.template-vista-window .vista-window-button:hover{background:linear-gradient
 body.template-vista-window .vista-window-button.close{width:46px;min-width:46px;border-radius:0 0 4px 0;border-right:1px solid #654338;border-color:#654338;background:linear-gradient(#e9b4a2,#ca7865 44%,#ad3a22 48%,#bd4c31)}
 body.template-vista-window .vista-window-button.close:hover{background:linear-gradient(#f7c4a4,#e7856e 44%,#d23d14 48%,#f26b3b);box-shadow:0 0 14px #ff5d22,inset 0 0 0 1px #ffd8a9}
 body.template-vista-window .vista-window .component-body,.template-vista-window .vista-window .window-body{min-width:0;padding:clamp(19px,3.2vw,34px);color:#1a3a52;background:#fff;border:1px solid rgb(74,138,175);box-shadow:0 0 0 1px #eefbff99;position:relative;overflow:hidden}
+body.template-vista-window .vista-window[data-component="marquee"] .component-body,body.template-vista-window .vista-window[data-component="marquee"] .window-body{padding:0;background:linear-gradient(#ffffff,rgba(166,208,232,.28) 48%,rgba(166,208,232,.4) 50%,rgba(166,208,232,.2)),#fff;}
+body.template-vista-window .vista-window[data-component="marquee"] .marquee-track{padding:10px 0;}
+body.template-vista-window .vista-window[data-component="marquee"] .marquee-item{font:700 13px/1.2 "Segoe UI",Tahoma,Arial,sans-serif;color:#238e9e;letter-spacing:.01em;}
+body.template-vista-window .vista-window[data-component="marquee"] .marquee-separator{color:#238e9e;margin:0 10px;}
 body.template-vista-window .vista-window[data-component="hero"] .component-body{padding:clamp(28px,5vw,60px)}
 body.template-vista-window .vista-window .component-body>:first-child{margin-top:0}
 body.template-vista-window .vista-window .component-body>:last-child{margin-bottom:0}

@@ -25,8 +25,10 @@ function boundedPosition(win,x,y){
  return {x:Math.max(minX,Math.min(x,Math.max(minX,maxX))),y:Math.max(minY,Math.min(y,Math.max(minY,maxY)))};
 }
 function applyPosition(win,x,y){var p=boundedPosition(win,x,y);positions[win.id]=p;win.style.transform='translate3d('+p.x+'px,'+p.y+'px,0)';}
+var enableDrag=false; // disabled per smoke report [OpenCode, 2026-11-22]
 windows.forEach(function(win,index){
  if(!win.id)win.id='vista-window-'+(index+1);
+ if(!enableDrag){win.style.transform='';positions[win.id]={x:0,y:0};return;}
  var p=saved[win.id];if(p&&Number.isFinite(Number(p.x))&&Number.isFinite(Number(p.y))){positions[win.id]={x:Number(p.x),y:Number(p.y)};win.style.transform='translate3d('+p.x+'px,'+p.y+'px,0)';}else positions[win.id]={x:0,y:0};
  var handle=win.querySelector('[data-vista-drag-handle], .vista-window-titlebar, .titlebar');if(!handle)return;var drag=null;
  handle.addEventListener('pointerdown',function(event){
@@ -57,7 +59,6 @@ document.addEventListener('click',function(event){
  var button=event.target.closest('[data-vista-window-action], [data-window-action]');if(!button)return;
  var win=button.closest('[data-vista-window]');if(!win)return;
  var action=button.getAttribute('data-vista-window-action') || button.getAttribute('data-window-action');
- if(action==='minimize')toggleMinimize(win);
- else if(action==='close')hideWindow(win,'closed');
+ if(action==='minimize'||action==='close')toggleMinimize(win);
 });
 })();

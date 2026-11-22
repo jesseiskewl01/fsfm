@@ -11,7 +11,7 @@ const css=fs.readFileSync(path.join(root,'src/styles/v13.css'),'utf8');
 const client=fs.readFileSync(path.join(root,'src/client/vista-windows.js'),'utf8');
 test('Vista window variants render Aero titlebars and controls',()=>{
  const result=renderComponent({id:'welcome',type:'hero',enabled:true,content:{title:'Vista test'},presentation:{variant:'vista-window',windowTitle:'Welcome'}},{page:{template:'vista-window'},site:{siteName:'FSFM'}});
- for(const token of ['vista-window-frame','data-vista-window','data-vista-drag-handle','data-vista-window-action="minimize"','data-vista-window-action="close"','Welcome'])assert.ok(result.html.includes(token),token);
+ for(const token of ['vista-window-frame','data-vista-window','data-vista-window-action="minimize"','data-vista-window-action="close"','Welcome'])assert.ok(result.html.includes(token),token);
 });
 test('Vista-specific chrome is isolated from the homepage and editorial templates',()=>{
  for(const template of ['homepage','editorial']){

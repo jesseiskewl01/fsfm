@@ -350,3 +350,11 @@ The architectural refurbishment itself: Roadmap Phases 3–5. Make homepage and 
 - **Vista close:** close now uses dock reopen (hideWindow) while minimize stays in-place collapse; fixes "close does not work" confusion.
 - **Vista/footer polish:** removed focus-within bezel outline; centered `.global-footer`.
 - **Verify:** validate/build/preview pass, npm test 183/170/13. `tina/tina-lock.json` unstaged.
+
+### Smoke follow-up 3: gadget layout, boot flash, vista behavior, marquee **[OpenCode, 2026-11-22]**
+
+- **Boot overlay flash on every homepage navigation:** added early inline sessionStorage check in `renderBootOverlay` and `html.fsfm-boot-seen` CSS hide in `homepage-vista.css` to prevent flash before JS loads.
+- **Homepage gadgets layout:** `computeDesktopLayout` now uses gradated 6-gadget frame (clock/featured/dates left, calendar/photo/note right; middle stepped inward). Extra widgets (barrel, bubbles, radio, purble) moved below copyright footer in `chrome.mjs`/`homepage.mjs` with flow layout styles.
+- **Vista windows:** drag disabled (no grab cursor/handle, no transform persistence) per smoke report; close now in-place collapse like minimize (no dock popup). `renderWindow` emits `data-vista-window-action` only for vista/draggable windows to preserve template isolation.
+- **Vista marquee:** remains windowed; added v13 styling for marquee component body/track/items to be closer to homepage band look (no homepage star easter egg).
+- **Tests:** updated `v15-desktop-regressions.test.mjs` and `vista-windows.test.mjs` for intentional layout/behavior changes. Validate/build/preview pass, npm test 183/170/13 baseline. `tina/tina-lock.json` unstaged.

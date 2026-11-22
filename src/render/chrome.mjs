@@ -56,7 +56,11 @@ export function renderDesktopGadgets(page) {
   const radio = gadgetShell('gadget-radio', label('radio', 'FSFM Radio'), `<div class="gadget-body control-body"><button type="button" id="homeMusicToggle" class="gadget-control-button" aria-pressed="false"><span aria-hidden="true">▶</span> <span id="homeMusicLabel">${escapeHtml(label('radioPlay', 'PLAY MUSIC'))}</span></button></div><audio id="homeMusicAudio" preload="none" loop aria-hidden="true" src="${escapeHtml(radioUrl)}"></audio>`, true);
   const gameUrl = safeUrl(g.purblePlaceUrl || 'https://www.play-games.com/iframe/37376.html', { allowRelative: false, requireHttps: true }) || 'https://www.play-games.com/iframe/37376.html';
   const purble = gadgetShell('gadget-purble', label('purblePlace', 'Purble Place'), `<div class="gadget-body control-body"><button type="button" id="purbleOpenButton" class="gadget-control-button">${escapeHtml(label('purblePlaceButton', 'OPEN PURBLE PLACE'))}</button></div>`, true);
-  return `<div class="fsfm-gadgets-desktop" id="fsfmGadgets" aria-label="FSFM desktop gadgets">${renderClockGadget(label('clock', 'Clock'))}${renderCalendarGadget(label('calendar', 'Calendar'))}${featuredRelease}${photo}${date}${note}${barrel}${bubbles}${radio}${purble}</div><script type="application/json" id="fsfmGadgetConfig">${safeJsonForHtml({ photos: g.photos || [], dates: g.dates || [], stickyNote: g.stickyNote || { text: '' }, funWidgets: g.funWidgets || {}, visibility: g.visibility || {}, positions: g.positions || {}, gameUrl })}</script>`;
+  const config = `<script type="application/json" id="fsfmGadgetConfig">${safeJsonForHtml({ photos: g.photos || [], dates: g.dates || [], stickyNote: g.stickyNote || { text: '' }, funWidgets: g.funWidgets || {}, visibility: g.visibility || {}, positions: g.positions || {}, gameUrl })}</script>`;
+  return {
+    desktop: `<div class="fsfm-gadgets-desktop" id="fsfmGadgets" aria-label="FSFM desktop gadgets">${renderClockGadget(label('clock', 'Clock'))}${renderCalendarGadget(label('calendar', 'Calendar'))}${featuredRelease}${photo}${date}${note}</div>${config}`,
+    extras: `<div class="fsfm-gadgets-extras" aria-label="Extra desktop gadgets">${barrel}${bubbles}${radio}${purble}</div>`
+  };
 }
 
 /* --------------------------------------------------------------- taskbar */
@@ -106,7 +110,7 @@ export function renderPurbleOverlay(gadgets = {}) {
 }
 
 export function renderBootOverlay(page, site) {
-  return `<div class="fsfm-boot-overlay" id="fsfmBootScreen" role="status" aria-live="polite"><div class="boot-brand" id="bootBrand">${escapeHtml(site.siteName.toUpperCase())}</div><div class="boot-progress-container"><div class="boot-progress-bar" id="bootProgressBar"></div></div><div class="boot-status" id="bootStatus">${escapeHtml(text(page.templateData?.desktopLabels?.bootLoading, 'LOADING YOUR DESKTOP'))}</div><div class="boot-caption">${escapeHtml(text(page.templateData?.desktopLabels?.bootCaption, 'SONIC SPACE-AGE AESTHETICS'))}</div></div>`;
+  return `<script>try{if(sessionStorage.getItem('fsfm_boot_seen_v1')==='1')document.documentElement.classList.add('fsfm-boot-seen')}catch(e){}</script><div class="fsfm-boot-overlay" id="fsfmBootScreen" role="status" aria-live="polite"><div class="boot-brand" id="bootBrand">${escapeHtml(site.siteName.toUpperCase())}</div><div class="boot-progress-container"><div class="boot-progress-bar" id="bootProgressBar"></div></div><div class="boot-status" id="bootStatus">${escapeHtml(text(page.templateData?.desktopLabels?.bootLoading, 'LOADING YOUR DESKTOP'))}</div><div class="boot-caption">${escapeHtml(text(page.templateData?.desktopLabels?.bootCaption, 'SONIC SPACE-AGE AESTHETICS'))}</div></div>`;
 }
 
 export function renderShutdownOverlay(page) {
@@ -145,16 +149,18 @@ export function renderDesktopChrome(page, { site, pages = [], wallpapers } = {})
   const enabled = (name) => isChromePartEnabled(page, name);
   const canvas = enabled('bubbleCanvas') ? '<canvas id="bgCanvas" aria-hidden="true"></canvas>' : '';
   const walls = '<div class="wall" id="wallA" aria-hidden="true"></div><div class="wall" id="wallB" aria-hidden="true"></div>' + canvas;
+  const gadgets = enabled('desktopGadgets') ? renderDesktopGadgets(page) : null;
   const beforeMain = [
     enabled('bootOverlay') ? renderBootOverlay(page, site) : '',
     walls,
-    enabled('desktopGadgets') ? renderDesktopGadgets(page) : '',
+    gadgets ? gadgets.desktop : '',
     enabled('desktopTaskbar') ? renderDesktopTaskbar(site, pages, page) : ''
   ].join('\n  ');
   return {
     head: enabled('themeEngine') ? renderThemeHead(page, wallpapers) : '',
     beforeMain,
     hero: enabled('desktopHero') ? renderDesktopHero(page, site) : '',
+    belowFooter: gadgets ? gadgets.extras : '',
     afterMain: [
       enabled('purbleOverlay') ? renderPurbleOverlay(page.templateData?.gadgets || {}) : '',
       enabled('shutdownOverlay') ? renderShutdownOverlay(page) : ''
