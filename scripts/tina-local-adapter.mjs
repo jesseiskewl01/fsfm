@@ -151,15 +151,19 @@ export function createLocalContentAdapter({
 
   async function readStoredPages() {
     await init();
-    if (dbReady && database?.query) {
-      // Keep simple file-backed list for deterministic ordering/shape; DB is authoritative for record reads.
-    }
-    const records = [JSON.parse(fs.readFileSync(path.join(contentRoot, 'homepage.json'), 'utf8'))];
+    const records = [];
+    const homepagePath = path.join(contentRoot, 'homepage.json');
+    const home = await read({ key: 'homepage', filePath: homepagePath });
+    if (home?.record) records.push(home.record);
     for (const directory of ['albums', 'vista-pages', 'editorial-pages']) {
       const folder = path.join(contentRoot, directory);
       if (!fs.existsSync(folder)) continue;
       for (const filename of fs.readdirSync(folder).filter((name) => name.endsWith('.json')).sort()) {
-        records.push(JSON.parse(fs.readFileSync(path.join(folder, filename), 'utf8')));
+        const slug = filename.replace(/\.json$/, '');
+        const key = directory + '/' + slug;
+        const filePath = path.join(folder, filename);
+        const page = await read({ key, filePath });
+        if (page?.record) records.push(page.record);
       }
     }
     return records;
