@@ -53,8 +53,8 @@ test('All original Homepage desktop gadgets are included in the Homepage templat
   const albumRecord = readJson('content/v13/albums/the-early-bird.json');
   const albumHtml = renderPage(albumRecord, { site, pages, wallpapers });
   assert.doesNotMatch(albumHtml, /id="fsfmGadgets"|id="gadget-clock"|id="gadget-radio"/);
-  assert.match(fs.readFileSync(path.join(root, 'src/styles/homepage-vista.css'), 'utf8'), /@media \(min-width: 1320px\) and \(min-height: 700px\)/);
-  assert.match(fs.readFileSync(path.join(root, 'src/styles/homepage-vista.css'), 'utf8'), /@media \(max-width: 1319px\), \(max-height: 699px\)/);
+  assert.match(fs.readFileSync(path.join(root, 'src/styles/homepage-vista.css'), 'utf8'), /@media \(min-width: 1180px\) and \(min-height: 600px\)/);
+  assert.match(fs.readFileSync(path.join(root, 'src/styles/homepage-vista.css'), 'utf8'), /@media \(max-width: 1179px\), \(max-height: 599px\)/);
 });
 
 test('Radio remains user-initiated and Purble Place remains a deferred, dismissible overlay', () => {

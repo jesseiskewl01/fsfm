@@ -333,3 +333,11 @@ The architectural refurbishment itself: Roadmap Phases 3–5. Make homepage and 
 - **Editorial alignment:** centered `.page-intro` and `.page-content` with auto margins in `v13.css`.
 - **Investigated/not code-changed:** homepage gadgets are enabled in content and present in dist; CSS shows them only at `min-width:1320px` and `min-height:700px`. Editorial Instagram link -> instagram.com is page content. Bandsintown load and album player playback are known/external/historic issues. Lag noted.
 - **Verify:** build/validate pass, npm test 183/170/13 baseline.
+
+### Smoke follow-up: gadgets, boot, vistatest parity **[OpenCode, 2026-11-22]**
+
+- **Homepage gadgets (1280x720 laptop):** lowered gadget breakpoint in `src/styles/homepage-vista.css` from 1320x700/1319x699 to 1180x600/1179x599 so 1280x720 viewports show gadgets. Updated `test/homepage-template-stage5.test.mjs` and `test/studio-preview.test.mjs` to match intentional breakpoint.
+- **Boot overlay every navigation:** `src/client/homepage-desktop.js` now uses sessionStorage `fsfm_boot_seen_v1`; after first boot in session, overlay is skipped/hidden immediately while theme still applies.
+- **Vistatest window parity:** removed conflicting old `variant-vista-window` border-radius/titlebar rules in `v13.css`; fixed title/icon selectors (`.window-title` font/ellipsis, `.window-mini-icon` styling); added `window-body` position/overflow; added in-place `window-minimized` styles for vista template.
+- **Vistatest minimize/close UX:** changed `src/client/vista-windows.js` minimize/close from dock-popup hide to in-place collapse (restore by clicking again). This is a behavior change from earlier dock-restore design; Jesse should confirm if dock restore is still preferred for close.
+- **Verify:** `npm run validate:v13` pass, `npm run build` pass, preview rebuilt, `npm test` 183/170/13 baseline. `tina/tina-lock.json` remains unstaged drift.

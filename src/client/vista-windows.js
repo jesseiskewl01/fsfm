@@ -43,11 +43,21 @@ windows.forEach(function(win,index){
   event.preventDefault();win.style.zIndex=String(++highestZ);applyPosition(win,x,y);savePositions();
  });
 });
+function toggleInPlace(win,action){
+ var minimized=win.classList.toggle('window-minimized');
+ var minBtn=win.querySelector('[data-window-action="minimize"],[data-vista-window-action="minimize"]');
+ var label=titleFor(win);
+ if(minBtn){
+  minBtn.setAttribute('aria-label',(minimized?'Restore ':'Minimize ')+label+' window');
+  minBtn.title=minimized?'Restore':'Minimize';
+  minBtn.textContent=minimized?'▢':'−';
+ }
+ if(action==='close'&&minimized){win.style.zIndex=String(++highestZ);}
+}
 document.addEventListener('click',function(event){
  var button=event.target.closest('[data-vista-window-action], [data-window-action]');if(!button)return;
  var win=button.closest('[data-vista-window]');if(!win)return;
  var action=button.getAttribute('data-vista-window-action') || button.getAttribute('data-window-action');
- if(action==='minimize')hideWindow(win,'minimized');
- else if(action==='close')hideWindow(win,'closed');
+ if(action==='minimize'||action==='close')toggleInPlace(win,action);
 });
 })();

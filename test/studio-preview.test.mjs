@@ -21,7 +21,7 @@ test('desktop preview uses a true desktop-sized CSS viewport that crosses the ho
   assert.match(studio, /desktop:\{width:'1442px',height:'902px',label:'Desktop · 1440 × 900 px'/);
   assert.match(studio, /frame\.style\.maxWidth='none'/);
   assert.match(studio, /device-desktop/);
-  assert.match(homepageStyles, /@media \(min-width: 1320px\) and \(min-height: 700px\)/);
+  assert.match(homepageStyles, /@media \(min-width: 1180px\) and \(min-height: 600px\)/);
   assert.match(studio, /preview-frame-wrap\{[^}]*overflow:auto/);
 });
 

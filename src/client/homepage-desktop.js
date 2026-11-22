@@ -24,11 +24,18 @@ var themes = Array.isArray(window.VISTA_THEMES) ? window.VISTA_THEMES : [];
 var setPalette = typeof window.paintPalette === 'function' ? window.paintPalette : function() {};
 
 var bootStartedAt = Date.now();
-var bootMinimumTime = 2400;
+var bootSeen = false;
+try { bootSeen = sessionStorage.getItem('fsfm_boot_seen_v1') === '1'; } catch (e) { bootSeen = false; }
+var bootMinimumTime = bootSeen ? 0 : 2400;
 function updateBootProgress(done, total) {
   var status = document.getElementById('bootStatus');
   if (!status) return;
+  if (bootSeen) return;
   status.textContent = done < total ? 'LOADING YOUR DESKTOP' : 'STARTING ARTIST DESKTOP';
+}
+if (bootSeen) {
+  var existingBoot = document.getElementById('fsfmBootScreen');
+  if (existingBoot) existingBoot.classList.add('loaded');
 }
 
 function preloadAllThemes() {
@@ -128,7 +135,8 @@ preloadAllThemes().then(function(results) {
     window.setTimeout(function() {
       var overlay = document.getElementById('fsfmBootScreen');
       if (overlay) overlay.classList.add('loaded');
-    }, 260);
+      try { sessionStorage.setItem('fsfm_boot_seen_v1', '1'); } catch (e) {}
+    }, bootSeen ? 0 : 260);
   }, remaining);
 });
 
