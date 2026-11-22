@@ -1,7 +1,7 @@
 'use strict';
 (function() {
   var layer = document.getElementById('fsfmGadgets');
-  if (!layer || !window.matchMedia('(min-width: 1320px) and (min-height: 700px)').matches) return;
+  if (!layer || !window.matchMedia('(min-width: 1180px) and (min-height: 600px)').matches) return;
 
   var STORAGE_KEY = 'fsfm_gadget_positions_v2';
   var LEGACY_STORAGE_KEY = 'fsfm_gadget_positions_v1';

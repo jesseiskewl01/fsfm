@@ -84,7 +84,7 @@ export function renderWindow({
 function windowWrap(section, inner, extraClass = '', context = {}) {
   const presentation = section.presentation || {};
   const variant = defaultVariant(section, context);
-  const isVistaWindow = context.page?.template === 'vista-window' && ['vista-window', 'vista-desktop'].includes(variant) && !['divider', 'spacer', 'marquee'].includes(section.type);
+  const isVistaWindow = context.page?.template === 'vista-window' && ['vista-window', 'vista-desktop'].includes(variant) && !['divider', 'spacer'].includes(section.type);
   const title = ['album-header', 'album-player'].includes(section.type) ? '' : (presentation.windowTitle || '').trim();
   const windowTitle = isVistaWindow ? vistaWindowTitle(section) : title;
   const groupId = section.group?.id ? ' data-layout-group="' + escapeHtml(section.group.id) + '"' : '';
@@ -313,9 +313,6 @@ export function renderComponent(section, context = {}) {
   }
   if (section.type === 'divider' || section.type === 'spacer') {
     return { html: windowWrap(section, inner, `component-${section.type}`, context), scripts: [] };
-  }
-  if (section.type === 'marquee') {
-    return { html: `<div class="marquee content-marquee" id="section-${escapeHtml(section.id || section.type)}">${inner}</div>`, scripts: [] };
   }
   return { html: windowWrap(section, inner, '', context), scripts };
 }

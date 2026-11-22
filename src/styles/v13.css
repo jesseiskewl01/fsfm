@@ -115,7 +115,7 @@ body[data-page-transition="true"] .site-shell { animation: fsfm-page-enter .48s 
 .album-header-block h1 { font-size: clamp(2.5rem, 6vw, 5rem); }
 .album-header-block p:last-child { color: rgba(254,245,222,.75); }
 .stage-placeholder { padding: 18px; border: 1px dashed rgba(189,139,78,.50); border-radius: 12px; color: rgba(254,245,222,.76); }
-.global-footer { display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap; padding: 24px 6px 4px; color: var(--muted); font: .78rem/1.6 "Roboto Mono", Consolas, monospace; }
+.global-footer { display: flex; align-items: center; justify-content: center; gap: 18px; flex-wrap: wrap; padding: 24px 6px 4px; color: var(--muted); font: .78rem/1.6 "Roboto Mono", Consolas, monospace; text-align: center; }
 .global-footer p { margin: 0; }
 .footer-socials { display: flex; gap: 3px; flex-wrap: wrap; }
 .footer-socials a { padding: 5px 9px; font-size: .76rem; }
@@ -138,7 +138,7 @@ body[data-page-transition="true"] .site-shell { animation: fsfm-page-enter .48s 
   .featured-release { grid-template-columns: 105px minmax(0,1fr); gap: 14px; }
   .album-header-block { grid-template-columns: minmax(0,1fr); }
   .album-header-block .album-cover { max-width: 270px; }
-  .global-footer { align-items: flex-start; flex-direction: column; }
+  .global-footer { align-items: center; flex-direction: column; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
@@ -301,7 +301,7 @@ body.template-vista-window .component-group.group-grid > .content-section { heig
 /* N2.3 [OpenCode, 2026-11-22]: legacy variant-vista-window overrides removed; canonical .vista-window rules below own chrome. */
 body.template-vista-window .variant-vista-window .component-body { min-width: 0; }
 body.template-vista-window .variant-vista-window[data-component="hero"] h1 { max-width: 900px; }
-body.template-vista-window .content-section:focus-within { outline: 1px solid rgba(255,255,255,.42); outline-offset: 3px; }
+/* focus-within bezel removed per smoke report [OpenCode, 2026-11-22] */
 
 body.template-editorial { --ink: #f5f0e7; --muted: rgba(245,240,231,.72); --line: rgba(238,226,207,.25); }
 body.template-editorial .site-shell { width: min(1000px, calc(100% - 40px)); }

@@ -341,3 +341,12 @@ The architectural refurbishment itself: Roadmap Phases 3–5. Make homepage and 
 - **Vistatest window parity:** removed conflicting old `variant-vista-window` border-radius/titlebar rules in `v13.css`; fixed title/icon selectors (`.window-title` font/ellipsis, `.window-mini-icon` styling); added `window-body` position/overflow; added in-place `window-minimized` styles for vista template.
 - **Vistatest minimize/close UX:** changed `src/client/vista-windows.js` minimize/close from dock-popup hide to in-place collapse (restore by clicking again). This is a behavior change from earlier dock-restore design; Jesse should confirm if dock restore is still preferred for close.
 - **Verify:** `npm run validate:v13` pass, `npm run build` pass, preview rebuilt, `npm test` 183/170/13 baseline. `tina/tina-lock.json` remains unstaged drift.
+
+### Smoke follow-up 2: gadgets, purble, vista marquee/close, footer **[OpenCode, 2026-11-22]**
+
+- **Homepage gadgets not movable/clustered:** `src/client/homepage-gadgets.js` still had old 1320x700 media-query guard; updated to 1180x600 so drag/position JS runs on 1280x720 laptops.
+- **Purble Place overlay broken:** missing `.purble-overlay/.purble-dialog/.fsfm-shutdown` CSS added to `src/styles/homepage-vista.css` (centered dimmed modal). 
+- **Vista marquee "not in a window"/broken:** reverted marquee to normal windowed section on vista template (`render/components.mjs`), removed plain-band special case. **Architecture note:** homepage marquee remains a special-case renderer for theme-star easter egg behavior; this divergence is intentional behavior but should stay visible as "mud/clay" risk - window/chrome should converge, behavior can vary by context.
+- **Vista close:** close now uses dock reopen (hideWindow) while minimize stays in-place collapse; fixes "close does not work" confusion.
+- **Vista/footer polish:** removed focus-within bezel outline; centered `.global-footer`.
+- **Verify:** validate/build/preview pass, npm test 183/170/13. `tina/tina-lock.json` unstaged.

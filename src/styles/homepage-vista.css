@@ -713,3 +713,16 @@ html, body, * {
 @media (max-width: 640px) {
   .task-menu > summary { padding: 3px 10px; }
 }
+
+ /* Purble Place + shutdown overlays (homepage) [OpenCode, 2026-11-22] */
+ .purble-overlay,.fsfm-shutdown{position:fixed;inset:0;z-index:12000;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(5,16,32,.52);backdrop-filter:blur(4px);}
+ .purble-overlay[hidden],.fsfm-shutdown[hidden]{display:none!important;}
+ .purble-dialog,.shutdown-dialog{width:min(920px,calc(100vw - 32px));max-height:calc(100vh - 48px);overflow:hidden;border:1px solid rgba(255,255,255,.72);border-radius:8px;background:linear-gradient(145deg,rgba(255,255,255,.92),rgba(224,242,255,.88));box-shadow:0 24px 60px rgba(0,0,0,.45),inset 0 1px rgba(255,255,255,.9);}
+ .purble-titlebar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;color:#10283a;font:700 12px/1.2 "Segoe UI",Tahoma,Arial,sans-serif;background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(177,219,244,.45));border-bottom:1px solid rgba(31,78,109,.2);}
+ .purble-titlebar button{width:32px;height:28px;border:1px solid rgba(120,48,36,.45);border-radius:4px;background:linear-gradient(#f1b2a1,#cc6f5d 45%,#b5422b 55%,#d56348);color:#fff;font:700 18px/1 Arial,sans-serif;cursor:pointer;}
+ .purble-frame{display:block;width:100%;height:min(70vh,640px);border:0;background:#000;}
+ .purble-fallback{padding:10px 14px;font:12px/1.4 "Segoe UI",Tahoma,Arial,sans-serif;color:#24485f;background:rgba(255,255,255,.7);}
+ .purble-fallback a{color:#0f5d84;}
+ .shutdown-dialog{width:min(420px,calc(100vw - 32px));padding:28px 24px;text-align:center;color:#15354a;}
+ .shutdown-dialog strong{display:block;margin-bottom:8px;font:700 28px/1.1 "Segoe UI",Tahoma,Arial,sans-serif;}
+ .shutdown-dialog p{margin:0;font:14px/1.5 "Segoe UI",Tahoma,Arial,sans-serif;color:#345a70;}
