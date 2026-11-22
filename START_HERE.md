@@ -68,6 +68,7 @@ This protocol supersedes the earlier "maintenance rule" in `WORK_LOG.md`. From 2
 | D11 | Phase 6 autosave is local-only and debounced; it must never deploy, and explicit Save plus stale-revision protection remain | [Jesse] 2026-11-22 |
 | D12 | If a Phase 6 change touches content/rendering that looks deliberate, strange or risky, stop and ask Jesse rather than guessing | [Jesse] 2026-11-22 |
 | D13 | Phase 6 is paused again pending Jesse's choice between a local Tina storage adapter and literal Tina GraphQL; no Phase 6 code was changed | [Jesse] 2026-11-22 |
+| D14 | Phase 6 proceeds with the adapter-first path: Studio keeps `/studio/` and `/__fsfm/api`; server reads/writes move behind a local Tina-backed storage adapter seam. Literal Tina GraphQL is not needed for current local/dev goals; it is only needed later for Tina Cloud, remote/multi-user editing, or official Tina admin editing every collection. D13 pause is superseded by this direction. | [Jesse + OpenCode, 2026-11-22] |
 
 ---
 
@@ -84,6 +85,8 @@ This protocol supersedes the earlier "maintenance rule" in `WORK_LOG.md`. From 2
 **State note [Jesse + OpenCode, 2026-11-22]:** Phase 6 is now reopened under D10. Direction: Studio remains the friendly editor and becomes a client of Tina's backend. Local/dev work only unless Jesse explicitly authorises otherwise.
 
 **State note [Jesse + OpenCode, 2026-11-22]:** Read-only mapping found Tina's checked-in GraphQL schema is album-only and stale; literal GraphQL would require expanded collections plus regenerated artifacts. Jesse chose to pause and think before choosing the bridge. No Phase 6 code was changed.
+
+**State note [Jesse + OpenCode, 2026-11-22]:** D13 pause superseded by D14. Phase 6 is active on the adapter-first path: Studio UI and `/__fsfm/api` contract stay; server content I/O moves behind a local Tina-backed storage adapter seam. Local-only debounced autosave is in scope; deploy/publishing remains locked. No credentials, no live publishing, no generated Tina artifacts unless explicitly authorised.
 
 ---
 

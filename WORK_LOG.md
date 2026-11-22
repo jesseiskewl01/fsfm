@@ -247,3 +247,9 @@ The architectural refurbishment itself: Roadmap Phases 3–5. Make homepage and 
 - Literal Tina GraphQL would require expanding the Tina schema to all six stores and regenerating `tina/__generated__/*`, which is not currently authorised.
 - Safer alternative identified: keep Studio's API contract and response shapes, but put a local Tina storage adapter behind the server's read/write seams. That would preserve revisions, validators, stale-save protection and the publish queue while making the backend Tina-backed rather than raw file I/O.
 - Jesse chose **Pause and think** when asked which bridge counts as “Studio calls Tina”. Recorded as D13. No Phase 6 implementation files were changed.
+
+### Phase 6 adapter-first direction **[Jesse + OpenCode, 2026-11-22]**
+
+- Jesse asked whether GraphQL is ever needed. Conclusion: not for current local/dev goals. GraphQL would only be needed later for Tina Cloud, remote/multi-user editing, or official Tina admin editing every collection.
+- **D14:** proceed with the adapter-first path, superseding D13. Studio keeps `/studio/` and `/__fsfm/api`; server reads/writes move behind a local Tina-backed storage adapter seam. Local-only debounced autosave is in scope; explicit Save and stale-revision protection remain; deploy/publishing stays locked.
+- Dependency/implementation note: `package.json` currently declares no dependencies. Cached Tina packages exist in the npx cache, but committing a cache-path dependency is brittle. Adding `@tinacms/graphql` and `memory-level` as local dev dependencies requires explicit approval or a safe alternative. No Phase 6 implementation files changed yet by this decision entry.
