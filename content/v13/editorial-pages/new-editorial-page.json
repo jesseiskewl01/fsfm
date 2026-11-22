@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "template": "editorial",
+  "identity": {
+    "name": "New Editorial Page",
+    "slug": "new-editorial-page",
+    "order": 20,
+    "route": "/pages/new-editorial-page/"
+  },
+  "templateData": {
+    "footerText": ""
+  },
+  "sections": [
+    {
+      "id": "new-editorial-page-bandsintown-events-1",
+      "type": "bandsintown-events",
+      "enabled": true,
+      "presentation": {
+        "variant": "editorial"
+      },
+      "content": {
+        "artistName": "hi pal",
+        "appId": "hi pal",
+        "displayDetails": true,
+        "displayLineup": true,
+        "displayStartTime": true,
+        "displayLocalDates": true,
+        "localDatesPosition": "tab",
+        "font": "Segoe UI",
+        "followSectionPosition": "hidden",
+        "followSectionAlignment": "center",
+        "followSectionCtaText": "FOLLOW",
+        "eventRsvpPosition": "hidden",
+        "eventRsvpOnlyShowIcon": true,
+        "playMyCityPosition": "bottom",
+        "playMyCityAlignment": "center",
+        "playMyCityCtaIcon": true
+      }
+    },
+    {
+      "id": "new-editorial-page-social-links-1",
+      "type": "social-links",
+      "enabled": true,
+      "presentation": {
+        "variant": "editorial"
+      },
+      "content": {
+        "links": [
+          {
+            "label": "Instagram",
+            "url": "https://instagram.com/"
+          }
+        ]
+      }
+    },
+    {
+      "id": "new-editorial-page-hero-1",
+      "type": "hero",
+      "enabled": true,
+      "presentation": {
+        "variant": "editorial"
+      },
+      "content": {
+        "eyebrow": "",
+        "title": "New heading",
+        "subtitle": "",
+        "image": "",
+        "imageAlt": "",
+        "linkText": "",
+        "linkUrl": ""
+      }
+    },
+    {
+      "id": "new-editorial-page-artist-statement-1",
+      "type": "artist-statement",
+      "enabled": true,
+      "presentation": {
+        "variant": "editorial"
+      },
+      "content": {
+        "body": "Write your statement here."
+      }
+    }
+  ],
+  "publishing": {
+    "published": true,
+    "showInNavigation": true,
+    "navigationLabel": "New Editorial Page"
+  },
+  "appearance": {
+    "wallpaper": {
+      "mode": "preset",
+      "preset": "aurora",
+      "customImage": "",
+      "customFit": "cover",
+      "customPosition": "center",
+      "presets": [
+        "vista-violet-haze",
+        "vista-aqua-glass",
+        "vista-solar-flare",
+        "vista-rose-bloom"
+      ],
+      "initialSelection": "random",
+      "cycle": {
+        "enabled": false,
+        "mode": "sequential",
+        "intervalSeconds": 30,
+        "manualControl": false
+      },
+      "choice": "template-default"
+    },
+    "effects": {
+      "backgroundEffects": true,
+      "pageTransition": true,
+      "respectReducedMotion": true
+    }
+  },
+  "seo": {
+    "title": "New Editorial Page | Fake Space Fog Machine",
+    "description": "",
+    "canonical": "https://fsfm.port82.net/pages/new-editorial-page/",
+    "socialImage": "/media/images/cover.png",
+    "allowIndexing": true
+  }
+}

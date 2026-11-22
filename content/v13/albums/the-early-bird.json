@@ -12,7 +12,7 @@
       "windowTitle": "The Early Bird....",
       "title": "The Early Bird....",
       "artistLine": "by Fake Space Fog Machine",
-      "eyebrow": "08/21",
+      "eyebrow": "08/21/2026",
       "artwork": "/media/images/cover.png"
     },
     "player": {
@@ -125,6 +125,17 @@
       "content": {
         "source": "templateData.spotify"
       }
+    },
+    {
+      "id": "stateymenty",
+      "type": "artist-statement",
+      "enabled": true,
+      "presentation": {
+        "variant": "vista-window"
+      },
+      "content": {
+        "body": "e^\"^^436rxctfgvbuyhnijhgvfdtrsdtfyg 867675678566tyuy7y"
+      }
     }
   ],
   "publishing": {
@@ -136,7 +147,6 @@
     "wallpaper": {
       "mode": "preset",
       "preset": "album-amber",
-      "customImage": "",
       "cycle": {
         "enabled": false,
         "mode": "sequential",

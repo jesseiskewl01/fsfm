@@ -4,7 +4,7 @@
   "identity": {
     "name": "vistatest",
     "slug": "vistatest",
-    "route": "vistatest",
+    "route": "/pages/vistatest/",
     "order": 10
   },
   "sections": [
@@ -26,6 +26,13 @@
       "enabled": true,
       "presentation": {
         "variant": "vista-window"
+      },
+      "content": {
+        "messages": [
+          "NEW MESSAGE",
+          "NEW MESSAGE",
+          "NEW MESSAGE"
+        ]
       }
     },
     {
@@ -45,13 +52,13 @@
     }
   ],
   "publishing": {
-    "published": false,
-    "showInNavigation": false,
+    "published": true,
+    "showInNavigation": true,
     "navigationLabel": "vistatest"
   },
   "appearance": {
     "wallpaper": {
-      "mode": "template-default",
+      "mode": "preset",
       "preset": "vista-aqua-glass",
       "customFit": "cover",
       "customPosition": "center",
@@ -73,6 +80,9 @@
   "seo": {
     "title": "vistatest",
     "description": "vistatest",
-    "allowIndexing": false
-  }
+    "allowIndexing": false,
+    "canonical": "https://fsfm.port82.net/pages/vistatest/",
+    "socialImage": "/media/images/cover.png"
+  },
+  "templateData": {}
 }
