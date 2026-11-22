@@ -11,6 +11,7 @@ import { validateSite } from '../src/core/page-validator.mjs';
 import { normalizePageRecord, normalizePages, routeForPage } from '../src/core/page-routes.mjs';
 import { COMPONENTS } from '../src/components/registry.mjs';
 import { TEMPLATES } from '../src/templates/registry.mjs';
+import { partCatalogue } from '../src/core/studio-controls.mjs';
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const previewRoot = path.join(projectRoot, 'preview-v13');
@@ -722,7 +723,7 @@ async function handleApi(request, response, pathname) {
       response.end();
       return;
     }
-    sendJson(response, 200, { components: COMPONENTS, templates: TEMPLATES }, request.method);
+    sendJson(response, 200, { ...partCatalogue(), components: COMPONENTS, templates: TEMPLATES }, request.method);
     return;
   }
 

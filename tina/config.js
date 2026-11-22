@@ -1,7 +1,10 @@
 /*
  * FSFM + TinaCMS prototype.
  * The schema edits FSFM's existing JSON files without changing its renderer.
+ * Part fields, block types and vocabularies are derived from src/core/parts.mjs.
+ * [OpenCode, 2026-11-22]
  */
+import { effectFields, groupLayoutOptions, pagePartFieldsFor, presentationOptions, sectionTypesFor, unionContentFields } from './fields.mjs';
 const hidden = (name, label, type = 'string') => ({
   type,
   name,
@@ -33,12 +36,9 @@ const trackFields = [
   { type: 'boolean', name: 'instrumental', label: 'Instrumental' },
 ];
 
-const sectionTypes = [
-  'album-header',
-  'artist-statement',
-  'album-player',
-  'spotify-embed',
-];
+// Derived from the part definitions: adding a part's field once makes it
+// editable here, valid in the build and renderable on the page.
+const sectionTypes = sectionTypesFor('album');
 
 export default {
   // Cloud edits are kept on the isolated prototype branch.
@@ -141,47 +141,39 @@ export default {
           {
             type: 'object',
             name: 'sections',
-            label: 'Building blocks',
+            label: 'Parts',
             list: true,
-            description: 'Reorder the album sections here. Keep each block ID unique and do not change a block type unless you intend to change how that section is rendered.',
+            description: 'Reorder the album parts here. Keep each part ID unique and do not change a part type unless you intend to change how that section is rendered.',
             ui: {
               itemProps: (item) => ({
                 label: item?.presentation?.windowTitle || item?.type || item?.id || 'Album section',
               }),
             },
             fields: [
-              textField('id', 'Block ID', 'Unique stable ID for this block.'),
+              textField('id', 'Part ID', 'Unique stable ID for this part.'),
               {
                 type: 'string',
                 name: 'type',
-                label: 'Block type',
+                label: 'Part type',
                 options: sectionTypes,
                 required: true,
               },
-              { type: 'boolean', name: 'enabled', label: 'Show this block' },
+              { type: 'boolean', name: 'enabled', label: 'Show this part' },
               objectField('presentation', 'Presentation', [
                 {
                   type: 'string',
                   name: 'variant',
                   label: 'Visual style',
-                  options: ['vista-window', 'vista-desktop', 'editorial', 'amber-editorial', 'amber-player', 'plain'],
+                  options: presentationOptions,
                 },
                 textField('windowTitle', 'Window title'),
               ]),
-              objectField('content', 'Block content', [
-                {
-                  type: 'string',
-                  name: 'body',
-                  label: 'Text / statement',
-                  ui: { component: 'textarea' },
-                },
-                {
-                  type: 'string',
-                  name: 'source',
-                  label: 'Content source',
-                  options: ['templateData.player', 'templateData.spotify'],
-                },
+              objectField('group', 'Layout group', [
+                textField('id', 'Group ID', 'Parts sharing this ID are laid out together.'),
+                { type: 'string', name: 'layout', label: 'Layout', options: groupLayoutOptions },
+                { type: 'number', name: 'columns', label: 'Columns' },
               ]),
+              objectField('content', 'Part content', unionContentFields('album')),
             ],
           },
 
@@ -235,7 +227,9 @@ export default {
               { type: 'boolean', name: 'backgroundEffects', label: 'Background effects' },
               { type: 'boolean', name: 'pageTransition', label: 'Page transition' },
               { type: 'boolean', name: 'respectReducedMotion', label: 'Respect reduced-motion setting' },
+              ...effectFields(),
             ]),
+            objectField('parts', 'Visible parts', pagePartFieldsFor('album'), 'Switch individual page chrome on or off.'),
           ]),
 
           objectField('seo', 'Search and sharing', [

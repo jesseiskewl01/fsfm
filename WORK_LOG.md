@@ -198,3 +198,20 @@ The architectural refurbishment itself: Roadmap Phases 3–5. Make homepage and 
 **Milestone:** the architecture phase is complete. Both mud huts and every inner page are now assembled from the same declared parts; nothing is published and no registry was altered.
 
 **Next:** Studio phase — derive Tina fields and Studio controls from these 32 definitions instead of maintaining a separate schema, without touching deployment or live publishing.
+
+---
+
+## Stage F complete — Studio and Tina controls now derive from the parts **[OpenCode, 2026-11-22]**
+
+- Added `src/core/studio-controls.mjs`: a plain-JSON `partCatalogue()` projection of all 32 parts, the four part categories, page/chrome/shell parts, the atmosphere effect, template allowances and the shared variant/layout vocabularies. This is the browser-safe bridge between `parts.mjs` and editor controls — no functions, secrets or duplicate labels.
+- Added `tina/fields.mjs`: converts part field metadata into Tina fields, and derives section types, unioned content fields, presentation/layout options, effect controls and page-part toggles from `parts.mjs`.
+- Updated `tina/config.js`: the album collection's part types, content fields, visual-style options, layout options, atmosphere mode and visible-part switches now come from the shared definitions. Outdated "building block" wording was changed to "part". Tina generated files were **not** regenerated and no Tina CLI/network/publishing was used.
+- Updated `scripts/dev-tina-preview.mjs`: `/__fsfm/api/catalog` now serves the complete part catalogue alongside the existing component/template payload.
+- Updated `studio/index.html`: Studio now takes part labels and descriptions from `S.catalog`, reads atmosphere modes and design vocabularies from the catalogue, and renders the appearance panel from the declared page parts/effects. Its old hardcoded `COMPONENT_LABELS` map is gone; safe fallback option lists remain for resilience.
+- Added `test/studio-derived-controls.test.mjs` (6 tests): catalogue completeness/serialisability, Tina block types and content fields from album allowances, shared vocabularies, atmosphere/page-part controls, field-type conversion, and Studio/server wiring.
+
+**Verification:** `npm test` 178 tests / 165 pass / **the same 13 pre-existing failures** (names unchanged). `validate:v13` and `build` pass. Golden baseline still has homepage, Vista and Editorial byte-identical; The Early Bird differs only by the intentional Stage B `data-atmosphere-mode="full"` attribute. Studio inline scripts and the changed Node modules pass syntax checks.
+
+**Scope note:** this completes Phase 5 — editor controls are derived from the declared parts. Studio still writes through its existing local JSON API; Phase 6 (the exact Studio/Tina backend-client relationship) remains a future decision and was not attempted.
+
+**Next:** commit Stage F locally on `rv26`, then pause before Phase 6 unless Jesse directs otherwise; no push, credentials, publishing or generated Tina artifacts.

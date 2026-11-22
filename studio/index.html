@@ -597,13 +597,9 @@ const $$=(s,r)=> Array.from((r||document).querySelectorAll(s));
 const api='/__fsfm/api';
 const S={items:[],catalog:null,wallpaperPresets:[],key:null,resource:null,record:null,revision:null,dirty:false,saving:false,deploying:false,publishStatus:null,route:'/',toastTimer:null,pageSearch:''};
 const body=$('#editorBody');
-const COMPONENT_LABELS={
-'site-header':'Site header','hero':'Hero','marquee':'Marquee','artist-statement':'Artist statement',
-'embed-window':'Embed window','bandsintown-events':'Bandsintown events','social-links':'Social links',
-'featured-release':'Featured release','rich-text':'Rich text','image':'Image','gallery':'Image gallery',
-'quote':'Quote','link-button':'Link or button','divider':'Divider','spacer':'Spacer',
-'album-header':'Album header','album-player':'FSFM media player','spotify-embed':'Spotify album embed'
-};
+function componentLabel(type){return S.catalog?.components?.[type]?.label||human(type);}
+const FALLBACK_PRESENTATION_OPTIONS=[['vista-window','Vista Window'],['vista-desktop','Vista Desktop'],['editorial','Editorial'],['amber-editorial','Amber Editorial'],['amber-player','Amber Player'],['plain','Plain']];
+const FALLBACK_LAYOUT_OPTIONS=[['grid','Grid'],['stack','Stack'],['columns','Columns']];
 function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function human(v){return String(v).replace(/([a-z0-9])([A-Z])/g,'$1 $2').replace(/[-_]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());}
 function get(o,p,d){const v=p.split('.').reduce((x,k)=>x==null?undefined:x[k],o);return v==null?d:v;}
@@ -666,6 +662,8 @@ function renderPageList(){
 function resourceUrl(key){return api+'/content/'+key.split('/').map(encodeURIComponent).join('/');}
 function routeForKey(key){const item=S.items.find(x=>x.key===key);return item?.route||'/';}
 function componentMeta(type){return S.catalog?.components?.[type]||{};}
+function partMeta(name){return S.catalog?.pageParts?.[name]||{};}
+function effectMeta(name){return S.catalog?.effects?.[name]||{};}
 function templateMeta(){return S.catalog?.templates?.[S.record?.template]||{};}
 function componentAllowed(type){return (templateMeta().allowedComponentTypes||[]).includes(type);}
 function componentCount(type){return (S.record?.sections||[]).filter(x=>x.type===type).length;}
@@ -693,7 +691,7 @@ function defaultComponent(type){
  'spotify-embed':{source:'templateData.spotify'}
  };
  base.content=data[type]||{};
- if(S.record.template==='homepage'&&type!=='marquee')base.presentation.windowTitle=COMPONENT_LABELS[type]||human(type);
+ if(S.record.template==='homepage'&&type!=='marquee')base.presentation.windowTitle=componentLabel(type);
  return base;
 }
 function defaultArrayItem(path,array){
@@ -719,7 +717,7 @@ function valueEditor(value,path,label,depth=0,options={}){
    const items=value.map((item,index)=>{
      const itemPath=path+'.'+index;
      let inner;
-     if(item&&typeof item==='object')inner=valueEditor(item,itemPath, label+' '+(index+1),depth+1);
+     if(item&&typeof item==='object')inner=valueEditor(item,itemPath, label+' '+(index+1),depth+1,options);
      else inner=primitiveEditor(item,itemPath,label+' '+(index+1),depth+1);
      const lyricTool=path==='templateData.player.tracks'&&item&&typeof item==='object'&&item.lyricsFile?'<button class="btn small" data-edit-lyrics="'+index+'">♫ Edit synced lyrics</button>':'';
      return '<div class="array-item"><div class="array-item-head"><span>'+esc(label)+' '+(index+1)+'</span><div class="array-item-controls"><button class="mini" data-move-array="'+esc(path)+'" data-index="'+index+'" data-dir="-1" title="Move up" '+(index===0?'disabled':'')+'>↑</button><button class="mini" data-move-array="'+esc(path)+'" data-index="'+index+'" data-dir="1" title="Move down" '+(index===value.length-1?'disabled':'')+'>↓</button><button class="mini" data-remove-array="'+esc(path)+'" data-index="'+index+'" title="Remove item">×</button></div></div>'+inner+lyricTool+'</div>';
@@ -731,8 +729,10 @@ function valueEditor(value,path,label,depth=0,options={}){
    if(!keys.length)return '<div class="helper">No settings have been added to '+esc(label.toLowerCase())+' yet.</div>';
    const inside=keys.map(k=>{
      if(options.hide?.includes(k))return '';
-     const v=value[k],p=path+'.'+k,l=human(k);
-     return valueEditor(v,p,l,depth+1);
+     const v=value[k],p=path+'.'+k,l=options.labels?.[k]||partMeta(k).label||human(k);
+     const help=options.descriptions?.[k]||partMeta(k).description||effectMeta(k).description||'';
+     const inner=valueEditor(v,p,l,depth+1,options);
+     return help?inner+'<span class="helper">'+esc(help)+'</span>':inner;
    }).join('');
    const openAttr=depth===0?' open':'';
    return '<details class="json-object depth-'+Math.min(depth,2)+'"'+openAttr+'><summary>'+esc(label)+'</summary><div class="json-object-inner">'+inside+'</div></details>';
@@ -741,11 +741,20 @@ function valueEditor(value,path,label,depth=0,options={}){
 }
 function fieldOptions(path){
  const clean=path.replace(/^ROOT\./,'');
- if(clean.endsWith('.presentation.variant'))return [
-  ['','Use template default'],['vista-window','Vista Window'],['vista-desktop','Vista Desktop'],
-  ['editorial','Editorial'],['amber-editorial','Amber Editorial'],['amber-player','Amber Player'],['plain','Plain']
- ];
- if(clean.endsWith('.group.layout'))return [['grid','Grid'],['stack','Stack'],['columns','Columns']];
+ if(clean.endsWith('.presentation.variant')){
+  const vocabulary=(S.catalog?.vocabularies?.presentationVariants||[]).filter(Boolean);
+  const choices=vocabulary.length?vocabulary.map(value=>[value,human(value)]):FALLBACK_PRESENTATION_OPTIONS;
+  return [['','Use template default'],...choices];
+ }
+ if(clean.endsWith('.group.layout')){
+  const vocabulary=S.catalog?.vocabularies?.groupLayouts||[];
+  return vocabulary.length?vocabulary.map(value=>[value,human(value)]):FALLBACK_LAYOUT_OPTIONS;
+ }
+ if(/^appearance\.effects\.([^.]+)\.mode$/.test(clean)){
+  const name=clean.match(/^appearance\.effects\.([^.]+)\.mode$/)[1];
+  const modes=effectMeta(name).modes;
+  if(modes)return modes.map(value=>[value,human(value)]);
+ }
  if(clean.endsWith('.appearance.wallpaper.mode'))return [
   ['template-default','Use template default'],['preset','Single wallpaper preset'],['custom','Custom image'],['cycle','Rotate between presets']
  ];
@@ -819,6 +828,15 @@ function togglePageActivation(action){
  renderEditor();
  toast(next?'Page activated locally. Save local, then deploy to make it public.':'Page deactivated locally. Save local, then deploy to remove it from the public site.');
 }
+function appearancePanel(){
+  const r=S.record,parts=S.catalog?.pageParts||{},effects=S.catalog?.effects||{};
+  const labels={parts:'Visible parts',effects:'Page effects',mode:'Mode',enabled:'Enabled'};
+  const descriptions={};
+  for(const [name,part] of Object.entries(parts)){labels[name]=part.label;descriptions[name]=part.description;}
+  for(const [name,effect] of Object.entries(effects)){labels[name]=effect.label;descriptions[name]=effect.description;}
+  const count=Object.keys(parts).length;
+  return '<section class="panel"><div class="panel-head"><span class="panel-title">Appearance</span><span class="panel-note">WALLPAPER · '+count+' PARTS</span></div>'+valueEditor(r.appearance||{},'appearance','Appearance',0,{labels,descriptions})+'</section>';
+}
 function pageFields(){
  const r=S.record;
  const identity=Object.assign({},r.identity||{});
@@ -827,7 +845,7 @@ function pageFields(){
  delete publishingSettings.published;
  return '<section class="panel"><div class="panel-head"><span class="panel-title">Page identity</span><span class="panel-note">NAME · ORDER · URL</span></div>'+valueEditor(identity,'identity','Identity')+'<div class="field" style="margin-top:8px"><label>URL slug · fixed after creation</label><input readonly value="'+esc(r.identity?.slug||'home')+'"><span class="helper">The slug determines the filename and public route. Create a new page to use a different URL.</span></div></section>'+pageActivationPanel()+
  '<section class="panel"><div class="panel-head"><span class="panel-title">Publishing</span><span class="panel-note">NAVIGATION · VISIBILITY</span></div>'+valueEditor(publishingSettings,'publishing','Publishing')+'</section>'+
- '<section class="panel"><div class="panel-head"><span class="panel-title">Appearance</span><span class="panel-note">WALLPAPER · EFFECTS</span></div>'+valueEditor(r.appearance||{},'appearance','Appearance')+'</section>'+
+ '<section class="panel"><div class="panel-head"><span class="panel-title">Appearance</span><span class="panel-note">WALLPAPER · EFFECTS</span></div>'+appearancePanel()+'</section>'+
  '<section class="panel"><div class="panel-head"><span class="panel-title">Search &amp; social preview</span><span class="panel-note">SEO</span></div>'+valueEditor(r.seo||{},'seo','SEO')+'</section>';
 }
 function renderSections(){
@@ -840,10 +858,10 @@ function renderSections(){
    const content=valueEditor(section.content||{},'sections.'+index+'.content','Content');
    const presentation=valueEditor(section.presentation||{variant:'',windowTitle:''},'sections.'+index+'.presentation','Presentation');
    const group=valueEditor(section.group||{id:'',layout:'grid',columns:2},'sections.'+index+'.group','Layout group');
-   return '<details class="section-card"'+(index===0?' open':'')+'><summary><span class="section-title">'+esc(COMPONENT_LABELS[section.type]||human(section.type))+'</span><span class="section-pill">'+esc(section.type)+'</span><span class="section-meta">'+(section.enabled?'Enabled':'Disabled')+'</span><div class="section-actions">'+move+remove+'</div></summary><div class="section-body"><div class="section-tools"><span class="helper">Block ID: '+esc(section.id)+'</span><div class="toggle-field" style="padding:4px 7px;min-height:28px"><label>Enabled</label><input class="switch" type="checkbox" data-path="sections.'+index+'.enabled" '+(section.enabled?'checked':'')+(required?' disabled':'')+'></div></div>'+presentation+group+content+'</div></details>';
+   return '<details class="section-card"'+(index===0?' open':'')+'><summary><span class="section-title">'+esc(componentLabel(section.type))+'</span><span class="section-pill">'+esc(section.type)+'</span><span class="section-meta">'+(section.enabled?'Enabled':'Disabled')+'</span><div class="section-actions">'+move+remove+'</div></summary><div class="section-body"><div class="section-tools"><span class="helper">Block ID: '+esc(section.id)+'</span><div class="toggle-field" style="padding:4px 7px;min-height:28px"><label>Enabled</label><input class="switch" type="checkbox" data-path="sections.'+index+'.enabled" '+(section.enabled?'checked':'')+(required?' disabled':'')+'></div></div>'+presentation+group+content+'</div></details>';
  }).join('');
  const allowed=(templateMeta().allowedComponentTypes||[]).filter(type=>componentCount(type)<maxComponents(type));
- const options=allowed.map(type=>'<option value="'+esc(type)+'">'+esc(COMPONENT_LABELS[type]||human(type))+'</option>').join('');
+ const options=allowed.map(type=>'<option value="'+esc(type)+'">'+esc(componentLabel(type))+'</option>').join('');
  return '<section class="panel"><div class="panel-head"><span class="panel-title">Page building blocks</span><span class="panel-note">'+sections.length+' BLOCKS · ORDERED</span></div><p class="panel-desc">Every block can be enabled, rearranged and configured. The fields below come directly from the FSFM renderer’s content model.</p>'+blocks+(options?'<div class="add-component"><select id="newComponentType"><option value="">Choose a building block…</option>'+options+'</select><button class="btn primary" id="addComponentButton">＋ Add block</button></div>':'<div class="helper">All available blocks are already added or are reserved for this page type.</div>')+'</section>';
 }
 function renderPageEditor(){
@@ -983,7 +1001,7 @@ function removeArrayItem(path,index){
 function removeSection(index){
  const section=S.record.sections[index];
  if(!section||isRequiredComponent(section.type)){toast('This component is required by the page template.',true);return;}
- if(!confirm('Remove '+(COMPONENT_LABELS[section.type]||section.type)+' from this page?'))return;
+ if(!confirm('Remove '+(componentLabel(section.type))+' from this page?'))return;
  S.record.sections.splice(index,1);dirty();renderEditor();
 }
 function moveSection(index,direction){
