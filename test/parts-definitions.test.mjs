@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { COMPONENTS, COMPONENT_TYPES, PRESENTATION_VARIANTS, GROUP_LAYOUTS, allowedComponentsFor } from '../src/core/parts.mjs';
+import { ALL_PARTS, COMPONENTS, COMPONENT_TYPES, PART_CATEGORIES, PRESENTATION_VARIANTS, GROUP_LAYOUTS, allowedComponentsFor, getPart, listParts } from '../src/core/parts.mjs';
 import { TEMPLATES } from '../src/templates/registry.mjs';
 import { RENDERED_COMPONENT_TYPES } from '../src/render/components.mjs';
 import { COMPONENTS as PUBLIC_COMPONENTS } from '../src/components/registry.mjs';
@@ -86,4 +86,16 @@ test('every part has a real branch in the renderer switch', () => {
     assert.match(source, new RegExp(`case '${type}':`), `${type} is missing from renderSectionInner`);
   }
   assert.strictEqual(RENDERED_COMPONENT_TYPES, COMPONENT_TYPES);
+});
+
+test('the whole visible site is one catalogue of 32 parts in four categories', () => {
+  assert.deepEqual([...PART_CATEGORIES], ['component', 'effect', 'chrome', 'shell']);
+  assert.equal(listParts().length, 32);
+  assert.equal(listParts('component').length, 18);
+  assert.equal(listParts('effect').length, 1);
+  assert.equal(listParts('chrome').length, 8);
+  assert.equal(listParts('shell').length, 5);
+  assert.strictEqual(getPart('hero'), COMPONENTS.hero);
+  assert.strictEqual(getPart('siteHeader', 'shell'), ALL_PARTS.siteHeader);
+  assert.equal(getPart('missing'), null);
 });

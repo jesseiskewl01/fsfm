@@ -1,21 +1,7 @@
 import { escapeHtml, safeCanonical, safeImageUrl, safeJsonForHtml, safeRoute, safeUrl } from './html.mjs';
 import { renderComponentList } from './components.mjs';
-import { renderWallpaperLayer } from './wallpaper.mjs';
 import { renderAtmosphere } from './effects.mjs';
-
-function siteNavigation(site, pages, currentPage) {
-  const items = (pages || [])
-    .filter((page) => page?.publishing?.published !== false && (page?.template === 'homepage' || page?.publishing?.showInNavigation === true))
-    .sort((a, b) => (Number(a.identity?.order) || 0) - (Number(b.identity?.order) || 0));
-  const links = items.map((page) => {
-    const current = page.identity?.route === currentPage.identity?.route;
-    const href = safeRoute(page.identity?.route, '/');
-    const label = page.publishing?.navigationLabel || (page.template === 'homepage' ? 'Home' : page.identity?.name) || 'Page';
-    const type = page.template === 'homepage' ? 'HOME' : page.template === 'album' ? 'ALBUM' : 'PAGE';
-    return `<a href="${escapeHtml(href)}"${current ? ' aria-current="page"' : ''}><span>${escapeHtml(label)}</span><small>${type}</small></a>`;
-  }).join('');
-  return `<details class="site-menu"><summary aria-label="Open page menu"><span class="menu-glyph" aria-hidden="true">☰</span><span>Pages</span></summary><nav class="site-menu-panel" aria-label="Site pages">${links || '<span class="site-menu-empty">No published pages yet.</span>'}</nav></details>`;
-}
+import { renderInnerPageChrome } from './shell.mjs';
 
 function structuredData(page, site, canonical, description) {
   const siteUrl = safeCanonical(site.baseUrl, 'https://fsfm.port82.net/');
@@ -108,16 +94,6 @@ function structuredData(page, site, canonical, description) {
   return { '@context': 'https://schema.org', '@graph': graph };
 }
 
-function renderGlobalHeader(site, nav) {
-  return `<header class="global-header"><a class="brand-link" href="/" aria-label="${escapeHtml(site.siteName)} home"><span class="brand-mark" aria-hidden="true">✧</span><span>${escapeHtml(site.siteName)}</span></a>${nav}</header>`;
-}
-
-function renderFooter(site, page) {
-  const socials = (site.socialProfiles || []).filter((item) => item?.label && safeUrl(item.url, { allowRelative: false, requireHttps: true }));
-  const footerText = page?.templateData?.footerText || site.footerText || `© ${new Date().getFullYear()} ${site.siteName}`;
-  return `<footer class="global-footer"><p>${escapeHtml(footerText)}</p>${socials.length ? `<nav aria-label="Social profiles" class="footer-socials">${socials.map((item) => `<a href="${escapeHtml(safeUrl(item.url, { allowRelative: false, requireHttps: true }))}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.label)}</a>`).join('')}</nav>` : ''}</footer>`;
-}
-
 export function renderSiteShell({ page, site, pages = [], wallpapers, bodyHtml, scripts = [], assets = '/assets', pageTitle, description, preview = false, homepageMode = false, homepageHead = '' }) {
   const title = pageTitle || page.seo?.title || site.seoDefaults?.title || site.siteName;
   const desc = description || page.seo?.description || site.seoDefaults?.description || site.description || '';
@@ -126,7 +102,7 @@ export function renderSiteShell({ page, site, pages = [], wallpapers, bodyHtml, 
   const canonical = safeCanonical(page.seo?.canonical, new URL(fallbackRoute, baseUrl).href);
   const socialImage = safeImageUrl(page.seo?.socialImage || site.seoDefaults?.socialImage || site.favicon);
   const robots = preview || page.seo?.allowIndexing === false ? 'noindex, nofollow' : 'index, follow';
-  const nav = siteNavigation(site, pages, page);
+  const shell = homepageMode ? null : renderInnerPageChrome(page, { site, pages, wallpapers });
   const scriptsToLoad = homepageMode ? new Set() : new Set(['wallpaper-engine.js', 'runtime.js']);
   if (scripts.includes('bandsintown')) scriptsToLoad.add('bandsintown.js');
   if (scripts.includes('album-player')) scriptsToLoad.add('album-player.js');
@@ -136,14 +112,14 @@ export function renderSiteShell({ page, site, pages = [], wallpapers, bodyHtml, 
   if (homepageMode) {
     for (const name of ['homepage-desktop.js','homepage-interactions.js','homepage-gadgets.js']) scriptsToLoad.add(name);
   }
-  const wallpaper = homepageMode ? '' : renderWallpaperLayer(page, wallpapers);
+  const wallpaper = shell?.wallpaper || '';
   const ld = structuredData(page, site, canonical, desc);
   const template = page.template || 'editorial';
   const effects = page.appearance?.effects || {};
   const backgroundEffects = effects.backgroundEffects === false ? 'false' : 'true';
   const pageTransition = effects.pageTransition === false ? 'false' : 'true';
   const albumAtmosphere = atmosphere.html;
-  const siteChrome = homepageMode ? bodyHtml : `<div class="site-shell">${renderGlobalHeader(site, nav)}<main id="main-content" class="page-main template-main-${escapeHtml(template)}">${bodyHtml}</main>${renderFooter(site, page)}</div>`;
+  const siteChrome = homepageMode ? bodyHtml : `<div class="site-shell">${shell.header}<main id="main-content" class="page-main template-main-${escapeHtml(template)}">${shell.intro}${bodyHtml}</main>${shell.footer}</div>`;
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -181,8 +157,6 @@ export function renderSiteShell({ page, site, pages = [], wallpapers, bodyHtml, 
 export function renderPage(page, { site, pages = [], wallpapers, assets = '/assets', preview = false, previewEmbeds = preview } = {}) {
   if (!page || !site) throw new Error('renderPage requires a page record and site settings.');
   const rendered = renderComponentList(page.sections || [], { page, site, wallpapers, preview: previewEmbeds });
-  const hasHeading = (page.sections || []).some((section) => section.enabled !== false && ['hero', 'album-header'].includes(section.type));
-  const heading = hasHeading ? '' : `<header class="page-intro"><p class="eyebrow">${escapeHtml(page.template === 'album' ? 'Release' : page.template === 'vista-window' ? 'FSFM' : 'Fake Space Fog Machine')}</p><h1>${escapeHtml(page.identity?.name || site.siteName)}</h1></header>`;
-  const bodyHtml = `${heading}<div class="page-content">${rendered.html}</div>`;
+  const bodyHtml = `<div class="page-content">${rendered.html}</div>`;
   return renderSiteShell({ page, site, pages, wallpapers, bodyHtml, scripts: rendered.scripts, assets, preview });
 }

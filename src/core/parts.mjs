@@ -84,14 +84,45 @@ export const CHROME_PARTS = Object.freeze(Object.fromEntries(
 
 export const CHROME_PART_NAMES = Object.freeze(Object.keys(CHROME_PARTS));
 
+/** Inner-page shell pieces are parts too: every template gets the same
+ *  composability the homepage desktop now has. */
+const SHELL_SOURCE = {
+  siteHeader: ['Site header', 'The global brand header at the top of album, Vista and Editorial pages.', ['album', 'vista-window', 'editorial']],
+  siteMenu: ['Site menu', 'The published-pages menu in the header.', ['album', 'vista-window', 'editorial']],
+  pageFooter: ['Page footer', 'The global footer with site text and social profiles.', ['album', 'vista-window', 'editorial']],
+  pageIntro: ['Page intro', 'The fallback title block when a page has no hero or album header.', ['album', 'vista-window', 'editorial']],
+  wallpaperLayer: ['Wallpaper layer', 'The static wallpaper background behind inner pages.', ['album', 'vista-window', 'editorial']]
+};
+
+export const SHELL_PARTS = Object.freeze(Object.fromEntries(
+  Object.entries(SHELL_SOURCE).map(([name, [label, description, templates]]) => [name, Object.freeze({
+    name,
+    label,
+    description,
+    category: 'shell',
+    templates: Object.freeze(templates),
+    path: `appearance.parts.${name}.enabled`,
+    default: true
+  })])
+));
+
+export const SHELL_PART_NAMES = Object.freeze(Object.keys(SHELL_PARTS));
+
+/** Every switchable page part, across all templates. */
+export const PAGE_PARTS = Object.freeze({ ...CHROME_PARTS, ...SHELL_PARTS });
+export const PAGE_PART_NAMES = Object.freeze(Object.keys(PAGE_PARTS));
+
 /** A missing setting means "on", preserving every existing content record. */
-export function isChromePartEnabled(page, name) {
-  const definition = CHROME_PARTS[name];
+export function isPagePartEnabled(page, name) {
+  const definition = PAGE_PARTS[name];
   if (!definition) return false;
   const value = page?.appearance?.parts?.[name];
   if (value === undefined) return definition.default;
   return value !== false && value.enabled !== false;
 }
+
+/** Kept as a compatibility name for the homepage chrome renderer. */
+export const isChromePartEnabled = isPagePartEnabled;
 
 /** The 18 visual parts, with their authoring fields. */
 const COMPONENT_SOURCE = {
@@ -203,7 +234,10 @@ export const COMPONENTS = Object.freeze(Object.fromEntries(
 
 export const COMPONENT_TYPES = Object.freeze(Object.keys(COMPONENTS));
 
-export const PART_CATEGORIES = Object.freeze(['component', 'effect', 'chrome']);
+export const PART_CATEGORIES = Object.freeze(['component', 'effect', 'chrome', 'shell']);
+
+/** Every declared part, in one catalogue for the Studio phase. */
+export const ALL_PARTS = Object.freeze({ ...COMPONENTS, ...EFFECTS, ...PAGE_PARTS });
 
 export function getComponent(type) {
   return COMPONENTS[type] ?? null;
@@ -213,10 +247,22 @@ export function getEffect(name) {
   return EFFECTS[name] ?? null;
 }
 
-export function getPart(type, category = 'component') {
+export function getPart(type, category) {
+  if (category === undefined) return ALL_PARTS[type] ?? null;
   if (category === 'effect') return getEffect(type);
   if (category === 'component') return getComponent(type);
+  if (category === 'chrome') return CHROME_PARTS[type] ?? null;
+  if (category === 'shell') return SHELL_PARTS[type] ?? null;
   return null;
+}
+
+export function listParts(category) {
+  if (!category) return Object.values(ALL_PARTS);
+  if (category === 'component') return Object.values(COMPONENTS);
+  if (category === 'effect') return Object.values(EFFECTS);
+  if (category === 'chrome') return Object.values(CHROME_PARTS);
+  if (category === 'shell') return Object.values(SHELL_PARTS);
+  return [];
 }
 
 /** Resolve an effect mode from a page record, falling back to the template default. */

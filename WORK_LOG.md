@@ -182,3 +182,19 @@ The architectural refurbishment itself: Roadmap Phases 3–5. Make homepage and 
 **Verification:** `npm test` 165 tests / 152 pass / **the same 13 pre-existing failures** (test numbers shifted by the 7 new tests; the names are unchanged). `validate:v13` and `build` pass. Golden baseline: homepage, Vista and Editorial are byte-for-byte identical; The Early Bird differs only by the intentional `data-atmosphere-mode="full"` attribute from Stage B.
 
 **Next:** Stage E — refurbish The Early Bird's album shell into the same shared part system, then derive Tina/Studio controls from the part definitions (Studio stays last).
+
+---
+
+## Stage E complete — every visible feature is now a part **[OpenCode, 2026-11-22]**
+
+- Added `src/render/shell.mjs`: the inner-page shell moved verbatim out of `page.mjs` — site header, site menu, page footer, page intro and wallpaper layer. `page.mjs` is now a thin assembly: shell parts + section components + effect parts + generic document shell.
+- Added the five shell parts to `src/core/parts.mjs`. `PAGE_PARTS` (13 switchable parts) now covers both the homepage desktop and the inner-page shell. Added the unified catalogue: `ALL_PARTS` / `listParts()` / `getPart()`, four categories — 18 components, 1 effect, 8 chrome parts, 5 shell parts = **32 parts**.
+- Validator checks every switchable part from `PAGE_PARTS`, not just the homepage chrome.
+- Declared shell parts explicitly in The Early Bird, new-album, Vista and Editorial records plus all three page starters. Verified as a visual no-op.
+- Added `test/parts-shell.test.mjs` (6 tests) and extended `parts-definitions.test.mjs` with the 32-part catalogue contract.
+
+**Verification:** `npm test` 172 tests / 159 pass / **the same 13 pre-existing failures** (numbering shifted by 13 new tests; names unchanged). `validate:v13` and `build` pass. Golden baseline: homepage, Vista and Editorial byte-identical; The Early Bird still differs only by the intentional Stage B `data-atmosphere-mode="full"` attribute.
+
+**Milestone:** the architecture phase is complete. Both mud huts and every inner page are now assembled from the same declared parts; nothing is published and no registry was altered.
+
+**Next:** Studio phase — derive Tina fields and Studio controls from these 32 definitions instead of maintaining a separate schema, without touching deployment or live publishing.

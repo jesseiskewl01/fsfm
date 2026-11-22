@@ -113,6 +113,13 @@
       "backgroundEffects": true,
       "pageTransition": true,
       "respectReducedMotion": true
+    },
+    "parts": {
+      "siteHeader": { "enabled": true },
+      "siteMenu": { "enabled": true },
+      "pageFooter": { "enabled": true },
+      "pageIntro": { "enabled": true },
+      "wallpaperLayer": { "enabled": true }
     }
   },
   "seo": {

@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { COMPONENTS } from '../components/registry.mjs';
 import { TEMPLATES } from '../templates/registry.mjs';
-import { EFFECTS, CHROME_PARTS, PRESENTATION_VARIANTS as SHARED_VARIANTS, GROUP_LAYOUTS as SHARED_LAYOUTS } from './parts.mjs';
+import { EFFECTS, PAGE_PARTS, PRESENTATION_VARIANTS as SHARED_VARIANTS, GROUP_LAYOUTS as SHARED_LAYOUTS } from './parts.mjs';
 import { routeForPage } from './page-routes.mjs';
 
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -76,7 +76,7 @@ export function validatePage(page, options = {}) {
     if (parts !== undefined) {
       if (!isRecord(parts)) issue(problems, where, 'appearance.parts must be an object');
       else {
-        for (const [name, definition] of Object.entries(CHROME_PARTS)) {
+        for (const [name, definition] of Object.entries(PAGE_PARTS)) {
           const value = parts[name];
           if (value === undefined || typeof value === 'boolean') continue;
           if (isRecord(value) && typeof value.enabled === 'boolean') continue;
