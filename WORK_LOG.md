@@ -313,3 +313,12 @@ The architectural refurbishment itself: Roadmap Phases 3–5. Make homepage and 
 - Canonicalized vista template CSS selectors from `.vista-window-frame` to `.vista-window` under `body.template-vista-window` in `src/styles/v13.css`.
 - Album hero window left as album-specific identity (separate chrome) for now; CSS duplication still partially present across homepage-vista.css/v13.css but markup is unified.
 - Verify: build/validate pass, npm test 183/170/13 baseline.
+
+
+### N2.5 automated smoke, N2.1 audit, N1.4 embed/release smoke, N3 simple CMS controls **[OpenCode, 2026-11-22]**
+
+- **N2.5 automated smoke (build/output):** dist checked for homepage, vistatest, new-editorial-page, Early Bird. Homepage/vistatest have canonical `vista-window`/titlebar/window-body/data-window-action markup; vistatest has `data-vista-window` drag/dock attrs, homepage does not. Editorial has no vista window chrome (expected). Album has album-player + spotify reference. All have main/footer. This is an automated HTML smoke pass, not a human browser visual pass.
+- **N1.4 embedding/release flow smoke (automated):** homepage dist contains Spotify embed iframe (`data-testid="embed-iframe"`) and no `component-fallback`; Early Bird has album-player and Spotify reference, no fallback. Render path uses `safeEmbedUrl` and preview fallback remains in place. Live Studio browser smoke still recommended.
+- **N2.1 CMS->CSS audit (findings):** renderers are mostly clean (inline styles limited to content-driven spacer height, group columns, wallpaper/background). Main mud-hut/CMS gaps: (1) many window visual values still hardcoded in `homepage-vista.css`/`v13.css` (colors, padding, glass gradients) rather than CMS tokens; (2) homepage default window labels in `renderHomeWindow` are fallback-only but fine; (3) album hero window remains a separate album-identity chrome; (4) section presentation had no padding/background controls - addressed in N3.
+- **N3 simple CMS controls (safe, no tina-lock regen):** added optional `presentation.padding` (default/compact/roomy) and `presentation.background` (default/soft/glass/dark) in `src/core/parts.mjs`, validator, studio-controls, renderers, and v13.css. Added fields to `tina/fields.mjs` and `tina/config.js` presentation block; **did not** regenerate/commit `tina/tina-lock.json` (still unstaged drift). Visibility: `section.enabled` already exists and is enforced by validator; render treats enabled!==false as visible.
+- **Verify:** `npm run build` pass, `npm run validate:v13` pass, `npm test` 183/170/13 baseline.

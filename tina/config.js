@@ -4,7 +4,7 @@
  * Part fields, block types and vocabularies are derived from src/core/parts.mjs.
  * [OpenCode, 2026-11-22]
  */
-import { effectFields, groupLayoutOptions, pagePartFieldsFor, presentationOptions, sectionTypesFor, unionContentFields } from './fields.mjs';
+import { effectFields, groupLayoutOptions, pagePartFieldsFor, presentationBackgroundOptions, presentationOptions, presentationPaddingOptions, sectionTypesFor, unionContentFields } from './fields.mjs';
 const hidden = (name, label, type = 'string') => ({
   type,
   name,
@@ -167,6 +167,8 @@ export default {
                   options: presentationOptions,
                 },
                 textField('windowTitle', 'Window title'),
+                { type: 'string', name: 'padding', label: 'Padding', options: presentationPaddingOptions },
+                { type: 'string', name: 'background', label: 'Background', options: presentationBackgroundOptions },
               ]),
               objectField('group', 'Layout group', [
                 textField('id', 'Group ID', 'Parts sharing this ID are laid out together.'),

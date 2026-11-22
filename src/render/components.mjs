@@ -88,9 +88,11 @@ function windowWrap(section, inner, extraClass = '', context = {}) {
   const title = ['album-header', 'album-player'].includes(section.type) ? '' : (presentation.windowTitle || '').trim();
   const windowTitle = isVistaWindow ? vistaWindowTitle(section) : title;
   const groupId = section.group?.id ? ' data-layout-group="' + escapeHtml(section.group.id) + '"' : '';
+  const presPad = ['compact', 'roomy'].includes(presentation.padding) ? 'pad-' + presentation.padding : '';
+  const presBg = ['soft', 'glass', 'dark'].includes(presentation.background) ? 'bg-' + presentation.background : '';
 
   if (isVistaWindow) {
-    const classes = ['content-section', 'variant-' + variant, 'vista-window-frame', extraClass].filter(Boolean).join(' ');
+    const classes = ['content-section', 'variant-' + variant, 'vista-window-frame', presPad, presBg, extraClass].filter(Boolean).join(' ');
     const dataAttrs = `data-component="${escapeHtml(section.type)}"${groupId} data-vista-window data-vista-window-id="${escapeHtml(section.id || section.type)}" data-vista-window-title="${escapeHtml(windowTitle)}"`;
     return renderWindow({
       id: 'section-' + (section.id || section.type),
@@ -106,7 +108,7 @@ function windowWrap(section, inner, extraClass = '', context = {}) {
     });
   }
 
-  const classes = ['content-section', 'variant-' + variant, extraClass].filter(Boolean).join(' ');
+  const classes = ['content-section', 'variant-' + variant, presPad, presBg, extraClass].filter(Boolean).join(' ');
   const titlebar = title
     ? '<div class="component-titlebar"><span class="component-title">' + escapeHtml(title) + '</span></div>'
     : '';
@@ -179,6 +181,9 @@ function renderHomeWindow(section, inner, preview = false) {
   const id = `home-${ids[type] || (section.id || type)}`;
   const bodyClass = type === 'artist-statement' ? 'bio-window-body' : type === 'embed-window' ? 'spotify-window-body' : type === 'bandsintown-events' ? 'bit-container' : type === 'social-links' ? 'social-window-body' : 'home-component-body';
   const aria = type === 'artist-statement' ? 'About Fake Space Fog Machine' : type === 'embed-window' ? 'Fake Space Fog Machine on Spotify' : type === 'bandsintown-events' ? 'Upcoming events' : type === 'social-links' ? 'Social links' : title;
+  const presentation = section.presentation || {};
+  const presPad = ['compact', 'roomy'].includes(presentation.padding) ? 'pad-' + presentation.padding : '';
+  const presBg = ['soft', 'glass', 'dark'].includes(presentation.background) ? 'bg-' + presentation.background : '';
   const body = type === 'artist-statement'
     ? `<div class="bio-text">${renderRichText(section.content?.body || '')}</div>`
     : type === 'embed-window'
@@ -188,7 +193,7 @@ function renderHomeWindow(section, inner, preview = false) {
       : inner;
   return renderWindow({
     id,
-    className: ['reveal', 'content-window', extras[type] || 'home-component-window'].filter(Boolean).join(' '),
+    className: ['reveal', 'content-window', extras[type] || 'home-component-window', presPad, presBg].filter(Boolean).join(' '),
     ariaLabel: aria,
     title,
     iconHtml: homeTitleIcon(type),

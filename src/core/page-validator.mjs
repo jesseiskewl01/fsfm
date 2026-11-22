@@ -2,12 +2,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { COMPONENTS } from '../components/registry.mjs';
 import { TEMPLATES } from '../templates/registry.mjs';
-import { EFFECTS, PAGE_PARTS, PRESENTATION_VARIANTS as SHARED_VARIANTS, GROUP_LAYOUTS as SHARED_LAYOUTS } from './parts.mjs';
+import { EFFECTS, PAGE_PARTS, PRESENTATION_VARIANTS as SHARED_VARIANTS, GROUP_LAYOUTS as SHARED_LAYOUTS, PRESENTATION_PADDINGS as SHARED_PADDINGS, PRESENTATION_BACKGROUNDS as SHARED_BACKGROUNDS } from './parts.mjs';
 import { routeForPage } from './page-routes.mjs';
 
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const PRESET_IDS = new Set(['vista-violet-haze','vista-aqua-glass','vista-solar-flare','vista-rose-bloom','aurora','album-amber']);
 const PRESENTATION_VARIANTS = new Set(SHARED_VARIANTS);
+const PRESENTATION_PADDINGS = new Set(SHARED_PADDINGS);
+const PRESENTATION_BACKGROUNDS = new Set(SHARED_BACKGROUNDS);
 const GROUP_LAYOUTS = new Set(SHARED_LAYOUTS);
 const isRecord = value => value && typeof value === 'object' && !Array.isArray(value);
 const getPath = (object, dotted) => dotted.split('.').reduce((value, key) => value?.[key], object);
@@ -114,6 +116,10 @@ export function validatePage(page, options = {}) {
       if (!isRecord(section.content)) issue(problems, sectionWhere, 'content object is required');
       const variant = section.presentation?.variant;
       if (variant && !PRESENTATION_VARIANTS.has(variant)) issue(problems, sectionWhere, `unknown presentation variant "${variant}"`);
+      const padding = section.presentation?.padding;
+      if (padding && !PRESENTATION_PADDINGS.has(padding)) issue(problems, sectionWhere, `unknown presentation padding "${padding}"`);
+      const background = section.presentation?.background;
+      if (background && !PRESENTATION_BACKGROUNDS.has(background)) issue(problems, sectionWhere, `unknown presentation background "${background}"`);
       if (section.group?.id) {
         if (typeof section.group.id !== 'string' || !/^[a-z0-9_-]+$/i.test(section.group.id)) issue(problems, sectionWhere, 'layout group id must use letters, numbers, hyphens or underscores');
         if (!GROUP_LAYOUTS.has(section.group.layout || 'grid')) issue(problems, sectionWhere, 'layout group layout must be grid, stack or columns');

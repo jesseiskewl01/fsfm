@@ -459,3 +459,11 @@ body.template-vista-window .vista-window.is-dragging{z-index:80!important;cursor
 .vista-dock-item{max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:7px 10px;border:1px solid rgba(255,255,255,.46);border-radius:5px;color:#fff;font:600 11px "Segoe UI",Tahoma,Arial,sans-serif;cursor:pointer;background:linear-gradient(180deg,rgba(255,255,255,.24),rgba(255,255,255,.07) 48%,rgba(5,25,50,.45) 52%)}
 .vista-dock-item:hover{border-color:#fff;background:linear-gradient(180deg,rgba(255,255,255,.4),rgba(255,255,255,.12) 48%,rgba(18,69,116,.64) 52%)}
 @media(max-width:760px){body.template-vista-window .vista-window .component-body{padding:18px}.vista-window-dock{left:8px;bottom:8px;max-width:calc(100vw - 16px)}}
+
+
+/* N3 [OpenCode, 2026-11-22]: simple section presentation controls (CMS-driven). */
+.content-section.pad-compact .component-body,.vista-window.pad-compact .window-body{padding:12px 14px}
+.content-section.pad-roomy .component-body,.vista-window.pad-roomy .window-body{padding:clamp(28px,4vw,52px)}
+.content-section.bg-soft .component-body,.vista-window.bg-soft .window-body{background:linear-gradient(145deg,rgba(255,255,255,.82),rgba(239,248,255,.7))}
+.content-section.bg-glass .component-body,.vista-window.bg-glass .window-body{background:linear-gradient(145deg,rgba(255,255,255,.32),rgba(180,220,245,.14));backdrop-filter:blur(8px)}
+.content-section.bg-dark .component-body,.vista-window.bg-dark .window-body{background:linear-gradient(145deg,rgba(10,24,42,.78),rgba(6,16,30,.86));color:#f0f7ff}

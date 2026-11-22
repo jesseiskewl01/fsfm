@@ -18,6 +18,9 @@ export const PRESENTATION_VARIANTS = Object.freeze([
   'vista-window', 'vista-desktop', 'editorial', 'amber-editorial', 'amber-player', 'plain', ''
 ]);
 
+export const PRESENTATION_PADDINGS = Object.freeze(['default', 'compact', 'roomy']);
+export const PRESENTATION_BACKGROUNDS = Object.freeze(['default', 'soft', 'glass', 'dark']);
+
 export const GROUP_LAYOUTS = Object.freeze(['grid', 'stack', 'columns']);
 
 const field = (name, label, type = 'string', extra = {}) => ({ name, label, type, required: false, ...extra });

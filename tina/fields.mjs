@@ -7,6 +7,8 @@ import {
   EFFECTS,
   GROUP_LAYOUTS,
   PAGE_PARTS,
+  PRESENTATION_BACKGROUNDS,
+  PRESENTATION_PADDINGS,
   PRESENTATION_VARIANTS,
   allowedComponentsFor
 } from '../src/core/parts.mjs';
@@ -75,6 +77,8 @@ export function unionContentFields(template) {
 export const sectionTypesFor = (template) => allowedComponentsFor(template);
 
 export const presentationOptions = PRESENTATION_VARIANTS.filter(Boolean);
+export const presentationPaddingOptions = [...PRESENTATION_PADDINGS];
+export const presentationBackgroundOptions = [...PRESENTATION_BACKGROUNDS];
 
 export const groupLayoutOptions = [...GROUP_LAYOUTS];
 

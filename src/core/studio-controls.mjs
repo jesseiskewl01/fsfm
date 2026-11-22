@@ -12,6 +12,8 @@ import {
   GROUP_LAYOUTS,
   PAGE_PARTS,
   PART_CATEGORIES,
+  PRESENTATION_BACKGROUNDS,
+  PRESENTATION_PADDINGS,
   PRESENTATION_VARIANTS,
   SHELL_PARTS,
   listParts
@@ -53,6 +55,8 @@ export function partCatalogue() {
     }])),
     vocabularies: {
       presentationVariants: [...PRESENTATION_VARIANTS],
+      presentationPaddings: [...PRESENTATION_PADDINGS],
+      presentationBackgrounds: [...PRESENTATION_BACKGROUNDS],
       groupLayouts: [...GROUP_LAYOUTS]
     },
     total: Object.keys(ALL_PARTS).length
