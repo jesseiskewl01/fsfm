@@ -358,3 +358,28 @@ The architectural refurbishment itself: Roadmap Phases 3–5. Make homepage and 
 - **Vista windows:** drag disabled (no grab cursor/handle, no transform persistence) per smoke report; close now in-place collapse like minimize (no dock popup). `renderWindow` emits `data-vista-window-action` only for vista/draggable windows to preserve template isolation.
 - **Vista marquee:** remains windowed; added v13 styling for marquee component body/track/items to be closer to homepage band look (no homepage star easter egg).
 - **Tests:** updated `v15-desktop-regressions.test.mjs` and `vista-windows.test.mjs` for intentional layout/behavior changes. Validate/build/preview pass, npm test 183/170/13 baseline. `tina/tina-lock.json` unstaged.
+
+### N2.1 mud-hut audit + safe consolidation **[OpenCode, 2026-11-22]**
+
+- **Scope:** no-visual-change audit/refactor only (no smoke-dependent tuning). `tina/tina-lock.json` left unstaged; no push.
+
+- **Small safe refactors applied:**
+  - `src/styles/homepage-vista.css`: merged redundant caption-control declarations into canonical `.caption-buttons`/`.caption-button` rules (added `align-items:stretch`, `padding:0`, `text-decoration:none` where missing; removed duplicate later block). Removed redundant `.vista-window.content-window .titlebar, .content-window .titlebar` height/padding rule already covered by `.titlebar`.
+  - `src/styles/v13.css`: normalized `body.template-vista-window .vista-window .component-body,.template-vista-window .vista-window .window-body` selector to include `body` on both sides for consistency (no intended specificity/visual change).
+
+- **Window/CSS duplication map (homepage-vista.css vs v13.css):**
+  - **Caption controls:** `homepage-vista.css` defines canonical `.caption-button` Aero styling using CSS variables (`--hi/bright/glass/deep/mid-rgb`); `v13.css` defines near-equivalent `body.template-vista-window .vista-window-button` with hardcoded blue-gray values. `renderWindow()` emits both class families. *Not safe to blindly merge* without a shared token layer because color systems differ by context.
+  - **Window chrome base:** homepage defines `.titlebar/.window-title/.window-body/.content-window.vista-window` base; vista template defines scoped `body.template-vista-window .vista-window*` rules in `v13.css`. Both are Aero-family but context-scoped (homepage-vista.css loads only in homepage mode; v13 loads everywhere). Consolidation target: extract shared Aero window tokens/primitives into a common layer loaded by both contexts, then keep context-specific overrides minimal.
+  - **Minimized state:** `homepage-vista.css` has `.window-minimized { padding-bottom:0!important; }` and `.window-minimized > .window-body { display:none!important; }`; `v13.css` has template-scoped `body.template-vista-window .vista-window.window-minimized...` equivalents. Duplication is small but scope-divergent; safe future target is a shared `.window-minimized` contract.
+  - **Legacy/compat classes still emitted:** `windowWrap()` emits `variant-${variant}` (`variant-vista-window`/`variant-vista-desktop`) alongside canonical `vista-window` classes; `.content-window` remains an alias. Keep until a deliberate cleanup pass confirms no content/CSS/JS dependency.
+  - **Presentation controls:** pad/bg rules in `v13.css` already target both `.content-section` and `.vista-window` - good shared pattern.
+
+- **Architecture “mud and clay” audit (special-case renderers / divergence risk):**
+  - **Homepage marquee:** special-case behavior/easter egg (star icon, wallpaper/theme interaction) in homepage renderer/styles/JS; vista template marquee is windowed plain content. Chrome should converge, but behavior is intentionally context-specific - keep documented.
+  - **Hero/shutdown:** homepage hero and shutdown overlay are desktop-chrome behaviors, not normal content parts; they intentionally bypass generic section rendering.
+  - **Album identity chrome:** album header/player/statement have album-specific renderers and `template-album` CSS; they share window/Aero language partially but remain identity-specific. Future convergence should preserve album atmosphere/identity.
+  - **Homepage gadgets:** rendered as desktop chrome/config (`renderDesktopChrome`, gadget config JSON, dedicated JS/CSS), not section-part instances. Extra widgets below footer are flow-layout gadgets. This is a deliberate boundary; turning them into generic parts would need careful data-model migration.
+  - **Vista close/minimize semantics:** currently in-place collapse for both on vista template; earlier smoke requested dock-reopen behavior for close. Needs Jesse decision before changing.
+  - **General risk:** adding one-off renderer/CSS forks per complaint increases “18 mud components”. Preferred path: keep `renderWindow/windowWrap` canonical, put visual differences in presentation tokens/classes/content, and isolate unavoidable behavior differences behind explicit, tested context flags.
+
+- **Verify:** `npm run validate:v13` pass; `npm run build` pass; `node scripts/build-v13.mjs --preview --include-drafts` pass; `npm test` **183/170/13** (same baseline).
