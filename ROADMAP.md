@@ -334,3 +334,79 @@ The project is done when:
 
 **Consequence for this roadmap:** Phases 3–5 (shared foundations, single-source definitions, block portability) are the mud-hut refurbishment. Phase 6 (Studio as a real Tina client) comes **after** them. This is Jesse's explicit ordering correction, dated 2026-11-22, and it overrides any earlier phrasing that implied Studio came first.
 - Never let a new assistant guess what we were doing — that is what these files are for.
+
+
+---
+
+## 9. Roadmap v2 — Current working plan **[Jesse + OpenCode, 2026-11-22 — appended, supersedes phase ordering below for active work]**
+
+> This section is the **current** plan. Earlier sections are preserved as history. Where this conflicts with earlier phase ordering, this section wins for active work, except the non-negotiable rules in §1/§3 and Jesse's explicit decisions.
+
+### 9.1 Current reality (verified)
+
+- **Architecture Stages A–F:** complete on `rv26` (32 parts in `src/core/parts.mjs`, derived controls, golden baseline preserved; Early Bird has known intentional Stage B delta).
+- **Phase 6 local/dev acceptance (D14/D15):** complete on `rv26`. Studio remains `/studio/` + `/__fsfm/api`; local content I/O goes through `scripts/tina-local-adapter.mjs`; TinaSchema covers 6 stores; Tina local DB initializes/indexes real repo content (`dbReady`), DB-authoritative reads with stripped Tina system keys; shape-compat verified for all 7 content records; atomic write/publisher/rollback preserved; local-only debounced autosave; deploy locked. No credentials, no live publishing, no generated Tina artifacts, no push.
+- **Known pre-existing test failures:** 13 (unchanged baseline).
+
+### 9.2 Live smoke findings (observed 2026-11-22)
+
+| # | Finding | Why it matters | Mud-hut rule |
+|---|---|---|---|
+| F1 | Homepage hero is special `templateData.hero` rendered by `renderDesktopHero()` (`src/render/chrome.mjs`), not a normal composable section. Homepage gadgets/boot/shutdown are also templateData specials. | You can't compose/move/reuse hero like other parts; homepage is still part "mud hut". | Violates unification. |
+| F2 | Studio UI is rough and visually disconnected from FSFM identities. | Studio should be a friendly, trustworthy client, not a confusing separate-feeling tool. | Product/UX gap. |
+| F3 | Editorial “Pages” menu appears behind page elements in preview. | Menu becomes unusable; likely stacking/z-index context issue. `template-vista-window` has explicit header/menu z-index rules; editorial does not. | Bug. |
+| F4 | Vista windows on `vistatest` look nothing like homepage windows. `components.mjs` only applies `vista-window-frame` for `template === 'vista-window'`; homepage uses different window/render/CSS paths (`.aero-window`, `homepage-vista.css`). | Same concept (“window”) has multiple implementations/looks. | Direct mud-hut violation. |
+
+### 9.3 Active phase plan
+
+#### Phase N1 — Bugfix & consistency pass (first)
+**Purpose:** Fix concrete breakage/inconsistency Jesse can see now.
+
+- **N1.1 Editorial menu stacking:** fix Pages menu appearing behind content; align header/menu/page-main stacking rules with the safe pattern used by vista-window, without changing visual identity.
+- **N1.2 Window unification audit/fix:** make “window” one concept with one implementation path where intended. Define canonical window chrome/behavior for Vista contexts; homepage and vista-window template should share it unless a difference is explicitly intentional and documented.
+- **N1.3 Preview parity check:** confirm Studio preview and built output behave consistently for the fixed cases.
+
+**Acceptance:** Editorial Pages menu is usable; vistatest/homepage window presentation is consistent by design; no regressions in golden baseline except intentional, Jesse-reviewed deltas.
+
+#### Phase N2 — Mud-hut refurbishment (core unification)
+**Purpose:** Make homepage/special surfaces use the same composable part system.
+
+- **N2.1 Homepage hero as composable part/section:** migrate `templateData.hero` into the unified part/section model while preserving the current look.
+- **N2.2 Homepage gadgets/boot/shutdown audit:** identify which should become parts/sections vs. true shell settings; migrate where it supports composition.
+- **N2.3 One window system:** converge Aero/Vista window chrome, titlebar, controls, drag/restore behavior, and styling tokens into shared implementation. Keep context-specific behavior only where necessary.
+- **N2.4 Part parity matrix:** for every visible UI concept, record: canonical part, templates allowed, config shape, render path, Studio control.
+
+**Acceptance:** Any “room” intended to be reusable can be placed through the same model; no duplicate window implementations for the same concept.
+
+#### Phase N3 — Studio as friendly client (after N1/N2 foundations)
+**Purpose:** Make Studio pleasant and trustworthy without creating a second source of truth.
+
+- **N3.1 UX cleanup:** clearer layout, hierarchy, labels, save/autosave/conflict states, less clutter.
+- **N3.2 Visual direction:** decide whether Studio should echo FSFM identity lightly or be a clean neutral tool; either way it must feel intentional.
+- **N3.3 Better composition UI:** make adding/reordering/configuring parts feel like arranging rooms, not editing raw structure.
+- **N3.4 Preview confidence:** make it obvious what is local preview, what is saved, and that deploy is locked.
+
+**Acceptance:** Jesse can use Studio comfortably for normal edits without fighting the UI.
+
+#### Phase N4 — CMS/backend hardening (local-first, guardrailed)
+**Purpose:** Finish the backend side without scope creep.
+
+- Keep adapter-first contract stable.
+- Evaluate full DB-authoritative behavior only with shape/behavior parity.
+- Decide if/when Tina Cloud/remote/multi-user/official Tina admin is needed; do not add GraphQL HTTP endpoint complexity unless that need is real.
+- Keep deploy locked until explicit publish flow is designed and approved.
+
+**Acceptance:** Local authoring is robust; backend choices are deliberate and documented.
+
+#### Phase N5 — QA, docs, and release readiness
+- Re-run tests/validate/build/baseline/audit as appropriate.
+- Visual review across Homepage, Early Bird, Vista, Editorial.
+- Update START_HERE/WORK_LOG/ROADMAP with clear next action.
+
+### 9.4 Guardrails (reaffirmed)
+
+- No push/merge/force-push/history rewrite/file deletion/credentials/live publishing.
+- No generated `tina/__generated__/*` artifacts unless explicitly authorised.
+- Docs append-only; dated entries tagged **[Jesse]**, **[OpenCode]**, or **[Jesse + OpenCode]**.
+- If a change looks deliberate, strange, or risky, stop and ask Jesse.
+- Preserve three visual identities: Vista, The Early Bird, Editorial.

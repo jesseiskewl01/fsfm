@@ -282,3 +282,10 @@ The architectural refurbishment itself: Roadmap Phases 3–5. Make homepage and 
 - **D15:** Phase 6 local acceptance pass complete on adapter-first path. Studio remains `/studio/` + `/__fsfm/api`; Tina local DB is indexed/verified; autosave local-only/debounced; deploy locked.
 
 **Verification:** `npm test` 183 / 170 pass / 13 fail (same 13 pre-existing failures). `npm run validate:v13` pass. `npm run build` pass. `node scripts/capture-render-baseline.mjs --compare` same known Early Bird delta (`a887b166af6e917a -> ecd9375223b463b9`), homepage/Vista/Editorial SAME. No generated Tina artifacts, no credentials, no live publishing, no push.
+
+
+### Roadmap v2 appended **[Jesse + OpenCode, 2026-11-22]**
+
+- Appended **ROADMAP.md §9 “Roadmap v2 — Current working plan”** (append-only; earlier sections preserved).
+- Captures verified current reality (Stages A–F complete, Phase 6 local acceptance D14/D15 complete) and live smoke findings F1–F4: homepage hero/gadgets as templateData specials, Studio UI disconnected, Editorial Pages menu z-index/stacking bug, Vista window rendering inconsistent between homepage and vista-window template.
+- Proposes active phases N1–N5: bugfix/consistency, mud-hut refurbishment, Studio UX, CMS/backend hardening, QA/release readiness. No code changes in this entry.
