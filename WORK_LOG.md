@@ -306,3 +306,10 @@ The architectural refurbishment itself: Roadmap Phases 3–5. Make homepage and 
 - `homepage-vista.css` selectors extended for canonical `.vista-window.content-window` alias. Vista template window CSS remains Aero-aligned in `v13.css`.
 - Tests: updated stale hero marker assertions in `test/homepage-template-stage5.test.mjs` and `test/parts-chrome.test.mjs` to accept canonical class order. `npm run build` pass, `npm run validate:v13` pass, `npm test` 183/170/13 (baseline).
 - `tina/tina-lock.json` remains unstaged local drift; not committed.
+
+### N2.3 polish **[OpenCode, 2026-11-22]**
+
+- Confirmed with Jesse: same Vista chrome everywhere, context-specific behavior (homepage in-place minimize/hero shutdown; vista template drag/dock/restore).
+- Canonicalized vista template CSS selectors from `.vista-window-frame` to `.vista-window` under `body.template-vista-window` in `src/styles/v13.css`.
+- Album hero window left as album-specific identity (separate chrome) for now; CSS duplication still partially present across homepage-vista.css/v13.css but markup is unified.
+- Verify: build/validate pass, npm test 183/170/13 baseline.

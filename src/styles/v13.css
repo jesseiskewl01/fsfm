@@ -414,14 +414,14 @@ body.template-vista-window .site-menu{z-index:1002}
 body.template-vista-window .site-menu-panel{z-index:1003}
 body.template-vista-window .page-main{position:relative;z-index:1}
 body.template-vista-window .page-content{align-items:start}
-/* N1.2 [OpenCode, 2026-11-22]: align vista-window template chrome to the homepage Aero window language for visual consistency. Markup/JS unification remains N2.3. */
-body.template-vista-window .vista-window-frame{
+/* N2.3 [OpenCode, 2026-11-22]: canonical Vista window chrome on vista template. Shared Aero language with homepage windows; behavior (drag/dock) stays context-specific. */
+body.template-vista-window .vista-window{
  position:relative;z-index:10;min-width:0;overflow:hidden;padding:0 6px 6px;border:1px solid rgba(19,62,96,.72);border-radius:7px 7px 4px 4px;
  background:linear-gradient(130deg,#effbff70 0%,#bfe9ff18 15%,#102c3e50 29%,#e7f8ff2f 30%,#6aa6b515 36%,#1a485451 60%,#e1f7ff45 82%,#8acde826 92%),rgba(166,208,232,.52);
  box-shadow:0 7px 23px rgba(0,0,0,.42),inset 0 0 0 1px #effbffc0;
  backdrop-filter:blur(14px) saturate(1.25);-webkit-backdrop-filter:blur(14px) saturate(1.25);will-change:transform;
 }
-body.template-vista-window .vista-window-frame:hover{border-color:rgba(231,247,255,.92);box-shadow:0 10px 28px rgba(0,0,0,.46),inset 0 0 0 1px #effbffd8}
+body.template-vista-window .vista-window:hover{border-color:rgba(231,247,255,.92);box-shadow:0 10px 28px rgba(0,0,0,.46),inset 0 0 0 1px #effbffd8}
 body.template-vista-window .vista-window-titlebar{
  height:30px;min-height:30px;display:flex;align-items:center;gap:6px;padding:0 4px;color:#081722;cursor:grab;user-select:none;touch-action:none;
  background:transparent;border-bottom:0;box-shadow:none;text-shadow:0 0 4px #fff,0 0 9px #fff,0 0 12px #fff;
@@ -443,12 +443,12 @@ body.template-vista-window .vista-window-button.minimize{border-radius:0 0 0 4px
 body.template-vista-window .vista-window-button:hover{background:linear-gradient(rgb(217,242,255),rgb(133,196,227) 45%,rgb(166,208,232) 50%,rgb(133,196,227));box-shadow:0 0 12px rgb(133,196,227),inset 0 0 0 1px #fff9}
 body.template-vista-window .vista-window-button.close{width:46px;min-width:46px;border-radius:0 0 4px 0;border-right:1px solid #654338;border-color:#654338;background:linear-gradient(#e9b4a2,#ca7865 44%,#ad3a22 48%,#bd4c31)}
 body.template-vista-window .vista-window-button.close:hover{background:linear-gradient(#f7c4a4,#e7856e 44%,#d23d14 48%,#f26b3b);box-shadow:0 0 14px #ff5d22,inset 0 0 0 1px #ffd8a9}
-body.template-vista-window .vista-window-frame .component-body{min-width:0;padding:clamp(19px,3.2vw,34px);color:#1a3a52;background:#fff;border:1px solid rgb(74,138,175);box-shadow:0 0 0 1px #eefbff99}
-body.template-vista-window .vista-window-frame[data-component="hero"] .component-body{padding:clamp(28px,5vw,60px)}
-body.template-vista-window .vista-window-frame .component-body>:first-child{margin-top:0}
-body.template-vista-window .vista-window-frame .component-body>:last-child{margin-bottom:0}
-body.template-vista-window .vista-window-frame .component-button{border:1px solid rgba(19,62,96,.45);border-radius:5px;box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 5px 16px rgba(0,0,0,.12)}
-body.template-vista-window .vista-window-frame.is-dragging{z-index:80!important;cursor:grabbing;box-shadow:0 30px 74px rgba(0,0,0,.5),0 0 0 1px rgba(221,244,255,.4)}
+body.template-vista-window .vista-window .component-body{min-width:0;padding:clamp(19px,3.2vw,34px);color:#1a3a52;background:#fff;border:1px solid rgb(74,138,175);box-shadow:0 0 0 1px #eefbff99}
+body.template-vista-window .vista-window[data-component="hero"] .component-body{padding:clamp(28px,5vw,60px)}
+body.template-vista-window .vista-window .component-body>:first-child{margin-top:0}
+body.template-vista-window .vista-window .component-body>:last-child{margin-bottom:0}
+body.template-vista-window .vista-window .component-button{border:1px solid rgba(19,62,96,.45);border-radius:5px;box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 5px 16px rgba(0,0,0,.12)}
+body.template-vista-window .vista-window.is-dragging{z-index:80!important;cursor:grabbing;box-shadow:0 30px 74px rgba(0,0,0,.5),0 0 0 1px rgba(221,244,255,.4)}
 .vista-window-dock{
  position:fixed;left:16px;bottom:16px;z-index:1200;display:flex;flex-wrap:wrap;align-items:center;gap:7px;max-width:min(680px,calc(100vw - 32px));padding:8px;
  border:1px solid rgba(224,242,255,.58);border-radius:8px;background:linear-gradient(145deg,rgba(28,63,99,.94),rgba(5,19,42,.97));
@@ -458,4 +458,4 @@ body.template-vista-window .vista-window-frame.is-dragging{z-index:80!important;
 .vista-window-dock-label{padding:0 5px;color:#c9e8ff;font:700 9px "Segoe UI",Tahoma,Arial,sans-serif;letter-spacing:.12em}
 .vista-dock-item{max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:7px 10px;border:1px solid rgba(255,255,255,.46);border-radius:5px;color:#fff;font:600 11px "Segoe UI",Tahoma,Arial,sans-serif;cursor:pointer;background:linear-gradient(180deg,rgba(255,255,255,.24),rgba(255,255,255,.07) 48%,rgba(5,25,50,.45) 52%)}
 .vista-dock-item:hover{border-color:#fff;background:linear-gradient(180deg,rgba(255,255,255,.4),rgba(255,255,255,.12) 48%,rgba(18,69,116,.64) 52%)}
-@media(max-width:760px){body.template-vista-window .vista-window-frame .component-body{padding:18px}.vista-window-dock{left:8px;bottom:8px;max-width:calc(100vw - 16px)}}
+@media(max-width:760px){body.template-vista-window .vista-window .component-body{padding:18px}.vista-window-dock{left:8px;bottom:8px;max-width:calc(100vw - 16px)}}
