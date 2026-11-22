@@ -64,6 +64,10 @@ This protocol supersedes the earlier "maintenance rule" in `WORK_LOG.md`. From 2
 | D7 | **Order: building blocks / architecture first, Studio last.** | [Jesse] 2026-11-22 |
 | D8 | All planning docs live in the canonical folder and are append-only with attribution | [Jesse] 2026-11-22 |
 | D9 | Phase 6 (Studio/Tina backend wiring) is paused until Jesse explicitly reopens it; D3 remains locked but implementation is deferred | [Jesse] 2026-11-22 |
+| D10 | Phase 6 is reopened: implement option #1, Studio as a custom client on Tina's backend, local/dev scope under the existing guardrails | [Jesse] 2026-11-22 |
+| D11 | Phase 6 autosave is local-only and debounced; it must never deploy, and explicit Save plus stale-revision protection remain | [Jesse] 2026-11-22 |
+| D12 | If a Phase 6 change touches content/rendering that looks deliberate, strange or risky, stop and ask Jesse rather than guessing | [Jesse] 2026-11-22 |
+| D13 | Phase 6 is paused again pending Jesse's choice between a local Tina storage adapter and literal Tina GraphQL; no Phase 6 code was changed | [Jesse] 2026-11-22 |
 
 ---
 
@@ -76,6 +80,10 @@ This protocol supersedes the earlier "maintenance rule" in `WORK_LOG.md`. From 2
 - Next real work: **Roadmap Phases 3–5** — the mud-hut refurbishment
 
 **State note [OpenCode, 2026-11-22]:** Phases 3–5 are complete; `rv26` head is `d7eac7f`. Phase 6 is paused by Jesse (D9).
+
+**State note [Jesse + OpenCode, 2026-11-22]:** Phase 6 is now reopened under D10. Direction: Studio remains the friendly editor and becomes a client of Tina's backend. Local/dev work only unless Jesse explicitly authorises otherwise.
+
+**State note [Jesse + OpenCode, 2026-11-22]:** Read-only mapping found Tina's checked-in GraphQL schema is album-only and stale; literal GraphQL would require expanded collections plus regenerated artifacts. Jesse chose to pause and think before choosing the bridge. No Phase 6 code was changed.
 
 ---
 

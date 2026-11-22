@@ -223,3 +223,27 @@ The architectural refurbishment itself: Roadmap Phases 3–5. Make homepage and 
 - Jesse chose **Pause Phase 6** when asked how Studio should call Tina. No Phase 6 implementation was started.
 - D3 remains locked: TinaCMS is the actual content backend and Studio must call it. This decision only defers the work.
 - Stage F / `d7eac7f` is the stopping point. Do not resume Studio/Tina backend wiring, credentials, live publishing or Tina CLI generated artifacts without an explicit new instruction from Jesse.
+
+---
+
+## Phase 6 reopened — direction #1 **[Jesse + OpenCode, 2026-11-22]**
+
+- Jesse explicitly reopened Phase 6 and chose **option #1**: Studio stays the friendly `/studio/` editor and becomes a custom client on Tina's backend.
+- This resolves the roadmap D1 leaning ("Custom client, per Jesse — needs technical confirmation") into an active implementation direction, recorded as D10 in `START_HERE.md`.
+- D9 is not erased: it was the pause. D10 is the explicit reopening.
+- Scope remains local/dev only under the existing guardrails: no credentials/auth files, no live publishing, no push/merge/history rewrite, no generated Tina artifacts unless separately authorised.
+- A read-only mapping subagent was launched to document the current Studio save paths, Tina configuration and local API options before any files are changed.
+
+### Phase 6 clarification from Jesse **[Jesse + OpenCode, 2026-11-22]**
+
+- Studio's existing local Save / Deploy Live split is the intended model. Phase 6 changes the save path to Tina; Deploy Live stays parked under the existing guardrails.
+- **D11:** autosave should be local-only and debounced. It must never deploy. Explicit Save and stale-revision protection remain.
+- **D12:** if a change touches content or rendering that looks deliberate, strange or risky, OpenCode must stop and ask Jesse rather than guessing.
+
+### Phase 6 reconnaissance and pause **[Jesse + OpenCode, 2026-11-22]**
+
+- A read-only mapping subagent completed a thorough survey. No files were changed by the survey.
+- Key finding: Studio currently calls `/__fsfm/api`, whose server writes repository JSON directly. Tina's checked-in GraphQL schema is album-only and stale versus the current derived config; it cannot safely round-trip homepage, site, wallpapers, Vista or Editorial records.
+- Literal Tina GraphQL would require expanding the Tina schema to all six stores and regenerating `tina/__generated__/*`, which is not currently authorised.
+- Safer alternative identified: keep Studio's API contract and response shapes, but put a local Tina storage adapter behind the server's read/write seams. That would preserve revisions, validators, stale-save protection and the publish queue while making the backend Tina-backed rather than raw file I/O.
+- Jesse chose **Pause and think** when asked which bridge counts as “Studio calls Tina”. Recorded as D13. No Phase 6 implementation files were changed.
