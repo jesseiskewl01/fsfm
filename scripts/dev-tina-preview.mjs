@@ -145,7 +145,7 @@ function albumSummary(fileName, record) {
   };
 }
 
-function readStoredPages() {
+async function readStoredPages() {
   return contentAdapter.readStoredPages();
 }
 
@@ -163,8 +163,8 @@ function contentResource(pathname) {
   };
 }
 
-function contentIndex() {
-  const pages = readStoredPages();
+async function contentIndex() {
+  const pages = await readStoredPages();
   return pages.map((page) => {
     const directory = page.template === 'homepage' ? 'homepage' : page.template === 'album' ? 'albums' : page.template === 'vista-window' ? 'vista-pages' : 'editorial-pages';
     const key = page.template === 'homepage' ? 'homepage' : directory + '/' + page.identity.slug;
@@ -231,15 +231,15 @@ function validateWallpaperCatalogue(record) {
   return null;
 }
 
-function readContentFile(resource) {
+async function readContentFile(resource) {
   return contentAdapter.read(resource);
 }
 
-function writeContentFile(resource, currentRaw, record) {
+async function writeContentFile(resource, currentRaw, record) {
   return contentAdapter.write(resource, currentRaw, record);
 }
 
-function validatePageForSave(resource, record) {
+async function validatePageForSave(resource, record) {
   const existing = JSON.parse(fs.readFileSync(resource.filePath, 'utf8'));
   if (record?.template !== existing.template) return 'A page template cannot be changed after creation.';
   if (existing.template === 'homepage' && record?.publishing?.published === false) {
@@ -253,7 +253,7 @@ function validatePageForSave(resource, record) {
   } catch (error) {
     return error.message || 'The page identity or URL is invalid.';
   }
-  const allPages = readStoredPages();
+  const allPages = await readStoredPages();
   const index = allPages.findIndex((page) =>
     page.template === existing.template && page.identity?.slug === existing.identity?.slug);
   if (index < 0) return 'The page could not be located in the site content index.';
@@ -715,7 +715,7 @@ async function handleApi(request, response, pathname) {
       response.end();
       return;
     }
-    sendJson(response, 200, { items: contentIndex() }, request.method);
+    sendJson(response, 200, { items: await contentIndex() }, request.method);
     return;
   }
 
@@ -752,7 +752,7 @@ async function handleApi(request, response, pathname) {
       return;
     }
     if (request.method === 'GET' || request.method === 'HEAD') {
-      const result = readContentFile(resource);
+      const result = await readContentFile(resource);
       if (!result) {
         sendJson(response, 404, { error: 'Studio content record not found.' }, request.method);
         return;
@@ -786,7 +786,7 @@ async function handleApi(request, response, pathname) {
           sendJson(response, 422, { error: 'This record does not match its page template.' });
           return;
         }
-        const validation = validatePageForSave(resource, record);
+        const validation = await validatePageForSave(resource, record);
         if (typeof validation === 'string') {
           sendJson(response, 422, { error: validation });
           return;
@@ -799,7 +799,7 @@ async function handleApi(request, response, pathname) {
           return;
         }
         try {
-          const pages = normalizePages(readStoredPages(), record);
+          const pages = normalizePages(await readStoredPages(), record);
           const pageErrors = validateSite(pages, { root: projectRoot });
           if (pageErrors.length) {
             sendJson(response, 422, { error: pageErrors.slice(0, 30).join('\n') });
@@ -816,7 +816,7 @@ async function handleApi(request, response, pathname) {
           return;
         }
       }
-      const saved = writeContentFile(resource, currentRaw, record);
+      const saved = await writeContentFile(resource, currentRaw, record);
       sendJson(response, 200, { ...saved, record });
     } catch (error) {
       sendJson(response, error.statusCode || 500, {

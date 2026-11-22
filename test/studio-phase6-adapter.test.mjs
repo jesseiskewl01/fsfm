@@ -13,9 +13,9 @@ const server = fs.readFileSync(path.join(root, 'scripts/dev-tina-preview.mjs'), 
 test('Studio server uses a local content adapter seam', () => {
   assert.match(server, /createLocalContentAdapter/);
   assert.match(server, /contentAdapter/);
-  assert.match(server, /function readContentFile\(resource\)\s*\{\s*return contentAdapter\.read\(resource\);\s*\}/);
-  assert.match(server, /function writeContentFile\(resource, currentRaw, record\)\s*\{\s*return contentAdapter\.write\(resource, currentRaw, record\);\s*\}/);
-  assert.match(server, /function readStoredPages\(\)\s*\{\s*return contentAdapter\.readStoredPages\(\);\s*\}/);
+  assert.match(server, /async function readContentFile\(resource\)\s*\{\s*return contentAdapter\.read\(resource\);\s*\}/);
+  assert.match(server, /async function writeContentFile\(resource, currentRaw, record\)\s*\{\s*return contentAdapter\.write\(resource, currentRaw, record\);\s*\}/);
+  assert.match(server, /async function readStoredPages\(\)\s*\{\s*return contentAdapter\.readStoredPages\(\);\s*\}/);
   assert.match(server, /contentAdapter\.createPage\(/);
 });
 
@@ -40,19 +40,19 @@ test('local content adapter preserves revision, write and rollback contract', as
     });
 
     const resource = { key: 'homepage', filePath };
-    const read = adapter.read(resource);
+    const read = await adapter.read(resource);
     assert.equal(read.key, 'homepage');
     assert.equal(read.record.identity.name, 'Home');
     assert.match(read.revision, /^[a-f0-9]{64}$/);
 
     const next = { ...record, identity: { ...record.identity, name: 'Home Updated' } };
-    const write = adapter.write(resource, fs.readFileSync(filePath, 'utf8'), next);
+    const write = await adapter.write(resource, fs.readFileSync(filePath, 'utf8'), next);
     assert.equal(write.ok, true);
     assert.match(write.revision, /^[a-f0-9]{64}$/);
     assert.equal(saved.length, 1);
     assert.equal(saved[0].relativePath.replace(/\\/g, '/'), 'content/v13/homepage.json');
     assert.equal(rebuilt.length, 1);
-    assert.equal(adapter.read(resource).record.identity.name, 'Home Updated');
+    assert.equal((await adapter.read(resource)).record.identity.name, 'Home Updated');
 
     // write does not validate; server-side validation remains the guard.
   } finally {
@@ -60,7 +60,7 @@ test('local content adapter preserves revision, write and rollback contract', as
   }
 });
 
-test('local content adapter rolls back file when publisher recording fails', () => {
+test('local content adapter rolls back file when publisher recording fails', async () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fsfm-adapter-'));
   try {
     const contentRoot = path.join(dir, 'content', 'v13');
@@ -76,7 +76,7 @@ test('local content adapter rolls back file when publisher recording fails', () 
       scheduleRebuild: () => {},
     });
     const resource = { key: 'homepage', filePath };
-    assert.throws(() => adapter.write(resource, original, { schemaVersion: 1, name: 'Changed' }), /queue failed/);
+    await assert.rejects(() => adapter.write(resource, original, { schemaVersion: 1, name: 'Changed' }), /queue failed/);
     assert.equal(fs.readFileSync(filePath, 'utf8'), original);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
