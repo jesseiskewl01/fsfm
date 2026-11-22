@@ -289,3 +289,10 @@ The architectural refurbishment itself: Roadmap Phases 3–5. Make homepage and 
 - Appended **ROADMAP.md §9 “Roadmap v2 — Current working plan”** (append-only; earlier sections preserved).
 - Captures verified current reality (Stages A–F complete, Phase 6 local acceptance D14/D15 complete) and live smoke findings F1–F4: homepage hero/gadgets as templateData specials, Studio UI disconnected, Editorial Pages menu z-index/stacking bug, Vista window rendering inconsistent between homepage and vista-window template.
 - Proposes active phases N1–N5: bugfix/consistency, mud-hut refurbishment, Studio UX, CMS/backend hardening, QA/release readiness. No code changes in this entry.
+
+
+### Tina lockfile drift note **[Jesse + OpenCode, 2026-11-22]**
+
+- `tina/tina-lock.json` changed locally (unstaged, not committed) during Studio localhost use. Diff indicates a Tina schema/lock regen: same version/collection, but “Building blocks” -> “Parts”, expanded part type options, group fields; ~74k -> ~105k.
+- Likely caused by running `npm run dev:tina` / Tina CLI dev, which can regenerate Tina artifacts. No harm observed, but per guardrails generated Tina artifacts are not committed casually.
+- **Action:** left unstaged intentionally. Do not commit without an explicit decision. If unwanted noise, restore with `git restore -- tina/tina-lock.json` (may reappear if `dev:tina` is run again).
