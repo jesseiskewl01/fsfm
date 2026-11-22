@@ -215,3 +215,11 @@ The architectural refurbishment itself: Roadmap Phases 3–5. Make homepage and 
 **Scope note:** this completes Phase 5 — editor controls are derived from the declared parts. Studio still writes through its existing local JSON API; Phase 6 (the exact Studio/Tina backend-client relationship) remains a future decision and was not attempted.
 
 **Next:** commit Stage F locally on `rv26`, then pause before Phase 6 unless Jesse directs otherwise; no push, credentials, publishing or generated Tina artifacts.
+
+---
+
+## Phase 6 paused **[Jesse + OpenCode, 2026-11-22]**
+
+- Jesse chose **Pause Phase 6** when asked how Studio should call Tina. No Phase 6 implementation was started.
+- D3 remains locked: TinaCMS is the actual content backend and Studio must call it. This decision only defers the work.
+- Stage F / `d7eac7f` is the stopping point. Do not resume Studio/Tina backend wiring, credentials, live publishing or Tina CLI generated artifacts without an explicit new instruction from Jesse.

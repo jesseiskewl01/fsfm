@@ -63,6 +63,7 @@ This protocol supersedes the earlier "maintenance rule" in `WORK_LOG.md`. From 2
 | D6 | **Jesse is the source of truth for goals; OpenCode is the source of truth for mechanics.** | [Jesse + OpenCode] |
 | D7 | **Order: building blocks / architecture first, Studio last.** | [Jesse] 2026-11-22 |
 | D8 | All planning docs live in the canonical folder and are append-only with attribution | [Jesse] 2026-11-22 |
+| D9 | Phase 6 (Studio/Tina backend wiring) is paused until Jesse explicitly reopens it; D3 remains locked but implementation is deferred | [Jesse] 2026-11-22 |
 
 ---
 
@@ -73,6 +74,8 @@ This protocol supersedes the earlier "maintenance rule" in `WORK_LOG.md`. From 2
 - Prototype branch untouched
 - Planning docs present in the folder, currently untracked on `rv26`
 - Next real work: **Roadmap Phases 3–5** — the mud-hut refurbishment
+
+**State note [OpenCode, 2026-11-22]:** Phases 3–5 are complete; `rv26` head is `d7eac7f`. Phase 6 is paused by Jesse (D9).
 
 ---
 
