@@ -269,3 +269,5 @@ The architectural refurbishment itself: Roadmap Phases 3–5. Make homepage and 
 **Follow-up [OpenCode, 2026-11-22]:** Adapter now builds a TinaSchema (via `@tinacms/schema-tools`) for the 6 content stores and exposes `getTinaSchema()`/`collections`; create flow is routed through `contentAdapter.createPage()`. Targeted Studio + adapter tests pass after the wiring update.
 
 **Follow-up [OpenCode, 2026-11-22]:** Adapter now async-initializes a best-effort Tina local Database (`@tinacms/graphql` Database + `FilesystemBridge` + `memory-level`) and warms it on writes, while keeping file-backed read/write contract and API behavior unchanged. Server content handlers await adapter reads/writes. `npm test` remains 183/170/13.
+
+**Follow-up [OpenCode, 2026-11-22]:** Adapter now seeds schema/lookup/graphql in memory and indexes repo content through Tina Database when available (`dbReady` verified on real repo content). Reads are DB-verified with file-shaped responses; writes keep atomic file+publisher+rollback contract and then update the DB index. No `tina/__generated__/*` files touched.

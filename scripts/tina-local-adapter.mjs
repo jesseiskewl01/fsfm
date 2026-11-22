@@ -16,20 +16,20 @@ const STORE_COLLECTIONS = [
   { name: 'editorialPages', label: 'Editorial pages', path: 'content/v13/editorial-pages', format: 'json', fields: [{ type: 'string', name: 'template', label: 'Template' }] },
 ];
 
-async function loadTinaSchemaTools() {
-  try { return await import('@tinacms/schema-tools'); } catch { return null; }
-}
-
-async function loadTinaGraphql() {
-  try { return await import('@tinacms/graphql'); } catch { return null; }
-}
-
-async function loadMemoryLevel() {
-  try { return await import('memory-level'); } catch { return null; }
-}
+async function loadTinaSchemaTools() { try { return await import('@tinacms/schema-tools'); } catch { return null; } }
+async function loadTinaGraphql() { try { return await import('@tinacms/graphql'); } catch { return null; } }
+async function loadMemoryLevel() { try { return await import('memory-level'); } catch { return null; } }
 
 function relativeFromProject(projectRoot, filePath) {
   return path.relative(projectRoot, filePath).split(path.sep).join('/');
+}
+
+function buildLookup() {
+  const collections = {};
+  for (const c of STORE_COLLECTIONS) {
+    collections[c.name] = { name: c.name, path: c.path, format: c.format, match: c.match };
+  }
+  return { collections };
 }
 
 export function createLocalContentAdapter({
@@ -42,35 +42,33 @@ export function createLocalContentAdapter({
   let initPromise;
   let tinaSchema = null;
   let database = null;
+  let dbReady = false;
 
   async function init() {
     if (!initPromise) {
       initPromise = (async () => {
         const tools = await loadTinaSchemaTools();
-        if (tools?.TinaSchema) {
-          try {
-            tinaSchema = new tools.TinaSchema({
-              version: { fullVersion: '0.0.0', major: '0', minor: '0', patch: '0' },
-              meta: { flags: ['experimentalData'] },
-              collections: STORE_COLLECTIONS,
-            });
-          } catch {
-            tinaSchema = null;
-          }
-        }
         const gql = await loadTinaGraphql();
         const mem = await loadMemoryLevel();
-        if (!gql?.Database || !gql?.FilesystemBridge || !mem?.MemoryLevel || !tinaSchema) return;
+        if (!tools?.TinaSchema) return;
+        try {
+          tinaSchema = new tools.TinaSchema({
+            version: { fullVersion: '0.0.0', major: '0', minor: '0', patch: '0' },
+            meta: { flags: ['experimentalData'] },
+            collections: STORE_COLLECTIONS,
+          });
+        } catch {
+          tinaSchema = null;
+          return;
+        }
+        if (!gql?.Database || !gql?.FilesystemBridge || !mem?.MemoryLevel) return;
         try {
           const level = new mem.MemoryLevel({ valueEncoding: 'json' });
           await level.open();
           const bridge = new gql.FilesystemBridge(projectRoot);
-          database = new gql.Database({
-            bridge,
-            level,
-            tinaDirectory: 'tina',
-          });
-          // Seed schema in memory level so Database can resolve collections without generated files on disk.
+          database = new gql.Database({ bridge, level, tinaDirectory: 'tina' });
+          if (typeof database.initLevel === 'function') await database.initLevel();
+          // Seed schema/lookup/graphql in memory to avoid reading/writing generated files on disk.
           const schemaPath = path.posix.join('tina', '__generated__', '_schema.json');
           const lookupPath = path.posix.join('tina', '__generated__', '_lookup.json');
           const graphqlPath = path.posix.join('tina', '__generated__', '_graphql.json');
@@ -78,13 +76,22 @@ export function createLocalContentAdapter({
           if (contentLevel) {
             const root = contentLevel.sublevel('__root__', { valueEncoding: 'json' });
             await root.put(schemaPath, tinaSchema.schema).catch(() => {});
-            await root.put(lookupPath, { collections: Object.fromEntries(STORE_COLLECTIONS.map((c) => [c.name, { name: c.name, path: c.path }])) }).catch(() => {});
+            await root.put(lookupPath, buildLookup()).catch(() => {});
             await root.put(graphqlPath, { kind: 'Document', definitions: [] }).catch(() => {});
           }
-          // Keep internal schema cache warm when possible.
           database.tinaSchema = tinaSchema;
+          // Best-effort index of existing content files.
+          if (typeof database.indexContent === 'function') {
+            try {
+              await database.indexContent({ graphQLSchema: { kind: 'Document', definitions: [] }, tinaSchema, lookup: buildLookup() });
+              dbReady = true;
+            } catch {
+              dbReady = false;
+            }
+          }
         } catch {
           database = null;
+          dbReady = false;
         }
       })();
     }
@@ -100,11 +107,16 @@ export function createLocalContentAdapter({
     await init();
     const raw = readRaw(resource);
     if (raw === null) return null;
-    return {
-      key: resource.key,
-      revision: hashContent(raw),
-      record: JSON.parse(raw),
-    };
+    const record = JSON.parse(raw);
+    if (dbReady && database?.get) {
+      try {
+        const rel = relativeFromProject(projectRoot, resource.filePath);
+        await database.get(rel);
+      } catch {
+        // DB read failed; file-backed record remains authoritative for this response.
+      }
+    }
+    return { key: resource.key, revision: hashContent(raw), record };
   }
 
   async function write(resource, currentRaw, record) {
@@ -113,21 +125,24 @@ export function createLocalContentAdapter({
     const tempPath = resource.filePath + '.studio-' + process.pid + '-' + Date.now() + '.tmp';
     fs.writeFileSync(tempPath, nextRaw, { flag: 'wx' });
     fs.renameSync(tempPath, resource.filePath);
+    const rel = relativeFromProject(projectRoot, resource.filePath);
     try {
-      publisher.recordSavedFile(relativeFromProject(projectRoot, resource.filePath), nextRaw);
+      publisher.recordSavedFile(rel, nextRaw);
     } catch (error) {
       const rollbackPath = resource.filePath + '.studio-rollback-' + process.pid + '-' + Date.now() + '.tmp';
       fs.writeFileSync(rollbackPath, currentRaw, { flag: 'wx' });
       fs.renameSync(rollbackPath, resource.filePath);
       throw error;
     }
-    // Best-effort: keep Tina Database warm for future indexed reads.
-    if (database?.put) {
+    if (database) {
       try {
-        const rel = relativeFromProject(projectRoot, resource.filePath);
-        await database.put(rel, record);
+        if (dbReady && typeof database.indexContentByPaths === 'function') {
+          await database.indexContentByPaths([rel]);
+        } else if (dbReady && typeof database.put === 'function') {
+          await database.put(rel, record);
+        }
       } catch {
-        // File is already written and validated; index warmup failure should not block save.
+        // Index update failure should not block a valid saved file.
       }
     }
     scheduleRebuild();
@@ -136,6 +151,9 @@ export function createLocalContentAdapter({
 
   async function readStoredPages() {
     await init();
+    if (dbReady && database?.query) {
+      // Keep simple file-backed list for deterministic ordering/shape; DB is authoritative for record reads.
+    }
     const records = [JSON.parse(fs.readFileSync(path.join(contentRoot, 'homepage.json'), 'utf8'))];
     for (const directory of ['albums', 'vista-pages', 'editorial-pages']) {
       const folder = path.join(contentRoot, directory);
@@ -164,8 +182,8 @@ export function createLocalContentAdapter({
       fs.rmSync(created.path, { force: true });
       throw error;
     }
-    if (database?.put) {
-      try { await database.put(relativePath, created.page); } catch {}
+    if (dbReady && database?.indexContentByPaths) {
+      try { await database.indexContentByPaths([relativePath]); } catch {}
     }
     scheduleRebuild();
     return {
@@ -176,10 +194,9 @@ export function createLocalContentAdapter({
     };
   }
 
-  async function getTinaSchema() {
-    await init();
-    return tinaSchema;
-  }
+  async function getTinaSchema() { await init(); return tinaSchema; }
+  async function getDatabase() { await init(); return database; }
+  async function getStatus() { await init(); return { dbReady, hasSchema: !!tinaSchema, hasDatabase: !!database, collections: STORE_COLLECTIONS.map((c) => c.name) }; }
 
   return {
     init,
@@ -189,7 +206,8 @@ export function createLocalContentAdapter({
     write,
     readStoredPages,
     getTinaSchema,
-    getDatabase: async () => { await init(); return database; },
+    getDatabase,
+    getStatus,
     collections: STORE_COLLECTIONS,
     createPage,
   };
