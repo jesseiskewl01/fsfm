@@ -43,13 +43,14 @@ function windowWrap(section, inner, extraClass = '', context = {}) {
   const windowTitle = isVistaWindow ? vistaWindowTitle(section) : title;
   const classes = ['content-section', 'variant-' + variant, isVistaWindow ? 'vista-window-frame' : '', extraClass].filter(Boolean).join(' ');
   const titlebar = isVistaWindow
-    ? '<div class="vista-window-titlebar" data-vista-drag-handle tabindex="0" aria-label="Move ' + escapeHtml(windowTitle) + ' window" title="Drag to move · Use arrow keys to nudge"><span class="vista-window-icon" aria-hidden="true">✧</span><span class="vista-window-title">' + escapeHtml(windowTitle) + '</span><span class="vista-window-controls"><button type="button" class="vista-window-button minimize" data-vista-window-action="minimize" aria-label="Minimize ' + escapeHtml(windowTitle) + '" title="Minimize">−</button><button type="button" class="vista-window-button close" data-vista-window-action="close" aria-label="Close ' + escapeHtml(windowTitle) + '" title="Close">×</button></span></div>'
+    ? '<div class="titlebar vista-window-titlebar" data-vista-drag-handle tabindex="0" aria-label="Move ' + escapeHtml(windowTitle) + ' window" title="Drag to move · Use arrow keys to nudge"><div class="window-title"><span class="window-mini-icon vista-window-icon" aria-hidden="true">✧</span><span class="vista-window-title">' + escapeHtml(windowTitle) + '</span></div><div class="caption-buttons vista-window-controls"><button type="button" class="caption-button vista-window-button minimize" data-window-action="minimize" data-vista-window-action="minimize" aria-label="Minimize ' + escapeHtml(windowTitle) + '" title="Minimize">−</button><button type="button" class="caption-button vista-window-button close" data-window-action="close" data-vista-window-action="close" aria-label="Close ' + escapeHtml(windowTitle) + '" title="Close">×</button></div></div>'
     : title
       ? '<div class="component-titlebar"><span class="component-title">' + escapeHtml(title) + '</span></div>'
       : '';
   const groupId = section.group?.id ? ' data-layout-group="' + escapeHtml(section.group.id) + '"' : '';
   const vistaAttributes = isVistaWindow ? ' data-vista-window data-vista-window-id="' + escapeHtml(section.id || section.type) + '" data-vista-window-title="' + escapeHtml(windowTitle) + '"' : '';
-  return '<section class="' + classes + '" id="section-' + escapeHtml(section.id || section.type) + '" data-component="' + escapeHtml(section.type) + '"' + groupId + vistaAttributes + '>' + titlebar + '<div class="component-body">' + inner + '</div></section>';
+  const bodyClass = isVistaWindow ? 'window-body component-body' : 'component-body';
+  return '<section class="' + classes + '" id="section-' + escapeHtml(section.id || section.type) + '" data-component="' + escapeHtml(section.type) + '"' + groupId + vistaAttributes + '>' + titlebar + '<div class="' + bodyClass + '">' + inner + '</div></section>';
 }
 
 function renderMarquee(content = {}) {

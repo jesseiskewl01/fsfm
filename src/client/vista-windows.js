@@ -28,7 +28,7 @@ function applyPosition(win,x,y){var p=boundedPosition(win,x,y);positions[win.id]
 windows.forEach(function(win,index){
  if(!win.id)win.id='vista-window-'+(index+1);
  var p=saved[win.id];if(p&&Number.isFinite(Number(p.x))&&Number.isFinite(Number(p.y))){positions[win.id]={x:Number(p.x),y:Number(p.y)};win.style.transform='translate3d('+p.x+'px,'+p.y+'px,0)';}else positions[win.id]={x:0,y:0};
- var handle=win.querySelector('[data-vista-drag-handle]');if(!handle)return;var drag=null;
+ var handle=win.querySelector('[data-vista-drag-handle], .vista-window-titlebar, .titlebar');if(!handle)return;var drag=null;
  handle.addEventListener('pointerdown',function(event){
   if(event.button!==0||event.target.closest('button,a,input,select,textarea'))return;
   var current=positions[win.id]||{x:0,y:0};drag={pointerId:event.pointerId,startX:event.clientX,startY:event.clientY,x:current.x,y:current.y};
@@ -44,9 +44,10 @@ windows.forEach(function(win,index){
  });
 });
 document.addEventListener('click',function(event){
- var button=event.target.closest('[data-vista-window-action]');if(!button)return;
+ var button=event.target.closest('[data-vista-window-action], [data-window-action]');if(!button)return;
  var win=button.closest('[data-vista-window]');if(!win)return;
- if(button.getAttribute('data-vista-window-action')==='minimize')hideWindow(win,'minimized');
- else if(button.getAttribute('data-vista-window-action')==='close')hideWindow(win,'closed');
+ var action=button.getAttribute('data-vista-window-action') || button.getAttribute('data-window-action');
+ if(action==='minimize')hideWindow(win,'minimized');
+ else if(action==='close')hideWindow(win,'closed');
 });
 })();
