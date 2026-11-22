@@ -273,3 +273,12 @@ The architectural refurbishment itself: Roadmap Phases 3–5. Make homepage and 
 **Follow-up [OpenCode, 2026-11-22]:** Adapter now seeds schema/lookup/graphql in memory and indexes repo content through Tina Database when available (`dbReady` verified on real repo content). Reads are DB-verified with file-shaped responses; writes keep atomic file+publisher+rollback contract and then update the DB index. No `tina/__generated__/*` files touched.
 
 **Follow-up [OpenCode, 2026-11-22]:** `readStoredPages()` now reads through the adapter's DB-verified `read()` path, so content listing/validation also traverses the Tina-backed adapter seam. Tests remain green.
+
+
+### Phase 6 local acceptance pass **[Jesse + OpenCode, 2026-11-22]**
+
+- Ran shape-compat check across all 7 content records: Tina DB records matched file records exactly after stripping Tina system keys (`_collection`, `_keepTemplateKey`, `_template`, `_relativePath`, `_id`, `_sys`). No missing content keys.
+- Switched adapter reads to DB-authoritative when `dbReady`, returning DB records with Tina system keys stripped; file-backed fallback retained. Writes remain atomic temp-write + publisher queue + rollback, then DB index update.
+- **D15:** Phase 6 local acceptance pass complete on adapter-first path. Studio remains `/studio/` + `/__fsfm/api`; Tina local DB is indexed/verified; autosave local-only/debounced; deploy locked.
+
+**Verification:** `npm test` 183 / 170 pass / 13 fail (same 13 pre-existing failures). `npm run validate:v13` pass. `npm run build` pass. `node scripts/capture-render-baseline.mjs --compare` same known Early Bird delta (`a887b166af6e917a -> ecd9375223b463b9`), homepage/Vista/Editorial SAME. No generated Tina artifacts, no credentials, no live publishing, no push.

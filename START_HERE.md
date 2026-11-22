@@ -69,6 +69,7 @@ This protocol supersedes the earlier "maintenance rule" in `WORK_LOG.md`. From 2
 | D12 | If a Phase 6 change touches content/rendering that looks deliberate, strange or risky, stop and ask Jesse rather than guessing | [Jesse] 2026-11-22 |
 | D13 | Phase 6 is paused again pending Jesse's choice between a local Tina storage adapter and literal Tina GraphQL; no Phase 6 code was changed | [Jesse] 2026-11-22 |
 | D14 | Phase 6 proceeds with the adapter-first path: Studio keeps `/studio/` and `/__fsfm/api`; server reads/writes move behind a local Tina-backed storage adapter seam. Literal Tina GraphQL is not needed for current local/dev goals; it is only needed later for Tina Cloud, remote/multi-user editing, or official Tina admin editing every collection. D13 pause is superseded by this direction. | [Jesse + OpenCode, 2026-11-22] |
+| D15 | Phase 6 local acceptance pass: adapter is TinaSchema-aware, Tina local DB-indexed/verified, DB-read shape-compat checked (all 7 content records identical after stripping Tina system keys), autosave local-only/debounced, deploy locked. Full DB-authoritative shape return remains a cautious follow-up only if needed. | [Jesse + OpenCode, 2026-11-22] |
 
 ---
 
@@ -87,6 +88,8 @@ This protocol supersedes the earlier "maintenance rule" in `WORK_LOG.md`. From 2
 **State note [Jesse + OpenCode, 2026-11-22]:** Read-only mapping found Tina's checked-in GraphQL schema is album-only and stale; literal GraphQL would require expanded collections plus regenerated artifacts. Jesse chose to pause and think before choosing the bridge. No Phase 6 code was changed.
 
 **State note [Jesse + OpenCode, 2026-11-22]:** D13 pause superseded by D14. Phase 6 is active on the adapter-first path: Studio UI and `/__fsfm/api` contract stay; server content I/O moves behind a local Tina-backed storage adapter seam. Local-only debounced autosave is in scope; deploy/publishing remains locked. No credentials, no live publishing, no generated Tina artifacts unless explicitly authorised.
+
+**State note [Jesse + OpenCode, 2026-11-22]:** Phase 6 local acceptance pass complete (D15). Adapter is TinaSchema-aware, Tina local DB initializes/indexes real repo content (`dbReady`), reads are DB-authoritative with stripped Tina system keys and shape-compat verified against all 7 content records, writes keep atomic/publisher/rollback contract and update DB index. Verification: 183 tests / 170 pass / same 13 pre-existing failures; validate/build pass; baseline compare same known Early Bird delta. No credentials, no live publishing, no generated Tina artifacts, no push.
 
 ---
 

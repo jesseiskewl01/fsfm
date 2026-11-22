@@ -32,6 +32,18 @@ function buildLookup() {
   return { collections };
 }
 
+const TINA_SYSTEM_KEYS = new Set(['_collection', '_keepTemplateKey', '_template', '_relativePath', '_id', '_sys']);
+function stripTinaSystemKeys(value) {
+  if (Array.isArray(value)) return value.map(stripTinaSystemKeys);
+  if (!value || typeof value !== 'object') return value;
+  const out = {};
+  for (const [k, v] of Object.entries(value)) {
+    if (TINA_SYSTEM_KEYS.has(k)) continue;
+    out[k] = stripTinaSystemKeys(v);
+  }
+  return out;
+}
+
 export function createLocalContentAdapter({
   projectRoot,
   contentRoot,
@@ -107,16 +119,16 @@ export function createLocalContentAdapter({
     await init();
     const raw = readRaw(resource);
     if (raw === null) return null;
-    const record = JSON.parse(raw);
     if (dbReady && database?.get) {
       try {
         const rel = relativeFromProject(projectRoot, resource.filePath);
-        await database.get(rel);
+        const dbRecord = stripTinaSystemKeys(await database.get(rel));
+        return { key: resource.key, revision: hashContent(raw), record: dbRecord };
       } catch {
-        // DB read failed; file-backed record remains authoritative for this response.
+        // Fall back to file-backed record when DB read is unavailable.
       }
     }
-    return { key: resource.key, revision: hashContent(raw), record };
+    return { key: resource.key, revision: hashContent(raw), record: JSON.parse(raw) };
   }
 
   async function write(resource, currentRaw, record) {
