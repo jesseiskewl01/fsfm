@@ -322,3 +322,14 @@ The architectural refurbishment itself: Roadmap Phases 3–5. Make homepage and 
 - **N2.1 CMS->CSS audit (findings):** renderers are mostly clean (inline styles limited to content-driven spacer height, group columns, wallpaper/background). Main mud-hut/CMS gaps: (1) many window visual values still hardcoded in `homepage-vista.css`/`v13.css` (colors, padding, glass gradients) rather than CMS tokens; (2) homepage default window labels in `renderHomeWindow` are fallback-only but fine; (3) album hero window remains a separate album-identity chrome; (4) section presentation had no padding/background controls - addressed in N3.
 - **N3 simple CMS controls (safe, no tina-lock regen):** added optional `presentation.padding` (default/compact/roomy) and `presentation.background` (default/soft/glass/dark) in `src/core/parts.mjs`, validator, studio-controls, renderers, and v13.css. Added fields to `tina/fields.mjs` and `tina/config.js` presentation block; **did not** regenerate/commit `tina/tina-lock.json` (still unstaged drift). Visibility: `section.enabled` already exists and is enforced by validator; render treats enabled!==false as visible.
 - **Verify:** `npm run build` pass, `npm run validate:v13` pass, `npm test` 183/170/13 baseline.
+
+
+### Smoke-report fixes **[OpenCode, 2026-11-22]**
+
+- **Vistatest titlebar layout:** added `justify-content:space-between` and `.window-title` flex in `v13.css` so caption buttons align right (not next to title).
+- **Vistatest window icons:** replaced hardcoded ✧ with type-based `vistaWindowIcon()` in `components.mjs`.
+- **Vistatest marquee:** non-homepage marquee no longer wrapped in vista window; renders as `.marquee.content-marquee` band (v13 marquee styles already present). Theme-star homepage behavior remains homepage-only.
+- **Inner footer:** removed social profile nav from `renderFooter` in `shell.mjs`; inner pages now use simple copyright footer like homepage intent.
+- **Editorial alignment:** centered `.page-intro` and `.page-content` with auto margins in `v13.css`.
+- **Investigated/not code-changed:** homepage gadgets are enabled in content and present in dist; CSS shows them only at `min-width:1320px` and `min-height:700px`. Editorial Instagram link -> instagram.com is page content. Bandsintown load and album player playback are known/external/historic issues. Lag noted.
+- **Verify:** build/validate pass, npm test 183/170/13 baseline.

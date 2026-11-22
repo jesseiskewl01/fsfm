@@ -99,7 +99,7 @@ function windowWrap(section, inner, extraClass = '', context = {}) {
       className: classes,
       ariaLabel: windowTitle,
       title: windowTitle,
-      iconHtml: '<span class="window-mini-icon vista-window-icon" aria-hidden="true">✧</span>',
+      iconHtml: vistaWindowIcon(section.type),
       controls: 'minimize-close',
       draggable: true,
       dataAttrs,
@@ -166,6 +166,21 @@ function homeTitleIcon(type) {
     'social-links': '<span class="window-mini-icon social" aria-hidden="true">✧</span>'
   };
   return icons[type] || '<span class="window-mini-icon" aria-hidden="true">✧</span>';
+}
+
+function vistaWindowIcon(type) {
+  const icons = {
+    'artist-statement': 'i',
+    'embed-window': '♫',
+    'bandsintown-events': '▦',
+    'social-links': '✧',
+    'hero': '✦',
+    'featured-release': '◉',
+    'rich-text': '✎',
+    'marquee': '✦',
+  };
+  const glyph = icons[type] || '✦';
+  return `<span class="window-mini-icon vista-window-icon" aria-hidden="true">${glyph}</span>`;
 }
 
 function renderHomeWindow(section, inner, preview = false) {
@@ -296,8 +311,11 @@ export function renderComponent(section, context = {}) {
     if (section.type === 'marquee') return { html: renderHomeWindow(section, inner, context.preview), scripts: [] };
     return { html: renderHomeWindow(section, inner, context.preview), scripts };
   }
-  if (section.type === 'divider' || section.type === 'spacer' || section.type === 'marquee') {
+  if (section.type === 'divider' || section.type === 'spacer') {
     return { html: windowWrap(section, inner, `component-${section.type}`, context), scripts: [] };
+  }
+  if (section.type === 'marquee') {
+    return { html: `<div class="marquee content-marquee" id="section-${escapeHtml(section.id || section.type)}">${inner}</div>`, scripts: [] };
   }
   return { html: windowWrap(section, inner, '', context), scripts };
 }

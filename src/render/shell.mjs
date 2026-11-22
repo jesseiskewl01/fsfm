@@ -28,9 +28,8 @@ function renderGlobalHeader(site, nav) {
 }
 
 function renderFooter(site, page) {
-  const socials = (site.socialProfiles || []).filter((item) => item?.label && safeUrl(item.url, { allowRelative: false, requireHttps: true }));
   const footerText = page?.templateData?.footerText || site.footerText || `© ${new Date().getFullYear()} ${site.siteName}`;
-  return `<footer class="global-footer"><p>${escapeHtml(footerText)}</p>${socials.length ? `<nav aria-label="Social profiles" class="footer-socials">${socials.map((item) => `<a href="${escapeHtml(safeUrl(item.url, { allowRelative: false, requireHttps: true }))}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.label)}</a>`).join('')}</nav>` : ''}</footer>`;
+  return `<footer class="global-footer"><p>${escapeHtml(footerText)}</p></footer>`;
 }
 
 function renderPageIntro(site, page) {
