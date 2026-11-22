@@ -265,3 +265,5 @@ The architectural refurbishment itself: Roadmap Phases 3–5. Make homepage and 
 **Verification:** `node --test` on targeted Studio suites passed (37 tests) plus new adapter suite (5 tests). `npm test` **183 tests / 170 pass / 13 fail** — same 13 pre-existing failures, +5 passing tests from the new suite. `npm run validate:v13` passed. `npm run build` passed. `node scripts/capture-render-baseline.mjs --compare` reports homepage, Vista and Editorial SAME; The Early Bird has the same known intentional Stage B delta (`a887b166af6e917a -> ecd9375223b463b9`, first difference at character 7430).
 
 **Scope note:** this is the first Phase 6 adapter slice. Studio still uses the local `/__fsfm/api` contract, now backed by a dedicated adapter seam. Deploy remains locked. No generated Tina artifacts, no credentials, no live publishing.
+
+**Follow-up [OpenCode, 2026-11-22]:** Adapter now builds a TinaSchema (via `@tinacms/schema-tools`) for the 6 content stores and exposes `getTinaSchema()`/`collections`; create flow is routed through `contentAdapter.createPage()`. Targeted Studio + adapter tests pass after the wiring update.

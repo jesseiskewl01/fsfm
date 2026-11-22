@@ -1,9 +1,29 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { createNewPage } from './create-page-v13.mjs';
 
 function hashContent(content) {
   return crypto.createHash('sha256').update(content).digest('hex');
+}
+
+const STORE_COLLECTIONS = [
+  { name: 'homepage', label: 'Homepage', path: 'content/v13', format: 'json', match: { include: 'homepage' }, fields: [{ type: 'string', name: 'template', label: 'Template' }] },
+  { name: 'site', label: 'Site settings', path: 'content/v13', format: 'json', match: { include: 'site' }, fields: [{ type: 'string', name: 'siteName', label: 'Site name' }] },
+  { name: 'wallpapers', label: 'Wallpapers', path: 'content/v13', format: 'json', match: { include: 'wallpapers' }, fields: [{ type: 'string', name: 'version', label: 'Version' }] },
+  { name: 'albums', label: 'Albums', path: 'content/v13/albums', format: 'json', fields: [{ type: 'string', name: 'template', label: 'Template' }] },
+  { name: 'vistaPages', label: 'Vista pages', path: 'content/v13/vista-pages', format: 'json', fields: [{ type: 'string', name: 'template', label: 'Template' }] },
+  { name: 'editorialPages', label: 'Editorial pages', path: 'content/v13/editorial-pages', format: 'json', fields: [{ type: 'string', name: 'template', label: 'Template' }] },
+];
+
+async function loadTinaSchemaTools() {
+  try {
+    const mod = await import('@tinacms/schema-tools');
+    return mod;
+  } catch {
+    return null;
+  }
 }
 
 export function createLocalContentAdapter({
@@ -13,8 +33,25 @@ export function createLocalContentAdapter({
   publisher,
   scheduleRebuild,
 }) {
-  function contentResourceToKey(resource) {
-    return resource.key;
+  let tinaSchemaPromise;
+
+  async function getTinaSchema() {
+    if (!tinaSchemaPromise) {
+      tinaSchemaPromise = (async () => {
+        const tools = await loadTinaSchemaTools();
+        if (!tools?.TinaSchema) return null;
+        try {
+          return new tools.TinaSchema({
+            version: { fullVersion: '0.0.0', major: '0', minor: '0', patch: '0' },
+            meta: { flags: ['experimentalData'] },
+            collections: STORE_COLLECTIONS,
+          });
+        } catch {
+          return null;
+        }
+      })();
+    }
+    return tinaSchemaPromise;
   }
 
   function readRaw(resource) {
@@ -64,11 +101,39 @@ export function createLocalContentAdapter({
     return records;
   }
 
+  function createPage(options) {
+    const created = createNewPage({
+      root: projectRoot,
+      template: options?.template,
+      name: options?.name,
+      slug: options?.slug,
+      published: options?.published === true,
+      showInNavigation: options?.showInNavigation !== false,
+    });
+    const relativePath = path.relative(projectRoot, created.path).split(path.sep).join('/');
+    try {
+      publisher.recordSavedFile(relativePath, fs.readFileSync(created.path));
+    } catch (error) {
+      fs.rmSync(created.path, { force: true });
+      throw error;
+    }
+    scheduleRebuild();
+    return {
+      ok: true,
+      key: (created.page.template === 'album' ? 'albums' : created.page.template === 'vista-window' ? 'vista-pages' : 'editorial-pages') + '/' + created.page.identity.slug,
+      page: created.page,
+      revision: hashContent(fs.readFileSync(created.path)),
+    };
+  }
+
   return {
     hashContent,
     read,
     readRaw,
     write,
     readStoredPages,
+    getTinaSchema,
+    collections: STORE_COLLECTIONS,
+    createPage,
   };
 }

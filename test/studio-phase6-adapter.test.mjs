@@ -16,6 +16,7 @@ test('Studio server uses a local content adapter seam', () => {
   assert.match(server, /function readContentFile\(resource\)\s*\{\s*return contentAdapter\.read\(resource\);\s*\}/);
   assert.match(server, /function writeContentFile\(resource, currentRaw, record\)\s*\{\s*return contentAdapter\.write\(resource, currentRaw, record\);\s*\}/);
   assert.match(server, /function readStoredPages\(\)\s*\{\s*return contentAdapter\.readStoredPages\(\);\s*\}/);
+  assert.match(server, /contentAdapter\.createPage\(/);
 });
 
 test('local content adapter preserves revision, write and rollback contract', async () => {

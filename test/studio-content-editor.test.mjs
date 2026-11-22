@@ -37,7 +37,7 @@ test('Studio exposes homepage, global settings, wallpaper, and all page template
     assert.ok(studio.includes(phrase), `Missing Studio workflow: ${phrase}`);
   }
   assert.match(server, /__fsfm\/api\/content\/create/);
-  assert.match(server, /createNewPage\(/);
+  assert.match(server, /contentAdapter\.createPage\(|createNewPage\(/);
   assert.match(server, /validateSite\(/);
 });
 

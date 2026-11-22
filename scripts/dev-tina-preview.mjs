@@ -731,28 +731,14 @@ async function handleApi(request, response, pathname) {
     }
     try {
       const body = await readRequestJson(request, 16 * 1024);
-      const created = createNewPage({
-        root: projectRoot,
+      const created = contentAdapter.createPage({
         template: body?.template,
         name: body?.name,
         slug: body?.slug,
         published: false,
         showInNavigation: body?.showInNavigation !== false,
       });
-      const relativePath = path.relative(projectRoot, created.path).split(path.sep).join('/');
-      try {
-        publisher.recordSavedFile(relativePath, fs.readFileSync(created.path));
-      } catch (error) {
-        fs.rmSync(created.path, { force: true });
-        throw error;
-      }
-      scheduleRebuild();
-      sendJson(response, 201, {
-        ok: true,
-        key: (created.page.template === 'album' ? 'albums' : created.page.template === 'vista-window' ? 'vista-pages' : 'editorial-pages') + '/' + created.page.identity.slug,
-        page: created.page,
-        revision: hashContent(fs.readFileSync(created.path)),
-      });
+      sendJson(response, 201, created);
     } catch (error) {
       sendJson(response, error.statusCode || 422, { error: error.message || 'Could not create the page.' });
     }
