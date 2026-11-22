@@ -167,3 +167,18 @@ The architectural refurbishment itself: Roadmap Phases 3–5. Make homepage and 
 **Still owed (Studio phase, later):** derive Tina fields and Studio controls from these definitions — `tina/config.js` still carries a separate album-only schema. The shared part layer is ready for it.
 
 **Next:** Stage D — refurbish the homepage mud hut so its desktop chrome (gadgets, taskbar, hero window, boot/shutdown) is made of the same part system as The Early Bird.
+
+---
+
+## Stage D complete — the homepage mud hut is refurbished **[OpenCode, 2026-11-22]**
+
+- Added `src/render/chrome.mjs`: the homepage desktop chrome moved **verbatim** out of the monolithic renderer and split into named part renderers — boot overlay, ambient bubble canvas, gadgets, taskbar, hero window, Purble overlay, shutdown overlay, theme engine, plus the runtime config. `src/render/homepage.mjs` is now thin assembly: shared component sections + chrome parts + the generic site shell.
+- Added the eight chrome parts to `src/core/parts.mjs` as `CHROME_PARTS`, with labels, descriptions, paths and `default: true`. A missing setting means "on", so no existing content record changes its appearance. `isChromePartEnabled()` accepts either `false` or `{ enabled: false }`.
+- `content/v13/homepage.json` now lists all eight parts explicitly as enabled. The baseline proves this is a visual no-op.
+- Validator checks `appearance.parts` from those definitions: must be an object; each known part must be a boolean or `{ enabled: boolean }`. Invalid values fail with the part's shared path.
+- Hardened `src/client/homepage-desktop.js`: it no longer assumes the theme-engine part exists. It falls back to an empty theme list and a no-op palette setter, and `applyTheme`/`cycleTheme` return early when there are no themes. This makes every chrome toggle genuinely safe in the browser, not just in the HTML.
+- Added `test/parts-chrome.test.mjs` (7 tests): definitions and defaults, explicit-config visual no-op, every part toggled independently, both toggle forms, all-off still keeps content/footer/scripts, client fallback, and validation from the definitions.
+
+**Verification:** `npm test` 165 tests / 152 pass / **the same 13 pre-existing failures** (test numbers shifted by the 7 new tests; the names are unchanged). `validate:v13` and `build` pass. Golden baseline: homepage, Vista and Editorial are byte-for-byte identical; The Early Bird differs only by the intentional `data-atmosphere-mode="full"` attribute from Stage B.
+
+**Next:** Stage E — refurbish The Early Bird's album shell into the same shared part system, then derive Tina/Studio controls from the part definitions (Studio stays last).

@@ -238,6 +238,16 @@
       "backgroundEffects": true,
       "pageTransition": true,
       "respectReducedMotion": true
+    },
+    "parts": {
+      "bootOverlay": { "enabled": true },
+      "bubbleCanvas": { "enabled": true },
+      "desktopGadgets": { "enabled": true },
+      "desktopTaskbar": { "enabled": true },
+      "desktopHero": { "enabled": true },
+      "purbleOverlay": { "enabled": true },
+      "shutdownOverlay": { "enabled": true },
+      "themeEngine": { "enabled": true }
     }
   },
   "seo": {

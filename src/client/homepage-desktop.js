@@ -17,6 +17,12 @@ var runtimeConfig = {};
 try { runtimeConfig = JSON.parse((document.getElementById('fsfmHomeRuntimeConfig') || {}).textContent || '{}'); } catch (e) { runtimeConfig = {}; }
 window.__FSFM_HOME_RUNTIME__ = runtimeConfig;
 
+// Theme data normally comes from the theme-engine part in <head>. When that
+// part is switched off in content, fall back to an empty set so the rest of
+// the desktop still starts cleanly. [OpenCode, 2026-11-22]
+var themes = Array.isArray(window.VISTA_THEMES) ? window.VISTA_THEMES : [];
+var setPalette = typeof window.paintPalette === 'function' ? window.paintPalette : function() {};
+
 var bootStartedAt = Date.now();
 var bootMinimumTime = 2400;
 function updateBootProgress(done, total) {
@@ -27,8 +33,8 @@ function updateBootProgress(done, total) {
 
 function preloadAllThemes() {
   var completed = 0;
-  updateBootProgress(0, VISTA_THEMES.length);
-  return Promise.all(VISTA_THEMES.map(function(theme, index) {
+  updateBootProgress(0, themes.length);
+  return Promise.all(themes.map(function(theme, index) {
     return new Promise(function(resolve) {
       var image = new Image();
       var settled = false;
@@ -39,7 +45,7 @@ function preloadAllThemes() {
         window.clearTimeout(failSafe);
         themeImages[index] = { image: ok ? image : null, ready: ok };
         completed += 1;
-        updateBootProgress(completed, VISTA_THEMES.length);
+        updateBootProgress(completed, themes.length);
         resolve({ ok: ok, index: index });
       }
       image.onload = function() { finish(true); };
@@ -50,10 +56,11 @@ function preloadAllThemes() {
 }
 
 function applyTheme(index) {
+  if (!themes.length) return;
   var token = ++applyToken;
-  currentTheme = (index + VISTA_THEMES.length) % VISTA_THEMES.length;
-  var theme = VISTA_THEMES[currentTheme];
-  paintPalette(theme);
+  currentTheme = (index + themes.length) % themes.length;
+  var theme = themes[currentTheme];
+  setPalette(theme);
 
   var url = theme.background || (theme.img ? "url('" + theme.img + "')" : 'none');
   var incoming = wallBack;
@@ -77,8 +84,9 @@ function applyTheme(index) {
 }
 
 function cycleTheme() {
+  if (!themes.length) return;
   var settings = runtimeConfig.wallpaper || {}; var cycle = settings.cycle || {};
-  if (cycle.mode === 'random' && VISTA_THEMES.length > 1) { var choices = VISTA_THEMES.map(function(_,i){return i;}).filter(function(i){return i !== currentTheme;}); applyTheme(choices[Math.floor(Math.random()*choices.length)]); }
+  if (cycle.mode === 'random' && themes.length > 1) { var choices = themes.map(function(_,i){return i;}).filter(function(i){return i !== currentTheme;}); applyTheme(choices[Math.floor(Math.random()*choices.length)]); }
   else applyTheme(currentTheme + 1);
 }
 
@@ -102,7 +110,7 @@ function renderMarquee(messages) {
 window.__fsfmRenderMarquee = renderMarquee;
 renderMarquee(runtimeConfig.marqueeMessages || []);
 var cycleSettings = runtimeConfig.wallpaper && runtimeConfig.wallpaper.cycle || {};
-if (cycleSettings.enabled && VISTA_THEMES.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+if (cycleSettings.enabled && themes.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
   var cycleSeconds = Math.max(5, Math.min(3600, Number(cycleSettings.intervalSeconds) || 30));
   window.setInterval(function(){ if (!document.hidden) cycleTheme(); }, cycleSeconds * 1000);
 }

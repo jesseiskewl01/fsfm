@@ -57,6 +57,42 @@ export const EFFECTS = Object.freeze({
   }
 });
 
+/** Homepage desktop chrome is a part family too. Each piece can be switched
+ *  off from content; the historical "everything on" state is the default. */
+const CHROME_SOURCE = {
+  bootOverlay: ['Boot overlay', 'The startup progress screen.'],
+  bubbleCanvas: ['Ambient bubble canvas', 'The animated glass-refraction canvas behind the desktop.'],
+  desktopGadgets: ['Desktop gadgets', 'Clock, calendar, featured release, photos, dates, notes and fun widgets.'],
+  desktopTaskbar: ['Desktop taskbar', 'The bottom navigation bar and page menu.'],
+  desktopHero: ['Desktop hero window', 'The large Aero window with the artist name and handle.'],
+  purbleOverlay: ['Purble Place overlay', 'The dismissible game dialog.'],
+  shutdownOverlay: ['Shutdown overlay', 'The "Goodnight" closing dialog.'],
+  themeEngine: ['Theme engine', 'Wallpaper palette selection and cycling script.']
+};
+
+export const CHROME_PARTS = Object.freeze(Object.fromEntries(
+  Object.entries(CHROME_SOURCE).map(([name, [label, description]]) => [name, Object.freeze({
+    name,
+    label,
+    description,
+    category: 'chrome',
+    templates: Object.freeze(['homepage']),
+    path: `appearance.parts.${name}.enabled`,
+    default: true
+  })])
+));
+
+export const CHROME_PART_NAMES = Object.freeze(Object.keys(CHROME_PARTS));
+
+/** A missing setting means "on", preserving every existing content record. */
+export function isChromePartEnabled(page, name) {
+  const definition = CHROME_PARTS[name];
+  if (!definition) return false;
+  const value = page?.appearance?.parts?.[name];
+  if (value === undefined) return definition.default;
+  return value !== false && value.enabled !== false;
+}
+
 /** The 18 visual parts, with their authoring fields. */
 const COMPONENT_SOURCE = {
   'site-header': {
