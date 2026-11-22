@@ -595,7 +595,7 @@ import { getPagePublicationState, setPagePublished } from './page-state.mjs';
 const $=(s,r)=> (r||document).querySelector(s);
 const $$=(s,r)=> Array.from((r||document).querySelectorAll(s));
 const api='/__fsfm/api';
-const S={items:[],catalog:null,wallpaperPresets:[],key:null,resource:null,record:null,revision:null,dirty:false,saving:false,deploying:false,publishStatus:null,route:'/',toastTimer:null,pageSearch:''};
+const S={items:[],catalog:null,wallpaperPresets:[],key:null,resource:null,record:null,revision:null,dirty:false,saving:false,deploying:false,publishStatus:null,route:'/',toastTimer:null,pageSearch:'',autosaveTimer:null,autosaveMs:1200,autosaveConflict:false};
 const body=$('#editorBody');
 function componentLabel(type){return S.catalog?.components?.[type]?.label||human(type);}
 const FALLBACK_PRESENTATION_OPTIONS=[['vista-window','Vista Window'],['vista-desktop','Vista Desktop'],['editorial','Editorial'],['amber-editorial','Amber Editorial'],['amber-player','Amber Player'],['plain','Plain']];
@@ -626,7 +626,9 @@ function friendlyError(error){
  if(/EACCES|EPERM|permission denied/i.test(message))return 'Windows blocked access to that file. Check that the project folder is writable and that the file is not locked by another program.';
  return message||'Something went wrong while working with your FSFM content. Try again, and reload the page if the problem continues.';
 }
-function dirty(){S.dirty=true;$('#saveButton').disabled=false;$('#saveHint').textContent='Unsaved changes';updateDeployButton();}
+function clearAutosave(){if(S.autosaveTimer){clearTimeout(S.autosaveTimer);S.autosaveTimer=null;}}
+function scheduleAutosave(){clearAutosave();if(!S.key||S.saving||S.deploying||S.autosaveConflict)return;S.autosaveTimer=setTimeout(()=>{S.autosaveTimer=null;if(S.dirty&&!S.saving&&!S.deploying&&!S.autosaveConflict)saveLocal({quiet:true,autosave:true});},S.autosaveMs);}
+function dirty(){if(!S.autosaveConflict)S.autosaveConflict=false;S.dirty=true;$('#saveButton').disabled=false;$('#saveHint').textContent='Unsaved changes';updateDeployButton();scheduleAutosave();}
 function updateDeployButton(){const p=S.publishStatus;$('#deployButton').disabled=S.saving||S.deploying||!p||!p.mainReady||!!(p.conflicts&&p.conflicts.length)||(!S.dirty&&!(p.pendingCount>0));}
 function renderPublishStatus(p){S.publishStatus=p;const hint=$('#publishHint');hint.textContent=p.reason||((p.pendingCount||0)+' saved file(s) ready to publish to main.');if(p.mainReady&&p.pendingCount===0&&!S.dirty)hint.textContent='No saved changes waiting to publish.';updateDeployButton();}
 async function refreshPublishStatus(){try{const res=await fetch(api+'/deploy/status');if(res.status===401){location.href='/studio/login.html';return;}const data=await res.json();if(!res.ok)throw Error(data.error||'Could not check live publishing');renderPublishStatus(data);}catch(error){$('#publishHint').textContent='Live publishing status unavailable';S.publishStatus=null;updateDeployButton();}}
@@ -911,7 +913,7 @@ async function loadRecord(key){
    const pageItem=S.items.find(item=>item.key===key);
    if(pageItem)pageItem.published=getPagePublicationState(S.record).active;
  }
- S.dirty=false;$('#saveButton').disabled=true;$('#saveHint').textContent='All changes saved';
+ clearAutosave();S.dirty=false;$('#saveButton').disabled=true;$('#saveHint').textContent='All changes saved';
  S.route=S.resource==='page'?routeForKey(key):'/';
  renderEditor();loadPreview();updateDeployButton();
 }
@@ -921,23 +923,26 @@ function loadPreview(){
  frame.src=path+(path.includes('?')?'&':'?')+'studioPreview='+Date.now();
 }
 function saveUrl(){return resourceUrl(S.key);}
-async function saveLocal(){
+async function saveLocal(options={}){
+ const quiet=options.quiet===true,autosave=options.autosave===true;
  if(!S.dirty||S.saving)return false;
- S.saving=true;$('#saveButton').disabled=true;$('#deployButton').disabled=true;$('#saveButton').textContent='Saving…';$('#saveHint').textContent='Checking content…';
+ clearAutosave();
+ S.saving=true;$('#saveButton').disabled=true;$('#deployButton').disabled=true;$('#saveButton').textContent=autosave?'Auto-saving…':'Saving…';$('#saveHint').textContent=autosave?'Auto-saving locally…':'Checking content…';
  try{
    const response=await fetch(saveUrl(),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({revision:S.revision,record:S.record})});
    if(response.status===401){location.href='/studio/login.html';return false;}
    const data=await response.json();
    if(response.status===409)throw Error(apiError(response,data,'save this page'));
    if(!response.ok)throw Error(apiError(response,data,'save this page'));
-   S.record=data.record||S.record;S.revision=data.revision;S.dirty=false;
-   $('#saveHint').textContent='Saved locally';toast('Saved locally. Rebuilding the FSFM preview…');
+   S.record=data.record||S.record;S.revision=data.revision;S.autosaveConflict=false;S.dirty=false;
+   $('#saveHint').textContent=autosave?'Auto-saved locally':'Saved locally';
+   if(!quiet)toast('Saved locally. Rebuilding the FSFM preview…');
    $('#previewLoading').classList.add('show');
    setTimeout(()=>{$('#previewLoading').classList.remove('show');loadPreview();},1100);
    const index=await fetch(api+'/content');if(index.ok)S.items=(await index.json()).items||[];
    renderEditor();await refreshPublishStatus();return true;
- }catch(error){toast(friendlyError(error),true);$('#saveHint').textContent='Save needs attention';return false;}
- finally{S.saving=false;$('#saveButton').textContent='Save local';$('#saveButton').disabled=!S.dirty;updateDeployButton();}
+ }catch(error){const message=friendlyError(error);const conflict=/changed on disk|stale save|reload before trying/i.test(message);toast(message,true);$('#saveHint').textContent=conflict?'Reload required before saving':'Save needs attention';if(autosave)S.dirty=true;if(conflict){S.autosaveConflict=true;clearAutosave();}return false;}
+ finally{S.saving=false;$('#saveButton').textContent='Save local';$('#saveButton').disabled=!S.dirty;updateDeployButton();if(S.dirty&&!S.deploying&&!S.autosaveConflict)scheduleAutosave();}
 }
 async function deployLive(){
  if(S.deploying||S.saving)return;

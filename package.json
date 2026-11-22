@@ -36,5 +36,9 @@
     "dev:tina": "npx --yes @tinacms/cli@4.0.5 dev -c \"node scripts/dev-tina-preview.mjs\"",
     "check:tina": "node --check tina/config.js && node --check scripts/dev-tina-preview.mjs && npx --yes @tinacms/cli@4.0.5 audit",
     "test:tina:local": "node scripts/test-tina-local.mjs"
+  },
+  "devDependencies": {
+    "@tinacms/graphql": "4.1.0",
+    "memory-level": "1.0.0"
   }
 }

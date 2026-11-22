@@ -253,3 +253,15 @@ The architectural refurbishment itself: Roadmap Phases 3–5. Make homepage and 
 - Jesse asked whether GraphQL is ever needed. Conclusion: not for current local/dev goals. GraphQL would only be needed later for Tina Cloud, remote/multi-user editing, or official Tina admin editing every collection.
 - **D14:** proceed with the adapter-first path, superseding D13. Studio keeps `/studio/` and `/__fsfm/api`; server reads/writes move behind a local Tina-backed storage adapter seam. Local-only debounced autosave is in scope; explicit Save and stale-revision protection remain; deploy/publishing stays locked.
 - Dependency/implementation note: `package.json` currently declares no dependencies. Cached Tina packages exist in the npx cache, but committing a cache-path dependency is brittle. Adding `@tinacms/graphql` and `memory-level` as local dev dependencies requires explicit approval or a safe alternative. No Phase 6 implementation files changed yet by this decision entry.
+
+### Phase 6 adapter seam + local autosave **[Jesse + OpenCode, 2026-11-22]**
+
+- Jesse approved adding pinned dev dependencies: `@tinacms/graphql@4.1.0` and `memory-level@1.0.0` (`--save-dev --save-exact`). `node_modules/` remains git-ignored; `package.json` and `package-lock.json` updated.
+- Added `scripts/tina-local-adapter.mjs` as the local content adapter seam. It owns content read/raw/write/readStoredPages with the same SHA-256 revision, atomic temp-write, publisher queue, rollback and rebuild behavior.
+- Wired `scripts/dev-tina-preview.mjs` to delegate `readContentFile`, `writeContentFile` and `readStoredPages` through the adapter. The `/__fsfm/api` contract, origin checks, session gating, stale `409` saves, validators, deploy/auth/assets/lyrics routes, and preview rebuild behavior remain unchanged.
+- Added local-only debounced autosave in `studio/index.html` (`autosaveMs:1200`, quiet autosave, conflict pauses autosave, no deploy calls). Explicit Save and stale-revision protection remain.
+- Added `test/studio-phase6-adapter.test.mjs` (5 tests) covering adapter seam wiring, revision/write contract, publisher-failure rollback, autosave-local-only behavior, and explicit save/conflict protection.
+
+**Verification:** `node --test` on targeted Studio suites passed (37 tests) plus new adapter suite (5 tests). `npm test` **183 tests / 170 pass / 13 fail** — same 13 pre-existing failures, +5 passing tests from the new suite. `npm run validate:v13` passed. `npm run build` passed. `node scripts/capture-render-baseline.mjs --compare` reports homepage, Vista and Editorial SAME; The Early Bird has the same known intentional Stage B delta (`a887b166af6e917a -> ecd9375223b463b9`, first difference at character 7430).
+
+**Scope note:** this is the first Phase 6 adapter slice. Studio still uses the local `/__fsfm/api` contract, now backed by a dedicated adapter seam. Deploy remains locked. No generated Tina artifacts, no credentials, no live publishing.

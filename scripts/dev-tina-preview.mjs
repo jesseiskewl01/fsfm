@@ -12,6 +12,7 @@ import { normalizePageRecord, normalizePages, routeForPage } from '../src/core/p
 import { COMPONENTS } from '../src/components/registry.mjs';
 import { TEMPLATES } from '../src/templates/registry.mjs';
 import { partCatalogue } from '../src/core/studio-controls.mjs';
+import { createLocalContentAdapter } from './tina-local-adapter.mjs';
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const previewRoot = path.join(projectRoot, 'preview-v13');
@@ -30,6 +31,13 @@ if (!['127.0.0.1', 'localhost', '::1'].includes(host)) {
 const authDataDir = path.resolve(process.env.FSFM_STUDIO_DATA_DIR || path.join(os.homedir(), '.fsfm-studio'));
 const authFilePath = path.join(authDataDir, 'auth.json');
 const publisher = createStudioPublisher({ projectRoot, dataDir: authDataDir });
+const contentAdapter = createLocalContentAdapter({
+  projectRoot,
+  contentRoot,
+  albumsRoot,
+  publisher,
+  scheduleRebuild: (...args) => scheduleRebuild(...args),
+});
 const sessionCookieName = 'fsfm_studio_session';
 const sessionLifetimeMs = 8 * 60 * 60 * 1000;
 const sessions = new Map();
@@ -138,15 +146,7 @@ function albumSummary(fileName, record) {
 }
 
 function readStoredPages() {
-  const records = [JSON.parse(fs.readFileSync(path.join(contentRoot, 'homepage.json'), 'utf8'))];
-  for (const directory of ['albums', 'vista-pages', 'editorial-pages']) {
-    const folder = path.join(contentRoot, directory);
-    if (!fs.existsSync(folder)) continue;
-    for (const filename of fs.readdirSync(folder).filter((name) => name.endsWith('.json')).sort()) {
-      records.push(JSON.parse(fs.readFileSync(path.join(folder, filename), 'utf8')));
-    }
-  }
-  return records;
+  return contentAdapter.readStoredPages();
 }
 
 function contentResource(pathname) {
@@ -232,29 +232,11 @@ function validateWallpaperCatalogue(record) {
 }
 
 function readContentFile(resource) {
-  if (!resource || !fs.existsSync(resource.filePath) || !fs.statSync(resource.filePath).isFile()) return null;
-  const raw = fs.readFileSync(resource.filePath, 'utf8');
-  return { key: resource.key, revision: hashContent(raw), record: JSON.parse(raw) };
+  return contentAdapter.read(resource);
 }
 
 function writeContentFile(resource, currentRaw, record) {
-  const nextRaw = JSON.stringify(record, null, 2) + '\n';
-  const tempPath = resource.filePath + '.studio-' + process.pid + '-' + Date.now() + '.tmp';
-  fs.writeFileSync(tempPath, nextRaw, { flag: 'wx' });
-  fs.renameSync(tempPath, resource.filePath);
-  try {
-    publisher.recordSavedFile(
-      path.relative(projectRoot, resource.filePath).split(path.sep).join('/'),
-      nextRaw,
-    );
-  } catch (error) {
-    const rollbackPath = resource.filePath + '.studio-rollback-' + process.pid + '-' + Date.now() + '.tmp';
-    fs.writeFileSync(rollbackPath, currentRaw, { flag: 'wx' });
-    fs.renameSync(rollbackPath, resource.filePath);
-    throw error;
-  }
-  scheduleRebuild();
-  return { ok: true, revision: hashContent(nextRaw), savedAt: new Date().toISOString() };
+  return contentAdapter.write(resource, currentRaw, record);
 }
 
 function validatePageForSave(resource, record) {
