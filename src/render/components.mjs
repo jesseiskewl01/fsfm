@@ -1,7 +1,8 @@
 import { escapeHtml, safeUrl, safeImageUrl, safeEmbedUrl, renderRichText } from './html.mjs';
 import { renderAlbumPlayer } from './album-player.mjs';
+import { COMPONENT_TYPES, PRESENTATION_VARIANTS } from '../core/parts.mjs';
 
-const VARIANTS = new Set(['vista-window', 'vista-desktop', 'editorial', 'amber-editorial', 'amber-player', 'plain', '']);
+const VARIANTS = new Set(PRESENTATION_VARIANTS);
 const ICONS = {
   Spotify: '♫', TikTok: '♪', Bandcamp: 'B', Instagram: '◎', Twitter: '𝕏', YouTube: '▶'
 };
@@ -204,7 +205,7 @@ function renderSectionInner(section, context = {}) {
   }
 }
 
-export const RENDERED_COMPONENT_TYPES = Object.freeze(['site-header','hero','marquee','artist-statement','embed-window','bandsintown-events','social-links','featured-release','rich-text','image','gallery','quote','link-button','divider','spacer','album-header','album-player','spotify-embed']);
+export const RENDERED_COMPONENT_TYPES = COMPONENT_TYPES;
 
 export function renderComponent(section, context = {}) {
   if (!section || section.enabled === false) return { html: '', scripts: [] };

@@ -2,13 +2,13 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { COMPONENTS } from '../components/registry.mjs';
 import { TEMPLATES } from '../templates/registry.mjs';
-import { EFFECTS } from './parts.mjs';
+import { EFFECTS, PRESENTATION_VARIANTS as SHARED_VARIANTS, GROUP_LAYOUTS as SHARED_LAYOUTS } from './parts.mjs';
 import { routeForPage } from './page-routes.mjs';
 
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const PRESET_IDS = new Set(['vista-violet-haze','vista-aqua-glass','vista-solar-flare','vista-rose-bloom','aurora','album-amber']);
-const PRESENTATION_VARIANTS = new Set(['vista-window','vista-desktop','editorial','amber-editorial','amber-player','plain']);
-const GROUP_LAYOUTS = new Set(['grid','stack','columns']);
+const PRESENTATION_VARIANTS = new Set(SHARED_VARIANTS);
+const GROUP_LAYOUTS = new Set(SHARED_LAYOUTS);
 const isRecord = value => value && typeof value === 'object' && !Array.isArray(value);
 const getPath = (object, dotted) => dotted.split('.').reduce((value, key) => value?.[key], object);
 const issue = (list, where, message) => list.push(`${where}: ${message}`);

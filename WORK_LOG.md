@@ -150,3 +150,20 @@ The architectural refurbishment itself: Roadmap Phases 3–5. Make homepage and 
 **Verification:** `npm test` 152 tests / 139 pass / **13 fail — exactly the same 13 pre-existing failures**, with 8 new passes. `npm run validate:v13` and `npm run build` both pass. Baseline compare: 3 pages byte-identical; The Early Bird differs by **one new attribute only** (`data-atmosphere-mode="full"`), confirmed by word diff. No visual change.
 
 **Next:** Stage C — fold full field definitions into the shared part layer so editor controls, validation and renderer registration derive from one place.
+
+---
+
+## Stage C complete — one definition per part **[OpenCode, 2026-11-22]**
+
+- `src/core/parts.mjs` is now the authoritative source: all 18 parts with labels, template lists, singleton rules, field metadata (name/label/type/required/options) and derived `required` paths. Also owns the shared presentation-variant and group-layout vocabularies and the effect definitions.
+- `src/components/registry.mjs` is now a compatibility re-export pointing at the shared definitions.
+- `src/templates/registry.mjs` derives every template's `allowedComponentTypes` from the parts themselves; required/maximum component rules remain declared per template.
+- `src/render/components.mjs` derives `RENDERED_COMPONENT_TYPES` and its variant set from the shared definitions.
+- `src/core/page-validator.mjs` uses the shared vocabularies; required-field checks already follow the now-derived `required` arrays.
+- Added `test/parts-definitions.test.mjs` (6 tests) which pins the pre-refactor rules as expected values, proving the derivation changed no behaviour.
+
+**Verification:** `npm test` 158 tests / 145 pass / **the same 13 pre-existing failures**. `validate:v13` and `build` pass. Baseline compare still shows only the intentional `data-atmosphere-mode="full"` attribute on The Early Bird; the other three pages are byte-identical.
+
+**Still owed (Studio phase, later):** derive Tina fields and Studio controls from these definitions — `tina/config.js` still carries a separate album-only schema. The shared part layer is ready for it.
+
+**Next:** Stage D — refurbish the homepage mud hut so its desktop chrome (gadgets, taskbar, hero window, boot/shutdown) is made of the same part system as The Early Bird.

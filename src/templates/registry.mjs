@@ -1,27 +1,36 @@
-/** Template registry. Each template defines composition rules; the renderer arrives in Stage 3. */
-export const TEMPLATES = Object.freeze({
+/** Template registry. Composition rules are declared here; the list of parts a
+ *  template accepts is derived from the parts' own `templates` arrays.
+ *  [OpenCode, 2026-11-22] */
+import { allowedComponentsFor } from '../core/parts.mjs';
+
+const withParts = (name, definition) => Object.freeze({
+  ...definition,
+  allowedComponentTypes: Object.freeze(allowedComponentsFor(name))
+});
+
+const TEMPLATE_SOURCE = {
   homepage: {
     label: 'Homepage', oneOfOne: true, route: '/',
-    allowedComponentTypes: ['site-header','hero','marquee','artist-statement','embed-window','bandsintown-events','social-links','featured-release','rich-text','image','gallery','quote','link-button','divider','spacer'],
-    features: ['vista-desktop','desktop-gadgets','wallpaper-engine','bubbles','shutdown-transition']
+    features: ['vista-desktop', 'desktop-gadgets', 'wallpaper-engine', 'bubbles', 'shutdown-transition']
   },
   album: {
     label: 'Album', oneOfOne: false, routePattern: '/albums/{slug}/',
-    allowedComponentTypes: ['site-header','marquee','artist-statement','embed-window','social-links','featured-release','rich-text','image','gallery','quote','link-button','divider','spacer','album-header','album-player','spotify-embed'],
-    requiredComponents: { 'album-header': 1, 'album-player': 1 },
-    maximumComponents: { 'album-player': 1, 'album-header': 1, 'spotify-embed': 1 },
-    features: ['album-player','synchronised-lyrics','album-amber-atmosphere']
+    requiredComponents: Object.freeze({ 'album-header': 1, 'album-player': 1 }),
+    maximumComponents: Object.freeze({ 'album-player': 1, 'album-header': 1, 'spotify-embed': 1 }),
+    features: ['album-player', 'synchronised-lyrics', 'album-amber-atmosphere']
   },
   'vista-window': {
     label: 'Vista', oneOfOne: false, routePattern: '/pages/{slug}/',
-    allowedComponentTypes: ['site-header','hero','marquee','artist-statement','embed-window','bandsintown-events','social-links','featured-release','rich-text','image','gallery','quote','link-button','divider','spacer'],
-    features: ['vista-windows','wallpaper-engine']
+    features: ['vista-windows', 'wallpaper-engine']
   },
   editorial: {
     label: 'Editorial Page', oneOfOne: false, routePattern: '/pages/{slug}/',
-    allowedComponentTypes: ['site-header','hero','marquee','artist-statement','embed-window','bandsintown-events','social-links','featured-release','rich-text','image','gallery','quote','link-button','divider','spacer'],
-    features: ['editorial-layout','wallpaper-engine']
+    features: ['editorial-layout', 'wallpaper-engine']
   }
-});
+};
+
+export const TEMPLATES = Object.freeze(Object.fromEntries(
+  Object.entries(TEMPLATE_SOURCE).map(([name, definition]) => [name, withParts(name, definition)])
+));
 
 export function getTemplate(type) { return TEMPLATES[type] ?? null; }
