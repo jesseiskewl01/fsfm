@@ -27,6 +27,37 @@
   else installResetButton();
 })();
 
+// Spotify's brown embed has its own rounded edge. Its exposed corners need the
+// two-tone player colors, so paint them at runtime without touching saved HTML.
+// [Jesse + OpenCode, 2026-11-24]
+(function() {
+  var EMBED_URL = 'https://open.spotify.com/embed/artist/2PcGMMcKTObTrK7XVw9GSX?utm_source=generator&si=5263054ac6d0459f';
+  var CORNERS = [
+    { name: 'tl', color: '#372828', css: 'left:0;top:0' },
+    { name: 'tr', color: '#372828', css: 'right:0;top:0' },
+    { name: 'bl', color: '#493A3A', css: 'left:0;bottom:0' },
+    { name: 'br', color: '#493A3A', css: 'right:0;bottom:0' }
+  ];
+  function installSpotifyCorners() {
+    var body = document.querySelector('.spotify-window-body');
+    var iframe = body && body.querySelector('iframe');
+    if (!body || !iframe) return;
+    if (iframe.getAttribute('src') !== EMBED_URL) iframe.setAttribute('src', EMBED_URL);
+    iframe.setAttribute('style', 'border-radius:12px; background:#372828');
+    body.style.background = 'linear-gradient(#372828 0 50%, #493A3A 50% 100%)';
+    Array.prototype.slice.call(body.querySelectorAll('.fsfm-spotify-corner')).forEach(function(node) { node.remove(); });
+    CORNERS.forEach(function(corner) {
+      var square = document.createElement('div');
+      square.className = 'fsfm-spotify-corner';
+      square.setAttribute('data-corner', corner.name);
+      square.setAttribute('style', 'position:absolute;width:15px;height:15px;pointer-events:none;z-index:2;background:' + corner.color + ';' + corner.css);
+      body.appendChild(square);
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', installSpotifyCorners);
+  else installSpotifyCorners();
+})();
+
 (function() {
   var layer = document.getElementById('fsfmGadgets');
   if (!layer || !window.matchMedia('(min-width: 1180px) and (min-height: 600px)').matches) return;

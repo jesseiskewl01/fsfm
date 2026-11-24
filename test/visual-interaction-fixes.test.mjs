@@ -62,6 +62,18 @@ test('the Spotify window keeps its original vanilla chrome and body', () => {
   assert.doesNotMatch(css, /\.spotify-window \{ background:#101012 !important/);
 });
 
+test('the Spotify embed uses the brown color and runtime two-tone corner squares', () => {
+  assert.match(gadgets, /var EMBED_URL = 'https:\/\/open\.spotify\.com\/embed\/artist\/2PcGMMcKTObTrK7XVw9GSX\?utm_source=generator&si=5263054ac6d0459f'/);
+  assert.doesNotMatch(gadgets, /theme=0/);
+  assert.match(gadgets, /iframe\.setAttribute\('style', 'border-radius:12px; background:#372828'\)/);
+  assert.match(gadgets, /body\.style\.background = 'linear-gradient\(#372828 0 50%, #493A3A 50% 100%\)'/);
+  assert.match(gadgets, /width:15px;height:15px/);
+  assert.match(gadgets, /pointer-events:none;z-index:2/);
+  assert.match(gadgets, /fsfm-spotify-corner/);
+  assert.match(gadgets, /#372828/);
+  assert.match(gadgets, /#493A3A/);
+});
+
 test('the album header uses the same inset and control geometry as the homepage taskbar', () => {
   assert.match(albumCss, /padding: 3px max\(12px, calc\(\(100% - 880px\) \/ 2\)\)/);
   assert.doesNotMatch(albumCss, /100vw - 880px/);
