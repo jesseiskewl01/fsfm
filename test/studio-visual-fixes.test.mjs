@@ -33,12 +33,18 @@ test('bottom widgets are not shown as draggable and their slider is readable', (
   assert.match(css, /\.fsfm-gadgets-extras \.gadget-range-output\{color:#173f57/);
 });
 
-test('the Spotify window keeps normal chrome with clipped dark bottom padding', () => {
+test('the Spotify window returns to the original vanilla window rules', () => {
   assert.doesNotMatch(css, /\.spotify-window \{ background:#101012/);
-  assert.match(css, /\.spotify-window\.content-window \{ box-shadow:0 7px 23px rgba\(0,0,0,\.42\),inset 0 0 0 1px #effbffc0,inset 0 -8px 0 #121212; \}/);
+  assert.doesNotMatch(css, /\.spotify-window\.content-window/);
+  assert.match(css, /\.spotify-window-body \{ padding:0; background:#121212; \}/);
+  assert.match(css, /\.spotify-window-body iframe \{[^}]*border-radius:0; box-shadow:none; background:#121212; \}/);
+  assert.doesNotMatch(css, /\.spotify-window-body::after/);
   assert.doesNotMatch(css, /\.spotify-window::after/);
+  assert.doesNotMatch(css, /clip-path:inset\(0 round/);
+  assert.doesNotMatch(css, /inset 0 -8px 0 #121212/);
+  assert.doesNotMatch(css, /radial-gradient\(circle at 0 0, #121212 0 8px, transparent 9px\)/);
   assert.doesNotMatch(css, /radial-gradient\(circle at 0 100%, rgba\(8,14,18,\.95\)/);
-  assert.match(css, /clip-path:inset\(0 round 5px\)/);
+  assert.doesNotMatch(css, /spotify-window-body iframe \{[^}]*filter:brightness/);
 });
 
 test('the Vista close button closes a window; minimize still minimizes it', () => {

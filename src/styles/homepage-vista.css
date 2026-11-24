@@ -492,12 +492,10 @@ text-shadow: 0 1px 3px rgb(var(--deep-rgb)), 0 0 8px rgba(var(--deep-rgb), 0.8);
 .window-mini-icon.social { font-size:15px; }
 .bio-window-body { min-height:352px; display:flex; align-items:center; justify-content:center; padding:28px 24px; background:linear-gradient(145deg,#fff,#f1f8fb); }
 .bio-window-body .bio-text { max-width:39ch; font-size:14px; line-height:1.85; text-align:left; }
-/* Keep the normal Vista glass window. The bottom inset shadow fills the existing
-   dark padding from inside the border box, so the window's own radius clips it
-   cleanly instead of scuffing the corners with an overlay strip. [Jesse + OpenCode, 2026-11-24] */
-.spotify-window.content-window { box-shadow:0 7px 23px rgba(0,0,0,.42),inset 0 0 0 1px #effbffc0,inset 0 -8px 0 #121212; }
-.spotify-window-body { position:relative; padding:0; background:#121212; overflow:hidden; }
-.spotify-window-body iframe { width:100%; max-width:none; height:352px; min-height:352px; display:block; border:0; border-radius:5px; clip-path:inset(0 round 5px); box-shadow:none; background:#121212; }
+/* Original vanilla Spotify window rules, restored as the clean base. Normal
+   Vista chrome and padding apply; no corner masks, clipping, or overlays. [Jesse + OpenCode, 2026-11-24] */
+.spotify-window-body { padding:0; background:#121212; }
+.spotify-window-body iframe { width:100%; max-width:none; height:352px; min-height:352px; display:block; border:0; border-radius:0; box-shadow:none; background:#121212; }
 .events-window { margin-top:20px; }
 .events-window .bit-container { min-height:100px; padding:15px; border:0; border-radius:0; box-shadow:none; background:linear-gradient(145deg,#fff,#f4f9fc) !important; display:flex; align-items:center; justify-content:center; text-align:center; }
 .events-window .bandsintown-widget, .events-window .component-fallback { max-width:100%; margin-inline:auto; }

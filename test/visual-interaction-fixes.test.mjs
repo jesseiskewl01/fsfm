@@ -47,13 +47,17 @@ test('Purble Place uses a fixed Vista-style window and locks page scroll', () =>
   assert.match(css, /\.purble-frame\{display:block;flex:1 1 auto/);
 });
 
-test('the Spotify window keeps its normal chrome and its bottom corners cannot bleed grey', () => {
-  assert.match(css, /\.spotify-window\.content-window \{ box-shadow:0 7px 23px rgba\(0,0,0,\.42\),inset 0 0 0 1px #effbffc0,inset 0 -8px 0 #121212; \}/);
-  assert.match(css, /\.spotify-window-body \{ position:relative; padding:0; background:#121212; overflow:hidden; \}/);
-  assert.match(css, /\.spotify-window-body iframe \{[^}]*border-radius:5px; clip-path:inset\(0 round 5px\)/);
+test('the Spotify window keeps its original vanilla chrome and body', () => {
+  assert.match(css, /\.vista-window\.content-window, \.content-window \{[\s\S]*?padding:0 6px 6px/);
+  assert.match(css, /\.spotify-window-body \{ padding:0; background:#121212; \}/);
+  assert.match(css, /\.spotify-window-body iframe \{[^}]*border-radius:0; box-shadow:none; background:#121212; \}/);
+  assert.doesNotMatch(css, /\.spotify-window\.content-window/);
   assert.doesNotMatch(css, /\.spotify-window-body::after/);
   assert.doesNotMatch(css, /\.spotify-window::after/);
+  assert.doesNotMatch(css, /clip-path:inset\(0 round/);
+  assert.doesNotMatch(css, /inset 0 -8px 0 #121212/);
   assert.doesNotMatch(css, /radial-gradient\(circle at 0 0, #121212 0 8px, transparent 9px\)/);
+  assert.doesNotMatch(css, /radial-gradient\(circle at 0 100%, rgba\(8,14,18,\.95\)/);
   assert.doesNotMatch(css, /spotify-window-body iframe \{[^}]*filter:brightness/);
   assert.doesNotMatch(css, /\.spotify-window \{ background:#101012 !important/);
 });
