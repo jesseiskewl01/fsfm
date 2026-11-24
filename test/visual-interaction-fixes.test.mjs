@@ -12,6 +12,7 @@ const gadgets = read('src/client/homepage-gadgets.js');
 const desktop = read('src/client/homepage-desktop.js');
 const interactions = read('src/client/homepage-interactions.js');
 const components = read('src/render/components.mjs');
+const studio = read('studio/index.html');
 
 test('the first wallpaper star click stops automatic cycling', () => {
   assert.match(desktop, /var cycleTimer = null;/);
@@ -42,6 +43,11 @@ test('the homepage About window stays pinned while the desktop scrolls', () => {
   assert.match(css, /body\.template-homepage \.wrap > \.social-window \{ grid-column:2; grid-row:5; \}/);
   assert.match(css, /body\.template-homepage \.wrap > \.site-footer \{ grid-row:6; \}/);
   assert.match(css, /body\.template-homepage:has\(\.home-window-grid > \.bio-window\[hidden\]\) \.wrap \{ grid-template-columns:minmax\(0,1fr\); \}/);
+});
+
+test('the Studio topbar and left page menu stay pinned while content scrolls', () => {
+  assert.match(studio, /@media\(max-width:1020px\)\{[\s\S]*?\.topbar\{position:sticky;top:0;z-index:30\}/);
+  assert.match(studio, /@media\(max-width:1020px\)\{[\s\S]*?\.sidebar\{grid-column:1;grid-row:1\/3;position:sticky;top:70px;height:calc\(100vh - 70px\);min-height:520px;z-index:20\}/);
 });
 
 test('the barrel roll gadget is no longer hidden by the saved flag', () => {

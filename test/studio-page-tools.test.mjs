@@ -18,12 +18,17 @@ const studio = fs.readFileSync(path.join(root, 'studio/index.html'), 'utf8');
 const server = fs.readFileSync(path.join(root, 'scripts/dev-tina-preview.mjs'), 'utf8');
 const sourceVistaPath = path.join(root, 'content/v13/vista-pages/vistatest.json');
 const sourceVista = JSON.parse(fs.readFileSync(sourceVistaPath, 'utf8'));
+if (sourceVista.publishing) delete sourceVista.publishing.retired;
 
 function fixture(t) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fsfm-page-tools-'));
   t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
   const contentRoot = path.join(dir, 'content', 'v13');
   fs.cpSync(path.join(root, 'content', 'v13'), contentRoot, { recursive: true });
+  const vistaPath = path.join(contentRoot, 'vista-pages', 'vistatest.json');
+  const vistaFixture = JSON.parse(fs.readFileSync(vistaPath, 'utf8'));
+  if (vistaFixture.publishing) delete vistaFixture.publishing.retired;
+  fs.writeFileSync(vistaPath, JSON.stringify(vistaFixture, null, 2) + '\n');
   const saved = [];
   const forgotten = [];
   const rebuilt = [];
