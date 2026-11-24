@@ -47,6 +47,15 @@ test('V15 homepage widgets form the intended six-window frame with loose bonus p
   assert.match(js, /var COLUMN_GAP = 24/);
   assert.match(js, /var leftRegion = \{ start:edge, end:Math\.max\(edge \+ mainWidth, heroLeft - REGION_GAP\) \}/);
   assert.match(js, /var rightRegion = \{ start:Math\.min\(viewportWidth - edge - mainWidth, heroRight \+ REGION_GAP\), end:viewportWidth - edge \}/);
+  // Three staggered rows: outer / inner / outer on both sides.
+  assert.match(js, /'gadget-clock': \[leftOuter, rows\[0\]\]/);
+  assert.match(js, /'gadget-now-playing': \[leftInner, rows\[1\]\]/);
+  assert.match(js, /'gadget-dates': \[leftOuter, rows\[2\]\]/);
+  assert.match(js, /'gadget-calendar': \[rightOuter, rows\[0\]\]/);
+  assert.match(js, /'gadget-photos': \[rightInner, rows\[1\]\]/);
+  assert.match(js, /'gadget-note': \[rightOuter, rows\[2\]\]/);
+  assert.match(js, /var rowHeights = \[[\s\S]*?Math\.max\(clockHeight, calendarHeight\)/);
+  assert.match(js, /var minGap = leftPaired && rightPaired \? -4 : COLLISION_GAP/);
   // Extra widgets are rendered below footer, not in the fixed desktop gadget layout. [OpenCode, 2026-11-22]
   assert.match(js, /Widgets live in the gutters between the website edges and the hero edges\./);
   assert.match(js, /fsfm_gadget_positions_v2/);

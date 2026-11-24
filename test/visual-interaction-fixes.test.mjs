@@ -27,6 +27,7 @@ test('widgets live in hero gutters and settle without overlap after a drag', () 
   assert.match(gadgets, /document\.documentElement\.clientWidth \|\| window\.innerWidth/);
   assert.match(gadgets, /columnsFor\(leftRegion\)/);
   assert.match(gadgets, /columnsFor\(rightRegion\)/);
+  assert.match(gadgets, /outside \/ inside \/ outside on each side/);
   assert.match(gadgets, /function settleWidgets\(anchor\)/);
   assert.match(gadgets, /settleWidgets\(widget\);[\s\S]*?savePositions\(\);/);
   assert.match(gadgets, /applyPosition\(other, stored\[0\] \+ dx, stored\[1\] \+ dy\)/);

@@ -60,8 +60,9 @@
 
     var leftColumns = columnsFor(leftRegion);
     var rightColumns = columnsFor(rightRegion);
-    var topRow = 72;
-    var rowGap = viewportHeight < 860 ? 14 : ROW_GAP;
+    var leftPaired = leftColumns.length > 1;
+    var rightPaired = rightColumns.length > 1;
+    var topRow = viewportHeight < 720 ? 48 : 72;
     function height(id, fallback) {
       var widget = widgetById[id];
       return widget ? widget.offsetHeight : fallback;
@@ -72,22 +73,42 @@
     var calendarHeight = height('gadget-calendar', 241);
     var photosHeight = height('gadget-photos', 183);
     var noteHeight = height('gadget-note', 124);
-    var leftPaired = leftColumns.length > 1;
-    var rightPaired = rightColumns.length > 1;
-    var leftRows = leftPaired
-      ? [topRow, topRow + Math.max(clockHeight, nowHeight) + rowGap]
-      : [topRow, topRow + clockHeight + rowGap, topRow + clockHeight + rowGap + nowHeight + rowGap];
-    var rightRows = rightPaired
-      ? [topRow, topRow + Math.max(calendarHeight, photosHeight) + rowGap]
-      : [topRow, topRow + calendarHeight + rowGap, topRow + calendarHeight + rowGap + photosHeight + rowGap];
+
+    // Three shared rows: outside / inside / outside on each side. Clock and dates
+    // hug the left gutter, featured release steps toward the hero; calendar and
+    // sticky note hug the right gutter, picture steps toward the hero.
+    // [Jesse + OpenCode, 2026-11-24]
+    var rowHeights = [
+      Math.max(clockHeight, calendarHeight),
+      Math.max(nowHeight, photosHeight),
+      Math.max(datesHeight, noteHeight)
+    ];
+    var stackedHeight = rowHeights[0] + rowHeights[1] + rowHeights[2];
+    var availableHeight = Math.max(0, viewportHeight - 8 - topRow);
+    var rowGap = ROW_GAP;
+    if (stackedHeight + rowGap * 2 > availableHeight) {
+      // A small vertical stagger is safe only when the two columns are separate;
+      // their 24px horizontal gap still clears the 16px collision gap.
+      var minGap = leftPaired && rightPaired ? -4 : COLLISION_GAP;
+      rowGap = Math.max(minGap, Math.floor((availableHeight - stackedHeight) / 2));
+    }
+    var rows = [
+      topRow,
+      topRow + rowHeights[0] + rowGap,
+      topRow + rowHeights[0] + rowHeights[1] + rowGap * 2
+    ];
+    var leftOuter = leftColumns[0];
+    var leftInner = leftColumns[leftPaired ? 1 : 0];
+    var rightInner = rightColumns[0];
+    var rightOuter = rightColumns[rightPaired ? 1 : 0];
 
     return {
-      'gadget-clock': [leftColumns[0], leftRows[0]],
-      'gadget-now-playing': [leftColumns[leftPaired ? 1 : 0], leftRows[leftPaired ? 0 : 1]],
-      'gadget-dates': [leftColumns[0], leftRows[leftPaired ? 1 : 2]],
-      'gadget-calendar': [rightColumns[0], rightRows[0]],
-      'gadget-photos': [rightColumns[rightPaired ? 1 : 0], rightRows[rightPaired ? 0 : 1]],
-      'gadget-note': [rightColumns[0], rightRows[rightPaired ? 1 : 2]]
+      'gadget-clock': [leftOuter, rows[0]],
+      'gadget-now-playing': [leftInner, rows[1]],
+      'gadget-dates': [leftOuter, rows[2]],
+      'gadget-calendar': [rightOuter, rows[0]],
+      'gadget-photos': [rightInner, rows[1]],
+      'gadget-note': [rightOuter, rows[2]]
     };
   }
 
