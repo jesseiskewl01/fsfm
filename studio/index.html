@@ -520,9 +520,238 @@ html,body{background:radial-gradient(ellipse at 14% -16%,rgba(126,76,168,.22),tr
 @media(max-width:850px){.editor-head h1{font-size:22px}.editor-body{padding-bottom:45px}}
 @media(max-width:600px){.page-item{min-height:48px}.create-page-actions{flex-direction:column-reverse}.create-page-actions .btn{width:100%}}
 
+/* ─────────────────────────────────────────────────────────────────────────
+   AMOLED CRT terminal skin. The Night Workshop tokens above stay in place
+   for compatibility; these rules are the visible surface. [OpenCode, 2026-11-24]
+   ───────────────────────────────────────────────────────────────────────── */
+:root{
+  --crt-black:#020405;
+  --crt-panel:#070c0d;
+  --crt-panel-2:#0a1213;
+  --crt-line:#1b3a36;
+  --crt-green:#8dffd4;
+  --crt-cyan:#7de8ff;
+  --crt-violet:#c6a2ff;
+  --crt-amber:#ffd89a;
+  --crt-red:#ff7f96;
+}
+html,body{
+  background:
+    radial-gradient(ellipse at 20% -12%,rgba(29,120,99,.20),transparent 40%),
+    radial-gradient(ellipse at 100% 8%,rgba(99,62,155,.16),transparent 36%),
+    radial-gradient(ellipse at 50% 110%,rgba(18,80,72,.14),transparent 46%),
+    var(--crt-black);
+  color:#eafff8;
+}
+body{position:relative;isolation:isolate}
+body::before{
+  content:"";position:fixed;inset:0;z-index:9997;pointer-events:none;
+  background:repeating-linear-gradient(180deg,rgba(190,255,235,.024) 0 1px,transparent 1px 3px);
+  opacity:.72;mix-blend-mode:screen;
+}
+body::after{
+  content:"";position:fixed;inset:0;z-index:9996;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 48%,transparent 42%,rgba(0,0,0,.46) 100%),linear-gradient(90deg,rgba(0,255,190,.028),transparent 24%,transparent 76%,rgba(120,90,255,.028));
+}
+.app,.sidebar,.editor,.preview{background:transparent}
+.topbar{
+  background:linear-gradient(180deg,#07100f 0%,#040708 100%);
+  border-bottom-color:var(--crt-line);
+  box-shadow:0 0 0 1px #6dffd508,0 12px 38px #000c,inset 0 -1px #8dffd410;
+}
+.brandmark{
+  border:1px solid #9dffe0;border-radius:10px;
+  background:linear-gradient(145deg,#e8fff7,#8dffd4 48%,#2f9f83);
+  color:#03130e;box-shadow:0 0 22px #6dffd555,inset 0 1px #fff;
+}
+.brand strong,.brand small,.topmeta,.side-label,.navitem,.panel-title,.panel-note,.eyebrow,.route,.preview-title,.preview-sub,.section-title,.section-meta,.section-pill,.toast,.mode-toggle,.advanced-drawer>summary{
+  font-family:"Roboto Mono",ui-monospace,SFMono-Regular,Consolas,monospace;
+}
+.brand strong{letter-spacing:.24em;color:#f2fff9;text-shadow:0 0 14px #8dffd466}
+.brand small,.topmeta{color:#83b8aa;letter-spacing:.15em}
+.dot{box-shadow:0 0 0 4px #8dffd414,0 0 18px #8dffd4}
+.savehint,.publishhint{color:#9dc9bb}
+.publishhint a{color:var(--crt-cyan)}
+.btn{
+  border-color:#29564e;background:linear-gradient(180deg,#0c1918,#070d0f);color:#d7fff1;
+  font-family:"Roboto Mono",ui-monospace,Consolas,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+  box-shadow:inset 0 1px #ffffff0a,0 4px 14px #0008;
+}
+.btn:hover:not(:disabled){border-color:#6dffd5;background:linear-gradient(180deg,#102722,#0a1515);box-shadow:0 0 18px #6dffd536,inset 0 1px #ffffff14}
+.btn:active:not(:disabled){box-shadow:inset 0 2px 8px #000a}
+.btn.primary{
+  border-color:#a8ffe4;background:linear-gradient(135deg,#eafff7,#8dffd4 50%,#3fb596);
+  color:#03130e;box-shadow:0 0 24px #6dffd555,inset 0 1px #fff;
+}
+.btn.primary:hover:not(:disabled){border-color:#fff;filter:brightness(1.08);box-shadow:0 0 32px #6dffd577}
+.mode-toggle{min-width:104px;border-style:dashed;color:var(--crt-green)}
+.mode-toggle[aria-pressed="true"]{border-style:solid;color:var(--crt-amber);border-color:#7a6338;box-shadow:0 0 18px #ffd89a33,inset 0 0 12px #ffd89a12}
+.sidebar{
+  background:linear-gradient(180deg,#050a0b 0%,#030607 100%);
+  border-right-color:var(--crt-line);box-shadow:inset -1px 0 #8dffd40c;
+}
+.side-label{color:#6fae9c;letter-spacing:.22em}
+.navitem{color:#a9cfc1;border-color:transparent;font-size:11px}
+.navitem:hover{background:#0a1716;border-color:#245a4f;color:#eafff8;box-shadow:0 0 16px #00ffb414}
+.navitem.active{
+  background:linear-gradient(100deg,#0b2420,#081312);border-color:#367867;color:#f0fff8;
+  box-shadow:inset 3px 0 var(--crt-green),0 0 22px #00ffb41f;
+}
+.side-divider{background:linear-gradient(90deg,transparent,#2a6257,transparent)}
+.page-search{
+  border-color:#28544b;background:#050b0c;color:#eafff8;font-family:"Roboto Mono",ui-monospace,Consolas,monospace;
+}
+.page-search::placeholder{color:#5f8c7e}
+.page-search:hover{border-color:#4c9c88}
+.page-search:focus{border-color:var(--crt-green);background:#081313;box-shadow:0 0 0 3px #8dffd420,0 0 18px #00ffb422}
+.page-item{color:#c3e6d9}
+.page-item:hover{background:#0a1615;border-color:#245a4f}
+.page-item.selected{background:linear-gradient(100deg,#102a25,#091312);border-color:#3b8270;box-shadow:inset 3px 0 var(--crt-green),0 0 18px #00ffb41a}
+.page-icon{border-color:#2e6458;background:linear-gradient(145deg,#102824,#07100f);color:var(--crt-green)}
+.page-copy strong{color:#f0fff8}
+.page-copy small{color:#7fad9e}
+.page-state.active{background:#08221a;border-color:#3f8f70;color:var(--crt-green);box-shadow:0 0 12px #00ffb422}
+.page-state.inactive{background:#0d1012;border-color:#38403e;color:#91a09a}
+.sidebar-foot{color:#63877b;border-top-color:#1b3a36}
+.editor{background:linear-gradient(180deg,#05090a,#020405 74%);border-right-color:var(--crt-line)}
+.editor-head{background:#050b0ced;border-bottom-color:var(--crt-line);box-shadow:0 10px 28px #000a}
+.eyebrow{color:var(--crt-green);text-shadow:0 0 12px #00ffb455}
+h1{color:#f4fff9;text-shadow:0 0 20px #8dffd42b}
+.subhead{color:#8fb9aa}
+.route{border-color:#28544b;background:#071010;color:var(--crt-cyan)}
+.editor-body{gap:13px}
+.panel{
+  border:1px solid var(--crt-line);border-radius:12px;
+  background:linear-gradient(145deg,#0a1213 0%,#05090a 78%);
+  box-shadow:inset 0 1px #ffffff08,0 12px 28px #000a;
+}
+.panel::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .22s;background:linear-gradient(115deg,transparent 24%,rgba(141,255,212,.045) 50%,transparent 76%)}
+.panel:hover::after{opacity:1}
+.panel:hover{border-color:#39796d;box-shadow:inset 0 1px #ffffff0c,0 16px 36px #000c,0 0 22px #00ffb410}
+.panel-head{border-bottom-color:#1b3a36}
+.panel-title{color:#eafff8;letter-spacing:.12em}
+.panel-note{color:#6fa795;letter-spacing:.15em}
+.panel-desc,.helper,.page-activation-copy p,.page-activation-footer{color:#8fb3a7}
+.json-object{border-color:#1d403a;background:#060d0e}
+.json-object>summary{background:linear-gradient(100deg,#0d1c1a,#080f10);color:#d5f8ea}
+.json-object>summary:hover{background:#102622;color:#fff}
+.json-object[open]>summary{border-bottom-color:#1d403a}
+.field label,.toggle-field label,.array-head strong,.array-item-head span{color:#d2f5e8;font-family:"Roboto Mono",ui-monospace,Consolas,monospace}
+.field input,.field textarea,.field select,.add-component select,.lyrics-body textarea{
+  border-color:#28544b;background:#030807;color:#eafff8;font-family:"Roboto Mono",ui-monospace,Consolas,monospace;
+}
+.field input:hover,.field textarea:hover,.field select:hover{border-color:#4c9c88}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--crt-green);background:#071010;box-shadow:0 0 0 3px #8dffd41c,0 0 16px #00ffb418}
+.field input[readonly]{background:#0a0f10;border-color:#24342f;color:#6f8d82}
+.toggle-field{background:#0b1616;border-color:#28544b}
+.toggle-field:hover{background:#102322;border-color:#4c9c88}
+.switch{background:#39554d;box-shadow:inset 0 1px 3px #000}
+.switch:checked{background:var(--crt-green);box-shadow:0 0 14px #00ffb455}
+.array-box{border-color:#28544b;background:#060d0e}
+.array-item{border-color:#23443e;background:#050b0c}
+.array-item:hover{border-color:#39796d}
+.mini{border-color:#2d5e54;background:#0c1a18;color:#c9f6e7}
+.mini:hover:not(:disabled){background:#14302b;border-color:#6dffd5;box-shadow:0 0 12px #00ffb42c}
+.add-item{border-color:#39796d;color:var(--crt-green)}
+.quick-panel{border-color:#2c6b5e;background:linear-gradient(145deg,#0b1917,#050b0c)}
+.quick-panel .panel-head{color:var(--crt-green)}
+.quick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:11px}
+.preset-strip{display:flex;flex-wrap:wrap;gap:8px}
+.preset-chip{padding:7px 10px;border:1px solid #28544b;border-radius:999px;background:#081312;color:#c9f6e7;font:9px "Roboto Mono",ui-monospace,Consolas,monospace;letter-spacing:.06em;box-shadow:inset 0 1px #ffffff08}
+.preset-chip b{color:var(--crt-cyan);font-weight:700}
+.section-card{
+  position:relative;border-color:#23443e;border-radius:12px;
+  background:linear-gradient(145deg,#0b1415,#05090a);
+  box-shadow:inset 0 1px #ffffff08,0 8px 22px #0008;
+  transition:border-color .18s,box-shadow .18s,transform .18s;
+}
+.section-card::before{content:"";position:absolute;left:0;top:12px;bottom:12px;width:2px;border-radius:2px;background:linear-gradient(180deg,transparent,var(--crt-green),transparent);opacity:.34}
+.section-card:hover{border-color:#39796d;box-shadow:inset 0 1px #ffffff0c,0 12px 30px #000b,0 0 18px #00ffb413;transform:translateY(-1px)}
+.section-card>summary{min-height:62px;padding:12px 12px 12px 16px}
+.section-card>summary:hover{background:#0d1d1b}
+.section-card[open]>summary{background:linear-gradient(100deg,#102320,#081111);border-bottom-color:#23443e}
+.section-card.dragging{opacity:.58;transform:scale(.99);border-color:var(--crt-cyan);box-shadow:0 0 0 1px var(--crt-cyan),0 0 34px #7de8ff55}
+.section-card.drop-before{box-shadow:0 -3px 0 var(--crt-green),0 -10px 22px #00ffb426,0 8px 22px #0008}
+.section-card.drop-after{box-shadow:0 3px 0 var(--crt-green),0 10px 22px #00ffb426,0 8px 22px #0008}
+.section-grip{flex:none;width:13px;color:#5f9c8b;font-size:13px;cursor:grab;text-shadow:0 0 10px #00ffb466}
+.section-card.dragging .section-grip{cursor:grabbing;color:var(--crt-cyan)}
+.section-glyph{flex:none;width:30px;height:30px;display:grid;place-items:center;border:1px solid #2d6458;border-radius:8px;background:linear-gradient(145deg,#102a25,#071110);color:var(--crt-green);font-size:14px;box-shadow:inset 0 1px #ffffff0a,0 0 12px #00ffb41f}
+.section-title{color:#effff7;letter-spacing:.04em}
+.section-meta{color:#76a998}
+.section-pill{border-color:#2d6458;background:#081915;color:var(--crt-cyan);font-size:8px}
+.section-body{padding:13px 13px 15px}
+.section-tools{border-bottom-color:#1b3a36}
+.advanced-drawer{
+  margin-top:14px;border:1px dashed #2c5e54;border-radius:12px;overflow:hidden;
+  background:linear-gradient(180deg,#081111,#030707);
+}
+.advanced-drawer>summary{
+  list-style:none;cursor:pointer;padding:12px 14px;display:flex;align-items:center;gap:9px;
+  color:var(--crt-green);font-size:9px;font-weight:800;letter-spacing:.18em;
+  background:linear-gradient(90deg,#0b1b18,#050b0c);
+  transition:background .16s,color .16s,box-shadow .16s;
+}
+.advanced-drawer>summary::-webkit-details-marker{display:none}
+.advanced-drawer>summary::before{content:"▸";font-size:14px;transition:transform .18s;color:var(--crt-cyan)}
+.advanced-drawer[open]>summary::before{transform:rotate(90deg)}
+.advanced-drawer>summary:hover{background:#102622;color:#fff;box-shadow:inset 0 0 18px #00ffb412}
+.advanced-drawer>summary:hover::before{text-shadow:0 0 12px var(--crt-cyan)}
+.advanced-label{color:#7eb4a3;font-weight:500;letter-spacing:.08em}
+.advanced-chevron{margin-left:auto;color:#4b7f71}
+.advanced-body{padding:14px;border-top:1px solid #1b3a36}
+.advanced-body .panel{margin-bottom:12px}
+.advanced-body .advanced-drawer{margin-top:12px}
+.preview{background:linear-gradient(180deg,#040809,#020405);border-left-color:var(--crt-line)}
+.preview-head{background:#050b0c;border-bottom-color:var(--crt-line)}
+.preview-title{color:var(--crt-green)}
+.preview-sub{color:#6fa795}
+.device{border-color:#28544b;background:#071010}
+.device button{color:#87b5a6;font-family:"Roboto Mono",ui-monospace,Consolas,monospace}
+.device button:hover{background:#102522;color:#fff}
+.device button.active{background:#123a31;color:var(--crt-green);box-shadow:inset 0 0 0 1px #4a9d88,0 0 14px #00ffb422}
+.preview-dimensions{color:#8fb9aa}
+.preview-frame-wrap{background:radial-gradient(ellipse at 50% 0%,#0b1f1c 0%,#040809 58%,#020405 100%);scrollbar-color:#2c6b5e #05090a}
+.preview-frame{border-color:#2c5e54;box-shadow:0 0 0 1px #6dffd50d,0 26px 80px #000c}
+.preview-loading{border-color:#2c6b5e;background:#020405e8;color:var(--crt-green);font-family:"Roboto Mono",ui-monospace,Consolas,monospace;letter-spacing:.08em}
+.toast{
+  border-color:#39796d;background:linear-gradient(145deg,#0c1d1a,#050a0b);color:#eafff8;
+  font-family:"Roboto Mono",ui-monospace,Consolas,monospace;box-shadow:0 0 30px #00ffb422,0 18px 60px #000c;
+}
+.toast.error{border-color:#b05267;background:linear-gradient(145deg,#240b12,#0d0508);color:#ffe3ea;box-shadow:0 0 30px #ff2f5b30,0 18px 60px #000c}
+dialog.lyrics-dialog{border-color:#39796d;background:linear-gradient(145deg,#0a1515,#040809);box-shadow:0 35px 110px #000e,0 0 40px #00ffb414}
+dialog.lyrics-dialog::backdrop{background:#010303d9;backdrop-filter:blur(7px)}
+.lyrics-head{background:#081312;border-bottom-color:#1b3a36}
+.lyrics-head strong{color:#eafff8;font-family:"Roboto Mono",ui-monospace,Consolas,monospace;letter-spacing:.12em}
+.lyrics-foot{border-top-color:#1b3a36}
+.upload-pick{border-color:#39796d;color:var(--crt-green)}
+.upload-pick:hover{background:#0e2420;border-color:#6dffd5}
+.create-page-form input,.create-page-form select{border-color:#28544b;background:#030807;color:#eafff8}
+.create-page-form input:focus,.create-page-form select:focus{border-color:var(--crt-green);box-shadow:0 0 0 3px #8dffd41c}
+:focus-visible{outline:2px solid var(--crt-cyan)!important;outline-offset:3px}
+::-webkit-scrollbar-track{background:#030607}
+::-webkit-scrollbar-thumb{border-color:#030607;background:#24594f;box-shadow:inset 0 0 8px #00ffb422}
+::-webkit-scrollbar-thumb:hover{background:#3b8c7b}
+@keyframes crt-flicker{0%,100%{opacity:.72}47%{opacity:.76}48%{opacity:.68}49%{opacity:.75}}
+body::before{animation:crt-flicker 7s steps(1,end) infinite}
+@media(prefers-reduced-motion:reduce){body::before{animation:none}}
+@media(max-width:760px){.section-card>summary{flex-wrap:nowrap}.section-glyph{width:26px;height:26px}.advanced-body{padding:11px}}
+/* Simple view keeps the essential controls; advanced drawers stay at the bottom. [Jesse + OpenCode, 2026-11-24] */
+.advanced-led{color:var(--crt-cyan);font-size:8px;text-shadow:0 0 10px var(--crt-cyan)}
+body.simple-mode .quick-panel{display:block}
+body.advanced-mode .quick-panel{display:none}
+body.simple-mode .advanced-drawer{margin-top:15px}
+body.advanced-mode .advanced-drawer{border-style:solid;border-color:#39796d;background:linear-gradient(180deg,#0b1716,#050b0b)}
+body.advanced-mode .advanced-drawer>summary{background:linear-gradient(90deg,#12342d,#081413);color:var(--crt-amber);border-bottom:1px solid #23443e}
+body.advanced-mode .advanced-drawer>summary::before{color:var(--crt-amber)}
+.editor-body>.advanced-drawer:last-child{margin-top:2px}
+.section-card[data-section-index]{scroll-margin-top:70px}
+.section-card.dragging *{pointer-events:none}
+.section-grip[draggable="true"]:hover{color:var(--crt-cyan);text-shadow:0 0 14px var(--crt-cyan)}
+.section-grip[draggable="true"]:active{cursor:grabbing}
+@media(prefers-reduced-motion:reduce){.section-card,.panel,.advanced-drawer>summary{transition:none}}
 </style>
 </head>
-<body>
+<body class="simple-mode">
 <div class="app">
 <header class="topbar">
   <div class="brand"><div class="brandmark">F.</div><div><strong>FSFM STUDIO</strong><small>YOUR SITE, IN THE WORKSHOP</small></div></div>
@@ -530,6 +759,7 @@ html,body{background:radial-gradient(ellipse at 14% -16%,rgba(126,76,168,.22),tr
   <div class="spacer"></div>
   <div class="savehint" id="saveHint">All changes saved</div>
   <div class="publishhint" id="publishHint">Checking live publishing…</div>
+  <button class="btn mode-toggle" id="viewModeButton" type="button" aria-pressed="false" title="Show the technical settings">SIMPLE VIEW</button>
   <button class="btn" id="reloadButton">↻ Reload</button>
   <button class="btn" id="saveButton" disabled>Save local</button>
   <button class="btn primary" id="deployButton" disabled>Save &amp; deploy live</button>
@@ -595,9 +825,60 @@ import { getPagePublicationState, setPagePublished } from './page-state.mjs';
 const $=(s,r)=> (r||document).querySelector(s);
 const $$=(s,r)=> Array.from((r||document).querySelectorAll(s));
 const api='/__fsfm/api';
-const S={items:[],catalog:null,wallpaperPresets:[],key:null,resource:null,record:null,revision:null,dirty:false,saving:false,deploying:false,publishStatus:null,route:'/',toastTimer:null,pageSearch:'',autosaveTimer:null,autosaveMs:1200,autosaveConflict:false};
+const S={items:[],catalog:null,wallpaperPresets:[],key:null,resource:null,record:null,revision:null,dirty:false,saving:false,deploying:false,publishStatus:null,route:'/',toastTimer:null,pageSearch:'',autosaveTimer:null,autosaveMs:1200,autosaveConflict:false,viewMode:'simple',dragSection:null};
+try{S.viewMode=localStorage.getItem('fsfm_studio_view_mode')==='advanced'?'advanced':'simple';}catch(error){S.viewMode='simple';}
 const body=$('#editorBody');
 function componentLabel(type){return S.catalog?.components?.[type]?.label||human(type);}
+function applyViewMode(){
+  const advanced=S.viewMode==='advanced';
+  document.body.classList.toggle('advanced-mode',advanced);
+  document.body.classList.toggle('simple-mode',!advanced);
+  const button=$('#viewModeButton');
+  if(button){button.textContent=advanced?'ADVANCED VIEW':'SIMPLE VIEW';button.setAttribute('aria-pressed',String(advanced));button.title=advanced?'Show only what you need':'Show the technical settings';}
+}
+function setViewMode(mode){
+  S.viewMode=mode==='advanced'?'advanced':'simple';
+  try{localStorage.setItem('fsfm_studio_view_mode',S.viewMode);}catch(error){}
+  applyViewMode();
+  if(S.record)renderEditor();
+}
+function advancedDrawer(title,content){
+  return '<details class="advanced-drawer"'+(S.viewMode==='advanced'?' open':'')+'><summary><span class="advanced-led">◆</span><span>ADVANCED</span><span class="advanced-label">'+esc(title)+'</span><span class="advanced-chevron">⌄</span></summary><div class="advanced-body">'+content+'</div></details>';
+}
+function componentGlyph(type){
+  const glyphs={'site-header':'⌂','hero':'✦','marquee':'≋','artist-statement':'❝','embed-window':'▣','bandsintown-events':'◷','social-links':'↗','featured-release':'♫','rich-text':'¶','image':'▧','gallery':'▦','quote':'❞','link-button':'→','divider':'—','spacer':'·','album-header':'◉','album-player':'▶','spotify-embed':'♬'};
+  return glyphs[type]||'◇';
+}
+function quickPanel(title,note,content){
+  return '<section class="panel quick-panel"><div class="panel-head"><span class="panel-title">'+esc(title)+'</span><span class="panel-note">'+esc(note)+'</span></div>'+content+'</section>';
+}
+function presetStrip(){
+  const presets=(S.wallpaperPresets||[]).slice(0,10);
+  if(!presets.length)return '<div class="helper">No wallpaper presets are available yet.</div>';
+  return '<div class="preset-strip">'+presets.map(preset=>'<button class="preset-chip" type="button" data-quick-wallpaper="'+esc(preset.id)+'"><b>▧</b> '+esc(preset.name||human(preset.id))+'</button>').join('')+'</div>';
+}
+function applyQuickWallpaper(id){
+  if(S.resource!=='page'||!S.record){toast('Open a page first, then pick a wallpaper.',true);return;}
+  const preset=(S.wallpaperPresets||[]).find(item=>item.id===id);
+  if(!preset)return;
+  set(S.record,'appearance.wallpaper.mode','preset');
+  set(S.record,'appearance.wallpaper.preset',id);
+  dirty();
+  renderEditor();
+  toast('Wallpaper set to '+(preset.name||human(preset.id))+' locally. Save local to keep it.');
+}
+function pageQuickPanel(){
+  const count=(S.record.sections||[]).length;
+  return quickPanel('Quick controls','ONLY WHAT YOU NEED','<div class="quick-grid"><div><span class="helper">Wallpaper · tap to apply locally</span>'+presetStrip()+'</div><div><span class="helper">Page</span><div class="helper">'+count+' building block'+(count===1?'':'s')+' · drag <strong>⠿</strong> to reorder. Add more below.</div></div></div>');
+}
+function siteQuickPanel(){
+  const essentials={siteName:S.record.siteName||'',description:S.record.description||'',favicon:S.record.favicon||''};
+  return quickPanel('Site essentials','QUICK EDIT',valueEditor(essentials,'ROOT','Site',0,{labels:{siteName:'Site name',description:'Short description',favicon:'Favicon'}}));
+}
+function wallpaperQuickPanel(){
+  const count=(S.wallpaperPresets||[]).length;
+  return quickPanel('Wallpaper shortcuts',count+' PRESETS','<div class="helper">Open a page to apply a preset instantly. Full palette settings are in Advanced.</div>'+presetStrip());
+}
 const FALLBACK_PRESENTATION_OPTIONS=[['vista-window','Vista Window'],['vista-desktop','Vista Desktop'],['editorial','Editorial'],['amber-editorial','Amber Editorial'],['amber-player','Amber Player'],['plain','Plain']];
 const FALLBACK_LAYOUT_OPTIONS=[['grid','Grid'],['stack','Stack'],['columns','Columns']];
 function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
@@ -858,13 +1139,34 @@ function appearancePanel(){
 function pageFields(){
  const r=S.record;
  const identity=Object.assign({},r.identity||{});
- const publishingSettings=Object.assign({},r.publishing||{});
  delete identity.slug;delete identity.route;
+ return '<section class="panel"><div class="panel-head"><span class="panel-title">Page identity</span><span class="panel-note">NAME · ORDER · URL</span></div>'+valueEditor(identity,'identity','Identity')+'</section>'+pageActivationPanel();
+}
+function pageAdvancedFields(){
+ const r=S.record;
+ const publishingSettings=Object.assign({},r.publishing||{});
  delete publishingSettings.published;
- return '<section class="panel"><div class="panel-head"><span class="panel-title">Page identity</span><span class="panel-note">NAME · ORDER · URL</span></div>'+valueEditor(identity,'identity','Identity')+'<div class="field" style="margin-top:8px"><label>URL slug · fixed after creation</label><input readonly value="'+esc(r.identity?.slug||'home')+'"><span class="helper">The slug determines the filename and public route. Create a new page to use a different URL.</span></div></section>'+pageActivationPanel()+
- '<section class="panel"><div class="panel-head"><span class="panel-title">Publishing</span><span class="panel-note">NAVIGATION · VISIBILITY</span></div>'+valueEditor(publishingSettings,'publishing','Publishing')+'</section>'+
- '<section class="panel"><div class="panel-head"><span class="panel-title">Appearance</span><span class="panel-note">WALLPAPER · EFFECTS</span></div>'+appearancePanel()+'</section>'+
+ return '<section class="panel"><div class="panel-head"><span class="panel-title">Publishing</span><span class="panel-note">NAVIGATION · VISIBILITY</span></div>'+valueEditor(publishingSettings,'publishing','Publishing')+'</section>'+
+  appearancePanel()+
  '<section class="panel"><div class="panel-head"><span class="panel-title">Search &amp; social preview</span><span class="panel-note">SEO</span></div>'+valueEditor(r.seo||{},'seo','SEO')+'</section>';
+}
+function clearSectionDrag(){
+  $$('.section-card').forEach(card=>card.classList.remove('dragging','drop-before','drop-after'));
+  S.dragSection=null;
+}
+function moveDraggedSection(targetIndex,after){
+  const from=S.dragSection,sections=S.record?.sections;
+  if(from==null||!Array.isArray(sections)||from<0||from>=sections.length||targetIndex<0||targetIndex>=sections.length){clearSectionDrag();return;}
+  if(from===targetIndex){clearSectionDrag();return;}
+  const [section]=sections.splice(from,1);
+  let insert=targetIndex;
+  if(from<targetIndex)insert-=1;
+  if(after)insert+=1;
+  insert=Math.max(0,Math.min(sections.length,insert));
+  sections.splice(insert,0,section);
+  clearSectionDrag();
+  dirty();
+  renderEditor();
 }
 function renderSections(){
  const sections=S.record.sections||[];
@@ -876,7 +1178,8 @@ function renderSections(){
    const content=valueEditor(section.content||{},'sections.'+index+'.content','Content');
    const presentation=valueEditor(section.presentation||{variant:'',windowTitle:''},'sections.'+index+'.presentation','Presentation');
    const group=valueEditor(section.group||{id:'',layout:'grid',columns:2},'sections.'+index+'.group','Layout group');
-   return '<details class="section-card"'+(index===0?' open':'')+'><summary><span class="section-title">'+esc(componentLabel(section.type))+'</span><span class="section-pill">'+esc(section.type)+'</span><span class="section-meta">'+(section.enabled?'Enabled':'Disabled')+'</span><div class="section-actions">'+move+remove+'</div></summary><div class="section-body"><div class="section-tools"><span class="helper">Block ID: '+esc(section.id)+'</span><div class="toggle-field" style="padding:4px 7px;min-height:28px"><label>Enabled</label><input class="switch" type="checkbox" data-path="sections.'+index+'.enabled" '+(section.enabled?'checked':'')+(required?' disabled':'')+'></div></div>'+presentation+group+content+'</div></details>';
+   const technical='<div class="helper">Block ID: '+esc(section.id)+'</div>'+presentation+group;
+   return '<details class="section-card"'+(index===0?' open':'')+' data-section-index="'+index+'"><summary><span class="section-grip" draggable="true" data-section-grip="'+index+'" title="Drag to reorder">⠿</span><span class="section-glyph">'+componentGlyph(section.type)+'</span><span class="section-title">'+esc(componentLabel(section.type))+'</span><span class="section-pill">'+esc(section.type)+'</span><span class="section-meta">'+(section.enabled?'Enabled':'Disabled')+'</span><div class="section-actions">'+move+remove+'</div></summary><div class="section-body"><div class="section-tools"><div class="toggle-field" style="padding:4px 7px;min-height:28px"><label>Enabled</label><input class="switch" type="checkbox" data-path="sections.'+index+'.enabled" '+(section.enabled?'checked':'')+(required?' disabled':'')+'></div></div>'+content+advancedDrawer('block settings',technical)+'</div></details>';
  }).join('');
  const allowed=(templateMeta().allowedComponentTypes||[]).filter(type=>componentCount(type)<maxComponents(type));
  const options=allowed.map(type=>'<option value="'+esc(type)+'">'+esc(componentLabel(type))+'</option>').join('');
@@ -888,17 +1191,17 @@ function renderPageEditor(){
  const isHome=template==='homepage';
  const summary=isHome?'Your desktop, homepage gadgets, hero and content windows.':S.record.identity?.name||'Untitled page';
  setHeader(templateName.toUpperCase()+' WORKSPACE',summary,templateName+' · '+(S.record.sections||[]).length+' building blocks',S.route);
- body.innerHTML=pageFields()+
+ body.innerHTML=pageQuickPanel()+pageFields()+
   (isHome?'':'<section class="panel"><div class="panel-head"><span class="panel-title">'+(template==='album'?'Album &amp; player settings':'Template settings')+'</span><span class="panel-note">TEMPLATE DATA</span></div><p class="panel-desc">These are the template-specific settings used by the real FSFM page renderer.</p>'+valueEditor(S.record.templateData||{},'templateData','Template data')+'</section>')+
- renderSections();
+ renderSections()+advancedDrawer('page settings',pageAdvancedFields());
 }
 function renderGlobalEditor(){
  if(S.key==='site'){
    setHeader('GLOBAL SETTINGS','Site settings','Identity, default metadata, social profiles and global footer.','GLOBAL');
-   body.innerHTML='<section class="panel"><div class="panel-head"><span class="panel-title">Site-wide configuration</span><span class="panel-note">SITE.JSON</span></div>'+valueEditor(S.record,'ROOT','Site settings')+'</section>';
+   body.innerHTML=siteQuickPanel()+advancedDrawer('site settings','<section class="panel"><div class="panel-head"><span class="panel-title">Site-wide configuration</span><span class="panel-note">SITE.JSON</span></div>'+valueEditor(S.record,'ROOT','Site settings')+'</section>');
  }else{
    setHeader('DESIGN ASSETS','Wallpaper catalogue','Every preset, image URL and colour palette.','WALLPAPERS');
-   body.innerHTML='<section class="panel"><div class="panel-head"><span class="panel-title">Wallpaper presets</span><span class="panel-note">'+(S.record.presets||[]).length+' PRESETS</span></div><p class="panel-desc">Edit preset names, remote image sources, families and individual palette values. Page wallpaper settings are edited on the page itself.</p>'+valueEditor(S.record,'ROOT','Wallpaper catalogue')+'</section>';
+   body.innerHTML=wallpaperQuickPanel()+advancedDrawer('wallpaper catalogue','<section class="panel"><div class="panel-head"><span class="panel-title">Wallpaper presets</span><span class="panel-note">'+(S.record.presets||[]).length+' PRESETS</span></div><p class="panel-desc">Edit preset names, remote image sources, families and individual palette values. Page wallpaper settings are edited on the page itself.</p>'+valueEditor(S.record,'ROOT','Wallpaper catalogue')+'</section>');
  }
 }
 function renderEditor(){
@@ -1123,7 +1426,9 @@ function bindEvents(){
    if(field)changePath(field.dataset.path,field);
  });
  body.addEventListener('click',event=>{
-   const add=event.target.closest('[data-add-array]');
+    const wallpaper=event.target.closest('[data-quick-wallpaper]');
+    if(wallpaper){applyQuickWallpaper(wallpaper.dataset.quickWallpaper);return;}
+    const add=event.target.closest('[data-add-array]');
    const moveArray=event.target.closest('[data-move-array]');
    const remove=event.target.closest('[data-remove-array]');
    const removeBlock=event.target.closest('[data-remove-section]');
@@ -1139,7 +1444,33 @@ function bindEvents(){
    if(move){moveSection(Number(move.dataset.moveSection),Number(move.dataset.dir));return;}
    if(event.target.closest('#addComponentButton')){addComponent();return;}
  });
- $('#pageSearch').addEventListener('input',event=>{S.pageSearch=event.target.value;renderPageList();});
+ body.addEventListener('dragstart',event=>{
+    const grip=event.target.closest('[data-section-grip]');
+    if(!grip)return;
+    S.dragSection=Number(grip.dataset.sectionGrip);
+    if(event.dataTransfer){event.dataTransfer.effectAllowed='move';event.dataTransfer.setData('text/plain',String(S.dragSection));}
+    const card=grip.closest('.section-card');
+    if(card)card.classList.add('dragging');
+  });
+  body.addEventListener('dragover',event=>{
+    if(S.dragSection==null)return;
+    const card=event.target.closest('.section-card');
+    if(!card)return;
+    event.preventDefault();
+    $$('.section-card').forEach(node=>node.classList.remove('drop-before','drop-after'));
+    const rect=card.getBoundingClientRect();
+    card.classList.add(event.clientY<rect.top+rect.height/2?'drop-before':'drop-after');
+    if(event.dataTransfer)event.dataTransfer.dropEffect='move';
+  });
+  body.addEventListener('drop',event=>{
+    if(S.dragSection==null)return;
+    const card=event.target.closest('.section-card');
+    if(!card)return;
+    event.preventDefault();
+    moveDraggedSection(Number(card.dataset.sectionIndex),card.classList.contains('drop-after'));
+  });
+  body.addEventListener('dragend',clearSectionDrag);
+  $('#pageSearch').addEventListener('input',event=>{S.pageSearch=event.target.value;renderPageList();});
  $('#pageList').addEventListener('click',async event=>{
    const item=event.target.closest('[data-key]');if(!item||item.dataset.key===S.key)return;
    if(S.dirty&&!confirm('Discard unsaved changes and open another page?'))return;
@@ -1153,7 +1484,8 @@ function bindEvents(){
  $('#saveLyricsButton').addEventListener('click',saveLyrics);
  $('#closeLyricsButton').addEventListener('click',()=>$('#lyricsDialog').close());
  $('#cancelLyricsButton').addEventListener('click',()=>$('#lyricsDialog').close());
- $('#saveButton').addEventListener('click',saveLocal);
+  $('#viewModeButton').addEventListener('click',()=>setViewMode(S.viewMode==='advanced'?'simple':'advanced'));
+  $('#saveButton').addEventListener('click',saveLocal);
  $('#deployButton').addEventListener('click',deployLive);
  $('#newPageButton').addEventListener('click',createPage);
  $('#createPageForm').addEventListener('submit',submitCreatePage);
@@ -1188,7 +1520,8 @@ function bindEvents(){
  window.addEventListener('beforeunload',event=>{if(S.dirty){event.preventDefault();event.returnValue='';}});
 }
 async function start(){
- bindEvents();
+  bindEvents();
+  applyViewMode();
  try{
    await fetch(api+'/health').then(response=>{if(!response.ok)throw Error('Local server unavailable.');return response.json();});
    await loadIndex();await refreshPublishStatus();
