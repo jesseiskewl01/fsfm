@@ -11,7 +11,17 @@ const marker = {
   repository: 'jesseiskewl01/fsfm',
   targetBranch: 'main',
   publishRoots: ['content/v13', 'media', 'audio', 'lyrics'],
+  verification: [
+    'npm run check:all',
+    'npm run check:tina',
+    'npm run test:tina:local',
+    'npm run predeploy-check',
+  ],
 };
+
+const tinaChecks = `      - run: npm run check:tina
+      - run: npm run test:tina:local
+`;
 
 const workflow = `name: Build and deploy FSFM to GitHub Pages
 on:
@@ -26,9 +36,11 @@ jobs:
   build:
     steps:
       - run: npm run check:all
-      - run: npm run predeploy-check
+${tinaChecks}      - run: npm run predeploy-check
       - uses: actions/deploy-pages@v4
 `;
+
+const workflowWithoutTinaChecks = workflow.replace(tinaChecks, '');
 
 function command(cwd, args) {
   return execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
@@ -40,7 +52,7 @@ function writeFile(root, relative, content) {
   fs.writeFileSync(target, content);
 }
 
-function setupRepositories({ includeMarker = true } = {}) {
+function setupRepositories({ includeMarker = true, workflowText = workflow } = {}) {
   const folder = fs.mkdtempSync(path.join(os.tmpdir(), 'fsfm-publisher-test-'));
   const bare = path.join(folder, 'origin.git');
   const seed = path.join(folder, 'seed');
@@ -52,7 +64,7 @@ function setupRepositories({ includeMarker = true } = {}) {
   command(seed, ['config', 'user.name', 'FSFM Test']);
   command(seed, ['config', 'user.email', 'fsfm-test@example.invalid']);
   if (includeMarker) writeFile(seed, '.fsfm-studio-deploy.json', JSON.stringify(marker, null, 2));
-  writeFile(seed, '.github/workflows/deploy-pages.yml', workflow);
+  writeFile(seed, '.github/workflows/deploy-pages.yml', workflowText);
   writeFile(seed, 'content/v13/albums/test-album.json', '{"title":"Original"}\n');
   command(seed, ['add', '.']);
   command(seed, ['commit', '-m', 'Initial production site']);
@@ -77,6 +89,21 @@ test('publishing stays locked until the V16 deployment protocol exists on main',
   assert.equal(status.mainReady, false);
   assert.equal(status.canDeploy, false);
   assert.match(status.reason, /merged into main/);
+});
+
+test('publishing stays locked when main skips the Tina checks', async (t) => {
+  const fixture = setupRepositories({ workflowText: workflowWithoutTinaChecks });
+  t.after(() => fs.rmSync(fixture.folder, { recursive: true, force: true }));
+  const publisher = createStudioPublisher({
+    projectRoot: fixture.project,
+    dataDir: fixture.dataDir,
+    allowLocalRemotes: true,
+    runChecks: async () => {},
+  });
+  const status = await publisher.getStatus();
+  assert.equal(status.mainReady, false);
+  assert.equal(status.canDeploy, false);
+  assert.match(status.reason, /publishing safeguards/);
 });
 
 test('publication pushes only queued Studio files and preserves the development workspace', async (t) => {

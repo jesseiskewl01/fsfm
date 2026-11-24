@@ -12,6 +12,8 @@ const validation = fs.readFileSync(path.join(root, '.github/workflows/v15-valida
 test('Production deployment builds and audits dist before publishing it to GitHub Pages', () => {
   assert.match(workflow, /push:\n\s+branches:\n\s+- main/);
   assert.match(workflow, /npm run check:all/);
+  assert.match(workflow, /npm run check:tina/);
+  assert.match(workflow, /npm run test:tina:local/);
   assert.match(workflow, /npm run predeploy-check/);
   assert.match(workflow, /actions\/upload-pages-artifact@v4/);
   assert.match(workflow, /path: dist/);

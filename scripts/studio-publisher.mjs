@@ -147,7 +147,7 @@ function npmCommand(script) {
 }
 
 async function runProductionChecks(worktreePath) {
-  for (const script of ['check:all', 'predeploy-check']) {
+  for (const script of ['check:all', 'check:tina', 'test:tina:local', 'predeploy-check']) {
     const command = npmCommand(script);
     await run(command.program, command.args, worktreePath, 10 * 60 * 1000);
   }
@@ -207,6 +207,8 @@ export function createStudioPublisher({
     const workflowReady =
       /push:\s*\n\s*branches:\s*\n\s*-\s*main/m.test(workflow) &&
       workflow.includes('npm run check:all') &&
+      workflow.includes('npm run check:tina') &&
+      workflow.includes('npm run test:tina:local') &&
       workflow.includes('npm run predeploy-check') &&
       workflow.includes('actions/deploy-pages@v4');
 

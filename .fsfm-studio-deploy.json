@@ -11,6 +11,8 @@
   "deploymentWorkflow": ".github/workflows/deploy-pages.yml",
   "verification": [
     "npm run check:all",
+    "npm run check:tina",
+    "npm run test:tina:local",
     "npm run predeploy-check"
   ]
 }
