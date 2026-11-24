@@ -27,24 +27,24 @@
   else installResetButton();
 })();
 
-// Spotify's brown embed has its own rounded edge. Its exposed corners need the
+// Spotify's black embed has its own rounded edge. Its exposed corners need the
 // two-tone player colors, so paint them at runtime without touching saved HTML.
 // [Jesse + OpenCode, 2026-11-24]
 (function() {
-  var EMBED_URL = 'https://open.spotify.com/embed/artist/2PcGMMcKTObTrK7XVw9GSX?utm_source=generator&si=5263054ac6d0459f';
+  var EMBED_URL = 'https://open.spotify.com/embed/artist/2PcGMMcKTObTrK7XVw9GSX?utm_source=generator&theme=0&si=5263054ac6d0459f';
   var CORNERS = [
-    { name: 'tl', color: '#372828', css: 'left:0;top:0' },
-    { name: 'tr', color: '#372828', css: 'right:0;top:0' },
-    { name: 'bl', color: '#493A3A', css: 'left:0;bottom:0' },
-    { name: 'br', color: '#493A3A', css: 'right:0;bottom:0' }
+    { name: 'tl', color: '#1F1F1F', css: 'left:0;top:0' },
+    { name: 'tr', color: '#1F1F1F', css: 'right:0;top:0' },
+    { name: 'bl', color: '#121212', css: 'left:0;bottom:0' },
+    { name: 'br', color: '#121212', css: 'right:0;bottom:0' }
   ];
   function installSpotifyCorners() {
     var body = document.querySelector('.spotify-window-body');
     var iframe = body && body.querySelector('iframe');
     if (!body || !iframe) return;
     if (iframe.getAttribute('src') !== EMBED_URL) iframe.setAttribute('src', EMBED_URL);
-    iframe.setAttribute('style', 'border-radius:12px; background:#372828');
-    body.style.background = 'linear-gradient(#372828 0 50%, #493A3A 50% 100%)';
+    iframe.setAttribute('style', 'border-radius:12px');
+    body.style.background = 'linear-gradient(#1F1F1F 0 50%, #121212 50% 100%)';
     Array.prototype.slice.call(body.querySelectorAll('.fsfm-spotify-corner')).forEach(function(node) { node.remove(); });
     CORNERS.forEach(function(corner) {
       var square = document.createElement('div');
