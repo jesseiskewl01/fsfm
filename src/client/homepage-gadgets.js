@@ -37,8 +37,8 @@
     var viewportHeight = window.innerHeight;
     var heroTop = heroRect ? heroRect.top : 82;
     var topRow = Math.max(72, Math.round(heroTop));
-    var middleRow = Math.max(topRow + 170, Math.round(heroTop + 170));
-    var lowerRow = Math.max(middleRow + 170, Math.round(heroTop + 340));
+    var middleRow = Math.max(topRow + 196, Math.round(heroTop + 196));
+    var lowerRow = Math.max(middleRow + 196, Math.round(heroTop + 392));
     var mainWidth = 184;
     var leftOuter = 16;
     var leftInner = 46;
@@ -176,6 +176,31 @@
     } catch (e) {}
   }
 
+  // A held widget nudges any widget it hits. [OpenCode, 2026-11-24]
+  function pushOverlappingWidgets(held, dx, dy) {
+    if (!dx && !dy) return;
+    var gap = 8;
+    for (var pass = 0; pass < 3; pass += 1) {
+      var heldRect = held.getBoundingClientRect();
+      var heldBox = { x:heldRect.left, y:heldRect.top, width:heldRect.width, height:heldRect.height };
+      var moved = false;
+      widgets.forEach(function(other) {
+        if (other === held || other.hidden || !other.querySelector('[data-drag-handle]')) return;
+        var rect = other.getBoundingClientRect();
+        var box = { x:rect.left, y:rect.top, width:rect.width, height:rect.height };
+        if (!boxesOverlap(heldBox, box, gap)) return;
+        var stored = positions[other.id] || [rect.left, rect.top];
+        applyPosition(other, stored[0] + dx, stored[1] + dy);
+        customPositions[other.id] = true;
+        other.classList.add('gadget-pushed');
+        if (other._pushTimer) clearTimeout(other._pushTimer);
+        other._pushTimer = setTimeout(function() { other.classList.remove('gadget-pushed'); other._pushTimer = null; }, 240);
+        moved = true;
+      });
+      if (!moved) break;
+    }
+  }
+
   widgets.forEach(function(widget) {
     var handle = widget.querySelector('[data-drag-handle]');
     if (!handle) return;
@@ -183,7 +208,8 @@
     handle.addEventListener('pointerdown', function(event) {
       if (event.button !== 0 || event.target.closest('button,select,a,input')) return;
       var rect = widget.getBoundingClientRect();
-      drag = { pointerId:event.pointerId, startX:event.clientX, startY:event.clientY, left:rect.left, top:rect.top };
+      drag = { pointerId:event.pointerId, startX:event.clientX, startY:event.clientY, lastX:event.clientX, lastY:event.clientY, left:rect.left, top:rect.top };
+      widget.classList.add('is-dragging');
       widget.style.zIndex = '80';
       widgets.forEach(function(other) { if (other !== widget) other.style.zIndex = '35'; });
       try { handle.setPointerCapture(event.pointerId); } catch (e) {}
@@ -192,11 +218,15 @@
     handle.addEventListener('pointermove', function(event) {
       if (!drag || event.pointerId !== drag.pointerId) return;
       customPositions[widget.id] = true;
+      var dx = event.clientX - drag.lastX, dy = event.clientY - drag.lastY;
+      drag.lastX = event.clientX; drag.lastY = event.clientY;
       applyPosition(widget, drag.left + event.clientX - drag.startX, drag.top + event.clientY - drag.startY);
+      pushOverlappingWidgets(widget, dx, dy);
     });
     function endDrag(event) {
       if (!drag || (event && event.pointerId !== drag.pointerId)) return;
       drag = null;
+      widget.classList.remove('is-dragging');
       savePositions();
     }
     handle.addEventListener('pointerup', endDrag);
@@ -212,7 +242,9 @@
       else return;
       event.preventDefault();
       customPositions[widget.id] = true;
+      var beforeX = rect.left, beforeY = rect.top;
       applyPosition(widget, x, y);
+      pushOverlappingWidgets(widget, x - beforeX, y - beforeY);
       savePositions();
     });
   });

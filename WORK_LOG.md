@@ -468,3 +468,15 @@ The architectural refurbishment itself: Roadmap Phases 3–5. Make homepage and 
 - Added `npm run check:tina` and `npm run test:tina:local` to the deploy workflow, so a direct Studio publish to `main` no longer skips Tina checks. Updated `.fsfm-studio-deploy.json` verification list to match.
 - Updated `scripts/studio-publisher.mjs` so its local pre-push checks run all four commands, and its main-branch safeguard refuses to unlock unless the deploy workflow includes both Tina checks. Added a regression test for a main workflow missing those checks.
 - **Verify:** `npm test` **197/197 pass**; `npm run check:all` pass; `npm run check:tina` pass; `npm run test:tina:local` pass; `npm run predeploy-check` pass. No push, merge, force, history rewrite, live publish, file deletion, or credential access.
+
+### Milestone 10 — first visual fixes from the live review **[Jesse + OpenCode, 2026-11-24]**
+
+- Bottom homepage widgets: removed the six-dot drag grip because they are not movable, softened the doubled top bezel, and increased the gap between cards.
+- Bubble Frequency slider: replaced the small native control with a clear custom track, larger thumb, stronger label, and a value readout box.
+- Top widgets: increased the row spacing and added collision behaviour — a held widget now pushes any widget it hits, with a brief glow on the pushed widget. This also works with arrow-key nudging.
+- Fixed the artist embed mismatch by making the whole Spotify window dark, matching its dark iframe instead of leaving a white shell around it.
+- Vista windows: the close button now actually closes the window and shows a **Reopen** dock item; minimize still minimizes.
+- `localhost:3000` now works for Studio as well as `127.0.0.1:3000` and `::1`; cross-site origins are still rejected with the exact original error wording.
+- Added `test/studio-visual-fixes.test.mjs` covering collision, slider, grip, embed frame, close versus minimize, and loopback origins.
+- **Baseline note:** the saved 28,931-character baseline was stale by one navigation link that already existed at `HEAD`. A fresh baseline was captured from the current committed output (29,030 characters). None of the changes in this milestone touch rendered HTML.
+- **Verify:** `npm test` **202/202 pass**; `npm run build` pass; `node scripts/build-v13.mjs --preview --include-drafts` pass; browser check confirmed hidden grips, 18px gadget gap, dark Spotify frame and 16px slider control. No push, merge, force, history rewrite, live publish, file deletion, or credential access.

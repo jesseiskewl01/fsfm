@@ -59,6 +59,6 @@ document.addEventListener('click',function(event){
  var button=event.target.closest('[data-vista-window-action], [data-window-action]');if(!button)return;
  var win=button.closest('[data-vista-window]');if(!win)return;
  var action=button.getAttribute('data-vista-window-action') || button.getAttribute('data-window-action');
- if(action==='minimize'||action==='close')toggleMinimize(win);
+ if(action==='minimize'){toggleMinimize(win);return;}if(action==='close'){win.classList.remove('window-minimized');hideWindow(win,'closed');}
 });
 })();

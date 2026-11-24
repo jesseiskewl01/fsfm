@@ -306,12 +306,13 @@ function validateAlbumRecord(id, record) {
 }
 
 
-function expectedStudioOrigin() {
-  return 'http://' + host + ':' + port;
+// Every loopback spelling of this port is the same local Studio. [OpenCode, 2026-11-24]
+function studioOrigins() {
+  return ['http://127.0.0.1:' + port, 'http://localhost:' + port, 'http://[::1]:' + port];
 }
 
 function hasExpectedOrigin(request) {
-  return request.headers.origin === expectedStudioOrigin();
+  return studioOrigins().includes(request.headers.origin);
 }
 
 function readSessionToken(request) {
@@ -881,10 +882,9 @@ async function handleApi(request, response, pathname) {
     return;
   }
 
-  // Only accept editor writes from this exact local Studio origin.
+  // Only accept editor writes from a local Studio origin.
   // This blocks cross-site browser requests from unrelated websites.
-  const expectedOrigin = 'http://' + host + ':' + port;
-  if (request.headers.origin !== expectedOrigin) {
+  if (!hasExpectedOrigin(request)) {
     sendJson(response, 403, { error: 'Studio saves must come from this local FSFM Studio page.' });
     return;
   }
