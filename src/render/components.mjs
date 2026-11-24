@@ -63,14 +63,15 @@ export function renderWindow({
     ariaLabel ? `aria-label="${escapeHtml(ariaLabel)}"` : '',
     dataAttrs,
   ].filter(Boolean).join(' ');
+  const vistaActions = draggable || /data-vista-window/.test(dataAttrs || '');
+  const titlebarClass = vistaActions ? 'titlebar vista-window-titlebar' : 'titlebar';
   const titlebarAttrs = draggable
-    ? ' class="titlebar vista-window-titlebar" data-vista-drag-handle tabindex="0" aria-label="Move ' + escapeHtml(title) + ' window" title="Drag to move · Use arrow keys to nudge"'
-    : ' class="titlebar"';
+    ? ' class="' + titlebarClass + '" data-vista-drag-handle tabindex="0" aria-label="Move ' + escapeHtml(title) + ' window" title="Drag to move · Use arrow keys to nudge"'
+    : ' class="' + titlebarClass + '"';
   const icon = iconHtml || '<span class="window-mini-icon" aria-hidden="true">✧</span>';
   const titleSpan = titleId
     ? `<span id="${escapeHtml(titleId)}">${escapeHtml(title)}</span>`
     : `<span>${escapeHtml(title)}</span>`;
-  const vistaActions = draggable || /data-vista-window/.test(dataAttrs || '');
   const controlButtons = [];
   if (controls === 'minimize-close' || controls === 'minimize') {
     controlButtons.push(`<button type="button" class="caption-button vista-window-button minimize" data-window-action="minimize"${vistaActions ? ' data-vista-window-action="minimize"' : ''} aria-label="Minimize ${escapeHtml(title)} window" title="Minimize">−</button>`);

@@ -14,6 +14,7 @@ const wallpapers = readJson('content/v13/wallpapers.json');
 const album = readJson('content/v13/albums/the-early-bird.json');
 const vista = readJson('content/v13/vista-pages/vistatest.json');
 const editorial = readJson('content/v13/editorial-pages/new-editorial-page.json');
+const css = fs.readFileSync(path.join(root, 'src/styles/v13.css'), 'utf8');
 const pages = [album, vista, editorial];
 
 const render = (page) => renderPage(page, { site, wallpapers, pages, assets: '/assets' });
@@ -94,4 +95,9 @@ test('shell part settings validate from the shared definitions', () => {
     assert.equal(problems.length, 1, `expected one problem for ${JSON.stringify(bad)}`);
     assert.match(problems[0], /: appearance\.parts\.siteMenu\.enabled must be true, false, or an object with a boolean enabled field$/);
   }
+});
+
+test('shell CSS uses the current menu vocabulary, not legacy navigation selectors', () => {
+  assert.doesNotMatch(css, /site-navigation/);
+  assert.match(css, /\.site-menu-panel a/);
 });

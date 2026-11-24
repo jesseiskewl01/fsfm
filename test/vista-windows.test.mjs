@@ -11,7 +11,7 @@ const css=fs.readFileSync(path.join(root,'src/styles/v13.css'),'utf8');
 const client=fs.readFileSync(path.join(root,'src/client/vista-windows.js'),'utf8');
 test('Vista window variants render Aero titlebars and controls',()=>{
  const result=renderComponent({id:'welcome',type:'hero',enabled:true,content:{title:'Vista test'},presentation:{variant:'vista-window',windowTitle:'Welcome'}},{page:{template:'vista-window'},site:{siteName:'FSFM'}});
- for(const token of ['vista-window-frame','data-vista-window','data-vista-window-action="minimize"','data-vista-window-action="close"','Welcome'])assert.ok(result.html.includes(token),token);
+ for(const token of ['vista-window-frame','vista-window-titlebar','data-vista-window','data-vista-window-action="minimize"','data-vista-window-action="close"','Welcome'])assert.ok(result.html.includes(token),token);
 });
 test('Vista-specific chrome is isolated from the homepage and editorial templates',()=>{
  for(const template of ['homepage','editorial']){
@@ -23,6 +23,7 @@ test('Vista pages load their client script and layer the navigation above window
  assert.match(renderer,/page\.template === 'vista-window'\) scriptsToLoad\.add\('vista-windows\.js'\)/);
  assert.match(css,/template-vista-window \.global-header\{position:relative;z-index:1000/);
  assert.match(css,/template-vista-window \.site-menu-panel\{z-index:1003/);
+ assert.match(css,/template-editorial \.site-shell \{ width: min\(1000px, calc\(100% - 40px\)\); isolation: isolate/);
 });
 test('Vista script parses and supports dragging, keyboard movement and dock restoration',()=>{
  assert.doesNotThrow(()=>new vm.Script(client,{filename:'vista-windows.js'}));

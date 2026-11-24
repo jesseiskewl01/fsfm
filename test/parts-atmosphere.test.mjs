@@ -87,3 +87,11 @@ test('the lite client path is a real reduction, not a cosmetic flag', () => {
   assert.match(js, /var steps = 22/);
   assert.match(js, /1 : 1\.1/);
 });
+
+test('the atmosphere client does not duplicate the canonical album player', () => {
+  const js = fs.readFileSync(path.join(root, 'src/client/album-atmosphere.js'), 'utf8');
+  assert.match(js, /getElementById\('nebulaCanvas'\)/);
+  assert.doesNotMatch(js, /var TRACKS/);
+  assert.doesNotMatch(js, /getElementById\('albumAudio'\)/);
+  assert.doesNotMatch(js, /function selectTrack/);
+});
