@@ -409,3 +409,8 @@ The architectural refurbishment itself: Roadmap Phases 3–5. Make homepage and 
   - Replaced all stale `.site-navigation` CSS with the live `.site-menu` / `.site-menu-panel` vocabulary, preserving album amber menu styling and responsive padding.
 - **Verify:** `npm test` **187/187 pass**; `npm run validate:v13` pass; `npm run build` pass; `npm run predeploy-check` pass; `npm run check:all` pass; draft preview build pass. `tina/tina-lock.json` remains modified but unstaged.
 - Still needing Jesse's explicit decision before any further “100% building blocks” work: homepage hero/gadgets content-shape migration, expanding the 32-part catalogue with page behavior effects, expanding Tina from album-only to all six stores, removing legacy/stage npm scripts, re-enabling Vista drag, and moving the deploy marker/workflow to `origin/main` to unlock live publishing. None of these were attempted.
+
+### Decision checkpoint **[Jesse + OpenCode, 2026-11-24]**
+
+- Jesse approved: migrate homepage hero/gadgets into composable parts; declare `backgroundEffects`, `pageTransition`, and `respectReducedMotion` as effects; expand Tina from album-only to all six stores **and regenerate Tina artifacts** (explicit override of the earlier no-generated-artifacts guardrail); remove legacy/stage npm script exposure while leaving files; hide the placeholder `new-editorial-page`; keep Vista drag disabled; leave live publishing locked.
+- A local checkpoint commit and tag will be created before schema/content-shape changes begin. Nothing will be pushed. The existing unstaged `tina/tina-lock.json` drift will be handled deliberately once regeneration is authorized and reviewed.
