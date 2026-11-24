@@ -60,7 +60,11 @@
 
 (function() {
   var layer = document.getElementById('fsfmGadgets');
-  if (!layer || !window.matchMedia('(min-width: 1180px) and (min-height: 600px)').matches) return;
+  if (!layer) return;
+  // CSS still hides gadgets on small screens, but the viewport can grow after
+  // load. Keep the runtime alive and lay out whenever desktop space exists.
+  // [Jesse + OpenCode, 2026-11-24]
+  var desktopQuery = window.matchMedia('(min-width: 1180px) and (min-height: 600px)');
 
   var STORAGE_KEY = 'fsfm_gadget_positions_v2';
   var LEGACY_STORAGE_KEY = 'fsfm_gadget_positions_v1';
@@ -249,22 +253,24 @@
     return layout;
   }
 
-  widgets.forEach(function(widget) {
-    var saved = storedPositions[widget.id];
-    if (storedV2) {
-      customPositions[widget.id] = customPositions[widget.id] === true;
-    } else {
-      customPositions[widget.id] = !!(saved && !isLegacyDefault(widget, saved));
-    }
-    var configured = gadgetConfig.positions && gadgetConfig.positions[widget.id];
-    var fallback = defaultPositions[widget.id] || [16, 90];
-    var useSaved = customPositions[widget.id] && saved && Number.isFinite(saved[0]) && Number.isFinite(saved[1]);
-    var x = useSaved ? saved[0] : (configured ? Number(configured[0]) : fallback[0]);
-    var y = useSaved ? saved[1] : (configured ? Number(configured[1]) : fallback[1]);
-    applyInitialPosition(widget, x, y);
-  });
+  if (desktopQuery.matches) {
+    widgets.forEach(function(widget) {
+      var saved = storedPositions[widget.id];
+      if (storedV2) {
+        customPositions[widget.id] = customPositions[widget.id] === true;
+      } else {
+        customPositions[widget.id] = !!(saved && !isLegacyDefault(widget, saved));
+      }
+      var configured = gadgetConfig.positions && gadgetConfig.positions[widget.id];
+      var fallback = defaultPositions[widget.id] || [16, 90];
+      var useSaved = customPositions[widget.id] && saved && Number.isFinite(saved[0]) && Number.isFinite(saved[1]);
+      var x = useSaved ? saved[0] : (configured ? Number(configured[0]) : fallback[0]);
+      var y = useSaved ? saved[1] : (configured ? Number(configured[1]) : fallback[1]);
+      applyInitialPosition(widget, x, y);
+    });
 
-  settleWidgets(null);
+    settleWidgets(null);
+  }
 
   function applyInitialPosition(widget, x, y) {
     var p = clampWidget(widget, x, y);
@@ -459,16 +465,17 @@
     storedV2 = false;
     reflowDesktopWidgets();
   });
-  window.addEventListener('resize', function() {
+  function scheduleDesktopReflow() {
+    if (!desktopQuery.matches) return;
     if (resizeFrame) cancelAnimationFrame(resizeFrame);
     resizeFrame = requestAnimationFrame(reflowDesktopWidgets);
-  }, { passive: true });
+  }
+  window.addEventListener('resize', scheduleDesktopReflow, { passive: true });
+  if (desktopQuery.addEventListener) desktopQuery.addEventListener('change', scheduleDesktopReflow);
+  else if (desktopQuery.addListener) desktopQuery.addListener(scheduleDesktopReflow);
 
   if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(function() {
-      if (resizeFrame) cancelAnimationFrame(resizeFrame);
-      resizeFrame = requestAnimationFrame(reflowDesktopWidgets);
-    });
+    document.fonts.ready.then(scheduleDesktopReflow);
   }
 
   // Clock
