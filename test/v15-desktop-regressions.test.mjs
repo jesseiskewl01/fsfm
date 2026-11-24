@@ -43,7 +43,7 @@ test('V15 homepage widgets form the intended six-window frame with loose bonus p
   for (const id of ['gadget-clock', 'gadget-now-playing', 'gadget-dates', 'gadget-calendar', 'gadget-photos', 'gadget-note']) {
     assert.match(js, new RegExp("'" + id + "':"));
   }
-  assert.match(js, /var COLLISION_GAP = 16/);
+  assert.match(js, /var COLLISION_GAP = 12/);
   assert.match(js, /var COLUMN_GAP = 24/);
   assert.match(js, /var leftRegion = \{ start:edge, end:Math\.max\(edge \+ mainWidth, heroLeft - REGION_GAP\) \}/);
   assert.match(js, /var rightRegion = \{ start:Math\.min\(viewportWidth - edge - mainWidth, heroRight \+ REGION_GAP\), end:viewportWidth - edge \}/);

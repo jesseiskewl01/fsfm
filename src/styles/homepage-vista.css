@@ -492,24 +492,12 @@ text-shadow: 0 1px 3px rgb(var(--deep-rgb)), 0 0 8px rgba(var(--deep-rgb), 0.8);
 .window-mini-icon.social { font-size:15px; }
 .bio-window-body { min-height:352px; display:flex; align-items:center; justify-content:center; padding:28px 24px; background:linear-gradient(145deg,#fff,#f1f8fb); }
 .bio-window-body .bio-text { max-width:39ch; font-size:14px; line-height:1.85; text-align:left; }
+/* Keep the normal Vista glass window. The bottom inset shadow fills the existing
+   dark padding from inside the border box, so the window's own radius clips it
+   cleanly instead of scuffing the corners with an overlay strip. [Jesse + OpenCode, 2026-11-24] */
+.spotify-window.content-window { box-shadow:0 7px 23px rgba(0,0,0,.42),inset 0 0 0 1px #effbffc0,inset 0 -8px 0 #121212; }
 .spotify-window-body { position:relative; padding:0; background:#121212; overflow:hidden; }
-.spotify-window-body iframe { width:100%; max-width:none; height:352px; min-height:352px; display:block; border:0; border-radius:5px; box-shadow:none; background:#121212; }
-/* The embed paints white corner slivers; mask them with the player's own background. [Jesse + OpenCode, 2026-11-24] */
-.spotify-window-body::after { content:""; position:absolute; z-index:3; inset:0; pointer-events:none;
-  background:
-    radial-gradient(circle at 0 0, #121212 0 8px, transparent 9px),
-    radial-gradient(circle at 100% 0, #121212 0 8px, transparent 9px),
-    radial-gradient(circle at 0 100%, #121212 0 8px, transparent 9px),
-    radial-gradient(circle at 100% 100%, #121212 0 8px, transparent 9px);
-}
-/* Keep the normal Vista glass window; only its rounded corners need a dark finish. [Jesse + OpenCode, 2026-11-24] */
-.spotify-window::after { content:""; position:absolute; z-index:6; inset:0; pointer-events:none; border-radius:inherit;
-  background:
-    radial-gradient(circle at 0 100%, rgba(8,14,18,.95) 0 6px, transparent 7px),
-    radial-gradient(circle at 100% 100%, rgba(8,14,18,.95) 0 6px, transparent 7px),
-    radial-gradient(circle at 0 0, rgba(8,14,18,.55) 0 4px, transparent 5px),
-    radial-gradient(circle at 100% 0, rgba(8,14,18,.55) 0 4px, transparent 5px);
-}
+.spotify-window-body iframe { width:100%; max-width:none; height:352px; min-height:352px; display:block; border:0; border-radius:5px; clip-path:inset(0 round 5px); box-shadow:none; background:#121212; }
 .events-window { margin-top:20px; }
 .events-window .bit-container { min-height:100px; padding:15px; border:0; border-radius:0; box-shadow:none; background:linear-gradient(145deg,#fff,#f4f9fc) !important; display:flex; align-items:center; justify-content:center; text-align:center; }
 .events-window .bandsintown-widget, .events-window .component-fallback { max-width:100%; margin-inline:auto; }
@@ -775,3 +763,8 @@ html, body, * {
  .fsfm-gadgets-extras .gadget-control-button{width:100%;min-height:34px;padding:7px 9px;border:1px solid rgba(66,105,132,.48);border-radius:5px;color:#173b53;font:700 8px "Roboto Mono",monospace;letter-spacing:.025em;text-align:center;background:linear-gradient(#fff 0%,#e7f6ff 47%,#c6e5f5 52%,#f8fcff 100%);box-shadow:inset 0 1px #fff,0 2px 4px rgba(0,0,0,.16);cursor:pointer;}
  .fsfm-gadgets-extras .gadget-control-button:hover,.fsfm-gadgets-extras .gadget-control-button:focus-visible{filter:brightness(1.04);box-shadow:0 0 9px rgba(255,255,255,.9),inset 0 1px #fff;}
  .fsfm-gadgets-extras .gadget-control-button[aria-pressed="true"]{background:linear-gradient(#dff8ff,#a9dff1 48%,#83c2df 52%,#e8faff);}
+ /* Bottom reset icon: same Vista glass button language as the window captions. [Jesse + OpenCode, 2026-11-24] */
+ .fsfm-gadget-reset{display:flex;align-items:center;justify-content:center;width:100%;padding:8px 0 2px;}
+ .gadget-reset-button{width:27px;height:20px;display:flex;align-items:center;justify-content:center;padding:0;border:1px solid rgba(var(--deep-rgb),.5);border-radius:3px;box-shadow:inset 0 0 0 1px #ffffff65;color:#fff;text-shadow:0 0 1px #000,1px 1px 1px #000;font:700 14px Arial;background:linear-gradient(rgba(var(--hi-rgb),.4),rgba(var(--hi-rgb),.15) 46%,rgba(var(--deep-rgb),.4) 50%,rgba(var(--mid-rgb),.3));cursor:pointer;transition:background .15s ease,box-shadow .15s ease;}
+ .gadget-reset-button:hover,.gadget-reset-button:focus-visible{background:linear-gradient(rgb(var(--hi-rgb)),rgb(var(--bright-rgb)) 45%,rgb(var(--glass-rgb)) 50%,rgb(var(--bright-rgb)));box-shadow:0 0 12px rgb(var(--bright-rgb)),inset 0 0 0 1px #fff9;}
+ .gadget-reset-button.is-resetting{box-shadow:0 0 18px rgb(var(--bright-rgb)),inset 0 0 0 1px #fff;color:#fff;}

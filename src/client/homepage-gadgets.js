@@ -1,4 +1,32 @@
 'use strict';
+
+// A small Vista-style reset icon at the bottom of the gadget area. It clears
+// only saved gadget positions, never content or settings. [Jesse + OpenCode, 2026-11-24]
+(function() {
+  var STORAGE_KEY = 'fsfm_gadget_positions_v2';
+  var LEGACY_STORAGE_KEY = 'fsfm_gadget_positions_v1';
+  function installResetButton() {
+    var host = document.querySelector('.fsfm-gadgets-extras');
+    if (!host || document.getElementById('fsfmGadgetReset')) return;
+    var bar = document.createElement('div');
+    bar.className = 'fsfm-gadget-reset';
+    bar.innerHTML = '<button type="button" id="fsfmGadgetReset" class="gadget-reset-button" aria-label="Reset gadget positions" title="Reset gadget positions"><span aria-hidden="true">↺</span></button>';
+    host.appendChild(bar);
+    var button = document.getElementById('fsfmGadgetReset');
+    button.addEventListener('click', function() {
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(LEGACY_STORAGE_KEY);
+      } catch (e) {}
+      window.dispatchEvent(new CustomEvent('fsfm:reset-gadgets'));
+      button.classList.add('is-resetting');
+      window.setTimeout(function() { button.classList.remove('is-resetting'); }, 600);
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', installResetButton);
+  else installResetButton();
+})();
+
 (function() {
   var layer = document.getElementById('fsfmGadgets');
   if (!layer || !window.matchMedia('(min-width: 1180px) and (min-height: 600px)').matches) return;
@@ -24,7 +52,7 @@
     }
   } catch (e) { storedPositions = {}; customPositions = {}; }
 
-  var COLLISION_GAP = 16;
+  var COLLISION_GAP = 12;
   var REGION_GAP = 16;
   var COLUMN_GAP = 24;
   var ROW_GAP = 32;
@@ -88,7 +116,7 @@
     var rowGap = ROW_GAP;
     if (stackedHeight + rowGap * 2 > availableHeight) {
       // A small vertical stagger is safe only when the two columns are separate;
-      // their 24px horizontal gap still clears the 16px collision gap.
+      // their 24px horizontal gap still clears the 12px collision gap.
       var minGap = leftPaired && rightPaired ? -4 : COLLISION_GAP;
       rowGap = Math.max(minGap, Math.floor((availableHeight - stackedHeight) / 2));
     }
@@ -285,11 +313,13 @@
     });
   }
 
-  // A held widget nudges any widget it hits. [OpenCode, 2026-11-24]
+  // A held widget nudges a hit widget by the smallest amount that clears it,
+  // along the drag direction. The soft glow and settle still apply on release.
+  // [Jesse + OpenCode, 2026-11-24]
   function pushOverlappingWidgets(held, dx, dy) {
     if (!dx && !dy) return;
     var gap = COLLISION_GAP;
-    for (var pass = 0; pass < 3; pass += 1) {
+    for (var pass = 0; pass < 2; pass += 1) {
       var heldRect = held.getBoundingClientRect();
       var heldBox = { x:heldRect.left, y:heldRect.top, width:heldRect.width, height:heldRect.height };
       var moved = false;
@@ -299,7 +329,14 @@
         var box = { x:rect.left, y:rect.top, width:rect.width, height:rect.height };
         if (!boxesOverlap(heldBox, box, gap)) return;
         var stored = positions[other.id] || [rect.left, rect.top];
-        applyPosition(other, stored[0] + dx, stored[1] + dy);
+        var clearX = dx > 0 ? heldBox.x + heldBox.width + gap - box.x : box.x + box.width + gap - heldBox.x;
+        var clearY = dy > 0 ? heldBox.y + heldBox.height + gap - box.y : box.y + box.height + gap - heldBox.y;
+        var nx = stored[0], ny = stored[1];
+        if (Math.abs(dx) >= Math.abs(dy) && clearX > 0) nx += dx > 0 ? clearX : -clearX;
+        else if (clearY > 0) ny += dy > 0 ? clearY : -clearY;
+        else if (clearX > 0) nx += dx > 0 ? clearX : -clearX;
+        if (nx === stored[0] && ny === stored[1]) return;
+        applyPosition(other, nx, ny);
         // A pushed widget is not a user-placed widget: reflow may restore it.
         other.classList.add('gadget-pushed');
         if (other._pushTimer) clearTimeout(other._pushTimer);
@@ -331,7 +368,6 @@
       drag.lastX = event.clientX; drag.lastY = event.clientY;
       applyPosition(widget, drag.left + event.clientX - drag.startX, drag.top + event.clientY - drag.startY);
       pushOverlappingWidgets(widget, dx, dy);
-      settleWidgets(widget);
     });
     function endDrag(event) {
       if (!drag || (event && event.pointerId !== drag.pointerId)) return;
@@ -384,6 +420,14 @@
     settleWidgets(null);
     // Reflow is layout repair, not a user move: never persist clamped positions.
   }
+  // The reset icon clears storage first; restore the computed spawn points
+  // without writing them back. [Jesse + OpenCode, 2026-11-24]
+  window.addEventListener('fsfm:reset-gadgets', function() {
+    customPositions = {};
+    storedPositions = {};
+    storedV2 = false;
+    reflowDesktopWidgets();
+  });
   window.addEventListener('resize', function() {
     if (resizeFrame) cancelAnimationFrame(resizeFrame);
     resizeFrame = requestAnimationFrame(reflowDesktopWidgets);
