@@ -11,9 +11,16 @@ const liveGadgets = readJson('data/homepage-gadgets.json');
 
 test('Current live Homepage gadget data is merged into the V13 canonical record', () => {
   const migrated = homepage.templateData.gadgets;
-  for (const key of ['photos', 'dates', 'stickyNote', 'funWidgets']) {
+  for (const key of ['photos', 'dates', 'stickyNote']) {
     assert.deepEqual(migrated[key], liveGadgets[key], `${key} should match the live repository record`);
   }
+  // Canonical content intentionally enables radio and Purble after migration. [OpenCode, 2026-11-24]
+  assert.deepEqual(migrated.funWidgets, {
+    showBarrelRoll: false,
+    showBubbleSlider: true,
+    showMusicPlayer: true,
+    showPurblePlace: true
+  });
   assert.deepEqual(liveGadgets.photos, ['/media/images/earlybirdcd.jpg']);
   assert.equal(liveGadgets.dates[0].date, '2026-11-16');
   assert.equal(liveGadgets.stickyNote.text, 'typa shit that make you wanna grab a penguin');

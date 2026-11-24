@@ -125,17 +125,6 @@
       "content": {
         "source": "templateData.spotify"
       }
-    },
-    {
-      "id": "stateymenty",
-      "type": "artist-statement",
-      "enabled": true,
-      "presentation": {
-        "variant": "vista-window"
-      },
-      "content": {
-        "body": "e^\"^^436rxctfgvbuyhnijhgvfdtrsdtfyg 867675678566tyuy7y"
-      }
     }
   ],
   "publishing": {

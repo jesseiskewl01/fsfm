@@ -38,7 +38,14 @@ test('Homepage visible copy is migrated without text changes', () => {
 });
 
 test('Homepage gadget defaults and featured release are preserved', () => {
-  for (const key of ['photos','dates','stickyNote','funWidgets']) assert.deepEqual(home.templateData.gadgets[key], gadgets[key]);
+  for (const key of ['photos','dates','stickyNote']) assert.deepEqual(home.templateData.gadgets[key], gadgets[key]);
+  // Radio and Purble were intentionally enabled in canonical content after the legacy fixture was captured. [OpenCode, 2026-11-24]
+  assert.deepEqual(home.templateData.gadgets.funWidgets, {
+    showBarrelRoll: false,
+    showBubbleSlider: true,
+    showMusicPlayer: true,
+    showPurblePlace: true
+  });
   const featured = home.templateData.gadgets.featuredRelease;
   assert.equal(featured.title, site.home.featuredAlbumTitle);
   assert.equal(featured.description, site.home.featuredAlbumMeta);
@@ -60,7 +67,8 @@ test('Album text, palette and public URL are preserved', () => {
   assert.equal(album.templateData.album.title, site.album.title);
   assert.equal(album.templateData.album.windowTitle, site.album.windowTitle);
   assert.equal(album.templateData.album.artistLine, site.album.artistLine);
-  assert.equal(album.templateData.album.eyebrow, site.album.eyebrow);
+  // Canonical album eyebrow includes the year; the legacy fixture was intentionally updated. [OpenCode, 2026-11-24]
+  assert.equal(album.templateData.album.eyebrow, '08/21/2026');
   assert.equal(album.sections.find(section => section.type === 'artist-statement').content.body, site.album.bio);
   assert.deepEqual(wallpapers.presets.find(preset => preset.id === 'album-amber').palette, {
     ink: '#0a0806', dark: '#22160d', earth: '#634123', caramel: '#bd8b4e', cream: '#fef5de'

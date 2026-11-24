@@ -383,3 +383,18 @@ The architectural refurbishment itself: Roadmap Phases 3–5. Make homepage and 
   - **General risk:** adding one-off renderer/CSS forks per complaint increases “18 mud components”. Preferred path: keep `renderWindow/windowWrap` canonical, put visual differences in presentation tokens/classes/content, and isolate unavoidable behavior differences behind explicit, tested context flags.
 
 - **Verify:** `npm run validate:v13` pass; `npm run build` pass; `node scripts/build-v13.mjs --preview --include-drafts` pass; `npm test` **183/170/13** (same baseline).
+
+### Autonomous readiness pass — brief **[OpenCode, 2026-11-24]**
+
+- Jesse asked for a long autonomous work run toward three outcomes: Studio ready for the Tina → Git Actions → website deploy path, the site fully assembled from building blocks with no old architecture, and all checks passing.
+- Guardrails remain unchanged: local commits only; no push/merge/force/history rewrite/file deletion; no credentials or live publishing; no generated Tina artifacts; `tina/tina-lock.json` remains unstaged; stop for deliberate/strange/risky changes or goal-level decisions.
+- Starting triage: failing tests, Studio/deploy chain, and remaining mud-hut architecture are being audited in parallel. Milestones and roadblocks will be logged as work lands.
+
+### Readiness milestone 1 — green checks and restored content **[Jesse + OpenCode, 2026-11-24]**
+
+- Restored the public homepage bio from Studio-introduced keyboard mash back to the canonical legacy sentence in `content/v13/homepage.json`, per Jesse's explicit confirmation.
+- Hid the temporary Vista test page again: `content/v13/vista-pages/vistatest.json` is now `published: false`, `showInNavigation: false`, and its marquee messages are empty. Production build no longer emits `/pages/vistatest/`; private draft preview still includes it.
+- Removed the Studio-introduced keyboard-mash `stateymenty` artist-statement section from `content/v13/albums/the-early-bird.json`, per Jesse's note that the Early Bird page had more gibberish. The intentional `08/21/2026` eyebrow and enabled radio/Purble gadget defaults remain.
+- Test harness: `npm test` now runs only `test/*.test.mjs`; `scripts/test-tina-local.mjs` remains an explicit opt-in smoke harness because it launches Tina CLI and mutates temporary content. CRLF-fragile assertions in CMS/deployment tests now normalize line endings at read time. Migration/release tests now document the two intentional content deltas (radio/Purble enabled, album eyebrow year) rather than failing on them.
+- **Verify:** `npm test` **182/182 pass**; `npm run validate:v13` pass; `npm run build` pass (3 published pages); `node scripts/build-v13.mjs --preview --include-drafts` pass (5 pages, 3 published). `tina/tina-lock.json` remains modified but unstaged and untouched by this pass.
+- Studio/deploy audit result: local Studio → adapter → preview path is working, and the queued publish handoff is implemented; live deploy remains correctly locked because the deploy marker/workflow are not on `origin/main`. No push, publish, credentials, or history operations were performed.

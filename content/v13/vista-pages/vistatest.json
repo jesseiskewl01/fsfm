@@ -28,11 +28,7 @@
         "variant": "vista-window"
       },
       "content": {
-        "messages": [
-          "NEW MESSAGE",
-          "NEW MESSAGE",
-          "NEW MESSAGE"
-        ]
+        "messages": []
       }
     },
     {
@@ -52,8 +48,8 @@
     }
   ],
   "publishing": {
-    "published": true,
-    "showInNavigation": true,
+    "published": false,
+    "showInNavigation": false,
     "navigationLabel": "vistatest"
   },
   "appearance": {

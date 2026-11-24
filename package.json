@@ -8,7 +8,7 @@
     "validate:v13": "node scripts/validate-v13.mjs",
     "test:v13": "node --test",
     "build:v13:stage3-preview": "node scripts/build-stage3-preview.mjs",
-    "test": "node --test",
+    "test": "node --test test/*.test.mjs",
     "build:v13:stage4-preview": "node scripts/build-v13-stage4-preview.mjs",
     "check:v13:stage4": "node --check src/client/album-player.js && node --check src/client/album-atmosphere.js && node --check src/render/album-player.mjs && node --check src/render/components.mjs && node --check src/render/page.mjs",
     "build:v13:stage5": "node scripts/build-v13-stage5.mjs",
