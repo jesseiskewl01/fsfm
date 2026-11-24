@@ -204,8 +204,10 @@ test('Package scripts expose only the canonical build and preview commands', () 
   assert.equal(pkg.scripts.build, 'node scripts/build-v13.mjs');
   assert.equal(pkg.scripts.preview, undefined);
   assert.equal(pkg.scripts['build:legacy'], undefined);
-  for (const name of Object.keys(pkg.scripts)) {
+  assert.equal(pkg.scripts['preview:v13:templates'], undefined);
+  for (const [name, value] of Object.entries(pkg.scripts)) {
     assert.doesNotMatch(name, /stage[3-6]|legacy/i, `${name} should not be exposed as an npm script`);
+    assert.doesNotMatch(value, /build-v13-template-previews\.mjs/i, `${name} should not expose the stage-era template preview builder`);
   }
 });
 

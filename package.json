@@ -11,7 +11,6 @@
     "new:page": "node scripts/create-page-v13.mjs",
     "preview:v13": "node scripts/build-v13.mjs --preview",
     "preview:v13:drafts": "node scripts/build-v13.mjs --preview --include-drafts",
-    "preview:v13:templates": "npm run preview:v13 && node scripts/build-v13-template-previews.mjs",
     "audit:v13": "node scripts/audit-v13-release.mjs",
     "verify-release": "npm run build && npm run audit:v14",
     "predeploy-check": "npm run build && node scripts/audit-v13-release.mjs --require-media",

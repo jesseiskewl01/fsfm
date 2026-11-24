@@ -36,8 +36,11 @@ test('The V14 default build emits a clean dist directory', () => {
   const pkg = readJson('package.json');
   assert.equal(pkg.scripts.build, 'node scripts/build-v13.mjs');
   assert.equal(pkg.scripts['check:all'], 'npm test && npm run validate:v14 && npm run check:v14');
-  for (const name of Object.keys(pkg.scripts)) {
+  assert.equal(pkg.scripts['preview:v13:templates'], undefined);
+  assert.equal(pkg.scripts['preview:v14:templates'], undefined);
+  for (const [name, value] of Object.entries(pkg.scripts)) {
     assert.doesNotMatch(name, /stage[3-6]|legacy/i, `${name} should not be exposed as an npm script`);
+    assert.doesNotMatch(value, /build-v13-template-previews\.mjs/i, `${name} should not expose the stage-era template preview builder`);
   }
   const builder = fs.readFileSync(path.join(root, 'scripts/build-v13.mjs'), 'utf8');
   assert.match(builder, /isPreview \? 'preview-v13' : 'dist'/);
