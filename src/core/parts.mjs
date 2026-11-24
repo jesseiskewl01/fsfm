@@ -182,7 +182,10 @@ const CHROME_SOURCE = {
   desktopHero: ['Desktop hero window', 'The large Aero window with the artist name and handle.', desktopHeroFields],
   purbleOverlay: ['Purble Place overlay', 'The dismissible game dialog.', []],
   shutdownOverlay: ['Shutdown overlay', 'The "Goodnight" closing dialog.', shutdownOverlayFields],
-  themeEngine: ['Theme engine', 'Wallpaper palette selection and cycling script.', []]
+  themeEngine: ['Theme engine', 'Wallpaper palette selection and cycling script.', []],
+  homepageFooter: ['Homepage footer', 'The global footer text at the bottom of the homepage desktop.', [field('footerText', 'Footer text')]],
+  desktopWalls: ['Desktop walls', 'The two background wall panels behind the desktop.', []],
+  desktopRuntime: ['Desktop runtime', 'Hidden settings and scripts that make the desktop interactive.', []]
 };
 
 export const CHROME_PARTS = Object.freeze(Object.fromEntries(

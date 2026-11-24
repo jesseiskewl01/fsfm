@@ -1367,6 +1367,38 @@ components:
           label: Enable theme engine
           type: boolean
           default: true
+      - name: homepageFooter
+        label: Homepage footer
+        type: object
+        fields:
+        - name: enabled
+          label: Show homepage footer
+          type: boolean
+          default: true
+        - name: content
+          label: Homepage footer content
+          type: object
+          fields:
+          - name: footerText
+            label: Footer text
+            type: string
+            default: '© 2026 FAKE SPACE FOG MACHINE'
+      - name: desktopWalls
+        label: Desktop walls
+        type: object
+        fields:
+        - name: enabled
+          label: Show desktop walls
+          type: boolean
+          default: true
+      - name: desktopRuntime
+        label: Desktop runtime
+        type: object
+        fields:
+        - name: enabled
+          label: Enable desktop runtime
+          type: boolean
+          default: true
   homepageSections:
     type: block
     label: PAGE LAYOUT · BUILD THE HOMEPAGE

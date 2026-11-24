@@ -72,14 +72,16 @@ function applyTheme(index) {
   var url = theme.background || (theme.img ? "url('" + theme.img + "')" : 'none');
   var incoming = wallBack;
   var outgoing = wallFront;
-  incoming.style.backgroundSize = (runtimeConfig.wallpaper && runtimeConfig.wallpaper.fit === 'contain') ? 'contain' : 'cover';
-  incoming.style.backgroundRepeat = 'no-repeat';
-  incoming.style.backgroundPosition = (runtimeConfig.wallpaper && runtimeConfig.wallpaper.position) || 'center';
-  incoming.style.backgroundImage = url;
-  requestAnimationFrame(function() { incoming.classList.add('show'); });
-  window.setTimeout(function() { if (token === applyToken) outgoing.classList.remove('show'); }, 950);
-  wallFront = incoming;
-  wallBack = outgoing;
+  if (incoming && outgoing) {
+    incoming.style.backgroundSize = (runtimeConfig.wallpaper && runtimeConfig.wallpaper.fit === 'contain') ? 'contain' : 'cover';
+    incoming.style.backgroundRepeat = 'no-repeat';
+    incoming.style.backgroundPosition = (runtimeConfig.wallpaper && runtimeConfig.wallpaper.position) || 'center';
+    incoming.style.backgroundImage = url;
+    requestAnimationFrame(function() { incoming.classList.add('show'); });
+    window.setTimeout(function() { if (token === applyToken) outgoing.classList.remove('show'); }, 950);
+    wallFront = incoming;
+    wallBack = outgoing;
+  }
 
   var hero = document.getElementById('heroSection');
   if (hero) hero.style.backgroundImage = url;

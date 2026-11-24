@@ -173,8 +173,10 @@ export function renderRuntimeConfig(page) {
 export function renderDesktopChrome(page, { site, pages = [], wallpapers } = {}) {
   const enabled = (name) => isChromePartEnabled(page, name);
   const canvas = enabled('bubbleCanvas') ? '<canvas id="bgCanvas" aria-hidden="true"></canvas>' : '';
-  const walls = '<div class="wall" id="wallA" aria-hidden="true"></div><div class="wall" id="wallB" aria-hidden="true"></div>' + canvas;
+  const walls = (enabled('desktopWalls') ? '<div class="wall" id="wallA" aria-hidden="true"></div><div class="wall" id="wallB" aria-hidden="true"></div>' : '') + canvas;
   const gadgets = enabled('desktopGadgets') ? renderDesktopGadgets(page) : null;
+  const footerContent = partContent(page, 'homepageFooter');
+  const footer = enabled('homepageFooter') ? `<footer class="site-footer" id="siteFooter">${escapeHtml(text(footerContent.footerText, site.footerText))}</footer>` : '';
   const beforeMain = [
     enabled('bootOverlay') ? renderBootOverlay(page, site) : '',
     walls,
@@ -185,11 +187,12 @@ export function renderDesktopChrome(page, { site, pages = [], wallpapers } = {})
     head: enabled('themeEngine') ? renderThemeHead(page, wallpapers) : '',
     beforeMain,
     hero: enabled('desktopHero') ? renderDesktopHero(page, site) : '',
+    footer,
     belowFooter: gadgets ? gadgets.extras : '',
     afterMain: [
       enabled('purbleOverlay') ? renderPurbleOverlay(page) : '',
       enabled('shutdownOverlay') ? renderShutdownOverlay(page) : ''
-    ].join('') + '\n  ' + renderRuntimeConfig(page),
-    scripts: ['homepage-desktop', 'homepage-interactions', 'homepage-gadgets']
+    ].join('') + (enabled('desktopRuntime') ? '\n  ' + renderRuntimeConfig(page) : ''),
+    scripts: enabled('desktopRuntime') ? ['homepage-desktop', 'homepage-interactions', 'homepage-gadgets'] : []
   };
 }

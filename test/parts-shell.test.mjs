@@ -30,7 +30,7 @@ const MARKERS = {
 
 test('the inner-page shell parts are declared alongside the desktop parts', () => {
   assert.deepEqual([...SHELL_PART_NAMES], ['siteHeader', 'siteMenu', 'pageFooter', 'pageIntro', 'wallpaperLayer']);
-  assert.equal(Object.keys(PAGE_PARTS).length, 13);
+  assert.equal(Object.keys(PAGE_PARTS).length, 16);
   for (const [name, definition] of Object.entries(SHELL_PARTS)) {
     assert.equal(definition.category, 'shell');
     assert.equal(definition.path, `appearance.parts.${name}.enabled`);

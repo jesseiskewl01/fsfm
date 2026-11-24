@@ -24,12 +24,12 @@ const adapterStoreNames = createLocalContentAdapter({
 
 test('the Studio catalogue is a complete plain-JSON projection of every part', () => {
   const catalogue = partCatalogue();
-  assert.equal(catalogue.total, 35);
-  assert.equal(catalogue.parts.length, 35);
+  assert.equal(catalogue.total, 38);
+  assert.equal(catalogue.parts.length, 38);
   assert.deepEqual(catalogue.categories, ['component', 'effect', 'chrome', 'shell']);
   assert.deepEqual(Object.keys(catalogue.chromeParts), [...CHROME_PART_NAMES]);
   assert.deepEqual(Object.keys(catalogue.shellParts), [...SHELL_PART_NAMES]);
-  assert.equal(Object.keys(catalogue.pageParts).length, 13);
+  assert.equal(Object.keys(catalogue.pageParts).length, 16);
   assert.deepEqual(Object.keys(catalogue.effects), ['backgroundEffects', 'pageTransition', 'respectReducedMotion', 'albumAtmosphere']);
   assert.equal(catalogue.effects.albumAtmosphere.modes.join(','), 'full,lite,off');
   for (const name of ['backgroundEffects', 'pageTransition', 'respectReducedMotion']) {

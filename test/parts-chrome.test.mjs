@@ -34,10 +34,13 @@ const MARKERS = {
   desktopHero: 'aero-window hero-window',
   purbleOverlay: 'id="purbleOverlay"',
   shutdownOverlay: 'id="fsfmShutdown"',
-  themeEngine: 'window.__FSFM_THEME_CONFIG__'
+  themeEngine: 'window.__FSFM_THEME_CONFIG__',
+  homepageFooter: 'id="siteFooter"',
+  desktopWalls: 'id="wallA"',
+  desktopRuntime: 'id="fsfmHomeRuntimeConfig"'
 };
 
-test('the eight desktop parts are declared in one place and default to on', () => {
+test('the eleven desktop parts are declared in one place and default to on', () => {
   assert.deepEqual([...CHROME_PART_NAMES], Object.keys(MARKERS));
   for (const [name, definition] of Object.entries(CHROME_PARTS)) {
     assert.equal(definition.category, 'chrome');
@@ -78,13 +81,16 @@ test('both toggle forms work: false and { enabled: false }', () => {
   assert.ok(render(withParts({ bootOverlay: { enabled: true } })).includes(MARKERS.bootOverlay));
 });
 
-test('turning off all desktop parts leaves the content and footer intact', () => {
+test('turning off all desktop parts leaves only the main content', () => {
   const allOff = Object.fromEntries(CHROME_PART_NAMES.map((name) => [name, false]));
   const html = render(withParts(allOff));
   for (const marker of Object.values(MARKERS)) assert.ok(!html.includes(marker), `${marker} survived all-off`);
   assert.match(html, /<main class="wrap" id="main-content">/);
-  assert.match(html, /<footer class="site-footer" id="siteFooter">/);
-  assert.match(html, /<script src="\/assets\/homepage-gadgets\.js" defer><\/script>/);
+  assert.ok(html.includes('Fake Space Fog Machine is a fully independent artist'), 'main content should remain');
+  for (const script of ['homepage-desktop.js', 'homepage-interactions.js', 'homepage-gadgets.js']) {
+    assert.ok(!html.includes(`/assets/${script}`), `${script} survived all-off`);
+  }
+  assert.doesNotMatch(html, /id="fsfmHomeRuntimeConfig"/);
 });
 
 test('the client degrades cleanly when the theme-engine part is off', () => {

@@ -258,7 +258,15 @@
           "shutdownMessage": "Closing the FSFM desktop..."
         }
       },
-      "themeEngine": { "enabled": true }
+      "themeEngine": { "enabled": true },
+      "homepageFooter": {
+        "enabled": true,
+        "content": {
+          "footerText": "© 2026 FAKE SPACE FOG MACHINE"
+        }
+      },
+      "desktopWalls": { "enabled": true },
+      "desktopRuntime": { "enabled": true }
     }
   },
   "seo": {

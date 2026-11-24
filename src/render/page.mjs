@@ -110,7 +110,7 @@ export function renderSiteShell({ page, site, pages = [], wallpapers, bodyHtml, 
   if (atmosphere.scripts.includes('album-atmosphere.js')) scriptsToLoad.add('album-atmosphere.js');
   if (page.template === 'vista-window') scriptsToLoad.add('vista-windows.js');
   if (homepageMode) {
-    for (const name of ['homepage-desktop.js','homepage-interactions.js','homepage-gadgets.js']) scriptsToLoad.add(name);
+    for (const name of scripts) scriptsToLoad.add(name.endsWith('.js') ? name : `${name}.js`);
   }
   const wallpaper = shell?.wallpaper || '';
   const ld = structuredData(page, site, canonical, desc);
