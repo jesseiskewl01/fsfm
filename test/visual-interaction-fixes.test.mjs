@@ -35,6 +35,15 @@ test('widgets live in hero gutters and settle without overlap after a drag', () 
   assert.match(gadgets, /Reflow is layout repair, not a user move/);
 });
 
+test('the homepage About window stays pinned while the desktop scrolls', () => {
+  assert.match(css, /@media \(min-width: 761px\) \{[\s\S]*?body\.template-homepage \.home-window-grid > \.bio-window \{[\s\S]*?grid-column:1; grid-row:3 \/ 6; position:sticky; top:48px; align-self:start; z-index:20;/);
+  assert.match(css, /body\.template-homepage \.home-window-grid \{ display:contents; \}/);
+  assert.match(css, /body\.template-homepage \.wrap > \.events-window \{ grid-column:2; grid-row:4; \}/);
+  assert.match(css, /body\.template-homepage \.wrap > \.social-window \{ grid-column:2; grid-row:5; \}/);
+  assert.match(css, /body\.template-homepage \.wrap > \.site-footer \{ grid-row:6; \}/);
+  assert.match(css, /body\.template-homepage:has\(\.home-window-grid > \.bio-window\[hidden\]\) \.wrap \{ grid-template-columns:minmax\(0,1fr\); \}/);
+});
+
 test('the barrel roll gadget is no longer hidden by the saved flag', () => {
   assert.match(gadgets, /key === 'showBarrelRoll' \? false : cmsData\.funWidgets\[key\] === false/);
 });

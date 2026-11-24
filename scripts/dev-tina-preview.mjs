@@ -12,6 +12,7 @@ import { normalizePageRecord, normalizePages, routeForPage } from '../src/core/p
 import { COMPONENTS } from '../src/components/registry.mjs';
 import { TEMPLATES } from '../src/templates/registry.mjs';
 import { partCatalogue } from '../src/core/studio-controls.mjs';
+import { buildDuplicatePage, buildRenamedPage, buildRetiredPage, findReusableCarcass, pageKeyForRecord } from '../src/core/page-tools.mjs';
 import { createLocalContentAdapter } from './tina-local-adapter.mjs';
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -163,6 +164,55 @@ function contentResource(pathname) {
   };
 }
 
+function resourceForPageKey(key) {
+  const match = /^(albums|vista-pages|editorial-pages)\/([a-z0-9]+(?:-[a-z0-9]+)*)$/.exec(String(key || ''));
+  if (!match) return null;
+  return {
+    kind: 'page',
+    key,
+    template: match[1] === 'albums' ? 'album' : match[1] === 'vista-pages' ? 'vista-window' : 'editorial',
+    filePath: path.join(contentRoot, match[1], match[2] + '.json'),
+  };
+}
+
+function readSiteSettings() {
+  return JSON.parse(fs.readFileSync(path.join(contentRoot, 'site.json'), 'utf8'));
+}
+
+function requirePageRevision(resource, revision, required = false) {
+  if (required && typeof revision !== 'string') {
+    const error = new Error('A revision is required before changing this page. Reload and try again.');
+    error.statusCode = 409;
+    throw error;
+  }
+  if (!fs.existsSync(resource.filePath) || !fs.statSync(resource.filePath).isFile()) {
+    const error = new Error('Studio could not find that page file.');
+    error.statusCode = 404;
+    throw error;
+  }
+  const raw = fs.readFileSync(resource.filePath, 'utf8');
+  if (revision && revision !== hashContent(raw)) {
+    const error = new Error('This content changed on disk after you opened it. Reload before trying again.');
+    error.statusCode = 409;
+    throw error;
+  }
+  return raw;
+}
+
+async function validatePageCandidate({ record, sourceKey, mode = 'replace', ignoreKeys = [] }) {
+  const site = readSiteSettings();
+  const normalized = normalizePageRecord(record, site);
+  const ignored = new Set(ignoreKeys);
+  const pages = (await readStoredPages()).filter((page) => !ignored.has(pageKeyForRecord(page)));
+  const index = pages.findIndex((page) => pageKeyForRecord(page) === sourceKey);
+  if (index < 0) throw new Error('The page could not be located in the site content index.');
+  if (mode === 'replace') pages[index] = normalized;
+  else pages.push(normalized);
+  const errors = validateSite(normalizePages(pages, site), { root: projectRoot });
+  if (errors.length) throw new Error(errors.slice(0, 30).join('\n'));
+  return normalized;
+}
+
 async function contentIndex() {
   const pages = await readStoredPages();
   return pages.map((page) => {
@@ -178,6 +228,7 @@ async function contentIndex() {
       route,
       order: Number(page.identity?.order) || 0,
       published: page.publishing?.published !== false,
+      retired: page.publishing?.retired === true,
       showInNavigation: page.publishing?.showInNavigation === true,
       artwork: page.templateData?.album?.artwork || '',
       trackCount: Array.isArray(page.templateData?.player?.tracks) ? page.templateData.player.tracks.length : 0,
@@ -742,6 +793,84 @@ async function handleApi(request, response, pathname) {
       sendJson(response, 201, created);
     } catch (error) {
       sendJson(response, error.statusCode || 422, { error: error.message || 'Could not create the page.' });
+    }
+    return;
+  }
+
+  if (['/__fsfm/api/content/retire', '/__fsfm/api/content/rename', '/__fsfm/api/content/duplicate'].includes(pathname)) {
+    if (request.method !== 'POST') {
+      response.writeHead(405, { Allow: 'POST' });
+      response.end();
+      return;
+    }
+    if (!hasExpectedOrigin(request)) {
+      sendJson(response, 403, { error: 'Page changes must come from this local FSFM Studio origin.' });
+      return;
+    }
+    try {
+      const body = await readRequestJson(request, 64 * 1024);
+      const resource = resourceForPageKey(body?.key);
+      if (!resource) {
+        sendJson(response, 404, { error: 'Studio content record not found.' });
+        return;
+      }
+      const operation = pathname.slice('/__fsfm/api/content/'.length);
+      const currentRaw = requirePageRevision(resource, body.revision, operation === 'rename');
+      const current = JSON.parse(currentRaw);
+      if (current.publishing?.retired && operation !== 'retire') {
+        sendJson(response, 422, { error: 'Retired pages are reused by creating a new page of the same type.' });
+        return;
+      }
+      let record;
+      if (operation === 'retire') {
+        const typedName = String(body.name || '').trim();
+        if (typedName !== current.identity?.name) {
+          sendJson(response, 422, { error: 'The page name did not match. Nothing was retired.' });
+          return;
+        }
+        if (current.publishing?.retired) {
+          sendJson(response, 422, { error: 'This page is already retired.' });
+          return;
+        }
+        record = await validatePageCandidate({
+          record: buildRetiredPage(current),
+          sourceKey: body.key,
+        });
+        const retired = await contentAdapter.retirePage({ key: body.key, record, revision: body.revision, name: typedName });
+        sendJson(response, 200, { ...retired, record });
+        return;
+      }
+      const name = String(body.name || '').trim();
+      const slug = String(body.slug || '').trim();
+      if (!name) {
+        sendJson(response, 422, { error: 'A page name is required.' });
+        return;
+      }
+      if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
+        sendJson(response, 422, { error: 'The URL slug needs lowercase letters, numbers and single hyphens.' });
+        return;
+      }
+      const site = readSiteSettings();
+      if (operation === 'rename') {
+        record = await validatePageCandidate({
+          record: buildRenamedPage(current, { name, slug }, site),
+          sourceKey: body.key,
+        });
+        const renamed = await contentAdapter.renamePage({ key: body.key, record, revision: body.revision });
+        sendJson(response, 200, { ...renamed, record });
+        return;
+      }
+      const carcass = findReusableCarcass(await readStoredPages(), current.template);
+      record = await validatePageCandidate({
+        record: buildDuplicatePage(current, { name, slug }, site),
+        sourceKey: body.key,
+        mode: 'add',
+        ignoreKeys: carcass ? [pageKeyForRecord(carcass)] : [],
+      });
+      const duplicated = await contentAdapter.duplicatePage({ key: body.key, record });
+      sendJson(response, 201, { ...duplicated, record });
+    } catch (error) {
+      sendJson(response, error.statusCode || 422, { error: error.message || 'Could not change this page.' });
     }
     return;
   }

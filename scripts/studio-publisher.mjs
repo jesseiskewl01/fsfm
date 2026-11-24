@@ -303,6 +303,19 @@ export function createStudioPublisher({
     return { pendingCount: Object.keys(manifest.files).length };
   }
 
+  /** Remove a local path from the pending queue after a Studio rename or retirement.
+   *  The content file itself is never deleted here. [Jesse + OpenCode, 2026-11-24]
+   */
+  function forgetSavedFile(relativePath) {
+    assertCanSave();
+    const safePath = validateRelativePath(relativePath);
+    const manifest = readQueue();
+    if (!Object.hasOwn(manifest.files, safePath)) return { removed: false, pendingCount: Object.keys(manifest.files).length };
+    delete manifest.files[safePath];
+    writeQueue(manifest);
+    return { removed: true, pendingCount: Object.keys(manifest.files).length };
+  }
+
   async function deploy({ confirmation } = {}) {
     if (publishing) throw studioError('A live publication is already in progress.', 409);
     if (confirmation !== 'PUBLISH FSFM LIVE') {
@@ -421,5 +434,5 @@ export function createStudioPublisher({
     }
   }
 
-  return { getStatus, recordSavedFile, deploy, assertCanSave };
+  return { getStatus, recordSavedFile, forgetSavedFile, deploy, assertCanSave };
 }

@@ -508,6 +508,34 @@ text-shadow: 0 1px 3px rgb(var(--deep-rgb)), 0 0 8px rgba(var(--deep-rgb), 0.8);
 .window-minimized > .window-body { display:none !important; }
 .home-window-grid:has(> .content-window[hidden]) { grid-template-columns:minmax(0,1fr); }
 
+/* Keep the About window pinned while the rest of the desktop scrolls. The grid
+   wrapper is flattened on desktop so its two windows and the later full-width
+   windows share one containing grid; the bio window then sticks through the
+   content rows and stops before the footer. [Jesse + OpenCode, 2026-11-24] */
+@media (min-width: 761px) {
+  body.template-homepage .wrap {
+    display:grid; grid-template-columns:minmax(245px,.86fr) minmax(0,1.14fr);
+    column-gap:18px; align-items:start;
+  }
+  body.template-homepage .wrap > .hero-window,
+  body.template-homepage .wrap > .marquee,
+  body.template-homepage .wrap > .site-footer,
+  body.template-homepage .wrap > .fsfm-gadgets-extras { grid-column:1 / -1; }
+  body.template-homepage .home-window-grid { display:contents; }
+  body.template-homepage .home-window-grid > .bio-window {
+    grid-column:1; grid-row:3 / 6; position:sticky; top:48px; align-self:start; z-index:20;
+  }
+  body.template-homepage .home-window-grid > .spotify-window { grid-column:2; grid-row:3; }
+  body.template-homepage .wrap > .events-window { grid-column:2; grid-row:4; }
+  body.template-homepage .wrap > .social-window { grid-column:2; grid-row:5; }
+  body.template-homepage .wrap > .site-footer { grid-row:6; }
+  body.template-homepage .wrap > .fsfm-gadgets-extras { grid-row:7; }
+  body.template-homepage:has(.home-window-grid > .bio-window[hidden]) .wrap { grid-template-columns:minmax(0,1fr); }
+  body.template-homepage:has(.home-window-grid > .bio-window[hidden]) .home-window-grid > .spotify-window,
+  body.template-homepage:has(.home-window-grid > .bio-window[hidden]) .wrap > .events-window,
+  body.template-homepage:has(.home-window-grid > .bio-window[hidden]) .wrap > .social-window { grid-column:1; }
+}
+
 /* Interactive controls use the same draggable Vista desktop-gadget language as Clock and Calendar. */
 .fsfm-gadget.gadget-compact { width:176px; }
 .gadget-body.control-body { display:flex; align-items:center; justify-content:center; padding:10px; }

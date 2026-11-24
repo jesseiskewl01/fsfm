@@ -1,7 +1,9 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
-import { createNewPage } from './create-page-v13.mjs';
+import { buildPageRecord, createNewPage } from './create-page-v13.mjs';
+import { routeForPage } from '../src/core/page-routes.mjs';
+import { findReusableCarcass, pageFolderForTemplate, pageKeyForRecord, validatePageIdentityChange } from '../src/core/page-tools.mjs';
 
 function hashContent(content) {
   return crypto.createHash('sha256').update(content).digest('hex');
@@ -22,6 +24,15 @@ async function loadMemoryLevel() { try { return await import('memory-level'); } 
 
 function relativeFromProject(projectRoot, filePath) {
   return path.relative(projectRoot, filePath).split(path.sep).join('/');
+}
+
+function pageRelativePath(record) {
+  const folder = pageFolderForTemplate(record.template);
+  return path.join(folder, `${record.identity.slug}.json`);
+}
+
+function pageAbsolutePath(contentRoot, record) {
+  return path.join(contentRoot, pageRelativePath(record));
 }
 
 function buildLookup() {
@@ -163,19 +174,89 @@ export function createLocalContentAdapter({
       replaceFile(resource.filePath, currentRaw, 'studio-rollback');
       throw error;
     }
-    if (database) {
-      try {
-        if (dbReady && typeof database.indexContentByPaths === 'function') {
-          await database.indexContentByPaths([rel]);
-        } else if (dbReady && typeof database.put === 'function') {
-          await database.put(rel, record);
-        }
-      } catch {
-        // Index update failure should not block a valid saved file.
-      }
-    }
+    await refreshDatabaseIndex(rel, record);
     scheduleRebuild();
     return { ok: true, revision: hashContent(nextRaw), savedAt: new Date().toISOString() };
+  }
+
+  async function refreshDatabaseIndex(relativePath, record, removedPath = '') {
+    if (!database) return;
+    try {
+      if (dbReady && typeof database.indexContentByPaths === 'function') {
+        await database.indexContentByPaths([relativePath]);
+      } else if (dbReady && typeof database.put === 'function') {
+        await database.put(relativePath, record);
+      }
+      if (removedPath && removedPath !== relativePath && typeof database.delete === 'function') {
+        await database.delete(removedPath);
+      }
+    } catch {
+      // Index update failure should not block a valid saved file.
+    }
+  }
+
+  function forgetQueuedPath(relativePath) {
+    if (typeof publisher.forgetSavedFile !== 'function') return;
+    publisher.forgetSavedFile(relativePath);
+  }
+
+  function restoreQueuedPath(relativePath, raw) {
+    if (typeof publisher.recordSavedFile !== 'function') return;
+    publisher.recordSavedFile(relativePath, raw);
+  }
+
+  /**
+   * Write one page change without ever deleting a content file. A rename moves
+   * the existing file with fs.renameSync; a retired carcass reuse moves that
+   * file the same way. Queue/index cleanup happens only after the file is final.
+   * [Jesse + OpenCode, 2026-11-24]
+   */
+  async function commitPage({ resource, record, expectedRaw = null, moveSource = null }) {
+    await init();
+    const nextRaw = JSON.stringify(record, null, 2) + '\n';
+    const targetPath = resource.filePath;
+    const moving = !!moveSource && path.resolve(moveSource.filePath) !== path.resolve(targetPath);
+    if (moving && fs.existsSync(targetPath)) {
+      throw new Error(`A page file already exists at ${relativeFromProject(projectRoot, targetPath)}.`);
+    }
+    let didMove = false;
+    if (moving) {
+      fs.renameSync(moveSource.filePath, targetPath);
+      didMove = true;
+    }
+    try {
+      replaceFile(targetPath, nextRaw, 'studio-page');
+      const relativePath = relativeFromProject(projectRoot, targetPath);
+      const removedPath = moving ? relativeFromProject(projectRoot, moveSource.filePath) : '';
+      if (removedPath && removedPath !== relativePath) forgetQueuedPath(removedPath);
+      publisher.recordSavedFile(relativePath, nextRaw);
+      await refreshDatabaseIndex(relativePath, record, removedPath);
+      scheduleRebuild();
+      return {
+        ok: true,
+        key: resource.key,
+        page: record,
+        revision: hashContent(nextRaw),
+        savedAt: new Date().toISOString(),
+        reusedCarcass: moveSource?.reusedCarcass === true,
+      };
+    } catch (error) {
+      if (didMove) {
+        try {
+          replaceFile(targetPath, moveSource.raw, 'studio-rollback');
+          fs.renameSync(targetPath, moveSource.filePath);
+          const relativePath = relativeFromProject(projectRoot, targetPath);
+          const removedPath = relativeFromProject(projectRoot, moveSource.filePath);
+          forgetQueuedPath(relativePath);
+          restoreQueuedPath(removedPath, moveSource.raw);
+        } catch {
+          // Preserve the original failure; the rollback paths are best-effort.
+        }
+      } else if (expectedRaw !== null) {
+        try { replaceFile(targetPath, expectedRaw, 'studio-rollback'); } catch {}
+      }
+      throw error;
+    }
   }
 
   async function readStoredPages() {
@@ -198,9 +279,60 @@ export function createLocalContentAdapter({
     return records;
   }
 
+  function resourceForPageKey(key) {
+    const match = /^(albums|vista-pages|editorial-pages)\/([a-z0-9]+(?:-[a-z0-9]+)*)$/.exec(String(key || ''));
+    if (!match) throw new Error('This Studio page key is not valid.');
+    const filePath = path.join(contentRoot, match[1], match[2] + '.json');
+    if (!fs.existsSync(filePath) || !fs.statSync(filePath).isFile()) throw new Error('Studio could not find that page file.');
+    return { kind: 'page', key, filePath };
+  }
+
+  function requireRaw(resource, revision) {
+    const raw = readRaw(resource);
+    if (raw === null) throw new Error('Studio could not find that page file.');
+    if (revision && hashContent(raw) !== revision) {
+      throw new Error('This content changed on disk after you opened it. Reload before trying again.');
+    }
+    return raw;
+  }
+
+  async function assertTargetAvailable(record, sourceKey = '', reuseKey = '') {
+    const pages = await readStoredPages();
+    const conflict = validatePageIdentityChange(record, { pages, sourceKey });
+    if (conflict) throw new Error(conflict);
+    const targetKey = pageKeyForRecord(record);
+    const targetPath = pageAbsolutePath(contentRoot, record);
+    if (fs.existsSync(targetPath) && targetKey !== sourceKey && targetKey !== reuseKey) {
+      throw new Error(`A page with slug "${record.identity.slug}" already exists.`);
+    }
+    return pages;
+  }
+
+  async function findReuseSource(template) {
+    const pages = await readStoredPages();
+    const carcass = findReusableCarcass(pages, template);
+    if (!carcass) return null;
+    const key = pageKeyForRecord(carcass);
+    const filePath = pageAbsolutePath(contentRoot, carcass);
+    if (!fs.existsSync(filePath)) return null;
+    return { key, filePath, raw: fs.readFileSync(filePath, 'utf8'), record: carcass, reusedCarcass: true };
+  }
+
   async function createPage(options) {
     await init();
-    const created = createNewPage({
+    const reuse = await findReuseSource(options?.template);
+    if (!reuse) {
+      const created = createNewPage({
+        root: projectRoot,
+        template: options?.template,
+        name: options?.name,
+        slug: options?.slug,
+        published: options?.published === true,
+        showInNavigation: options?.showInNavigation !== false,
+      });
+      return { ok: true, key: pageKeyForRecord(created.page), page: created.page, revision: hashContent(fs.readFileSync(created.path)), reusedCarcass: false };
+    }
+    const page = buildPageRecord({
       root: projectRoot,
       template: options?.template,
       name: options?.name,
@@ -208,23 +340,49 @@ export function createLocalContentAdapter({
       published: options?.published === true,
       showInNavigation: options?.showInNavigation !== false,
     });
-    const relativePath = relativeFromProject(projectRoot, created.path);
-    try {
-      publisher.recordSavedFile(relativePath, fs.readFileSync(created.path));
-    } catch (error) {
-      fs.rmSync(created.path, { force: true });
-      throw error;
+    await assertTargetAvailable(page, '', reuse.key);
+    const targetResource = { kind: 'page', key: pageKeyForRecord(page), filePath: pageAbsolutePath(contentRoot, page) };
+    return commitPage({ resource: targetResource, record: page, moveSource: reuse });
+  }
+
+  async function retirePage({ key, record, revision, name }) {
+    await init();
+    const resource = resourceForPageKey(key);
+    const currentRaw = requireRaw(resource, revision);
+    const current = JSON.parse(currentRaw);
+    if (current.publishing?.retired) throw new Error('This page is already retired.');
+    if (String(name || '').trim() !== current.identity?.name) {
+      throw new Error('The page name did not match. Nothing was retired.');
     }
-    if (dbReady && database?.indexContentByPaths) {
-      try { await database.indexContentByPaths([relativePath]); } catch {}
-    }
-    scheduleRebuild();
-    return {
-      ok: true,
-      key: (created.page.template === 'album' ? 'albums' : created.page.template === 'vista-window' ? 'vista-pages' : 'editorial-pages') + '/' + created.page.identity.slug,
-      page: created.page,
-      revision: hashContent(fs.readFileSync(created.path)),
-    };
+    if (pageKeyForRecord(record) !== key) throw new Error('A retired page cannot change its slug.');
+    return commitPage({ resource, record, expectedRaw: currentRaw });
+  }
+
+  async function renamePage({ key, record, revision }) {
+    await init();
+    const resource = resourceForPageKey(key);
+    const currentRaw = requireRaw(resource, revision);
+    const current = JSON.parse(currentRaw);
+    if (current.publishing?.retired) throw new Error('Retired pages are reused by creating a new page.');
+    if (record.template !== current.template) throw new Error('A page template cannot be changed after creation.');
+    await assertTargetAvailable(record, key);
+    const targetResource = { kind: 'page', key: pageKeyForRecord(record), filePath: pageAbsolutePath(contentRoot, record) };
+    const moveSource = targetResource.key === key
+      ? null
+      : { key, filePath: resource.filePath, raw: currentRaw };
+    return commitPage({ resource: targetResource, record, expectedRaw: currentRaw, moveSource });
+  }
+
+  async function duplicatePage({ key, record }) {
+    await init();
+    const resource = resourceForPageKey(key);
+    const currentRaw = requireRaw(resource);
+    const current = JSON.parse(currentRaw);
+    if (current.publishing?.retired) throw new Error('Retired pages are reused by creating a new page.');
+    const reuse = await findReuseSource(current.template);
+    await assertTargetAvailable(record, '', reuse?.key || '');
+    const targetResource = { kind: 'page', key: pageKeyForRecord(record), filePath: pageAbsolutePath(contentRoot, record) };
+    return commitPage({ resource: targetResource, record, moveSource: reuse });
   }
 
   async function getTinaSchema() { await init(); return tinaSchema; }
@@ -243,5 +401,8 @@ export function createLocalContentAdapter({
     getStatus,
     collections: STORE_COLLECTIONS,
     createPage,
+    retirePage,
+    renamePage,
+    duplicatePage,
   };
 }

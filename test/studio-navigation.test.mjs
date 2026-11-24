@@ -18,7 +18,9 @@ test('page navigation can search page names and routes without replacing the sea
 test('the selected page is visibly and accessibly marked in the navigation list', () => {
   assert.match(studio, /aria-current=/);
   assert.ok(studio.includes('const active=S.key===item.key&&S.record?getPagePublicationState(S.record).active:item.published!==false;'));
-  assert.match(studio, /class="page-state '\+\(active\?'active':'inactive'\)/);
+  assert.ok(studio.includes("const pageActive=!retired&&active;"));
+  assert.ok(studio.includes("const stateClass=retired?'retired':pageActive?'active':'inactive';"));
+  assert.match(studio, /class="page-state '\+stateClass\+'/);
 });
 
 test('the live page list remains grouped by page template', () => {
