@@ -146,7 +146,7 @@ try {
 
 var canvas = document.getElementById('bgCanvas');
 
-if (canvas && runtimeConfig.effects?.backgroundEffects !== false && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+if (canvas && runtimeConfig.effects?.backgroundEffects !== false && (runtimeConfig.effects?.respectReducedMotion === false || !window.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
 
 var ctx = canvas.getContext('2d');
 

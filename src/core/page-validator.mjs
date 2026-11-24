@@ -66,6 +66,10 @@ export function validatePage(page, options = {}) {
       for (const [name, definition] of Object.entries(EFFECTS)) {
         const value = effects[name];
         if (value === undefined) continue;
+        if (definition.valueType === 'boolean') {
+          if (typeof value !== 'boolean') issue(problems, where, `${definition.path} must be true or false`);
+          continue;
+        }
         const mode = typeof value === 'string' ? value : value?.mode;
         if (!definition.modes.includes(mode)) {
           issue(problems, where, `${definition.path} must be one of ${definition.modes.join(', ')}`);

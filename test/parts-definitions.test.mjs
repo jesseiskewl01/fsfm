@@ -88,11 +88,11 @@ test('every part has a real branch in the renderer switch', () => {
   assert.strictEqual(RENDERED_COMPONENT_TYPES, COMPONENT_TYPES);
 });
 
-test('the whole visible site is one catalogue of 32 parts in four categories', () => {
+test('the whole visible site is one catalogue of 35 parts in four categories', () => {
   assert.deepEqual([...PART_CATEGORIES], ['component', 'effect', 'chrome', 'shell']);
-  assert.equal(listParts().length, 32);
+  assert.equal(listParts().length, 35);
   assert.equal(listParts('component').length, 18);
-  assert.equal(listParts('effect').length, 1);
+  assert.equal(listParts('effect').length, 4);
   assert.equal(listParts('chrome').length, 8);
   assert.equal(listParts('shell').length, 5);
   assert.strictEqual(getPart('hero'), COMPONENTS.hero);

@@ -136,9 +136,12 @@ body[data-page-transition="true"] .site-shell { animation: fsfm-page-enter .48s 
   .global-footer { align-items: center; flex-direction: column; }
 }
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
-  .marquee-run { animation: none; }
-  body[data-page-transition="true"] .site-shell { animation: none; }
+  body[data-respect-reduced-motion="true"],
+  body[data-respect-reduced-motion="true"] *,
+  body[data-respect-reduced-motion="true"] *::before,
+  body[data-respect-reduced-motion="true"] *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  body[data-respect-reduced-motion="true"] .marquee-run { animation: none; }
+  body[data-respect-reduced-motion="true"][data-page-transition="true"] .site-shell { animation: none; }
 }
 
 /* ---------- ALBUM TEMPLATE: THE EARLY BIRD.... ---------- */

@@ -1014,19 +1014,16 @@ components:
       type: object
       fields:
       - name: backgroundEffects
-        label: false
+        label: Background effects
         type: boolean
-        hidden: true
         default: true
       - name: pageTransition
-        label: false
+        label: Page transition
         type: boolean
-        hidden: true
         default: true
       - name: respectReducedMotion
-        label: false
+        label: Respect reduced-motion preference
         type: boolean
-        hidden: true
         default: true
   homepageSections:
     type: block

@@ -225,12 +225,7 @@ export default {
                 options: ['center', 'top', 'bottom', 'left', 'right'],
               },
             ]),
-            objectField('effects', 'Page effects', [
-              { type: 'boolean', name: 'backgroundEffects', label: 'Background effects' },
-              { type: 'boolean', name: 'pageTransition', label: 'Page transition' },
-              { type: 'boolean', name: 'respectReducedMotion', label: 'Respect reduced-motion setting' },
-              ...effectFields(),
-            ]),
+            objectField('effects', 'Page effects', effectFields()),
             objectField('parts', 'Visible parts', pagePartFieldsFor('album'), 'Switch individual page chrome on or off.'),
           ]),
 

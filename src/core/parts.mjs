@@ -23,6 +23,8 @@ export const PRESENTATION_BACKGROUNDS = Object.freeze(['default', 'soft', 'glass
 
 export const GROUP_LAYOUTS = Object.freeze(['grid', 'stack', 'columns']);
 
+const ALL_TEMPLATES = Object.freeze(['homepage', 'album', 'vista-window', 'editorial']);
+
 const field = (name, label, type = 'string', extra = {}) => ({ name, label, type, required: false, ...extra });
 const required = (name, label, type = 'string', extra = {}) => ({ ...field(name, label, type, extra), required: true });
 
@@ -46,14 +48,46 @@ export const ATMOSPHERE_MODES = Object.freeze({
 
 /** Page-level effects are parts too — they can be enabled on any template. */
 export const EFFECTS = Object.freeze({
+  backgroundEffects: {
+    label: 'Background effects',
+    description: 'Ambient wallpaper overlays and the animated desktop canvas.',
+    category: 'effect',
+    templates: ALL_TEMPLATES,
+    portableTo: ALL_TEMPLATES,
+    path: 'appearance.effects.backgroundEffects',
+    valueType: 'boolean',
+    default: true
+  },
+  pageTransition: {
+    label: 'Page transition',
+    description: 'The short entrance animation applied to inner-page content.',
+    category: 'effect',
+    templates: ALL_TEMPLATES,
+    portableTo: ALL_TEMPLATES,
+    path: 'appearance.effects.pageTransition',
+    valueType: 'boolean',
+    default: true
+  },
+  respectReducedMotion: {
+    label: 'Respect reduced motion',
+    description: 'Honour the visitor’s reduced-motion preference for all page effects.',
+    category: 'effect',
+    templates: ALL_TEMPLATES,
+    portableTo: ALL_TEMPLATES,
+    path: 'appearance.effects.respectReducedMotion',
+    valueType: 'boolean',
+    default: true
+  },
   albumAtmosphere: {
     label: 'Album atmosphere',
+    description: 'The amber canvas treatment for album pages.',
     category: 'effect',
     templates: ['album'],
-    portableTo: ['homepage', 'album', 'vista-window', 'editorial'],
+    portableTo: ALL_TEMPLATES,
     path: 'appearance.effects.albumAtmosphere.mode',
     defaultForTemplate: { album: 'full' },
     default: 'off',
+    valueType: 'mode',
     modes: Object.freeze(Object.keys(ATMOSPHERE_MODES)),
     script: 'album-atmosphere.js',
     required: []

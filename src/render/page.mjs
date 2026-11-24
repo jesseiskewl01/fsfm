@@ -118,6 +118,7 @@ export function renderSiteShell({ page, site, pages = [], wallpapers, bodyHtml, 
   const effects = page.appearance?.effects || {};
   const backgroundEffects = effects.backgroundEffects === false ? 'false' : 'true';
   const pageTransition = effects.pageTransition === false ? 'false' : 'true';
+  const respectReducedMotion = effects.respectReducedMotion === false ? 'false' : 'true';
   const albumAtmosphere = atmosphere.html;
   const siteChrome = homepageMode ? bodyHtml : `<div class="site-shell">${shell.header}<main id="main-content" class="page-main template-main-${escapeHtml(template)}">${shell.intro}${bodyHtml}</main>${shell.footer}</div>`;
   return `<!doctype html>
@@ -145,7 +146,7 @@ export function renderSiteShell({ page, site, pages = [], wallpapers, bodyHtml, 
   ${homepageHead}
   <script type="application/ld+json">${safeJsonForHtml(ld)}</script>
 </head>
-<body class="template-${escapeHtml(template)}" data-template="${escapeHtml(template)}" data-background-effects="${backgroundEffects}" data-page-transition="${pageTransition}">
+<body class="template-${escapeHtml(template)}" data-template="${escapeHtml(template)}" data-background-effects="${backgroundEffects}" data-page-transition="${pageTransition}" data-respect-reduced-motion="${respectReducedMotion}">
   ${wallpaper}
   ${albumAtmosphere}
   ${siteChrome}

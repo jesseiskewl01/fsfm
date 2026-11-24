@@ -128,7 +128,7 @@ opacity: 0; transition: opacity 0.9s ease;
   font: 8px var(--font-mono); letter-spacing: 0.2em;
 }
 @media (prefers-reduced-motion: reduce) {
-  .boot-progress-bar { animation: none; width: 58px; left: calc(50% - 29px); }
+  body[data-respect-reduced-motion="true"] .boot-progress-bar { animation: none; width: 58px; left: calc(50% - 29px); }
 }
 
 /* ---------- DESKTOP CANVAS & DECORATION ---------- */
@@ -551,8 +551,11 @@ text-shadow: 0 1px 3px rgb(var(--deep-rgb)), 0 0 8px rgba(var(--deep-rgb), 0.8);
   .marquee-track span { font-size: 11px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
-  .reveal { opacity: 1; transform: none; }
+  body[data-respect-reduced-motion="true"],
+  body[data-respect-reduced-motion="true"] *,
+  body[data-respect-reduced-motion="true"] *::before,
+  body[data-respect-reduced-motion="true"] *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  body[data-respect-reduced-motion="true"] .reveal { opacity: 1; transform: none; }
 }
 
 
@@ -639,7 +642,7 @@ text-shadow: 0 1px 3px rgb(var(--deep-rgb)), 0 0 8px rgba(var(--deep-rgb), 0.8);
   .fsfm-gadgets-desktop { display:none !important; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .fsfm-gadget, .fsfm-gadget * { scroll-behavior:auto !important; transition:none !important; }
+  body[data-respect-reduced-motion="true"] .fsfm-gadget, body[data-respect-reduced-motion="true"] .fsfm-gadget * { scroll-behavior:auto !important; transition:none !important; }
 }
 
 /* V13 reusable blocks hosted in the original FSFM Vista desktop frame. */

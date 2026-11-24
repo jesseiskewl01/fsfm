@@ -31,6 +31,7 @@ function plain(part) {
     ...(part.default !== undefined ? { default: part.default } : {}),
     ...(part.fields ? { fields: part.fields } : {}),
     ...(part.modes ? { modes: part.modes } : {}),
+    ...(part.valueType ? { valueType: part.valueType } : {}),
     ...(part.singleton ? { singleton: true } : {}),
     ...(part.required ? { required: [...part.required] } : {})
   };

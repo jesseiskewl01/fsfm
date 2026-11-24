@@ -91,20 +91,32 @@ export function pagePartFieldsFor(template) {
     ], definition.description));
 }
 
-/** Effect controls, including the aurora's full / lite / off choice. */
+/** Effect controls. Boolean effects stay as direct toggles so the Tina schema
+ *  matches the renderer's existing `appearance.effects` shape; mode effects get
+ *  a nested object with the shared vocabulary. */
 export function effectFields() {
-  return Object.entries(EFFECTS).map(([name, definition]) => object(
-    name,
-    definition.label,
-    [{
-      type: 'string',
-      name: 'mode',
-      label: 'Mode',
-      options: [...definition.modes],
-      description: definition.description
-    }],
-    definition.description
-  ));
+  return Object.entries(EFFECTS).map(([name, definition]) => {
+    if (definition.valueType === 'boolean') {
+      return {
+        type: 'boolean',
+        name,
+        label: definition.label,
+        description: definition.description
+      };
+    }
+    return object(
+      name,
+      definition.label,
+      [{
+        type: 'string',
+        name: 'mode',
+        label: 'Mode',
+        options: [...definition.modes],
+        description: definition.description
+      }],
+      definition.description
+    );
+  });
 }
 
 export { text, object as objectField };

@@ -95,3 +95,44 @@ test('the atmosphere client does not duplicate the canonical album player', () =
   assert.doesNotMatch(js, /getElementById\('albumAudio'\)/);
   assert.doesNotMatch(js, /function selectTrack/);
 });
+
+test('the three page-behaviour effects are declared as real boolean parts', () => {
+  assert.deepEqual(['backgroundEffects', 'pageTransition', 'respectReducedMotion'].map((name) => EFFECTS[name].valueType), ['boolean', 'boolean', 'boolean']);
+  for (const name of ['backgroundEffects', 'pageTransition', 'respectReducedMotion']) {
+    assert.equal(EFFECTS[name].default, true);
+    assert.equal(EFFECTS[name].category, 'effect');
+    assert.equal(EFFECTS[name].path, `appearance.effects.${name}`);
+    assert.deepEqual([...EFFECTS[name].templates], ['homepage', 'album', 'vista-window', 'editorial']);
+  }
+});
+
+test('page effects validate as booleans and reach the rendered body', () => {
+  const disabled = {
+    ...album,
+    appearance: {
+      ...album.appearance,
+      effects: { ...album.appearance.effects, backgroundEffects: false, pageTransition: false, respectReducedMotion: false }
+    }
+  };
+  assert.deepEqual(validatePage(disabled), []);
+  const html = renderPage(disabled, { site, wallpapers });
+  assert.match(html, /data-background-effects="false"/);
+  assert.match(html, /data-page-transition="false"/);
+  assert.match(html, /data-respect-reduced-motion="false"/);
+
+  const broken = {
+    ...album,
+    appearance: { ...album.appearance, effects: { ...album.appearance.effects, pageTransition: 'yes' } }
+  };
+  const problems = validatePage(broken);
+  assert.ok(problems.some((problem) => problem.includes('appearance.effects.pageTransition must be true or false')));
+});
+
+test('reduced-motion CSS and the desktop canvas honour the declared effect', () => {
+  const css = fs.readFileSync(path.join(root, 'src/styles/v13.css'), 'utf8');
+  const homepageCss = fs.readFileSync(path.join(root, 'src/styles/homepage-vista.css'), 'utf8');
+  const desktopJs = fs.readFileSync(path.join(root, 'src/client/homepage-desktop.js'), 'utf8');
+  assert.match(css, /body\[data-respect-reduced-motion="true"\]\[data-page-transition="true"\] \.site-shell \{ animation: none/);
+  assert.match(homepageCss, /body\[data-respect-reduced-motion="true"\] \.reveal/);
+  assert.match(desktopJs, /runtimeConfig\.effects\?\.respectReducedMotion === false \|\| !window\.matchMedia/);
+});

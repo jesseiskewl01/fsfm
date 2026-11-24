@@ -16,14 +16,18 @@ const appearance = field(albumCollection.fields, 'appearance');
 
 test('the Studio catalogue is a complete plain-JSON projection of every part', () => {
   const catalogue = partCatalogue();
-  assert.equal(catalogue.total, 32);
-  assert.equal(catalogue.parts.length, 32);
+  assert.equal(catalogue.total, 35);
+  assert.equal(catalogue.parts.length, 35);
   assert.deepEqual(catalogue.categories, ['component', 'effect', 'chrome', 'shell']);
   assert.deepEqual(Object.keys(catalogue.chromeParts), [...CHROME_PART_NAMES]);
   assert.deepEqual(Object.keys(catalogue.shellParts), [...SHELL_PART_NAMES]);
   assert.equal(Object.keys(catalogue.pageParts).length, 13);
-  assert.deepEqual(Object.keys(catalogue.effects), ['albumAtmosphere']);
+  assert.deepEqual(Object.keys(catalogue.effects), ['backgroundEffects', 'pageTransition', 'respectReducedMotion', 'albumAtmosphere']);
   assert.equal(catalogue.effects.albumAtmosphere.modes.join(','), 'full,lite,off');
+  for (const name of ['backgroundEffects', 'pageTransition', 'respectReducedMotion']) {
+    assert.equal(catalogue.effects[name].valueType, 'boolean');
+    assert.equal(catalogue.effects[name].default, true);
+  }
   assert.deepEqual(catalogue.vocabularies.groupLayouts, ['grid', 'stack', 'columns']);
   assert.deepEqual(catalogue.templates.album.allowedComponentTypes, allowedComponentsFor('album'));
   assert.doesNotMatch(JSON.stringify(catalogue), /function\s*\(/, 'catalogue must be serialisable to a browser');
@@ -53,6 +57,15 @@ test('Tina presentation and layout choices come from the shared vocabularies', (
 
 test('Tina exposes the atmosphere mode and every switchable part as editable fields', () => {
   const effects = field(appearance.fields, 'effects');
+  for (const [name, label] of [
+    ['backgroundEffects', 'Background effects'],
+    ['pageTransition', 'Page transition'],
+    ['respectReducedMotion', 'Respect reduced motion']
+  ]) {
+    const toggle = field(effects.fields, name);
+    assert.equal(toggle.type, 'boolean', `${name} should be a flat boolean Tina field`);
+    assert.equal(toggle.label, label);
+  }
   const atmosphere = field(effects.fields, 'albumAtmosphere');
   assert.equal(atmosphere.label, 'Album atmosphere');
   assert.deepEqual(field(atmosphere.fields, 'mode').options, ['full', 'lite', 'off']);

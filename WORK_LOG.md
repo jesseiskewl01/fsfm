@@ -421,3 +421,10 @@ The architectural refurbishment itself: Roadmap Phases 3–5. Make homepage and 
 - Removed `build:legacy` and every stage-era `build:*`, `preview:*`, and `check:*` entry from `package.json`. The corresponding script files remain untouched; `check:all` now runs only canonical test, validation, and syntax checks.
 - Added regression coverage for the hidden placeholder and for the reduced npm script surface.
 - **Verify:** `npm test` **188/188 pass**. The pre-existing unstaged `tina/tina-lock.json` drift remains untouched.
+
+### Milestone 4 — page-behaviour effects are real parts **[OpenCode, 2026-11-24]**
+
+- Declared `backgroundEffects`, `pageTransition`, and `respectReducedMotion` in `src/core/parts.mjs` as boolean effects available to all four templates. The catalogue is now 35 parts (18 visual parts, 4 effects, 8 chrome parts, 5 shell parts).
+- Effect validation, Studio catalogue projection, Tina field generation, and Pages CMS controls now derive from those definitions instead of hardcoded toggle lists. Boolean effects stay flat under `appearance.effects` so content shape and rendering remain compatible.
+- The rendered `<body>` now exposes `data-respect-reduced-motion`. Reduced-motion CSS and the desktop canvas honor the declared flag; the default `true` path preserves the previous visual behaviour.
+- **Verify:** `npm test` **191/191 pass**. `tina/tina-lock.json` still remains untouched and unstaged.
