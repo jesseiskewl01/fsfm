@@ -202,11 +202,14 @@ test('Homepage interface labels are CMS-editable and render from the canonical r
   ]) assert.ok(config.includes(field), `CMS config is missing ${field}`);
 });
 
-test('Default build command targets the V14 generator and the legacy builder is explicit', () => {
+test('Package scripts expose only the canonical build and preview commands', () => {
   const pkg = readJson('package.json');
   assert.equal(pkg.scripts.build, 'node scripts/build-v13.mjs');
-  assert.equal(pkg.scripts['build:v13:stage5'], 'node scripts/build-v13-stage5.mjs');
-  assert.equal(pkg.scripts['build:legacy'], 'node scripts/build-pages.mjs');
+  assert.equal(pkg.scripts.preview, undefined);
+  assert.equal(pkg.scripts['build:legacy'], undefined);
+  for (const name of Object.keys(pkg.scripts)) {
+    assert.doesNotMatch(name, /stage[3-6]|legacy/i, `${name} should not be exposed as an npm script`);
+  }
 });
 
  

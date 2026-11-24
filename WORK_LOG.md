@@ -414,3 +414,10 @@ The architectural refurbishment itself: Roadmap Phases 3–5. Make homepage and 
 
 - Jesse approved: migrate homepage hero/gadgets into composable parts; declare `backgroundEffects`, `pageTransition`, and `respectReducedMotion` as effects; expand Tina from album-only to all six stores **and regenerate Tina artifacts** (explicit override of the earlier no-generated-artifacts guardrail); remove legacy/stage npm script exposure while leaving files; hide the placeholder `new-editorial-page`; keep Vista drag disabled; leave live publishing locked.
 - A local checkpoint commit and tag will be created before schema/content-shape changes begin. Nothing will be pushed. The existing unstaged `tina/tina-lock.json` drift will be handled deliberately once regeneration is authorized and reviewed.
+
+### Milestone 3 — private placeholder and script exposure **[OpenCode, 2026-11-24]**
+
+- Hid `content/v13/editorial-pages/new-editorial-page.json`: `publishing.published` and `publishing.showInNavigation` are now both `false`. No content was deleted.
+- Removed `build:legacy` and every stage-era `build:*`, `preview:*`, and `check:*` entry from `package.json`. The corresponding script files remain untouched; `check:all` now runs only canonical test, validation, and syntax checks.
+- Added regression coverage for the hidden placeholder and for the reduced npm script surface.
+- **Verify:** `npm test` **188/188 pass**. The pre-existing unstaged `tina/tina-lock.json` drift remains untouched.
