@@ -459,7 +459,7 @@ button,input,textarea,select{font-family:inherit}
 }
 
 
-/* V16.9 Night Workshop refinement. */
+/* V16.8 Night Workshop refinement. */
 :root{--bg:#100d18;--surface:#1d1828;--surface2:#292238;--surface-raised:#292337;--surface-hover:#352b47;--line:#493b5d;--line-strong:#6b5684;--text:#f7f1fc;--muted:#b6a9c4;--accent:#d6b9ff;--accent-strong:#ad84e8}
 html,body{background:radial-gradient(ellipse at 14% -16%,rgba(126,76,168,.22),transparent 37%),radial-gradient(ellipse at 90% 100%,rgba(59,36,87,.17),transparent 36%),var(--bg)}
 .topbar{background:linear-gradient(100deg,rgba(24,19,34,.98),rgba(31,23,43,.96));border-bottom-color:#534368;box-shadow:0 10px 32px rgba(0,0,0,.32)}
@@ -550,7 +550,7 @@ html,body{background:radial-gradient(ellipse at 14% -16%,rgba(126,76,168,.22),tr
     <div class="page-list" id="pageList"><div class="empty">Loading your pages…</div></div>
     <button class="btn add-item" id="newPageButton">＋ Create a page</button>
   </div>
-  <div class="sidebar-foot">FSFM STUDIO · V16.9<br>All page and block edits use the real FSFM content model and renderer. Local saves never publish automatically.</div>
+  <div class="sidebar-foot">FSFM STUDIO · V16.8<br>All page and block edits use the real FSFM content model and renderer. Local saves never publish automatically.</div>
 </aside>
 <main class="editor">
   <div class="editor-head">
@@ -628,9 +628,17 @@ function friendlyError(error){
 }
 function clearAutosave(){if(S.autosaveTimer){clearTimeout(S.autosaveTimer);S.autosaveTimer=null;}}
 function scheduleAutosave(){clearAutosave();if(!S.key||S.saving||S.deploying||S.autosaveConflict)return;S.autosaveTimer=setTimeout(()=>{S.autosaveTimer=null;if(S.dirty&&!S.saving&&!S.deploying&&!S.autosaveConflict)saveLocal({quiet:true,autosave:true});},S.autosaveMs);}
-function dirty(){if(!S.autosaveConflict)S.autosaveConflict=false;S.dirty=true;$('#saveButton').disabled=false;$('#saveHint').textContent='Unsaved changes';updateDeployButton();scheduleAutosave();}
+function dirty(){S.dirty=true;$('#saveButton').disabled=false;$('#saveHint').textContent='Unsaved changes';updateDeployButton();scheduleAutosave();}
 function updateDeployButton(){const p=S.publishStatus;$('#deployButton').disabled=S.saving||S.deploying||!p||!p.mainReady||!!(p.conflicts&&p.conflicts.length)||(!S.dirty&&!(p.pendingCount>0));}
-function renderPublishStatus(p){S.publishStatus=p;const hint=$('#publishHint');hint.textContent=p.reason||((p.pendingCount||0)+' saved file(s) ready to publish to main.');if(p.mainReady&&p.pendingCount===0&&!S.dirty)hint.textContent='No saved changes waiting to publish.';updateDeployButton();}
+function renderPublishStatus(p){
+  const actionsUrl=p.actionsUrl||S.publishStatus?.actionsUrl||'';
+  S.publishStatus={...p,actionsUrl};
+  const hint=$('#publishHint');
+  hint.textContent=p.reason||((p.pendingCount||0)+' saved file(s) ready to publish to main.');
+  if(p.mainReady&&p.pendingCount===0&&!S.dirty)hint.textContent='No saved changes waiting to publish.';
+  if(actionsUrl){const link=document.createElement('a');link.href=actionsUrl;link.target='_blank';link.rel='noopener';link.textContent='View GitHub Actions';hint.appendChild(link);}
+  updateDeployButton();
+}
 async function refreshPublishStatus(){try{const res=await fetch(api+'/deploy/status');if(res.status===401){location.href='/studio/login.html';return;}const data=await res.json();if(!res.ok)throw Error(data.error||'Could not check live publishing');renderPublishStatus(data);}catch(error){$('#publishHint').textContent='Live publishing status unavailable';S.publishStatus=null;updateDeployButton();}}
 function setHeader(eyebrow,title,sub,route=''){ $('#editorEyebrow').textContent=eyebrow;$('#editorHeading').textContent=title;$('#editorSubhead').textContent=sub||'';$('#editorRoute').textContent=route; }
 function iconFor(template){return template==='homepage'?'⌂':template==='album'?'♫':template==='vista-window'?'▣':'¶';}
@@ -913,14 +921,18 @@ async function loadRecord(key){
    const pageItem=S.items.find(item=>item.key===key);
    if(pageItem)pageItem.published=getPagePublicationState(S.record).active;
  }
- clearAutosave();S.dirty=false;$('#saveButton').disabled=true;$('#saveHint').textContent='All changes saved';
+ clearAutosave();S.autosaveConflict=false;S.dirty=false;$('#saveButton').disabled=true;$('#saveHint').textContent='All changes saved';
  S.route=S.resource==='page'?routeForKey(key):'/';
  renderEditor();loadPreview();updateDeployButton();
 }
 function loadPreview(){
- const frame=$('#previewFrame');
- const path=S.route||'/';
+ const frame=$('#previewFrame'),loading=$('#previewLoading'),path=S.route||'/';
+ let settled=false;
+ const finish=()=>{if(settled)return;settled=true;loading.classList.remove('show');};
+ loading.classList.add('show');
+ frame.onload=finish;frame.onerror=finish;
  frame.src=path+(path.includes('?')?'&':'?')+'studioPreview='+Date.now();
+ setTimeout(finish,8000);
 }
 function saveUrl(){return resourceUrl(S.key);}
 async function saveLocal(options={}){
@@ -937,8 +949,7 @@ async function saveLocal(options={}){
    S.record=data.record||S.record;S.revision=data.revision;S.autosaveConflict=false;S.dirty=false;
    $('#saveHint').textContent=autosave?'Auto-saved locally':'Saved locally';
    if(!quiet)toast('Saved locally. Rebuilding the FSFM preview…');
-   $('#previewLoading').classList.add('show');
-   setTimeout(()=>{$('#previewLoading').classList.remove('show');loadPreview();},1100);
+   loadPreview();
    const index=await fetch(api+'/content');if(index.ok)S.items=(await index.json()).items||[];
    renderEditor();await refreshPublishStatus();return true;
  }catch(error){const message=friendlyError(error);const conflict=/changed on disk|stale save|reload before trying/i.test(message);toast(message,true);$('#saveHint').textContent=conflict?'Reload required before saving':'Save needs attention';if(autosave)S.dirty=true;if(conflict){S.autosaveConflict=true;clearAutosave();}return false;}
@@ -950,13 +961,13 @@ async function deployLive(){
  if(!S.dirty&&!(S.publishStatus.pendingCount>0)){toast('Save a local change before publishing.',true);return;}
  if(!confirm('Publish your saved FSFM content to the live website? Studio will create one commit on main. GitHub Actions will run the production checks and deploy only if they pass.'))return;
  if(S.dirty){const saved=await saveLocal();if(!saved||S.dirty)return;}
- S.deploying=true;$('#deployButton').textContent='Publishing…';$('#saveHint').textContent='Preparing production build…';updateDeployButton();
+ S.deploying=true;if(S.publishStatus)S.publishStatus.actionsUrl='';$('#deployButton').textContent='Publishing…';$('#saveHint').textContent='Preparing production build…';updateDeployButton();
  try{
    const response=await fetch(api+'/deploy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({confirmation:'PUBLISH FSFM LIVE'})});
    if(response.status===401){location.href='/studio/login.html';return;}
    const data=await response.json();if(!response.ok)throw Error(apiError(response,data,'publish the website'));
    $('#saveHint').textContent=data.noChanges?'Already up to date':'Sent to GitHub';toast(data.message||'Publication request completed.');
-   if(data.actionsUrl){const hint=$('#publishHint');hint.textContent='Pushed to main · ';const link=document.createElement('a');link.href=data.actionsUrl;link.target='_blank';link.rel='noopener';link.textContent='View GitHub Actions';hint.appendChild(link);}
+   if(data.actionsUrl)renderPublishStatus({...(S.publishStatus||{}),actionsUrl:data.actionsUrl});
    await refreshPublishStatus();
  }catch(error){toast(friendlyError(error),true);$('#saveHint').textContent='Live publishing needs attention';}
  finally{S.deploying=false;$('#deployButton').textContent='Save & deploy live';updateDeployButton();}

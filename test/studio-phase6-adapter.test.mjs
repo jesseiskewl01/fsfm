@@ -103,3 +103,20 @@ test('autosave preserves explicit Save and stale-revision protection', () => {
   assert.match(studio, /Save local/);
   assert.match(studio, /Save &amp; deploy live/);
 });
+
+test('loading a fresh record clears a previous autosave conflict', () => {
+  assert.doesNotMatch(studio, /function dirty\(\)\{if\(!S\.autosaveConflict\)S\.autosaveConflict=false/);
+  assert.match(studio, /clearAutosave\(\);S\.autosaveConflict=false;S\.dirty=false/);
+});
+
+test('publish status keeps the GitHub Actions link after refresh', () => {
+  assert.match(studio, /function renderPublishStatus\(p\)\{[\s\S]*?actionsUrl[\s\S]*?createElement\('a'\)[\s\S]*?appendChild\(link\)[\s\S]*?updateDeployButton\(\);\}/);
+  assert.match(studio, /S\.deploying=true;if\(S\.publishStatus\)S\.publishStatus\.actionsUrl=''/);
+  assert.match(studio, /if\(data\.actionsUrl\)renderPublishStatus\(/);
+  assert.doesNotMatch(studio, /hint\.textContent='Pushed to main/);
+});
+
+test('preview refresh waits for the frame instead of a fixed timer', () => {
+  assert.match(studio, /frame\.onload=finish;frame\.onerror=finish/);
+  assert.doesNotMatch(studio, /,1100\)/);
+});
