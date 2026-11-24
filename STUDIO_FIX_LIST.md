@@ -133,3 +133,37 @@ These are deliberate limits for a late-night read-only audit. The next session s
 Jesse chose: **"It is the actual content backend, and Studio must call it."**
 
 So P0-1 resolves to option (b): Studio becomes a real client of Tina, not a sibling that writes the same JSON files. This is a design requirement for the Studio phase — which now comes **after** the building-block architecture is consolidated.
+
+---
+
+## 6. Current visual and Studio UI backlog **[Jesse + OpenCode, 2026-11-24]**
+
+> Status: not started. Jesse asked for these to be collected while he reviews the local Studio. Nothing below has been changed yet.
+
+### Homepage / site visual fixes
+
+1. Fix the odd bezel at the top of the bottom widgets at just-below-desktop width.
+2. Remove the six-dot grab indicator from the bottom widgets; they are not movable.
+3. Make the Bubble Frequency slider easier to read.
+4. Add more breathing room between the top widgets.
+5. Add push/collision behaviour when dragging one top widget into another: the widget being held pushes the widget it hits.
+6. Fix the artist embed being dark grey inside a white container.
+7. Vista window close button should close the window, not just minimize it. Minimizing already works well.
+
+### Studio UI rehaul
+
+8. Redesign the Studio UI. Two directions were discussed and the final choice is still Jesse's:
+   - **AMOLED terminal:** Courier New, very dark, high contrast, dense but extremely helpful. Easier and faster to build; best for a tool you sit in for hours.
+   - **Vista mirror:** make Studio feel like the homepage desktop. Cooler and more on-brand, but harder and risks becoming decorative instead of useful.
+   - OpenCode recommendation: do the AMOLED terminal foundation first, then borrow Vista accents later.
+9. Make the building-block editor much more visual and clean: cards, previews, clear status, and less nested chrome.
+10. Fully flesh out error messages so they say exactly what went wrong, where it happened, and what to do next.
+11. Reduce the number of dropdowns and Russian-doll submenus. Booleans should be obvious switches, not menus. Make the whole thing more idiot-proof and friendly.
+
+### Local reliability
+
+12. Make `localhost:3000` work for Studio as well as `127.0.0.1:3000`. Right now the site loads from either name, but Studio's origin check only accepts `127.0.0.1`.
+
+### Performance
+
+13. Do the overdue optimization pass: make the same site load with less repeated work, while preserving the byte-identical default homepage.
