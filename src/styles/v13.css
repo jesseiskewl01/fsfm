@@ -150,19 +150,58 @@ body.template-album {
   overflow-x: hidden;
   color: #fef5de;
   background:
-    radial-gradient(ellipse at 18% 10%, rgba(189,139,78,.28) 0%, transparent 42%),
-    radial-gradient(ellipse at 82% 28%, rgba(99,65,35,.24) 0%, transparent 48%),
-    radial-gradient(ellipse at 50% 100%, rgba(189,139,78,.22) 0%, transparent 56%),
-    linear-gradient(180deg, #22160d 0%, #0a0806 42%, #22160d 72%, #0a0806 100%);
+    radial-gradient(ellipse at 50% -8%, rgba(254,245,222,.20) 0%, rgba(189,139,78,.18) 26%, transparent 56%),
+    radial-gradient(ellipse at 14% 14%, rgba(189,139,78,.32) 0%, transparent 44%),
+    radial-gradient(ellipse at 86% 22%, rgba(255,211,143,.20) 0%, transparent 48%),
+    radial-gradient(ellipse at 50% 104%, rgba(189,139,78,.30) 0%, transparent 58%),
+    linear-gradient(180deg, #2a1c10 0%, #0a0806 42%, #241609 72%, #0a0806 100%);
   --ink: #fef5de;
   --muted: rgba(254,245,222,.70);
   --line: rgba(189,139,78,.42);
   --accent: #bd8b4e;
 }
-.template-album .site-wallpaper { opacity: .25; }
-.template-album .album-atmosphere { position: fixed; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none; opacity: .92; }
-.template-album .bloom-vignette { position: fixed; inset: -7%; z-index: 1; pointer-events: none; background: radial-gradient(ellipse at 50% 8%,rgba(254,245,222,.055),transparent 43%),radial-gradient(ellipse at 8% 46%,rgba(189,139,78,.09),transparent 48%),radial-gradient(ellipse at 92% 58%,rgba(34,22,13,.13),transparent 52%),radial-gradient(ellipse at 50% 50%,transparent 34%,rgba(10,8,6,.38) 100%); opacity: .92; animation: album-bloom-breathe 24s ease-in-out infinite alternate; }
-@keyframes album-bloom-breathe { from { transform: scale(1); opacity: .78; } to { transform: scale(1.055); opacity: 1; } }
+.template-album .site-wallpaper { opacity: .34; }
+.template-album .album-atmosphere { position: fixed; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none; opacity: 1; mix-blend-mode: screen; filter: saturate(1.12); }
+/* Album-scoped bloom: soft light wells, drifting shafts, and a dark edge vignette. [Jesse + OpenCode, 2026-11-24] */
+.template-album .bloom-vignette { position: fixed; inset: -12%; z-index: 1; pointer-events: none; overflow: hidden;
+  background:
+    radial-gradient(ellipse 48% 34% at 50% 4%, rgba(254,245,222,.20), transparent 72%),
+    radial-gradient(ellipse 30% 58% at 10% 44%, rgba(189,139,78,.16), transparent 74%),
+    radial-gradient(ellipse 32% 62% at 90% 38%, rgba(255,205,132,.12), transparent 76%),
+    radial-gradient(ellipse 70% 30% at 50% 96%, rgba(189,139,78,.16), transparent 78%),
+    radial-gradient(ellipse at 50% 50%, transparent 38%, rgba(10,8,6,.28) 100%);
+  opacity: .95;
+  animation: album-bloom-breathe 22s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+}
+.template-album .bloom-vignette::before,
+.template-album .bloom-vignette::after { content: ""; position: absolute; inset: -20%; pointer-events: none; border-radius: 50%; }
+.template-album .bloom-vignette::before {
+  background:
+    radial-gradient(ellipse 18% 46% at 28% 12%, rgba(254,245,222,.14), transparent 68%),
+    radial-gradient(ellipse 14% 52% at 67% 4%, rgba(255,220,165,.12), transparent 70%),
+    radial-gradient(ellipse 22% 38% at 82% 60%, rgba(189,139,78,.10), transparent 74%);
+  filter: blur(26px);
+  mix-blend-mode: screen;
+  animation: album-bloom-drift-one 31s ease-in-out infinite alternate;
+}
+.template-album .bloom-vignette::after {
+  background:
+    radial-gradient(ellipse 26% 40% at 50% 82%, rgba(254,245,222,.10), transparent 72%),
+    radial-gradient(ellipse 16% 54% at 16% 72%, rgba(189,139,78,.12), transparent 72%),
+    radial-gradient(ellipse 14% 48% at 88% 76%, rgba(255,205,132,.09), transparent 74%);
+  filter: blur(34px);
+  mix-blend-mode: screen;
+  animation: album-bloom-drift-two 37s ease-in-out infinite alternate;
+}
+@keyframes album-bloom-breathe { from { transform: scale(1); opacity: .82; } to { transform: scale(1.07); opacity: 1; } }
+@keyframes album-bloom-drift-one { from { transform: translate3d(-2%,1%,0) rotate(-3deg) scale(1); } to { transform: translate3d(4%,-2%,0) rotate(4deg) scale(1.08); } }
+@keyframes album-bloom-drift-two { from { transform: translate3d(3%,-2%,0) rotate(3deg) scale(1.04); } to { transform: translate3d(-4%,3%,0) rotate(-4deg) scale(.98); } }
+body.template-album[data-atmosphere-mode="lite"] .bloom-vignette::before,
+body.template-album[data-atmosphere-mode="lite"] .bloom-vignette::after { animation-duration: 48s; filter: blur(38px); }
+body.template-album[data-atmosphere-mode="off"] .bloom-vignette { opacity: .68; animation: none; }
+body.template-album[data-atmosphere-mode="off"] .bloom-vignette::before,
+body.template-album[data-atmosphere-mode="off"] .bloom-vignette::after { display: none; }
 .template-album .album-grain { position: fixed; inset: 0; z-index: 998; pointer-events: none; opacity: .055; mix-blend-mode: soft-light; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.98' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
 .template-album .site-shell { position: relative; z-index: 10; width: min(920px, calc(100% - 32px)); max-width: 920px; margin: 0 auto; padding: 52px 0 30px; }
 .template-album .global-header { position: fixed; top: 0; left: 0; right: 0; z-index: 500; width: 100%; min-height: 38px; height: auto; padding: 3px max(12px, calc((100% - 880px) / 2)); display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; border: 0; border-bottom: 1px solid rgba(254,245,222,.42); border-radius: 0; background: linear-gradient(180deg,rgba(189,139,78,.35),rgba(189,139,78,.12) 49%,rgba(189,139,78,.04) 50%,rgba(189,139,78,.20)); box-shadow: 0 4px 18px rgba(10,8,6,.5),inset 0 1px 2px rgba(254,245,222,.95); backdrop-filter: blur(28px) saturate(220%); -webkit-backdrop-filter: blur(28px) saturate(220%); }
@@ -175,7 +214,7 @@ body.template-album {
 .template-album .component-body { padding: 0; }
 .template-album .component-titlebar { min-height: 35px; padding: 6px 12px; color: #fef5de; background: linear-gradient(180deg,rgba(254,245,222,.28),rgba(189,139,78,.07)); border-bottom: 1px solid rgba(189,139,78,.35); }
 .template-album .component-title { color: #fef5de; font-size: 12px; letter-spacing: .04em; text-transform: none; }
-.album-hero-window { position: relative; z-index: 10; isolation:isolate; overflow: hidden; border: 1px solid rgba(254,245,222,.42); border-radius: 9px 9px 6px 6px; background: linear-gradient(180deg,rgba(189,139,78,.25),rgba(189,139,78,.08)); background-clip: padding-box; box-shadow: 0 20px 68px rgba(10,8,6,.58),inset 0 1px 2px rgba(254,245,222,.18); backdrop-filter: blur(30px) saturate(220%); -webkit-backdrop-filter: blur(30px) saturate(220%); }
+.album-hero-window { position: relative; z-index: 10; isolation:isolate; overflow: hidden; border: 1px solid rgba(254,245,222,.42); border-radius: 9px 9px 6px 6px; background: linear-gradient(180deg,rgba(189,139,78,.25),rgba(189,139,78,.08)); background-clip: padding-box; box-shadow: 0 20px 68px rgba(10,8,6,.58),0 0 90px rgba(189,139,78,.24),inset 0 1px 2px rgba(254,245,222,.18); backdrop-filter: blur(30px) saturate(220%); -webkit-backdrop-filter: blur(30px) saturate(220%); }
 .album-hero-window::after { content: ""; position: absolute; z-index: 5; inset: auto 0 0; height: 12px; pointer-events: none; border-radius: 0 0 6px 6px; background: linear-gradient(180deg,rgba(254,245,222,0),rgba(254,245,222,.10)); box-shadow: inset 1px -1px 0 rgba(254,245,222,.26),inset -1px -1px 0 rgba(254,245,222,.26); }
 .album-window-titlebar { height: 30px; display: flex; align-items: center; gap: 8px; padding: 0 10px; color: #fef5de; background: linear-gradient(180deg,rgba(254,245,222,.35),rgba(254,245,222,.15) 49%,rgba(254,245,222,.04) 50%,rgba(254,245,222,.2)); border-bottom: 1px solid rgba(189,139,78,.4); font-size: 12px; font-weight: 600; text-shadow: 0 1px 2px rgba(10,8,6,.8); }
 .album-window-symbol { color: #fef5de; font-size: 14px; }
@@ -285,7 +324,9 @@ body.template-album {
   .player-listen { padding: 9px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .template-album .bloom-vignette { animation: none; }
+  .template-album .bloom-vignette,
+  .template-album .bloom-vignette::before,
+  .template-album .bloom-vignette::after { animation: none; }
   .lyrics-line.current.line-enter, .lyrics-note.instrumental { animation: none; }
   .template-album .content-section.reveal { opacity: 1; transform: none; }
 }

@@ -5,7 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ATMOSPHERE_MODES, EFFECTS, resolveEffectMode } from '../src/core/parts.mjs';
 import { renderAtmosphere, resolveAtmosphere } from '../src/render/effects.mjs';
-import { renderPage } from '../src/render/page.mjs';
+import { renderPage, renderSiteShell } from '../src/render/page.mjs';
 import { validatePage } from '../src/core/page-validator.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -13,6 +13,7 @@ const readJson = (name) => JSON.parse(fs.readFileSync(path.join(root, name), 'ut
 const site = readJson('content/v13/site.json');
 const wallpapers = readJson('content/v13/wallpapers.json');
 const album = readJson('content/v13/albums/the-early-bird.json');
+const homepage = readJson('content/v13/homepage.json');
 
 const withMode = (page, mode, template = page.template) => ({
   ...page,
@@ -65,7 +66,15 @@ test('turning the canvas off leaves the amber vignette and grain intact', () => 
 test('the configured mode reaches the page shell', () => {
   const html = renderPage(withMode(album, 'lite'), { site, wallpapers });
   assert.match(html, /id="nebulaCanvas" class="album-atmosphere" data-atmosphere-mode="lite"/);
+  assert.match(html, /data-template="album"[^>]*data-atmosphere-mode="lite"/);
   assert.match(html, /album-atmosphere\.js/);
+});
+
+test('the content-driven atmosphere mode never changes the homepage body', () => {
+  const html = renderSiteShell({ page: homepage, site, wallpapers, bodyHtml: '', homepageMode: true });
+  assert.match(html, /<body class="template-homepage" data-template="homepage"/);
+  assert.doesNotMatch(html, /data-atmosphere-mode=/);
+  assert.match(renderPage(withMode(album, 'off'), { site, wallpapers }), /data-atmosphere-mode="off"/);
 });
 
 test('invalid modes fall back safely and fail validation from the same definition', () => {
@@ -82,10 +91,27 @@ test('the lite client path is a real reduction, not a cosmetic flag', () => {
   assert.match(js, /if \(lite\) starCount/);
   assert.match(js, /if \(lite\) steps/);
   assert.match(js, /if \(lite\) \{[\s\S]*?drop the two per-frame blur passes/);
-  // The full path must remain intact for byte-for-byte visual parity.
+  assert.match(js, /function radialSprite\(size, stops\)/);
+  assert.match(js, /function buildLiteBackdrop\(\)/);
+  assert.match(js, /var cachedScene = lite && liteBackdrop;/);
+  assert.match(js, /ctx\.drawImage\(liteBackdrop/);
+  const draw = js.slice(js.indexOf('function drawAurora'), js.indexOf('resizeAurora();'));
+  assert.doesNotMatch(draw, /createRadialGradient/);
+  // The full path keeps its original bounded workload.
   assert.match(js, /Math\.min\(190,/);
   assert.match(js, /var steps = 22/);
   assert.match(js, /1 : 1\.1/);
+});
+
+test('the album bloom is album-scoped, richer, and honest about modes', () => {
+  const css = fs.readFileSync(path.join(root, 'src/styles/v13.css'), 'utf8');
+  assert.match(css, /\.template-album \.bloom-vignette::before/);
+  assert.match(css, /\.template-album \.bloom-vignette::after/);
+  assert.match(css, /@keyframes album-bloom-drift-one/);
+  assert.match(css, /@keyframes album-bloom-drift-two/);
+  assert.match(css, /\.template-album \.album-atmosphere \{[^}]*mix-blend-mode: screen/);
+  assert.match(css, /body\.template-album\[data-atmosphere-mode="lite"\]/);
+  assert.match(css, /body\.template-album\[data-atmosphere-mode="off"\] \.bloom-vignette \{ opacity: \.68; animation: none; \}/);
 });
 
 test('the atmosphere client does not duplicate the canonical album player', () => {

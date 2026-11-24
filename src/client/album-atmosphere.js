@@ -13,7 +13,58 @@ try {
     var motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
     var reduceMotion = motionPreference.matches;
     var stars = [], blooms = [], curtains = [];
+    var glowSprites = {}, liteBackdrop = null;
     function random(min, max) { return min + Math.random() * (max - min); }
+
+    // Soft light is painted once into offscreen canvases, then reused every frame.
+    // The lite mode reuses a whole cached scene instead of rebuilding gradients.
+    // [Jesse + OpenCode, 2026-11-24]
+    function radialSprite(size, stops) {
+      var sprite = document.createElement('canvas');
+      sprite.width = size; sprite.height = size;
+      var sc = sprite.getContext('2d');
+      var gradient = sc.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+      stops.forEach(function(stop) { gradient.addColorStop(stop[0], stop[1]); });
+      sc.fillStyle = gradient; sc.fillRect(0, 0, size, size);
+      return sprite;
+    }
+
+    function drawSprite(sprite, x, y, width, height, alpha) {
+      if (!sprite) return;
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+      ctx.drawImage(sprite, x, y, width, height);
+      ctx.restore();
+    }
+
+    function buildSprites() {
+      glowSprites = {
+        bloom: radialSprite(512, [
+          [0, 'rgba(254,245,222,0.96)'],
+          [0.18, 'rgba(255,220,165,0.78)'],
+          [0.42, 'rgba(189,139,78,0.46)'],
+          [0.74, 'rgba(99,65,35,0.14)'],
+          [1, 'rgba(10,8,6,0)']
+        ]),
+        star: radialSprite(128, [
+          [0, 'rgba(254,245,222,0.98)'],
+          [0.16, 'rgba(254,245,222,0.72)'],
+          [0.44, 'rgba(189,139,78,0.30)'],
+          [1, 'rgba(189,139,78,0)']
+        ]),
+        horizon: radialSprite(512, [
+          [0, 'rgba(189,139,78,0.34)'],
+          [0.42, 'rgba(99,65,35,0.16)'],
+          [1, 'rgba(10,8,6,0)']
+        ]),
+        bokeh: radialSprite(96, [
+          [0, 'rgba(255,246,224,0.95)'],
+          [0.35, 'rgba(254,211,150,0.42)'],
+          [1, 'rgba(254,211,150,0)']
+        ])
+      };
+      liteBackdrop = lite ? buildLiteBackdrop() : null;
+    }
 
     function resizeAurora() {
       dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 640 ? 1 : 1.1);
@@ -39,7 +90,7 @@ try {
           x: random(0, width), y: random(0, height),
           radius: giant ? random(compact ? 1.35 : 1.8, compact ? 2.7 : 3.8) : random(compact ? 0.35 : 0.45, compact ? 1.15 : 1.6),
           phase: random(0, Math.PI * 2), speed: random(0.24, 0.92),
-          alpha: giant ? random(0.42, 0.82) : random(0.18, 0.58),
+          alpha: giant ? random(0.55, 0.95) : random(0.24, 0.68),
           drift: random(-0.035, 0.035), giant: giant
         });
       }
@@ -48,7 +99,7 @@ try {
           x: random(width * 0.02, width * 0.98),
           y: random(height * 0.04, height * 0.98),
           radius: random(Math.min(width, height) * 0.20, Math.min(width, height) * 0.55),
-          alpha: random(0.045, 0.095), phase: random(0, Math.PI * 2), speed: random(0.11, 0.24)
+          alpha: random(lite ? 0.09 : 0.11, lite ? 0.16 : 0.22), phase: random(0, Math.PI * 2), speed: random(0.11, 0.24)
         });
       }
       var curtainCount = lite ? Math.max(3, Math.min(4, Math.round(width / 520) + 1)) : Math.max(4, Math.min(7, Math.round(width / (compact ? 220 : 250)) + 2));
@@ -65,9 +116,11 @@ try {
           detail: ci % 2 === 0 ? 1 : -1
         });
       }
+      buildSprites();
     }
 
-    function drawCurtain(curtain, time) {
+    function drawCurtain(curtain, time, target) {
+      var g = target || ctx;
       var yTop = -height * (width < 640 ? 0.16 : 0.10);
       var yBottom = height * (compact ? Math.min(1.18, curtain.depth + 0.10) : Math.min(1.25, curtain.depth + 0.16));
       var steps = 22;
@@ -91,44 +144,44 @@ try {
       for (var r = right.length - 1; r >= 0; r -= 1) path.lineTo(right[r].x, right[r].y);
       path.closePath();
 
-      var vertical = ctx.createLinearGradient(0, yTop, 0, yBottom);
+      var vertical = g.createLinearGradient(0, yTop, 0, yBottom);
       vertical.addColorStop(0, 'rgba(189,139,78,0)');
-      vertical.addColorStop(0.12, 'rgba(189,139,78,0.20)');
-      vertical.addColorStop(0.29, 'rgba(254,245,222,0.34)');
-      vertical.addColorStop(0.46, 'rgba(189,139,78,0.30)');
-      vertical.addColorStop(0.57, 'rgba(254,245,222,0.22)');
-      vertical.addColorStop(0.72, 'rgba(254,245,222,0.26)');
-      vertical.addColorStop(0.90, 'rgba(99,65,35,0.16)');
+      vertical.addColorStop(0.12, 'rgba(189,139,78,0.24)');
+      vertical.addColorStop(0.29, 'rgba(255,245,214,0.46)');
+      vertical.addColorStop(0.46, 'rgba(189,139,78,0.38)');
+      vertical.addColorStop(0.57, 'rgba(254,245,222,0.32)');
+      vertical.addColorStop(0.72, 'rgba(255,236,196,0.36)');
+      vertical.addColorStop(0.90, 'rgba(99,65,35,0.20)');
       vertical.addColorStop(1, 'rgba(10,8,6,0)');
 
-      ctx.save();
-      ctx.globalCompositeOperation = 'screen';
-      ctx.fillStyle = vertical;
+      g.save();
+      g.globalCompositeOperation = 'screen';
+      g.fillStyle = vertical;
       if (lite) {
         // Keep the soft gradient silhouette; drop the two per-frame blur passes.
-        ctx.globalAlpha = 0.86;
-        ctx.filter = 'none';
-        ctx.fill(path);
-        ctx.globalAlpha = 0.24;
+        g.globalAlpha = 0.90;
+        g.filter = 'none';
+        g.fill(path);
+        g.globalAlpha = 0.28;
       } else {
-        ctx.globalAlpha = 0.76;
-        ctx.filter = 'blur(13px)';
-        ctx.fill(path);
-        ctx.globalAlpha = 0.48;
-        ctx.filter = 'blur(4px)';
-        ctx.fill(path);
-        ctx.globalAlpha = 0.24;
-        ctx.filter = 'none';
+        g.globalAlpha = 0.86;
+        g.filter = 'blur(13px)';
+        g.fill(path);
+        g.globalAlpha = 0.54;
+        g.filter = 'blur(4px)';
+        g.fill(path);
+        g.globalAlpha = 0.28;
+        g.filter = 'none';
       }
-      ctx.strokeStyle = 'rgba(254,245,222,0.32)';
-      ctx.lineWidth = 1.1;
-      ctx.stroke(path);
+      g.strokeStyle = 'rgba(255,236,196,0.46)';
+      g.lineWidth = 1.1;
+      g.stroke(path);
 
       // Delicate vertical folds give the broad light curtains an aurora-like texture.
-      ctx.globalAlpha = 0.18;
-      ctx.lineWidth = 1;
+      g.globalAlpha = 0.24;
+      g.lineWidth = 1;
       for (var fold = 0; fold < 2; fold += 1) {
-        ctx.beginPath();
+        g.beginPath();
         for (var point = 0; point <= steps; point += 1) {
           var q = point / steps;
           var yy = yTop + (yBottom - yTop) * q;
@@ -136,12 +189,33 @@ try {
           wav += Math.sin(q * Math.PI * 5.2 - curtain.phase * 0.7 + driftTime * curtain.speed * 0.62) * curtain.amplitude * 0.24;
           var wAt = curtain.width * (0.38 + Math.sin(Math.PI * Math.min(1, q)) * 0.62);
           var xx = curtain.x + wav + (fold - 1.5) * wAt * 0.16 + Math.sin(q * 8 + fold) * 7;
-          if (point === 0) ctx.moveTo(xx, yy); else ctx.lineTo(xx, yy);
+          if (point === 0) g.moveTo(xx, yy); else g.lineTo(xx, yy);
         }
-        ctx.strokeStyle = fold % 2 ? 'rgba(254,245,222,0.26)' : 'rgba(254,245,222,0.28)';
-        ctx.stroke();
+        g.strokeStyle = fold % 2 ? 'rgba(255,236,196,0.34)' : 'rgba(254,245,222,0.36)';
+        g.stroke();
       }
-      ctx.restore();
+      g.restore();
+    }
+
+    function buildLiteBackdrop() {
+      var buffer = document.createElement('canvas');
+      buffer.width = Math.max(1, Math.round(width));
+      buffer.height = Math.max(1, Math.round(height));
+      var bc = buffer.getContext('2d');
+      bc.save();
+      bc.globalCompositeOperation = 'screen';
+      blooms.forEach(function(bloom) {
+        bc.globalAlpha = Math.min(1, bloom.alpha * 3.4);
+        bc.drawImage(glowSprites.bloom, bloom.x - bloom.radius, bloom.y - bloom.radius, bloom.radius * 2, bloom.radius * 2);
+      });
+      curtains.forEach(function(curtain) { drawCurtain(curtain, 0, bc); });
+      bc.restore();
+      var horizonRadius = Math.max(width, height) * 0.78;
+      bc.save();
+      bc.globalAlpha = 0.86;
+      bc.drawImage(glowSprites.horizon, width * 0.5 - horizonRadius, height * 0.92 - horizonRadius, horizonRadius * 2, horizonRadius * 2);
+      bc.restore();
+      return buffer;
     }
 
     function drawAurora(time) {
@@ -150,40 +224,42 @@ try {
       lastFrame = time;
       ctx.clearRect(0, 0, width, height);
       var clock = reduceMotion ? 0 : time;
+      var cachedScene = lite && liteBackdrop;
 
-      // Soft atmospheric blooms sit behind the curtains.
-      blooms.forEach(function(bloom) {
-        var pulse = reduceMotion ? 0.7 : (Math.sin(clock * 0.00024 * bloom.speed + bloom.phase) + 1) / 2;
-        var glow = ctx.createRadialGradient(bloom.x, bloom.y, 0, bloom.x, bloom.y, bloom.radius);
-        glow.addColorStop(0, 'rgba(254,245,222,' + (bloom.alpha * (0.8 + pulse * 0.7)) + ')');
-        glow.addColorStop(0.34, 'rgba(189,139,78,' + (bloom.alpha * 0.85) + ')');
-        glow.addColorStop(0.72, 'rgba(34,22,13,' + (bloom.alpha * 0.48) + ')');
-        glow.addColorStop(1, 'rgba(10,8,6,0)');
-        ctx.fillStyle = glow;
-        ctx.fillRect(bloom.x - bloom.radius, bloom.y - bloom.radius, bloom.radius * 2, bloom.radius * 2);
-      });
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      if (cachedScene) {
+        // Lite mode paints one cached scene and only breathes it; no per-frame gradients.
+        var breathe = reduceMotion ? 0.96 : 0.93 + Math.sin(clock * 0.00021) * 0.05;
+        var drift = reduceMotion ? 0 : Math.sin(clock * 0.00009) * 18;
+        ctx.globalAlpha = breathe;
+        ctx.drawImage(liteBackdrop, drift, 0, width, height);
+        ctx.globalAlpha = 1;
+        blooms.forEach(function(bloom) {
+          var bob = reduceMotion ? 0 : Math.sin(clock * 0.00012 + bloom.phase) * 14;
+          var bokehRadius = bloom.radius * 0.32;
+          drawSprite(glowSprites.bokeh, bloom.x - bokehRadius + bob, bloom.y - bokehRadius, bokehRadius * 2, bokehRadius * 2, bloom.alpha * 2.8);
+        });
+      } else {
+        blooms.forEach(function(bloom) {
+          var pulse = reduceMotion ? 0.7 : (Math.sin(clock * 0.00024 * bloom.speed + bloom.phase) + 1) / 2;
+          drawSprite(glowSprites.bloom, bloom.x - bloom.radius, bloom.y - bloom.radius, bloom.radius * 2, bloom.radius * 2, bloom.alpha * (1.9 + pulse * 1.4));
+        });
+        curtains.forEach(function(curtain) { drawCurtain(curtain, clock, ctx); });
+      }
+      ctx.restore();
 
-      curtains.forEach(function(curtain) { drawCurtain(curtain, clock); });
-
-      // A low horizon haze creates depth rather than leaving the lower half flat black.
-      var horizon = ctx.createRadialGradient(width * 0.5, height * 0.92, 0, width * 0.5, height * 0.92, Math.max(width, height) * 0.72);
-      horizon.addColorStop(0, 'rgba(189,139,78,0.12)');
-      horizon.addColorStop(0.45, 'rgba(34,22,13,0.07)');
-      horizon.addColorStop(1, 'rgba(10,8,6,0)');
-      ctx.fillStyle = horizon;
-      ctx.fillRect(0, 0, width, height);
+      if (!cachedScene) {
+        var horizonRadius = Math.max(width, height) * 0.78;
+        drawSprite(glowSprites.horizon, width * 0.5 - horizonRadius, height * 0.92 - horizonRadius, horizonRadius * 2, horizonRadius * 2, 0.95);
+      }
 
       stars.forEach(function(star) {
         var shimmer = reduceMotion ? 0.78 : (Math.sin(clock * 0.001 * star.speed + star.phase) + 1) / 2;
-        var alpha = star.alpha * (0.34 + shimmer * 0.82);
-        if (star.giant && !lite) {
+        var alpha = star.alpha * (0.42 + shimmer * 0.86);
+        if (star.giant) {
           var haloRadius = star.radius * (8 + shimmer * 6);
-          var halo = ctx.createRadialGradient(star.x, star.y, 0, star.x, star.y, haloRadius);
-          halo.addColorStop(0, 'rgba(254,245,222,' + (alpha * 0.80) + ')');
-          halo.addColorStop(0.18, 'rgba(189,139,78,' + (alpha * 0.42) + ')');
-          halo.addColorStop(1, 'rgba(189,139,78,0)');
-          ctx.fillStyle = halo;
-          ctx.fillRect(star.x - haloRadius, star.y - haloRadius, haloRadius * 2, haloRadius * 2);
+          drawSprite(glowSprites.star, star.x - haloRadius, star.y - haloRadius, haloRadius * 2, haloRadius * 2, Math.min(1, alpha * 1.2));
         }
         ctx.beginPath();
         ctx.arc(star.x, star.y, star.radius * (0.78 + shimmer * 0.25), 0, Math.PI * 2);
@@ -191,8 +267,8 @@ try {
         ctx.fill();
         if (star.giant && shimmer > 0.36) {
           var flare = star.radius * (5.2 + shimmer * 3.1);
-          ctx.strokeStyle = 'rgba(254,245,222,' + (alpha * 0.62) + ')';
-          ctx.lineWidth = 0.8;
+          ctx.strokeStyle = 'rgba(255,236,196,' + Math.min(1, alpha * 0.78) + ')';
+          ctx.lineWidth = 0.9;
           ctx.beginPath();
           ctx.moveTo(star.x - flare, star.y); ctx.lineTo(star.x + flare, star.y);
           ctx.moveTo(star.x, star.y - flare * 1.25); ctx.lineTo(star.x, star.y + flare * 1.25);
