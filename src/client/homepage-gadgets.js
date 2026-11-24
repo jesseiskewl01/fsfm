@@ -5,6 +5,7 @@
 
   var STORAGE_KEY = 'fsfm_gadget_positions_v2';
   var LEGACY_STORAGE_KEY = 'fsfm_gadget_positions_v1';
+  var HITBOX_PADDING = 8;
   var gadgetConfig = {};
   try { gadgetConfig = JSON.parse((document.getElementById('fsfmGadgetConfig') || {}).textContent || '{}'); } catch (e) { gadgetConfig = {}; }
   var widgets = Array.prototype.slice.call(layer.querySelectorAll('.fsfm-gadget'));
@@ -99,6 +100,15 @@
       a.y + a.height + spacing > b.y;
   }
 
+  // Widgets collide using a padded hitbox, not just the visible rectangle.
+  function boxAt(widget, x, y) {
+    return { x:x - HITBOX_PADDING, y:y - HITBOX_PADDING, width:widget.offsetWidth + (HITBOX_PADDING * 2), height:widget.offsetHeight + (HITBOX_PADDING * 2) };
+  }
+  function liveBox(widget) {
+    var rect = widget.getBoundingClientRect();
+    return { x:rect.left - HITBOX_PADDING, y:rect.top - HITBOX_PADDING, width:rect.width + (HITBOX_PADDING * 2), height:rect.height + (HITBOX_PADDING * 2) };
+  }
+
   function resolveWidgetCollisions(layout) {
     var occupied = [];
     var primaryIds = [
@@ -111,14 +121,14 @@
 
     primaryIds.forEach(function(id) {
       var widget = widgetById[id], point = layout[id];
-      if (!widget || !point) return;
-      occupied.push({ x:point[0], y:point[1], width:widget.offsetWidth, height:widget.offsetHeight });
+      if (!widget || widget.hidden || !point) return;
+      occupied.push(boxAt(widget, point[0], point[1]));
     });
 
     bonusIds.forEach(function(id) {
       var widget = widgetById[id], point = layout[id];
-      if (!widget || !point) return;
-      var candidate = { x:point[0], y:point[1], width:widget.offsetWidth, height:widget.offsetHeight };
+      if (!widget || widget.hidden || !point) return;
+      var candidate = boxAt(widget, point[0], point[1]);
       var attempts = 0;
       while (occupied.some(function(other) { return boxesOverlap(candidate, other, 12); }) && attempts < 24) {
         candidate.y += 20;
@@ -131,7 +141,7 @@
         }
         attempts += 1;
       }
-      layout[id] = [candidate.x, candidate.y];
+      layout[id] = [candidate.x + HITBOX_PADDING, candidate.y + HITBOX_PADDING];
       occupied.push(candidate);
     });
     return layout;
@@ -179,18 +189,19 @@
   // A held widget nudges any widget it hits. [OpenCode, 2026-11-24]
   function pushOverlappingWidgets(held, dx, dy) {
     if (!dx && !dy) return;
-    var gap = 8;
+    var gap = 4;
+    var pushX = Math.abs(dx) >= Math.abs(dy) ? dx : 0;
+    var pushY = pushX ? 0 : dy;
     for (var pass = 0; pass < 3; pass += 1) {
-      var heldRect = held.getBoundingClientRect();
-      var heldBox = { x:heldRect.left, y:heldRect.top, width:heldRect.width, height:heldRect.height };
+      var heldBox = liveBox(held);
       var moved = false;
       widgets.forEach(function(other) {
         if (other === held || other.hidden || !other.querySelector('[data-drag-handle]')) return;
         var rect = other.getBoundingClientRect();
-        var box = { x:rect.left, y:rect.top, width:rect.width, height:rect.height };
+        var box = liveBox(other);
         if (!boxesOverlap(heldBox, box, gap)) return;
         var stored = positions[other.id] || [rect.left, rect.top];
-        applyPosition(other, stored[0] + dx, stored[1] + dy);
+        applyPosition(other, stored[0] + pushX, stored[1] + pushY);
         customPositions[other.id] = true;
         other.classList.add('gadget-pushed');
         if (other._pushTimer) clearTimeout(other._pushTimer);
@@ -421,7 +432,9 @@
     Object.keys(allFlags).forEach(function(key){var node=document.getElementById(allFlags[key]);if(node && visibilityFlags[key]===false)node.hidden=true;});
     Object.keys(widgetFlags).forEach(function(key) {
       var widget = document.getElementById(widgetFlags[key]);
-      if (widget) widget.hidden = cmsData.funWidgets[key] === false;
+      // The saved flag used to hide this only on desktop while small screens
+      // skipped this script entirely. Keep the button available everywhere.
+      if (widget) widget.hidden = key === 'showBarrelRoll' ? false : cmsData.funWidgets[key] === false;
     });
   }
   renderCalendar();

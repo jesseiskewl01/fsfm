@@ -480,3 +480,15 @@ The architectural refurbishment itself: Roadmap Phases 3–5. Make homepage and 
 - Added `test/studio-visual-fixes.test.mjs` covering collision, slider, grip, embed frame, close versus minimize, and loopback origins.
 - **Baseline note:** the saved 28,931-character baseline was stale by one navigation link that already existed at `HEAD`. A fresh baseline was captured from the current committed output (29,030 characters). None of the changes in this milestone touch rendered HTML.
 - **Verify:** `npm test` **202/202 pass**; `npm run build` pass; `node scripts/build-v13.mjs --preview --include-drafts` pass; browser check confirmed hidden grips, 18px gadget gap, dark Spotify frame and 16px slider control. No push, merge, force, history rewrite, live publish, file deletion, or credential access.
+
+### Milestone 11 — small visual nits from the live review [Jesse + OpenCode, 2026-11-24]
+
+- Shrank the header orb beside Fake Space Fog Machine from 32px to 26px (22px on narrow screens) and scaled its highlight with it; centred the ✧ glyph inside the album-page header orb.
+- Centred the "On the Horizon" event grid inside its window with a flex fallback, so the grid no longer sits off-centre.
+- The first press of a marquee wallpaper star now clears the automatic cycle timer, so a visitor-chosen wallpaper stays put.
+- Widgets collide using an 8px padded hitbox and push along the drag axis; hidden widgets are skipped. The barrel-roll button is forced visible at every breakpoint without changing saved content.
+- Purble Place now opens in a fixed, dark Vista-style window with a reserved scrollbar gutter, so opening it no longer resizes or shifts the homepage.
+- Spotify window chrome is dark with cyan-tinted borders, the iframe is filtered darker, and inset corner masks cover the white seams.
+- The Early Bird hero titlebar icon is now the album cover itself; the hero and window corners use matching radii and a pale seam overlay, so the bottom corners no longer turn black.
+- Added `test/visual-interaction-fixes.test.mjs` with seven regressions for these behaviours.
+- **Verify:** `npm test` **209/209 pass**; `npm run build` pass; `node scripts/build-v13.mjs --preview --include-drafts` pass; production `dist/index.html` still equals the saved 29,030-character baseline byte-for-byte. Browser checks confirmed the barrel roll is visible, the orb is 26px, the event grid is centred, the star lock is set, Purble open/close causes no viewport shift, the album header glyph is centred, the cover icon is loaded, and the Spotify embed area has zero near-white pixels in a viewport capture. The pre-existing unstaged `studio/index.html` rehaul remains untouched and is not part of this commit. No push, merge, force, history rewrite, live publish, file deletion, or credential access.

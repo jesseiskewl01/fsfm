@@ -289,7 +289,8 @@ function renderSectionInner(section, context = {}) {
       const a = context.page?.templateData?.album || {};
       const art = safeImageUrl(a.artwork);
       const artworkLayers = art ? `<div class="album-hero-art" aria-hidden="true"><img class="album-hero-blur" src="${escapeHtml(art)}" alt=""><img class="album-hero-sharp" src="${escapeHtml(art)}" alt=""></div>` : '';
-      return `<div class="album-hero-window"><div class="album-window-titlebar"><span class="album-window-symbol" aria-hidden="true">◉</span><span>${escapeHtml(a.windowTitle || a.title || context.page.identity.name)}</span></div><header class="album-hero">${artworkLayers}<div class="album-hero-shade" aria-hidden="true"></div><div class="album-hero-inner">${a.eyebrow ? `<p class="album-eyebrow">${escapeHtml(a.eyebrow)}</p>` : ''}<h1>${escapeHtml(a.title || context.page.identity.name)}</h1><p class="album-artist-line">${escapeHtml(a.artistLine || context.site.siteName)}</p></div></header></div>`;
+      const windowIcon = art ? `<img class="album-window-symbol album-window-symbol-art" src="${escapeHtml(art)}" alt="" aria-hidden="true">` : '<span class="album-window-symbol" aria-hidden="true">◉</span>';
+      return `<div class="album-hero-window"><div class="album-window-titlebar">${windowIcon}<span>${escapeHtml(a.windowTitle || a.title || context.page.identity.name)}</span></div><header class="album-hero">${artworkLayers}<div class="album-hero-shade" aria-hidden="true"></div><div class="album-hero-inner">${a.eyebrow ? `<p class="album-eyebrow">${escapeHtml(a.eyebrow)}</p>` : ''}<h1>${escapeHtml(a.title || context.page.identity.name)}</h1><p class="album-artist-line">${escapeHtml(a.artistLine || context.site.siteName)}</p></div></header></div>`;
     }
     case 'album-player': return renderAlbumPlayer(context.page);
     case 'spotify-embed': {

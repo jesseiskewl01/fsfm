@@ -13,6 +13,7 @@ var wallBack = document.getElementById('wallB');
 var currentTheme = Number.isInteger(window.__themeIdx) ? window.__themeIdx : 0;
 var themeImages = [];
 var applyToken = 0;
+var cycleTimer = null;
 var runtimeConfig = {};
 try { runtimeConfig = JSON.parse((document.getElementById('fsfmHomeRuntimeConfig') || {}).textContent || '{}'); } catch (e) { runtimeConfig = {}; }
 window.__FSFM_HOME_RUNTIME__ = runtimeConfig;
@@ -99,6 +100,16 @@ function cycleTheme() {
   else applyTheme(currentTheme + 1);
 }
 
+// A visitor-chosen wallpaper is sticky: the first star press ends auto-cycling.
+function stopAutomaticCycle() {
+  if (cycleTimer !== null) {
+    window.clearInterval(cycleTimer);
+    cycleTimer = null;
+  }
+  document.documentElement.dataset.wallpaperChoiceMade = 'true';
+}
+window.__fsfmStopWallpaperCycle = stopAutomaticCycle;
+
 // Marquee copy is rendered into the static HTML for crawlability. This script
 // only enhances the server-rendered wallpaper stars with their click behaviour.
 var marqueeTrack = document.getElementById('marqueeTrack');
@@ -109,7 +120,7 @@ function renderMarquee(messages) {
   marqueeTrack.querySelectorAll('.star-icon').forEach(function(star) {
     star.setAttribute('aria-label', 'Change wallpaper theme');
     if (!runtimeConfig.wallpaper || !runtimeConfig.wallpaper.cycle || runtimeConfig.wallpaper.cycle.manualControl !== false) {
-      star.addEventListener('click', cycleTheme);
+      star.addEventListener('click', function(){ stopAutomaticCycle(); cycleTheme(); });
     } else {
       star.disabled = true;
       star.setAttribute('aria-hidden', 'true');
@@ -121,7 +132,7 @@ renderMarquee(runtimeConfig.marqueeMessages || []);
 var cycleSettings = runtimeConfig.wallpaper && runtimeConfig.wallpaper.cycle || {};
 if (cycleSettings.enabled && themes.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
   var cycleSeconds = Math.max(5, Math.min(3600, Number(cycleSettings.intervalSeconds) || 30));
-  window.setInterval(function(){ if (!document.hidden) cycleTheme(); }, cycleSeconds * 1000);
+  cycleTimer = window.setInterval(function(){ if (!document.hidden && cycleTimer !== null) cycleTheme(); }, cycleSeconds * 1000);
 }
 
 // Keep the splash simple: the moving XP-era segment stays visible until the four
