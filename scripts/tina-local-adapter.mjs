@@ -131,19 +131,36 @@ export function createLocalContentAdapter({
     return { key: resource.key, revision: hashContent(raw), record: JSON.parse(raw) };
   }
 
+  /** Windows watchers can hold the destination open, so rename is best-effort.
+   *  The temp file keeps the write all-or-nothing until the handoff step.
+   *  [OpenCode, 2026-11-24]
+   */
+  function replaceFile(filePath, content, prefix = 'studio') {
+    const tempPath = filePath + '.' + prefix + '-' + process.pid + '-' + Date.now() + '.tmp';
+    fs.writeFileSync(tempPath, content, { flag: 'wx' });
+    try {
+      try {
+        fs.renameSync(tempPath, filePath);
+      } catch (error) {
+        if (process.platform !== 'win32' || !['EPERM', 'EBUSY', 'EEXIST'].includes(error.code)) throw error;
+        fs.copyFileSync(tempPath, filePath);
+        fs.rmSync(tempPath, { force: true });
+      }
+    } catch (error) {
+      fs.rmSync(tempPath, { force: true });
+      throw error;
+    }
+  }
+
   async function write(resource, currentRaw, record) {
     await init();
     const nextRaw = JSON.stringify(record, null, 2) + '\n';
-    const tempPath = resource.filePath + '.studio-' + process.pid + '-' + Date.now() + '.tmp';
-    fs.writeFileSync(tempPath, nextRaw, { flag: 'wx' });
-    fs.renameSync(tempPath, resource.filePath);
+    replaceFile(resource.filePath, nextRaw);
     const rel = relativeFromProject(projectRoot, resource.filePath);
     try {
       publisher.recordSavedFile(rel, nextRaw);
     } catch (error) {
-      const rollbackPath = resource.filePath + '.studio-rollback-' + process.pid + '-' + Date.now() + '.tmp';
-      fs.writeFileSync(rollbackPath, currentRaw, { flag: 'wx' });
-      fs.renameSync(rollbackPath, resource.filePath);
+      replaceFile(resource.filePath, currentRaw, 'studio-rollback');
       throw error;
     }
     if (database) {

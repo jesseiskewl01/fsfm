@@ -731,7 +731,7 @@ async function handleApi(request, response, pathname) {
     }
     try {
       const body = await readRequestJson(request, 16 * 1024);
-      const created = contentAdapter.createPage({
+      const created = await contentAdapter.createPage({
         template: body?.template,
         name: body?.name,
         slug: body?.slug,
@@ -819,6 +819,7 @@ async function handleApi(request, response, pathname) {
       const saved = await writeContentFile(resource, currentRaw, record);
       sendJson(response, 200, { ...saved, record });
     } catch (error) {
+      console.error('[FSFM Studio API]', error);
       sendJson(response, error.statusCode || 500, {
         error: error.statusCode ? error.message : 'Could not save this content record.',
       });

@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 
 const host = '127.0.0.1';
 const port = Number(process.env.TINA_TEST_PORT || 3000);
@@ -13,16 +13,21 @@ let smokeCreatedPagePath = '';
 const args = [
   '--yes',
   '@tinacms/cli@4.0.5',
-  'dev',
   '--noTelemetry',
+  'dev',
   '-c',
   'node scripts/dev-tina-preview.mjs',
 ];
-const child = spawn('npx', args, {
+const isWindows = process.platform === 'win32';
+const command = isWindows
+  ? 'npx --yes @tinacms/cli@4.0.5 --noTelemetry dev -c "node scripts/dev-tina-preview.mjs"'
+  : 'npx';
+const child = spawn(command, isWindows ? [] : args, {
   cwd: process.cwd(),
   env: { ...process.env, HOST: host, PORT: String(port), FSFM_STUDIO_DATA_DIR: testDataDir },
   stdio: 'inherit',
-  detached: process.platform !== 'win32',
+  detached: !isWindows,
+  shell: isWindows,
 });
 
 let childExit = null;
@@ -34,8 +39,14 @@ async function stopChild() {
   if (!stopping) {
     stopping = true;
     try {
-      if (child.pid && process.platform !== 'win32') process.kill(-child.pid, 'SIGTERM');
-      else child.kill('SIGTERM');
+      if (isWindows && child.pid) {
+        // shell:true is needed for npx on Windows; kill the whole tree.
+        spawnSync('taskkill', ['/PID', String(child.pid), '/T', '/F'], { stdio: 'ignore' });
+      } else if (child.pid && process.platform !== 'win32') {
+        process.kill(-child.pid, 'SIGTERM');
+      } else {
+        child.kill('SIGTERM');
+      }
     } catch {
       // The process may already have exited.
     }

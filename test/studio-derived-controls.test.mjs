@@ -7,12 +7,20 @@ import { CHROME_PART_NAMES, COMPONENTS, PAGE_PARTS, SHELL_PART_NAMES, allowedCom
 import { partCatalogue } from '../src/core/studio-controls.mjs';
 import { toTinaField, unionContentFields } from '../tina/fields.mjs';
 import tinaConfig from '../tina/config.js';
+import { createLocalContentAdapter } from '../scripts/tina-local-adapter.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
-const albumCollection = tinaConfig.schema.collections.find((collection) => collection.name === 'album');
+const collection = (name) => tinaConfig.schema.collections.find((item) => item.name === name);
+const albumsCollection = collection('albums');
 const field = (fields, name) => fields.find((item) => item.name === name);
-const appearance = field(albumCollection.fields, 'appearance');
+const appearance = field(albumsCollection.fields, 'appearance');
+const adapterStoreNames = createLocalContentAdapter({
+  projectRoot: root,
+  contentRoot: path.join(root, 'content/v13'),
+  publisher: { recordSavedFile() {} },
+  scheduleRebuild() {},
+}).collections.map((item) => item.name);
 
 test('the Studio catalogue is a complete plain-JSON projection of every part', () => {
   const catalogue = partCatalogue();
@@ -33,8 +41,42 @@ test('the Studio catalogue is a complete plain-JSON projection of every part', (
   assert.doesNotMatch(JSON.stringify(catalogue), /function\s*\(/, 'catalogue must be serialisable to a browser');
 });
 
+test('Tina covers every local adapter store', () => {
+  assert.deepEqual(tinaConfig.schema.collections.map((item) => item.name), adapterStoreNames);
+  assert.deepEqual(adapterStoreNames, ['homepage', 'site', 'wallpapers', 'albums', 'vistaPages', 'editorialPages']);
+  for (const item of tinaConfig.schema.collections) {
+    assert.equal(item.format, 'json', `${item.name} should be JSON`);
+    assert.ok(item.path.startsWith('content/v13'), `${item.name} should edit canonical content`);
+    assert.ok(item.fields.length, `${item.name} should expose editable fields`);
+  }
+});
+
+test('Tina homepage uses part content instead of template data', () => {
+  const homepage = collection('homepage');
+  assert.equal(field(homepage.fields, 'templateData'), undefined);
+  const parts = field(field(homepage.fields, 'appearance').fields, 'parts');
+  const gadgets = field(parts.fields, 'desktopGadgets');
+  const gadgetContent = field(gadgets.fields, 'content');
+  for (const name of ['photos', 'dates', 'stickyNote', 'funWidgets', 'visibility', 'featuredRelease', 'labels']) {
+    assert.ok(field(gadgetContent.fields, name), `homepage gadget content is missing ${name}`);
+  }
+  const heroContent = field(field(parts.fields, 'desktopHero').fields, 'content');
+  assert.deepEqual(heroContent.fields.map((item) => item.name), ['windowTitle', 'badge', 'title', 'subtitle', 'handle']);
+});
+
+test('Tina page collections derive their block lists from each template', () => {
+  for (const [name, template] of [['albums', 'album'], ['vistaPages', 'vista-window'], ['editorialPages', 'editorial']]) {
+    const sections = field(collection(name).fields, 'sections');
+    assert.deepEqual(field(sections.fields, 'type').options, allowedComponentsFor(template), `${name} should use ${template} parts`);
+  }
+  assert.ok(field(collection('site').fields, 'siteName'));
+  assert.ok(field(collection('site').fields, 'socialProfiles'));
+  assert.ok(field(collection('wallpapers').fields, 'presets'));
+  assert.ok(field(collection('wallpapers').fields, 'customImage'));
+});
+
 test('Tina block types and content fields come from the album part allowances', () => {
-  const sections = field(albumCollection.fields, 'sections');
+  const sections = field(albumsCollection.fields, 'sections');
   const types = field(sections.fields, 'type');
   assert.deepEqual(types.options, allowedComponentsFor('album'));
   assert.equal(types.label, 'Part type');
@@ -48,7 +90,7 @@ test('Tina block types and content fields come from the album part allowances', 
 });
 
 test('Tina presentation and layout choices come from the shared vocabularies', () => {
-  const sections = field(albumCollection.fields, 'sections');
+  const sections = field(albumsCollection.fields, 'sections');
   const presentation = field(sections.fields, 'presentation');
   assert.deepEqual(field(presentation.fields, 'variant').options, partCatalogue().vocabularies.presentationVariants.filter(Boolean));
   const group = field(sections.fields, 'group');
