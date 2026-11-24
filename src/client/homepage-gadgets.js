@@ -5,7 +5,6 @@
 
   var STORAGE_KEY = 'fsfm_gadget_positions_v2';
   var LEGACY_STORAGE_KEY = 'fsfm_gadget_positions_v1';
-  var HITBOX_PADDING = 8;
   var gadgetConfig = {};
   try { gadgetConfig = JSON.parse((document.getElementById('fsfmGadgetConfig') || {}).textContent || '{}'); } catch (e) { gadgetConfig = {}; }
   var widgets = Array.prototype.slice.call(layer.querySelectorAll('.fsfm-gadget'));
@@ -25,6 +24,11 @@
     }
   } catch (e) { storedPositions = {}; customPositions = {}; }
 
+  var COLLISION_GAP = 16;
+  var REGION_GAP = 16;
+  var COLUMN_GAP = 24;
+  var ROW_GAP = 32;
+
   function clampWidget(widget, x, y) {
     var maxX = Math.max(8, window.innerWidth - widget.offsetWidth - 8);
     var maxY = Math.max(48, window.innerHeight - widget.offsetHeight - 8);
@@ -32,31 +36,58 @@
   }
 
   function computeDesktopLayout() {
-    var hero = document.querySelector('.hero-window');
+    // Widgets live in the gutters between the website edges and the hero edges.
+    // [Jesse + OpenCode, 2026-11-24]
+    var hero = document.querySelector('.hero-window') || document.querySelector('.wrap');
     var heroRect = hero ? hero.getBoundingClientRect() : null;
-    var viewportWidth = window.innerWidth;
+    var viewportWidth = document.documentElement.clientWidth || window.innerWidth;
     var viewportHeight = window.innerHeight;
-    var heroTop = heroRect ? heroRect.top : 82;
-    var topRow = Math.max(72, Math.round(heroTop));
-    var middleRow = Math.max(topRow + 196, Math.round(heroTop + 196));
-    var lowerRow = Math.max(middleRow + 196, Math.round(heroTop + 392));
     var mainWidth = 184;
-    var leftOuter = 16;
-    var leftInner = 46;
-    var rightOuter = viewportWidth - mainWidth - 16;
-    var rightInner = viewportWidth - mainWidth - 46;
+    var edge = 8;
+    var heroLeft = heroRect ? Math.round(heroRect.left) : Math.round(viewportWidth * 0.27);
+    var heroRight = heroRect ? Math.round(heroRect.right) : Math.round(viewportWidth * 0.73);
+    var leftRegion = { start:edge, end:Math.max(edge + mainWidth, heroLeft - REGION_GAP) };
+    var rightRegion = { start:Math.min(viewportWidth - edge - mainWidth, heroRight + REGION_GAP), end:viewportWidth - edge };
 
-    // Gradated framing requested by Jesse [OpenCode, 2026-11-22]:
-    // 1==[hero]==4  (clock / calendar)
-    // =2=[hero]=5=  (featured / photo) - stepped inward
-    // 3==[hero]==6  (dates / note)
+    function columnsFor(region) {
+      var width = region.end - region.start;
+      if (width >= (mainWidth * 2) + COLUMN_GAP + (edge * 2)) {
+        var start = region.start + Math.floor((width - (mainWidth * 2) - COLUMN_GAP) / 2);
+        return [start, start + mainWidth + COLUMN_GAP];
+      }
+      return [region.start + Math.max(0, Math.floor((width - mainWidth) / 2))];
+    }
+
+    var leftColumns = columnsFor(leftRegion);
+    var rightColumns = columnsFor(rightRegion);
+    var topRow = 72;
+    var rowGap = viewportHeight < 860 ? 14 : ROW_GAP;
+    function height(id, fallback) {
+      var widget = widgetById[id];
+      return widget ? widget.offsetHeight : fallback;
+    }
+    var clockHeight = height('gadget-clock', 191);
+    var nowHeight = height('gadget-now-playing', 127);
+    var datesHeight = height('gadget-dates', 85);
+    var calendarHeight = height('gadget-calendar', 241);
+    var photosHeight = height('gadget-photos', 183);
+    var noteHeight = height('gadget-note', 124);
+    var leftPaired = leftColumns.length > 1;
+    var rightPaired = rightColumns.length > 1;
+    var leftRows = leftPaired
+      ? [topRow, topRow + Math.max(clockHeight, nowHeight) + rowGap]
+      : [topRow, topRow + clockHeight + rowGap, topRow + clockHeight + rowGap + nowHeight + rowGap];
+    var rightRows = rightPaired
+      ? [topRow, topRow + Math.max(calendarHeight, photosHeight) + rowGap]
+      : [topRow, topRow + calendarHeight + rowGap, topRow + calendarHeight + rowGap + photosHeight + rowGap];
+
     return {
-      'gadget-clock': [leftOuter, topRow],
-      'gadget-now-playing': [leftInner, middleRow],
-      'gadget-dates': [leftOuter, lowerRow],
-      'gadget-calendar': [rightOuter, topRow],
-      'gadget-photos': [rightInner, middleRow],
-      'gadget-note': [rightOuter, lowerRow]
+      'gadget-clock': [leftColumns[0], leftRows[0]],
+      'gadget-now-playing': [leftColumns[leftPaired ? 1 : 0], leftRows[leftPaired ? 0 : 1]],
+      'gadget-dates': [leftColumns[0], leftRows[leftPaired ? 1 : 2]],
+      'gadget-calendar': [rightColumns[0], rightRows[0]],
+      'gadget-photos': [rightColumns[rightPaired ? 1 : 0], rightRows[rightPaired ? 0 : 1]],
+      'gadget-note': [rightColumns[0], rightRows[rightPaired ? 1 : 2]]
     };
   }
 
@@ -100,15 +131,6 @@
       a.y + a.height + spacing > b.y;
   }
 
-  // Widgets collide using a padded hitbox, not just the visible rectangle.
-  function boxAt(widget, x, y) {
-    return { x:x - HITBOX_PADDING, y:y - HITBOX_PADDING, width:widget.offsetWidth + (HITBOX_PADDING * 2), height:widget.offsetHeight + (HITBOX_PADDING * 2) };
-  }
-  function liveBox(widget) {
-    var rect = widget.getBoundingClientRect();
-    return { x:rect.left - HITBOX_PADDING, y:rect.top - HITBOX_PADDING, width:rect.width + (HITBOX_PADDING * 2), height:rect.height + (HITBOX_PADDING * 2) };
-  }
-
   function resolveWidgetCollisions(layout) {
     var occupied = [];
     var primaryIds = [
@@ -122,16 +144,16 @@
     primaryIds.forEach(function(id) {
       var widget = widgetById[id], point = layout[id];
       if (!widget || widget.hidden || !point) return;
-      occupied.push(boxAt(widget, point[0], point[1]));
+      occupied.push({ x:point[0], y:point[1], width:widget.offsetWidth, height:widget.offsetHeight });
     });
 
     bonusIds.forEach(function(id) {
       var widget = widgetById[id], point = layout[id];
       if (!widget || widget.hidden || !point) return;
-      var candidate = boxAt(widget, point[0], point[1]);
+      var candidate = { x:point[0], y:point[1], width:widget.offsetWidth, height:widget.offsetHeight };
       var attempts = 0;
-      while (occupied.some(function(other) { return boxesOverlap(candidate, other, 12); }) && attempts < 24) {
-        candidate.y += 20;
+      while (occupied.some(function(other) { return boxesOverlap(candidate, other, COLLISION_GAP); }) && attempts < 24) {
+        candidate.y += 24;
         if (candidate.y + candidate.height > window.innerHeight - 8) {
           candidate.y = Math.max(48, point[1] - 36);
           candidate.x += 24;
@@ -141,7 +163,7 @@
         }
         attempts += 1;
       }
-      layout[id] = [candidate.x + HITBOX_PADDING, candidate.y + HITBOX_PADDING];
+      layout[id] = [candidate.x, candidate.y];
       occupied.push(candidate);
     });
     return layout;
@@ -161,6 +183,8 @@
     var y = useSaved ? saved[1] : (configured ? Number(configured[1]) : fallback[1]);
     applyInitialPosition(widget, x, y);
   });
+
+  settleWidgets(null);
 
   function applyInitialPosition(widget, x, y) {
     var p = clampWidget(widget, x, y);
@@ -186,23 +210,76 @@
     } catch (e) {}
   }
 
+  // Keep the held widget where the user dropped it, then move everything else
+  // until no two visible widgets share the same space. [Jesse + OpenCode, 2026-11-24]
+  function settleWidgets(anchor) {
+    var movable = widgets.filter(function(widget) {
+      return !widget.hidden && !!widget.querySelector('[data-drag-handle]');
+    });
+    movable.sort(function(a, b) {
+      if (a === anchor) return -1;
+      if (b === anchor) return 1;
+      var ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+      return ra.top - rb.top || ra.left - rb.left;
+    });
+
+    var placed = [];
+    movable.forEach(function(widget) {
+      var rect = widget.getBoundingClientRect();
+      var box = { x:rect.left, y:rect.top, width:rect.width, height:rect.height };
+      var originalX = box.x, originalY = box.y;
+      var attempts = 0;
+      while (placed.some(function(other) { return boxesOverlap(box, other, COLLISION_GAP); }) && attempts < 48) {
+        var blocker = placed.filter(function(other) { return boxesOverlap(box, other, COLLISION_GAP); })[0];
+        var candidates = [
+          { x:box.x, y:blocker.y + blocker.height + COLLISION_GAP },
+          { x:box.x, y:blocker.y - box.height - COLLISION_GAP },
+          { x:blocker.x + blocker.width + COLLISION_GAP, y:box.y },
+          { x:blocker.x - box.width - COLLISION_GAP, y:box.y },
+          { x:box.x, y:box.y + 24 },
+          { x:box.x + 24, y:box.y },
+          { x:box.x, y:box.y - 24 },
+          { x:box.x - 24, y:box.y }
+        ];
+        var best = null;
+        candidates.forEach(function(candidate) {
+          var point = clampWidget(widget, candidate.x, candidate.y);
+          var trial = { x:point.x, y:point.y, width:box.width, height:box.height };
+          if (placed.some(function(other) { return boxesOverlap(trial, other, COLLISION_GAP); })) return;
+          var distance = Math.abs(point.x - originalX) + Math.abs(point.y - originalY);
+          if (!best || distance < best.distance) best = { x:point.x, y:point.y, distance:distance };
+        });
+        if (best) {
+          box.x = best.x;
+          box.y = best.y;
+        } else {
+          var fallback = clampWidget(widget, box.x, box.y + 24);
+          box.x = fallback.x;
+          box.y = fallback.y;
+        }
+        attempts += 1;
+      }
+      applyPosition(widget, box.x, box.y);
+      placed.push({ x:box.x, y:box.y, width:box.width, height:box.height });
+    });
+  }
+
   // A held widget nudges any widget it hits. [OpenCode, 2026-11-24]
   function pushOverlappingWidgets(held, dx, dy) {
     if (!dx && !dy) return;
-    var gap = 4;
-    var pushX = Math.abs(dx) >= Math.abs(dy) ? dx : 0;
-    var pushY = pushX ? 0 : dy;
+    var gap = COLLISION_GAP;
     for (var pass = 0; pass < 3; pass += 1) {
-      var heldBox = liveBox(held);
+      var heldRect = held.getBoundingClientRect();
+      var heldBox = { x:heldRect.left, y:heldRect.top, width:heldRect.width, height:heldRect.height };
       var moved = false;
       widgets.forEach(function(other) {
         if (other === held || other.hidden || !other.querySelector('[data-drag-handle]')) return;
         var rect = other.getBoundingClientRect();
-        var box = liveBox(other);
+        var box = { x:rect.left, y:rect.top, width:rect.width, height:rect.height };
         if (!boxesOverlap(heldBox, box, gap)) return;
         var stored = positions[other.id] || [rect.left, rect.top];
-        applyPosition(other, stored[0] + pushX, stored[1] + pushY);
-        customPositions[other.id] = true;
+        applyPosition(other, stored[0] + dx, stored[1] + dy);
+        // A pushed widget is not a user-placed widget: reflow may restore it.
         other.classList.add('gadget-pushed');
         if (other._pushTimer) clearTimeout(other._pushTimer);
         other._pushTimer = setTimeout(function() { other.classList.remove('gadget-pushed'); other._pushTimer = null; }, 240);
@@ -233,11 +310,13 @@
       drag.lastX = event.clientX; drag.lastY = event.clientY;
       applyPosition(widget, drag.left + event.clientX - drag.startX, drag.top + event.clientY - drag.startY);
       pushOverlappingWidgets(widget, dx, dy);
+      settleWidgets(widget);
     });
     function endDrag(event) {
       if (!drag || (event && event.pointerId !== drag.pointerId)) return;
       drag = null;
       widget.classList.remove('is-dragging');
+      settleWidgets(widget);
       savePositions();
     }
     handle.addEventListener('pointerup', endDrag);
@@ -256,6 +335,7 @@
       var beforeX = rect.left, beforeY = rect.top;
       applyPosition(widget, x, y);
       pushOverlappingWidgets(widget, x - beforeX, y - beforeY);
+      settleWidgets(widget);
       savePositions();
     });
   });
@@ -280,7 +360,8 @@
         applyPosition(widget, target[0], target[1]);
       }
     });
-    savePositions();
+    settleWidgets(null);
+    // Reflow is layout repair, not a user move: never persist clamped positions.
   }
   window.addEventListener('resize', function() {
     if (resizeFrame) cancelAnimationFrame(resizeFrame);

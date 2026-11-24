@@ -43,11 +43,12 @@ test('V15 homepage widgets form the intended six-window frame with loose bonus p
   for (const id of ['gadget-clock', 'gadget-now-playing', 'gadget-dates', 'gadget-calendar', 'gadget-photos', 'gadget-note']) {
     assert.match(js, new RegExp("'" + id + "':"));
   }
-  assert.match(js, /var leftOuter = 16/);
-  assert.match(js, /var leftInner = 46/);
-  assert.match(js, /var rightInner = viewportWidth - mainWidth - 46/);
+  assert.match(js, /var COLLISION_GAP = 16/);
+  assert.match(js, /var COLUMN_GAP = 24/);
+  assert.match(js, /var leftRegion = \{ start:edge, end:Math\.max\(edge \+ mainWidth, heroLeft - REGION_GAP\) \}/);
+  assert.match(js, /var rightRegion = \{ start:Math\.min\(viewportWidth - edge - mainWidth, heroRight \+ REGION_GAP\), end:viewportWidth - edge \}/);
   // Extra widgets are rendered below footer, not in the fixed desktop gadget layout. [OpenCode, 2026-11-22]
-  assert.match(js, /Gradated framing requested by Jesse/);
+  assert.match(js, /Widgets live in the gutters between the website edges and the hero edges\./);
   assert.match(js, /fsfm_gadget_positions_v2/);
   assert.match(js, /isLegacyDefault/);
   assert.match(js, /function boxesOverlap/);

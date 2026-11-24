@@ -13,10 +13,14 @@ const server = read('scripts/dev-tina-preview.mjs');
 
 test('a dragged top widget pushes widgets it collides with', () => {
   assert.match(gadgets, /function pushOverlappingWidgets\(held, dx, dy\)/);
+  assert.match(gadgets, /var COLLISION_GAP = 16;/);
+  assert.match(gadgets, /var gap = COLLISION_GAP;/);
+  assert.match(gadgets, /function settleWidgets\(anchor\)/);
   assert.match(gadgets, /boxesOverlap\(heldBox, box, gap\)/);
   assert.match(gadgets, /pushOverlappingWidgets\(widget, dx, dy\)/);
   assert.match(gadgets, /pushOverlappingWidgets\(widget, x - beforeX, y - beforeY\)/);
-  assert.match(gadgets, /customPositions\[other\.id\] = true/);
+  assert.match(gadgets, /applyPosition\(other, stored\[0\] \+ dx, stored\[1\] \+ dy\)/);
+  assert.doesNotMatch(gadgets, /customPositions\[other\.id\] = true/);
   assert.match(css, /\.fsfm-gadget\.is-dragging/);
   assert.match(css, /\.fsfm-gadget\.gadget-pushed/);
 });
@@ -28,9 +32,11 @@ test('bottom widgets are not shown as draggable and their slider is readable', (
   assert.match(css, /\.fsfm-gadgets-extras \.gadget-range-output\{color:#173f57/);
 });
 
-test('the Spotify window matches its dark embed instead of sitting in a white shell', () => {
-  assert.match(css, /\.spotify-window \{ background:#101012/);
-  assert.match(css, /\.spotify-window > \.titlebar/);
+test('the Spotify window keeps normal chrome with only dark corners', () => {
+  assert.doesNotMatch(css, /\.spotify-window \{ background:#101012/);
+  assert.match(css, /\.spotify-window::after \{ content:""; position:absolute; z-index:6/);
+  assert.match(css, /radial-gradient\(circle at 0 100%, rgba\(8,14,18,\.95\) 0 6px, transparent 7px\)/);
+  assert.match(css, /radial-gradient\(circle at 100% 100%, rgba\(8,14,18,\.95\) 0 6px, transparent 7px\)/);
 });
 
 test('the Vista close button closes a window; minimize still minimizes it', () => {

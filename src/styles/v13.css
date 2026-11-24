@@ -165,7 +165,7 @@ body.template-album {
 @keyframes album-bloom-breathe { from { transform: scale(1); opacity: .78; } to { transform: scale(1.055); opacity: 1; } }
 .template-album .album-grain { position: fixed; inset: 0; z-index: 998; pointer-events: none; opacity: .055; mix-blend-mode: soft-light; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.98' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
 .template-album .site-shell { position: relative; z-index: 10; width: min(920px, calc(100% - 32px)); max-width: 920px; margin: 0 auto; padding: 52px 0 30px; }
-.template-album .global-header { position: fixed; top: 0; left: 0; right: 0; z-index: 500; width: 100%; min-height: 38px; height: auto; padding: 3px max(16px, calc((100vw - 880px) / 2)); display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; border: 0; border-bottom: 1px solid rgba(254,245,222,.42); border-radius: 0; background: linear-gradient(180deg,rgba(189,139,78,.35),rgba(189,139,78,.12) 49%,rgba(189,139,78,.04) 50%,rgba(189,139,78,.20)); box-shadow: 0 4px 18px rgba(10,8,6,.5),inset 0 1px 2px rgba(254,245,222,.95); backdrop-filter: blur(28px) saturate(220%); -webkit-backdrop-filter: blur(28px) saturate(220%); }
+.template-album .global-header { position: fixed; top: 0; left: 0; right: 0; z-index: 500; width: 100%; min-height: 38px; height: auto; padding: 3px max(12px, calc((100% - 880px) / 2)); display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; border: 0; border-bottom: 1px solid rgba(254,245,222,.42); border-radius: 0; background: linear-gradient(180deg,rgba(189,139,78,.35),rgba(189,139,78,.12) 49%,rgba(189,139,78,.04) 50%,rgba(189,139,78,.20)); box-shadow: 0 4px 18px rgba(10,8,6,.5),inset 0 1px 2px rgba(254,245,222,.95); backdrop-filter: blur(28px) saturate(220%); -webkit-backdrop-filter: blur(28px) saturate(220%); }
 .template-album .brand-link { min-width: 0; gap: 10px; color: #fef5de; font-size: 12px; text-shadow: 0 2px 10px rgba(189,139,78,.7); white-space: nowrap; }
 .template-album .brand-mark { width: 24px; height: 24px; flex: 0 0 auto; padding: 0; border-radius: 50%; border-color: #fef5de; background: radial-gradient(circle at 35% 35%,#fef5de 0%,#634123 60%,#22160d 100%); box-shadow: 0 2px 10px rgba(189,139,78,.7),inset 0 1px 3px #fef5de; font-size: 0; line-height: 1; }
 .template-album .brand-mark::after { content: "✧"; display: block; font-size: 15px; line-height: 1; transform: translateY(-.5px); }
@@ -334,19 +334,26 @@ html, body, * {
   scrollbar-width: thin;
   scrollbar-color: rgba(154,204,240,.9) rgba(8,18,40,.86);
 }
-*::-webkit-scrollbar { width: 12px; height: 12px; }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
 *::-webkit-scrollbar-track {
-  background: rgba(8,18,40,.86);
+  background: linear-gradient(90deg, rgba(3,10,22,.96), rgba(9,24,44,.88));
+  box-shadow: inset 1px 0 rgba(255,255,255,.06);
 }
 *::-webkit-scrollbar-thumb {
-  border: 2px solid rgba(8,18,40,.86);
-  border-radius: 10px;
-  background: linear-gradient(180deg, rgba(255,255,255,.94), rgba(154,204,240,.88) 48%, rgba(83,146,193,.94));
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.42);
+  border: 1px solid rgba(129,254,250,.55);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(154,204,240,.9) 46%, rgba(72,138,186,.95) 54%, rgba(210,239,255,.92));
+  box-shadow: 0 0 10px rgba(129,254,250,.28), inset 0 1px rgba(255,255,255,.9), inset 0 -1px rgba(0,0,0,.22);
 }
 *::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #fff, rgba(190,225,255,.98) 48%, rgba(116,184,226,.98));
+  border-color: rgba(255,255,255,.78);
+  background: linear-gradient(180deg, #fff, rgba(190,225,255,.98) 46%, rgba(96,176,224,.98) 54%, #fff);
+  box-shadow: 0 0 14px rgba(129,254,250,.5), inset 0 1px #fff;
 }
+*::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(180deg, rgba(190,225,255,.98), rgba(83,146,193,.98));
+}
+*::-webkit-scrollbar-corner { background: rgba(3,10,22,.96); }
 .site-menu { position: relative; flex: 0 0 auto; z-index: 1000; }
 .site-menu > summary {
   list-style: none; display: inline-flex; align-items: center; gap: 8px;

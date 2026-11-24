@@ -492,18 +492,24 @@ text-shadow: 0 1px 3px rgb(var(--deep-rgb)), 0 0 8px rgba(var(--deep-rgb), 0.8);
 .window-mini-icon.social { font-size:15px; }
 .bio-window-body { min-height:352px; display:flex; align-items:center; justify-content:center; padding:28px 24px; background:linear-gradient(145deg,#fff,#f1f8fb); }
 .bio-window-body .bio-text { max-width:39ch; font-size:14px; line-height:1.85; text-align:left; }
-.spotify-window-body { position:relative; padding:0; background:#101012; overflow:hidden; }
-.spotify-window-body iframe { width:100%; max-width:none; height:352px; min-height:352px; display:block; border:0; border-radius:0; box-shadow:none; background:#101012; filter:brightness(.62) contrast(1.16) saturate(1.12); }
-/* The Spotify frame is dark; keep its whole window dark so it does not sit in a white shell. [OpenCode, 2026-11-24] */
-.spotify-window { background:#101012 !important; border-color:rgba(127,238,255,.55) !important; }
-.spotify-window > .titlebar { color:#f2f2f5; text-shadow:none; border-bottom-color:rgba(127,238,255,.35); background:linear-gradient(180deg,rgba(18,52,58,.95),rgba(9,19,24,.96)); }
-.spotify-window .window-title { color:#f2f2f5 !important; text-shadow:none; }
-.spotify-window .window-mini-icon { color:#f2f2f5; border-color:rgba(127,238,255,.38); background:linear-gradient(145deg,rgba(53,112,118,.85),rgba(12,27,32,.9)); box-shadow:inset 0 1px rgba(255,255,255,.16); }
-.spotify-window .window-control { color:#f2f2f5; }
-.spotify-window .caption-button { color:#f7fbff; border-color:rgba(127,238,255,.42); background:linear-gradient(rgba(53,112,118,.92),rgba(12,27,32,.94) 48%,rgba(9,19,24,.96)); box-shadow:inset 0 0 0 1px rgba(127,238,255,.35); }
-.spotify-window .caption-button.close { background:linear-gradient(rgba(176,74,58,.94),rgba(96,31,24,.96) 50%,rgba(58,18,14,.98)); border-color:rgba(255,166,142,.55); }
-.spotify-window .window-body { border-color:rgba(127,238,255,.38) !important; box-shadow:none; }
-.spotify-window-body::after { content:""; position:absolute; inset:0; pointer-events:none; border-radius:0 0 4px 4px; background:linear-gradient(180deg,rgba(8,13,18,.22),rgba(8,13,18,0) 26%); box-shadow:inset 0 0 0 1px rgba(127,238,255,.38),inset 14px 0 18px -14px #0b1013,inset -14px 0 18px -14px #0b1013,inset 0 14px 18px -14px #0b1013,inset 0 -14px 18px -14px #0b1013; }
+.spotify-window-body { position:relative; padding:0; background:#121212; overflow:hidden; }
+.spotify-window-body iframe { width:100%; max-width:none; height:352px; min-height:352px; display:block; border:0; border-radius:5px; box-shadow:none; background:#121212; }
+/* The embed paints white corner slivers; mask them with the player's own background. [Jesse + OpenCode, 2026-11-24] */
+.spotify-window-body::after { content:""; position:absolute; z-index:3; inset:0; pointer-events:none;
+  background:
+    radial-gradient(circle at 0 0, #121212 0 8px, transparent 9px),
+    radial-gradient(circle at 100% 0, #121212 0 8px, transparent 9px),
+    radial-gradient(circle at 0 100%, #121212 0 8px, transparent 9px),
+    radial-gradient(circle at 100% 100%, #121212 0 8px, transparent 9px);
+}
+/* Keep the normal Vista glass window; only its rounded corners need a dark finish. [Jesse + OpenCode, 2026-11-24] */
+.spotify-window::after { content:""; position:absolute; z-index:6; inset:0; pointer-events:none; border-radius:inherit;
+  background:
+    radial-gradient(circle at 0 100%, rgba(8,14,18,.95) 0 6px, transparent 7px),
+    radial-gradient(circle at 100% 100%, rgba(8,14,18,.95) 0 6px, transparent 7px),
+    radial-gradient(circle at 0 0, rgba(8,14,18,.55) 0 4px, transparent 5px),
+    radial-gradient(circle at 100% 0, rgba(8,14,18,.55) 0 4px, transparent 5px);
+}
 .events-window { margin-top:20px; }
 .events-window .bit-container { min-height:100px; padding:15px; border:0; border-radius:0; box-shadow:none; background:linear-gradient(145deg,#fff,#f4f9fc) !important; display:flex; align-items:center; justify-content:center; text-align:center; }
 .events-window .bandsintown-widget, .events-window .component-fallback { max-width:100%; margin-inline:auto; }
@@ -674,19 +680,26 @@ html, body, * {
   scrollbar-width: thin;
   scrollbar-color: rgba(154,204,240,.9) rgba(8,18,40,.86);
 }
-*::-webkit-scrollbar { width: 12px; height: 12px; }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
 *::-webkit-scrollbar-track {
-  background: rgba(8,18,40,.86);
+  background: linear-gradient(90deg, rgba(3,10,22,.96), rgba(9,24,44,.88));
+  box-shadow: inset 1px 0 rgba(255,255,255,.06);
 }
 *::-webkit-scrollbar-thumb {
-  border: 2px solid rgba(8,18,40,.86);
-  border-radius: 10px;
-  background: linear-gradient(180deg, rgba(255,255,255,.94), rgba(154,204,240,.88) 48%, rgba(83,146,193,.94));
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.42);
+  border: 1px solid rgba(129,254,250,.55);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(154,204,240,.9) 46%, rgba(72,138,186,.95) 54%, rgba(210,239,255,.92));
+  box-shadow: 0 0 10px rgba(129,254,250,.28), inset 0 1px rgba(255,255,255,.9), inset 0 -1px rgba(0,0,0,.22);
 }
 *::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #fff, rgba(190,225,255,.98) 48%, rgba(116,184,226,.98));
+  border-color: rgba(255,255,255,.78);
+  background: linear-gradient(180deg, #fff, rgba(190,225,255,.98) 46%, rgba(96,176,224,.98) 54%, #fff);
+  box-shadow: 0 0 14px rgba(129,254,250,.5), inset 0 1px #fff;
 }
+*::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(180deg, rgba(190,225,255,.98), rgba(83,146,193,.98));
+}
+*::-webkit-scrollbar-corner { background: rgba(3,10,22,.96); }
 .hero-favicon { object-fit: contain; filter: drop-shadow(0 0 3px rgba(255,255,255,.95)); }
 .task-menu { position: relative; flex: 0 0 auto; z-index: 9500; }
 .task-menu > summary {

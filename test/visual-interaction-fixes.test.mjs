@@ -20,12 +20,18 @@ test('the first wallpaper star click stops automatic cycling', () => {
   assert.match(desktop, /star\.addEventListener\('click', function\(\)\{ stopAutomaticCycle\(\); cycleTheme\(\); \}\)/);
 });
 
-test('widgets have padded hitboxes and push along the drag axis', () => {
-  assert.match(gadgets, /var HITBOX_PADDING = 8;/);
-  assert.match(gadgets, /function boxAt\(widget, x, y\)/);
-  assert.match(gadgets, /function liveBox\(widget\)/);
-  assert.match(gadgets, /boxesOverlap\(heldBox, box, gap\)/);
-  assert.match(gadgets, /var pushX = Math\.abs\(dx\) >= Math\.abs\(dy\) \? dx : 0;/);
+test('widgets live in hero gutters and settle without overlap after a drag', () => {
+  assert.doesNotMatch(gadgets, /HITBOX_PADDING|function boxAt|function liveBox/);
+  assert.match(gadgets, /var COLLISION_GAP = 16;/);
+  assert.match(gadgets, /document\.querySelector\('\.hero-window'\) \|\| document\.querySelector\('\.wrap'\)/);
+  assert.match(gadgets, /document\.documentElement\.clientWidth \|\| window\.innerWidth/);
+  assert.match(gadgets, /columnsFor\(leftRegion\)/);
+  assert.match(gadgets, /columnsFor\(rightRegion\)/);
+  assert.match(gadgets, /function settleWidgets\(anchor\)/);
+  assert.match(gadgets, /settleWidgets\(widget\);[\s\S]*?savePositions\(\);/);
+  assert.match(gadgets, /applyPosition\(other, stored\[0\] \+ dx, stored\[1\] \+ dy\)/);
+  assert.match(gadgets, /A pushed widget is not a user-placed widget/);
+  assert.match(gadgets, /Reflow is layout repair, not a user move/);
 });
 
 test('the barrel roll gadget is no longer hidden by the saved flag', () => {
@@ -40,10 +46,19 @@ test('Purble Place uses a fixed Vista-style window and locks page scroll', () =>
   assert.match(css, /\.purble-frame\{display:block;flex:1 1 auto/);
 });
 
-test('the Spotify embed is darkened and its corners are masked', () => {
-  assert.match(css, /\.spotify-window-body iframe \{[\s\S]*?filter:brightness\(\.62\)/);
-  assert.match(css, /\.spotify-window \.window-title \{ color:#f2f2f5 !important/);
-  assert.match(css, /\.spotify-window-body::after \{ content:"";/);
+test('the Spotify window keeps its normal chrome and its embed corners are dark', () => {
+  assert.match(css, /\.spotify-window-body \{ position:relative; padding:0; background:#121212; overflow:hidden; \}/);
+  assert.match(css, /\.spotify-window-body iframe \{[^}]*border-radius:5px/);
+  assert.match(css, /\.spotify-window-body::after \{ content:""; position:absolute; z-index:3/);
+  assert.match(css, /radial-gradient\(circle at 0 0, #121212 0 8px, transparent 9px\)/);
+  assert.doesNotMatch(css, /spotify-window-body iframe \{[^}]*filter:brightness/);
+  assert.doesNotMatch(css, /\.spotify-window \{ background:#101012 !important/);
+  assert.match(css, /\.spotify-window::after \{ content:""; position:absolute; z-index:6/);
+});
+
+test('the album header uses the same inset as the homepage taskbar', () => {
+  assert.match(albumCss, /padding: 3px max\(12px, calc\(\(100% - 880px\) \/ 2\)\)/);
+  assert.doesNotMatch(albumCss, /100vw - 880px/);
 });
 
 test('the small header details are centered and compact', () => {
