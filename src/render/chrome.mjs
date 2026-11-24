@@ -14,6 +14,15 @@ import { renderWindow } from './components.mjs';
 function safeImage(value) { return safeImageUrl(value) || ''; }
 function text(value, fallback = '') { return typeof value === 'string' ? value : fallback; }
 
+/** Content now lives on the declared chrome part, not in `templateData`. */
+function partContent(page, name) {
+  const part = page?.appearance?.parts?.[name];
+  return part && typeof part === 'object' && !Array.isArray(part)
+    && part.content && typeof part.content === 'object' && !Array.isArray(part.content)
+    ? part.content
+    : {};
+}
+
 /* ---------------------------------------------------------------- gadgets */
 
 function renderClockGadget(title = 'Clock') {
@@ -38,7 +47,7 @@ function gadgetShell(id, title, body, compact = false, label = title) {
 }
 
 export function renderDesktopGadgets(page) {
-  const g = page.templateData?.gadgets || {};
+  const g = partContent(page, 'desktopGadgets');
   const featured = g.featuredRelease || {};
   const labels = g.labels || {};
   const label = (key, fallback) => text(labels[key], fallback);
@@ -73,7 +82,7 @@ export function renderDesktopTaskbar(site, pages, currentPage) {
   const links = navPages.map((page) => {
     const isCurrent = page.identity?.route === currentPage.identity?.route;
     const href = safeRoute(page.identity?.route, '/');
-    const label = page.template === 'homepage' ? (page.templateData?.desktopLabels?.homeNavigationLabel || 'Home') : (page.publishing?.navigationLabel || page.identity?.name || 'Page');
+    const label = page.template === 'homepage' ? (text(partContent(page, 'desktopTaskbar').homeNavigationLabel, 'Home') || 'Home') : (page.publishing?.navigationLabel || page.identity?.name || 'Page');
     const type = page.template === 'homepage' ? 'HOME' : page.template === 'album' ? 'ALBUM' : 'PAGE';
     return `<a href="${escapeHtml(href)}" class="task-menu-link${isCurrent ? ' active' : ''}"${isCurrent ? ' aria-current="page"' : ''}><span>${escapeHtml(label)}</span><small>${type}</small></a>`;
   }).join('');
@@ -83,7 +92,7 @@ export function renderDesktopTaskbar(site, pages, currentPage) {
 /* ------------------------------------------------------------------ hero */
 
 export function renderDesktopHero(page, site) {
-  const hero = page.templateData?.hero || {};
+  const hero = partContent(page, 'desktopHero');
   const favicon = safeImage(site.favicon);
   const icon = favicon ? `<img class="hero-favicon" src="${escapeHtml(favicon)}" alt="" aria-hidden="true" width="14" height="14">` : '<span class="hero-favicon-fallback" aria-hidden="true">✧</span>';
   const bodyHtml = `<header class="hero" id="heroSection"><div class="hero-badge" id="heroBadge">${escapeHtml(text(hero.badge, ':]'))}</div><div class="hero-mark" id="heroTitle">${escapeHtml(text(hero.title, page.identity?.name || 'Fake Space Fog Machine'))}</div><div class="hero-sub" id="heroSubtitle">${escapeHtml(text(hero.subtitle))}</div><div class="hero-handle" id="heroHandle">${escapeHtml(text(hero.handle))}</div></header>`;
@@ -103,18 +112,21 @@ export function renderDesktopHero(page, site) {
 
 /* ------------------------------------------------------------ overlays */
 
-export function renderPurbleOverlay(gadgets = {}) {
+export function renderPurbleOverlay(page) {
+  const gadgets = partContent(page, 'desktopGadgets');
   const dialogTitle = text(gadgets.labels?.purblePlace, 'Purble Place').toUpperCase();
   const gameUrl = safeUrl(gadgets.purblePlaceUrl || 'https://www.play-games.com/iframe/37376.html', { allowRelative: false, requireHttps: true }) || 'https://www.play-games.com/iframe/37376.html';
   return `<div class="purble-overlay" id="purbleOverlay" hidden><section class="purble-dialog" role="dialog" aria-modal="true" aria-labelledby="purbleDialogTitle"><header class="purble-titlebar"><span id="purbleDialogTitle">${escapeHtml(dialogTitle)}</span><button type="button" id="purbleCloseButton" aria-label="Close Purble Place">×</button></header><iframe class="purble-frame" id="purbleFrame" title="Purble Place game" src="about:blank" data-src="${escapeHtml(gameUrl)}" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups allow-popups-to-escape-sandbox"></iframe><div class="purble-fallback">Game not loading? <a href="${escapeHtml(gameUrl)}" target="_blank" rel="noopener noreferrer">Open Purble Place in a new tab</a>.</div></section></div>`;
 }
 
 export function renderBootOverlay(page, site) {
-  return `<script>try{if(sessionStorage.getItem('fsfm_boot_seen_v1')==='1')document.documentElement.classList.add('fsfm-boot-seen')}catch(e){}</script><div class="fsfm-boot-overlay" id="fsfmBootScreen" role="status" aria-live="polite"><div class="boot-brand" id="bootBrand">${escapeHtml(site.siteName.toUpperCase())}</div><div class="boot-progress-container"><div class="boot-progress-bar" id="bootProgressBar"></div></div><div class="boot-status" id="bootStatus">${escapeHtml(text(page.templateData?.desktopLabels?.bootLoading, 'LOADING YOUR DESKTOP'))}</div><div class="boot-caption">${escapeHtml(text(page.templateData?.desktopLabels?.bootCaption, 'SONIC SPACE-AGE AESTHETICS'))}</div></div>`;
+  const labels = partContent(page, 'bootOverlay');
+  return `<script>try{if(sessionStorage.getItem('fsfm_boot_seen_v1')==='1')document.documentElement.classList.add('fsfm-boot-seen')}catch(e){}</script><div class="fsfm-boot-overlay" id="fsfmBootScreen" role="status" aria-live="polite"><div class="boot-brand" id="bootBrand">${escapeHtml(site.siteName.toUpperCase())}</div><div class="boot-progress-container"><div class="boot-progress-bar" id="bootProgressBar"></div></div><div class="boot-status" id="bootStatus">${escapeHtml(text(labels.bootLoading, 'LOADING YOUR DESKTOP'))}</div><div class="boot-caption">${escapeHtml(text(labels.bootCaption, 'SONIC SPACE-AGE AESTHETICS'))}</div></div>`;
 }
 
 export function renderShutdownOverlay(page) {
-  return `<div class="fsfm-shutdown" id="fsfmShutdown" hidden role="status" aria-live="polite"><div class="shutdown-dialog"><strong id="shutdownTitle">${escapeHtml(text(page.templateData?.desktopLabels?.shutdownTitle, 'Goodnight.'))}</strong><p id="shutdownMessage">${escapeHtml(text(page.templateData?.desktopLabels?.shutdownMessage, 'Closing the FSFM desktop...'))}</p></div></div>`;
+  const labels = partContent(page, 'shutdownOverlay');
+  return `<div class="fsfm-shutdown" id="fsfmShutdown" hidden role="status" aria-live="polite"><div class="shutdown-dialog"><strong id="shutdownTitle">${escapeHtml(text(labels.shutdownTitle, 'Goodnight.'))}</strong><p id="shutdownMessage">${escapeHtml(text(labels.shutdownMessage, 'Closing the FSFM desktop...'))}</p></div></div>`;
 }
 
 /* ------------------------------------------------- theme + runtime config */
@@ -136,9 +148,22 @@ export function renderThemeHead(page, wallpapers) {
 
 export function renderRuntimeConfig(page) {
   const wallpaperSettings = page.appearance?.wallpaper || {};
-  const g = page.templateData?.gadgets || {};
+  const g = partContent(page, 'desktopGadgets');
+  const boot = partContent(page, 'bootOverlay');
+  const shutdown = partContent(page, 'shutdownOverlay');
+  const taskbar = partContent(page, 'desktopTaskbar');
+  const labels = {};
+  // Keep the historical key order: client scripts and the saved HTML baseline
+  // both depend on it. [OpenCode, 2026-11-24]
+  for (const [source, key] of [
+    [boot, 'bootLoading'], [boot, 'bootWelcome'], [boot, 'bootReady'], [boot, 'bootCaption'],
+    [shutdown, 'shutdownTitle'], [shutdown, 'shutdownMessage'],
+    [taskbar, 'homeNavigationLabel']
+  ]) {
+    if (typeof source[key] === 'string') labels[key] = source[key];
+  }
   const runtimeWallpaper = { ...wallpaperSettings, fit: wallpaperSettings.customFit || wallpaperSettings.fit || 'cover', position: String(wallpaperSettings.customPosition || wallpaperSettings.position || 'center').replaceAll('-', ' ') };
-  const homeRuntime = { labels: page.templateData?.desktopLabels || {}, gadgetLabels: g.labels || {}, shutdownRedirectUrl: safeUrl(g.shutdownRedirectUrl, { allowRelative: false, requireHttps: true }) || 'https://open.spotify.com/track/2CnrJj6Jz4vSe5E1hsWtpg', marqueeMessages: (page.sections || []).find((s) => s.type === 'marquee' && s.enabled !== false)?.content?.messages || [], bubbleDefault: Math.max(0, Math.min(100, Number.isFinite(Number(g.bubbleDefault)) ? Number(g.bubbleDefault) : 50)), wallpaper: runtimeWallpaper, effects: page.appearance?.effects || {} };
+  const homeRuntime = { labels, gadgetLabels: g.labels || {}, shutdownRedirectUrl: safeUrl(g.shutdownRedirectUrl, { allowRelative: false, requireHttps: true }) || 'https://open.spotify.com/track/2CnrJj6Jz4vSe5E1hsWtpg', marqueeMessages: (page.sections || []).find((s) => s.type === 'marquee' && s.enabled !== false)?.content?.messages || [], bubbleDefault: Math.max(0, Math.min(100, Number.isFinite(Number(g.bubbleDefault)) ? Number(g.bubbleDefault) : 50)), wallpaper: runtimeWallpaper, effects: page.appearance?.effects || {} };
   return `<script type="application/json" id="fsfmHomeRuntimeConfig">${safeJsonForHtml(homeRuntime)}</script>`;
 }
 
@@ -162,7 +187,7 @@ export function renderDesktopChrome(page, { site, pages = [], wallpapers } = {})
     hero: enabled('desktopHero') ? renderDesktopHero(page, site) : '',
     belowFooter: gadgets ? gadgets.extras : '',
     afterMain: [
-      enabled('purbleOverlay') ? renderPurbleOverlay(page.templateData?.gadgets || {}) : '',
+      enabled('purbleOverlay') ? renderPurbleOverlay(page) : '',
       enabled('shutdownOverlay') ? renderShutdownOverlay(page) : ''
     ].join('') + '\n  ' + renderRuntimeConfig(page),
     scripts: ['homepage-desktop', 'homepage-interactions', 'homepage-gadgets']

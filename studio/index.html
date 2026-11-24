@@ -840,12 +840,20 @@ function togglePageActivation(action){
 }
 function appearancePanel(){
   const r=S.record,parts=S.catalog?.pageParts||{},effects=S.catalog?.effects||{};
-  const labels={parts:'Visible parts',effects:'Page effects',mode:'Mode',enabled:'Enabled'};
+  const labels={parts:'Visible parts',effects:'Page effects',mode:'Mode',enabled:'Enabled',content:'Part content'};
   const descriptions={};
-  for(const [name,part] of Object.entries(parts)){labels[name]=part.label;descriptions[name]=part.description;}
-  for(const [name,effect] of Object.entries(effects)){labels[name]=effect.label;descriptions[name]=effect.description;}
+  const addFields=(fields)=>{
+   for(const item of fields||[]){
+    if(!labels[item.name])labels[item.name]=item.label;
+    if(item.description&&!descriptions[item.name])descriptions[item.name]=item.description;
+    addFields(item.fields);
+    addFields(item.itemFields);
+   }
+  };
+  for(const [name,part] of Object.entries(parts)){labels[name]=part.label;descriptions[name]=part.description;addFields(part.fields);}
+  for(const [name,effect] of Object.entries(effects)){labels[name]=effect.label;descriptions[name]=effect.description;addFields(effect.fields);}
   const count=Object.keys(parts).length;
-  return '<section class="panel"><div class="panel-head"><span class="panel-title">Appearance</span><span class="panel-note">WALLPAPER · '+count+' PARTS</span></div>'+valueEditor(r.appearance||{},'appearance','Appearance',0,{labels,descriptions})+'</section>';
+  return '<section class="panel"><div class="panel-head"><span class="panel-title">Appearance</span><span class="panel-note">WALLPAPER · '+count+' PARTS</span></div><p class="panel-desc">Every visible desktop part owns its own settings. Expand a part to change its content, or switch it off here.</p>'+valueEditor(r.appearance||{},'appearance','Appearance',0,{labels,descriptions})+'</section>';
 }
 function pageFields(){
  const r=S.record;
@@ -881,7 +889,7 @@ function renderPageEditor(){
  const summary=isHome?'Your desktop, homepage gadgets, hero and content windows.':S.record.identity?.name||'Untitled page';
  setHeader(templateName.toUpperCase()+' WORKSPACE',summary,templateName+' · '+(S.record.sections||[]).length+' building blocks',S.route);
  body.innerHTML=pageFields()+
- '<section class="panel"><div class="panel-head"><span class="panel-title">'+(isHome?'Homepage desktop &amp; gadgets':template==='album'?'Album &amp; player settings':'Template settings')+'</span><span class="panel-note">TEMPLATE DATA</span></div><p class="panel-desc">'+(isHome?'Every configurable part of the custom desktop is editable here, including gadgets, labels, featured release, photos, important dates, radio and shutdown behaviour.':'These are the template-specific settings used by the real FSFM page renderer.')+'</p>'+valueEditor(S.record.templateData||{},'templateData','Template data')+'</section>'+
+  (isHome?'':'<section class="panel"><div class="panel-head"><span class="panel-title">'+(template==='album'?'Album &amp; player settings':'Template settings')+'</span><span class="panel-note">TEMPLATE DATA</span></div><p class="panel-desc">These are the template-specific settings used by the real FSFM page renderer.</p>'+valueEditor(S.record.templateData||{},'templateData','Template data')+'</section>')+
  renderSections();
 }
 function renderGlobalEditor(){

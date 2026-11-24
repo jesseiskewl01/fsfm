@@ -7,82 +7,6 @@
     "route": "/",
     "order": 0
   },
-  "templateData": {
-    "hero": {
-      "windowTitle": "Homepage",
-      "badge": ":]",
-      "title": "Fake Space Fog Machine",
-      "subtitle": "jesse freaking scarsbrook",
-      "handle": "@mirrorlesssmoke"
-    },
-    "gadgets": {
-      "photos": [
-        "/media/images/earlybirdcd.jpg"
-      ],
-      "dates": [
-        {
-          "title": "fake space birthday machine",
-          "date": "2026-11-16"
-        }
-      ],
-      "stickyNote": {
-        "text": "typa shit that make you wanna grab a penguin"
-      },
-      "funWidgets": {
-        "showBarrelRoll": false,
-        "showBubbleSlider": true,
-        "showMusicPlayer": true,
-        "showPurblePlace": true
-      },
-      "visibility": {
-        "showClock": true,
-        "showCalendar": true,
-        "showFeaturedRelease": true,
-        "showPhotos": true,
-        "showDates": true,
-        "showStickyNote": true
-      },
-      "radioAudioUrl": "https://github.com/jesseiskewl01/fsfm/raw/refs/heads/main/audio/groovy.mp3",
-      "bubbleDefault": 50,
-      "purblePlaceUrl": "https://www.play-games.com/iframe/37376.html",
-      "featuredRelease": {
-        "windowTitle": "FEATURED RELEASE",
-        "title": "The Early Bird....",
-        "description": "Debut album",
-        "artwork": "/media/images/cover.png",
-        "linkText": "OUT NOW....",
-        "url": "https://open.spotify.com/album/0clOFZSG1MHTVtK9DAjUOe",
-        "componentType": "featured-release"
-      },
-      "shutdownRedirectUrl": "https://open.spotify.com/track/2CnrJj6Jz4vSe5E1hsWtpg",
-      "labels": {
-        "clock": "Clock",
-        "calendar": "Calendar",
-        "pictureFrame": "Picture Frame",
-        "importantDates": "Important Dates",
-        "stickyNote": "Sticky Note",
-        "barrelRoll": "Barrel Roll",
-        "bubbleFrequency": "Bubble Frequency",
-        "radio": "FSFM Radio",
-        "purblePlace": "Purble Place",
-        "barrelRollButton": "DO A BARREL ROLL",
-        "bubbleFrequencyLabel": "AMBIENT BUBBLES",
-        "radioPlay": "PLAY MUSIC",
-        "radioPause": "PAUSE MUSIC",
-        "purblePlaceButton": "OPEN PURBLE PLACE"
-      }
-    },
-    "footerText": "© 2026 FAKE SPACE FOG MACHINE",
-    "desktopLabels": {
-      "bootLoading": "LOADING YOUR DESKTOP",
-      "bootWelcome": "WELCOME",
-      "bootReady": "DESKTOP READY",
-      "bootCaption": "SONIC SPACE-AGE AESTHETICS",
-      "shutdownTitle": "Goodnight.",
-      "shutdownMessage": "Closing the FSFM desktop...",
-      "homeNavigationLabel": "Home"
-    }
-  },
   "sections": [
     {
       "type": "marquee",
@@ -240,13 +164,100 @@
       "respectReducedMotion": true
     },
     "parts": {
-      "bootOverlay": { "enabled": true },
+      "bootOverlay": {
+        "enabled": true,
+        "content": {
+          "bootLoading": "LOADING YOUR DESKTOP",
+          "bootWelcome": "WELCOME",
+          "bootReady": "DESKTOP READY",
+          "bootCaption": "SONIC SPACE-AGE AESTHETICS"
+        }
+      },
       "bubbleCanvas": { "enabled": true },
-      "desktopGadgets": { "enabled": true },
-      "desktopTaskbar": { "enabled": true },
-      "desktopHero": { "enabled": true },
+      "desktopGadgets": {
+        "enabled": true,
+        "content": {
+          "photos": [
+            "/media/images/earlybirdcd.jpg"
+          ],
+          "dates": [
+            {
+              "title": "fake space birthday machine",
+              "date": "2026-11-16"
+            }
+          ],
+          "stickyNote": {
+            "text": "typa shit that make you wanna grab a penguin"
+          },
+          "funWidgets": {
+            "showBarrelRoll": false,
+            "showBubbleSlider": true,
+            "showMusicPlayer": true,
+            "showPurblePlace": true
+          },
+          "visibility": {
+            "showClock": true,
+            "showCalendar": true,
+            "showFeaturedRelease": true,
+            "showPhotos": true,
+            "showDates": true,
+            "showStickyNote": true
+          },
+          "radioAudioUrl": "https://github.com/jesseiskewl01/fsfm/raw/refs/heads/main/audio/groovy.mp3",
+          "bubbleDefault": 50,
+          "purblePlaceUrl": "https://www.play-games.com/iframe/37376.html",
+          "featuredRelease": {
+            "windowTitle": "FEATURED RELEASE",
+            "title": "The Early Bird....",
+            "description": "Debut album",
+            "artwork": "/media/images/cover.png",
+            "linkText": "OUT NOW....",
+            "url": "https://open.spotify.com/album/0clOFZSG1MHTVtK9DAjUOe",
+            "componentType": "featured-release"
+          },
+          "shutdownRedirectUrl": "https://open.spotify.com/track/2CnrJj6Jz4vSe5E1hsWtpg",
+          "labels": {
+            "clock": "Clock",
+            "calendar": "Calendar",
+            "pictureFrame": "Picture Frame",
+            "importantDates": "Important Dates",
+            "stickyNote": "Sticky Note",
+            "barrelRoll": "Barrel Roll",
+            "bubbleFrequency": "Bubble Frequency",
+            "radio": "FSFM Radio",
+            "purblePlace": "Purble Place",
+            "barrelRollButton": "DO A BARREL ROLL",
+            "bubbleFrequencyLabel": "AMBIENT BUBBLES",
+            "radioPlay": "PLAY MUSIC",
+            "radioPause": "PAUSE MUSIC",
+            "purblePlaceButton": "OPEN PURBLE PLACE"
+          }
+        }
+      },
+      "desktopTaskbar": {
+        "enabled": true,
+        "content": {
+          "homeNavigationLabel": "Home"
+        }
+      },
+      "desktopHero": {
+        "enabled": true,
+        "content": {
+          "windowTitle": "Homepage",
+          "badge": ":]",
+          "title": "Fake Space Fog Machine",
+          "subtitle": "jesse freaking scarsbrook",
+          "handle": "@mirrorlesssmoke"
+        }
+      },
       "purbleOverlay": { "enabled": true },
-      "shutdownOverlay": { "enabled": true },
+      "shutdownOverlay": {
+        "enabled": true,
+        "content": {
+          "shutdownTitle": "Goodnight.",
+          "shutdownMessage": "Closing the FSFM desktop..."
+        }
+      },
       "themeEngine": { "enabled": true }
     }
   },

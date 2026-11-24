@@ -10,7 +10,7 @@ const homepage = readJson('content/v13/homepage.json');
 const liveGadgets = readJson('data/homepage-gadgets.json');
 
 test('Current live Homepage gadget data is merged into the V13 canonical record', () => {
-  const migrated = homepage.templateData.gadgets;
+  const migrated = homepage.appearance.parts.desktopGadgets.content;
   for (const key of ['photos', 'dates', 'stickyNote']) {
     assert.deepEqual(migrated[key], liveGadgets[key], `${key} should match the live repository record`);
   }

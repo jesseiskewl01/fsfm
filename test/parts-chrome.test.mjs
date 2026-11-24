@@ -15,7 +15,14 @@ const homepage = readJson('content/v13/homepage.json');
 const context = { site, wallpapers, pages: [homepage], assets: '/assets' };
 
 const render = (page) => renderHomepage(page, context);
-const withParts = (parts) => ({ ...homepage, appearance: { ...homepage.appearance, parts } });
+const withParts = (overrides) => ({
+  ...homepage,
+  appearance: { ...homepage.appearance, parts: { ...homepage.appearance.parts, ...overrides } }
+});
+const stripToggles = () => Object.fromEntries(Object.entries(homepage.appearance.parts).map(([name, part]) => {
+  const { enabled, ...contentOnly } = part;
+  return [name, contentOnly];
+}));
 const partProblems = (page) => validatePage(page).filter((problem) => problem.includes('appearance.parts'));
 
 /** A unique, stable marker for each chrome part in the rendered HTML. */
@@ -42,8 +49,8 @@ test('the eight desktop parts are declared in one place and default to on', () =
   assert.equal(isChromePartEnabled({}, 'notAPart'), false);
 });
 
-test('the explicit settings in homepage.json are a visual no-op', () => {
-  const withoutConfig = { ...homepage, appearance: { ...homepage.appearance, parts: undefined } };
+test('the explicit toggles in homepage.json are a visual no-op', () => {
+  const withoutConfig = { ...homepage, appearance: { ...homepage.appearance, parts: stripToggles() } };
   assert.equal(render(withoutConfig), render(homepage));
   const html = render(homepage);
   for (const marker of Object.values(MARKERS)) assert.ok(html.includes(marker), `missing default marker ${marker}`);

@@ -20,9 +20,13 @@ function legacyTracks() {
   return JSON.parse(match[1]);
 }
 
+const homepageHero = home.appearance.parts.desktopHero.content;
+const homepageGadgets = home.appearance.parts.desktopGadgets.content;
+
 test('Homepage visible copy is migrated without text changes', () => {
   assert.equal(home.identity.name, site.siteName);
-  assert.deepEqual(home.templateData.hero, {
+  assert.equal(home.templateData, undefined);
+  assert.deepEqual(homepageHero, {
     windowTitle: site.home.heroWindowTitle,
     badge: site.home.heroBadge,
     title: site.home.heroTitle,
@@ -38,27 +42,28 @@ test('Homepage visible copy is migrated without text changes', () => {
 });
 
 test('Homepage gadget defaults and featured release are preserved', () => {
-  for (const key of ['photos','dates','stickyNote']) assert.deepEqual(home.templateData.gadgets[key], gadgets[key]);
+  for (const key of ['photos','dates','stickyNote']) assert.deepEqual(homepageGadgets[key], gadgets[key]);
   // Radio and Purble were intentionally enabled in canonical content after the legacy fixture was captured. [OpenCode, 2026-11-24]
-  assert.deepEqual(home.templateData.gadgets.funWidgets, {
+  assert.deepEqual(homepageGadgets.funWidgets, {
     showBarrelRoll: false,
     showBubbleSlider: true,
     showMusicPlayer: true,
     showPurblePlace: true
   });
-  const featured = home.templateData.gadgets.featuredRelease;
+  const featured = homepageGadgets.featuredRelease;
   assert.equal(featured.title, site.home.featuredAlbumTitle);
   assert.equal(featured.description, site.home.featuredAlbumMeta);
   assert.equal(featured.artwork, site.home.featuredCoverImage);
   assert.equal(featured.linkText, site.home.featuredLinkText);
   assert.equal(featured.url, site.home.featuredLinkUrl);
-  assert.equal(home.templateData.gadgets.shutdownRedirectUrl, site.home.shutdownRedirectUrl);
+  assert.equal(homepageGadgets.shutdownRedirectUrl, site.home.shutdownRedirectUrl);
 });
 
 test('Site identity, favicon and footer are retained', () => {
   assert.equal(siteV13.siteName, site.siteName);
   assert.equal(siteV13.favicon, site.favicon);
-  assert.equal(home.templateData.footerText, site.footerText);
+  assert.equal(home.templateData, undefined);
+  assert.equal(siteV13.footerText, site.footerText);
   assert.equal(album.templateData.footerText, site.footerText);
 });
 

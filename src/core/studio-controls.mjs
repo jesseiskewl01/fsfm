@@ -28,6 +28,7 @@ function plain(part) {
     description: part.description || '',
     templates: [...(part.templates || [])],
     ...(part.path ? { path: part.path } : {}),
+    ...(part.contentPath ? { contentPath: part.contentPath } : {}),
     ...(part.default !== undefined ? { default: part.default } : {}),
     ...(part.fields ? { fields: part.fields } : {}),
     ...(part.modes ? { modes: part.modes } : {}),

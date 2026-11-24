@@ -428,3 +428,11 @@ The architectural refurbishment itself: Roadmap Phases 3–5. Make homepage and 
 - Effect validation, Studio catalogue projection, Tina field generation, and Pages CMS controls now derive from those definitions instead of hardcoded toggle lists. Boolean effects stay flat under `appearance.effects` so content shape and rendering remain compatible.
 - The rendered `<body>` now exposes `data-respect-reduced-motion`. Reduced-motion CSS and the desktop canvas honor the declared flag; the default `true` path preserves the previous visual behaviour.
 - **Verify:** `npm test` **191/191 pass**. `tina/tina-lock.json` still remains untouched and unstaged.
+
+### Milestone 5 — homepage desktop content now lives on parts **[Jesse + OpenCode, 2026-11-24]**
+
+- Moved the homepage hero, gadgets, boot/shutdown/taskbar copy out of `templateData` and into `appearance.parts.<part>.content`; added `contentPath` and declared field metadata to the eight chrome parts in `src/core/parts.mjs`. The catalogue stays at 35 parts.
+- The renderer now reads those declared part contents, and the homepage footer reads `site.footerText`. The saved pre-migration HTML baseline is still byte-for-byte identical (28,931 characters) after the migration.
+- Updated the validator, Studio Appearance panel, Tina field derivation, Pages CMS schema, and migration/release/Studio tests to the new model. Studio no longer exposes a homepage `templateData` panel, and homepage `templateData` is now rejected by validation.
+- **Verify:** `npm test` **191/191 pass**; `npm run check:all` pass; `npm run predeploy-check` pass; `npm run validate:v13` pass; `npm run build` pass; `node scripts/build-v13.mjs --preview --include-drafts` pass. The pre-existing unstaged `tina/tina-lock.json` drift remains untouched and is not part of this commit.
+- Next: expand Tina from album-only to all six adapter stores and regenerate artifacts.

@@ -95,27 +95,107 @@ export const EFFECTS = Object.freeze({
 });
 
 /** Homepage desktop chrome is a part family too. Each piece can be switched
- *  off from content; the historical "everything on" state is the default. */
+ *  off from content and now owns the copy it renders; the historical "everything
+ *  on" state remains the default. [OpenCode, 2026-11-24]
+ */
+const desktopLabelField = (name, label) => field(name, label);
+
+const desktopHeroFields = [
+  field('windowTitle', 'Window title'),
+  field('badge', 'Badge'),
+  required('title', 'Title'),
+  field('subtitle', 'Subtitle'),
+  field('handle', 'Artist handle')
+];
+
+const gadgetLabelFields = [
+  desktopLabelField('clock', 'Clock label'),
+  desktopLabelField('calendar', 'Calendar label'),
+  desktopLabelField('pictureFrame', 'Picture frame label'),
+  desktopLabelField('importantDates', 'Important dates label'),
+  desktopLabelField('stickyNote', 'Sticky note label'),
+  desktopLabelField('barrelRoll', 'Barrel roll label'),
+  desktopLabelField('bubbleFrequency', 'Bubble frequency label'),
+  desktopLabelField('radio', 'Radio label'),
+  desktopLabelField('purblePlace', 'Purble Place label'),
+  desktopLabelField('barrelRollButton', 'Barrel roll button'),
+  desktopLabelField('bubbleFrequencyLabel', 'Bubble frequency caption'),
+  desktopLabelField('radioPlay', 'Radio play button'),
+  desktopLabelField('radioPause', 'Radio pause button'),
+  desktopLabelField('purblePlaceButton', 'Purble Place button')
+];
+
+const desktopGadgetFields = [
+  field('photos', 'Photos', 'array', { itemType: 'image', description: 'Images shown in the picture frame gadget.' }),
+  field('dates', 'Important dates', 'array', {
+    itemType: 'object',
+    itemFields: [required('title', 'Title'), required('date', 'Date')]
+  }),
+  field('stickyNote', 'Sticky note', 'object', { fields: [field('text', 'Note text', 'textarea')] }),
+  field('funWidgets', 'Fun widgets', 'object', { fields: [
+    field('showBarrelRoll', 'Show barrel roll', 'boolean'),
+    field('showBubbleSlider', 'Show bubble slider', 'boolean'),
+    field('showMusicPlayer', 'Show music player', 'boolean'),
+    field('showPurblePlace', 'Show Purble Place', 'boolean')
+  ] }),
+  field('visibility', 'Gadget visibility', 'object', { fields: [
+    field('showClock', 'Show clock', 'boolean'),
+    field('showCalendar', 'Show calendar', 'boolean'),
+    field('showFeaturedRelease', 'Show featured release', 'boolean'),
+    field('showPhotos', 'Show photos', 'boolean'),
+    field('showDates', 'Show dates', 'boolean'),
+    field('showStickyNote', 'Show sticky note', 'boolean')
+  ] }),
+  field('radioAudioUrl', 'Radio audio URL', 'url'),
+  field('bubbleDefault', 'Default bubble level', 'number', { min: 0, max: 100 }),
+  field('purblePlaceUrl', 'Purble Place URL', 'url'),
+  field('featuredRelease', 'Featured release', 'object', { fields: [
+    required('windowTitle', 'Gadget title'),
+    required('title', 'Release title'),
+    field('description', 'Description'),
+    field('artwork', 'Artwork', 'image'),
+    required('linkText', 'Link text'),
+    required('url', 'Link URL', 'url'),
+    field('componentType', 'Component type')
+  ] }),
+  field('shutdownRedirectUrl', 'Shutdown redirect URL', 'url'),
+  field('labels', 'Gadget labels', 'object', { fields: gadgetLabelFields })
+];
+
+const bootOverlayFields = [
+  field('bootLoading', 'Loading message'),
+  field('bootWelcome', 'Welcome message'),
+  field('bootReady', 'Ready message'),
+  field('bootCaption', 'Boot caption')
+];
+
+const shutdownOverlayFields = [
+  field('shutdownTitle', 'Shutdown title'),
+  field('shutdownMessage', 'Shutdown message')
+];
+
 const CHROME_SOURCE = {
-  bootOverlay: ['Boot overlay', 'The startup progress screen.'],
-  bubbleCanvas: ['Ambient bubble canvas', 'The animated glass-refraction canvas behind the desktop.'],
-  desktopGadgets: ['Desktop gadgets', 'Clock, calendar, featured release, photos, dates, notes and fun widgets.'],
-  desktopTaskbar: ['Desktop taskbar', 'The bottom navigation bar and page menu.'],
-  desktopHero: ['Desktop hero window', 'The large Aero window with the artist name and handle.'],
-  purbleOverlay: ['Purble Place overlay', 'The dismissible game dialog.'],
-  shutdownOverlay: ['Shutdown overlay', 'The "Goodnight" closing dialog.'],
-  themeEngine: ['Theme engine', 'Wallpaper palette selection and cycling script.']
+  bootOverlay: ['Boot overlay', 'The startup progress screen.', bootOverlayFields],
+  bubbleCanvas: ['Ambient bubble canvas', 'The animated glass-refraction canvas behind the desktop.', []],
+  desktopGadgets: ['Desktop gadgets', 'Clock, calendar, featured release, photos, dates, notes and fun widgets.', desktopGadgetFields],
+  desktopTaskbar: ['Desktop taskbar', 'The bottom navigation bar and page menu.', [field('homeNavigationLabel', 'Home navigation label')]],
+  desktopHero: ['Desktop hero window', 'The large Aero window with the artist name and handle.', desktopHeroFields],
+  purbleOverlay: ['Purble Place overlay', 'The dismissible game dialog.', []],
+  shutdownOverlay: ['Shutdown overlay', 'The "Goodnight" closing dialog.', shutdownOverlayFields],
+  themeEngine: ['Theme engine', 'Wallpaper palette selection and cycling script.', []]
 };
 
 export const CHROME_PARTS = Object.freeze(Object.fromEntries(
-  Object.entries(CHROME_SOURCE).map(([name, [label, description]]) => [name, Object.freeze({
+  Object.entries(CHROME_SOURCE).map(([name, [label, description, fields]]) => [name, Object.freeze({
     name,
     label,
     description,
     category: 'chrome',
     templates: Object.freeze(['homepage']),
     path: `appearance.parts.${name}.enabled`,
-    default: true
+    contentPath: `appearance.parts.${name}.content`,
+    default: true,
+    fields: Object.freeze(fields.map(Object.freeze))
   })])
 ));
 

@@ -260,7 +260,7 @@ try {
   const homepageContent = await fetch(api + '/content/homepage', { headers: authHeaders });
   if (!homepageContent.ok) throw new Error('Homepage editor did not load.');
   const homepageData = await homepageContent.json();
-  if (!homepageData.record.templateData.gadgets) throw new Error('Homepage editor did not receive the complete desktop gadget settings.');
+  if (!homepageData.record.appearance?.parts?.desktopGadgets?.content) throw new Error('Homepage editor did not receive the complete desktop gadget settings.');
   const siteContent = await fetch(api + '/content/site', { headers: authHeaders });
   if (!siteContent.ok) throw new Error('Site-wide settings did not load.');
   const siteData = await siteContent.json();

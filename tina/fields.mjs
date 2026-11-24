@@ -82,12 +82,16 @@ export const presentationBackgroundOptions = [...PRESENTATION_BACKGROUNDS];
 
 export const groupLayoutOptions = [...GROUP_LAYOUTS];
 
-/** Editor toggles for every switchable page part, grouped by definition. */
+/** Editor controls for every switchable page part. Declared part fields become
+ *  a nested `content` object so studio editors and Tina see the same model. */
 export function pagePartFieldsFor(template) {
   return Object.entries(PAGE_PARTS)
     .filter(([, definition]) => definition.templates.includes(template))
     .map(([name, definition]) => object(name, definition.label, [
-      { type: 'boolean', name: 'enabled', label: 'Enabled', description: definition.description }
+      { type: 'boolean', name: 'enabled', label: 'Enabled', description: definition.description },
+      ...(definition.fields?.length
+        ? [object('content', 'Part content', definition.fields.map(toTinaField), 'Content owned by this part.')]
+        : [])
     ], definition.description));
 }
 

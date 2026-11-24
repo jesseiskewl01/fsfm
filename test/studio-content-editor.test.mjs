@@ -33,9 +33,10 @@ test('each page template exposes only blocks registered for that template', () =
 });
 
 test('Studio exposes homepage, global settings, wallpaper, and all page template workflows', () => {
-  for (const phrase of ['Homepage desktop &amp; gadgets', 'Site settings', 'Wallpaper catalogue', 'Create a page', 'Album &amp; player settings', 'Vista', 'Editorial pages']) {
+  for (const phrase of ['Every visible desktop part owns its own settings', 'Site settings', 'Wallpaper catalogue', 'Create a page', 'Album &amp; player settings', 'Vista', 'Editorial pages']) {
     assert.ok(studio.includes(phrase), `Missing Studio workflow: ${phrase}`);
   }
+  assert.doesNotMatch(studio, /Homepage desktop &amp; gadgets/);
   assert.match(server, /__fsfm\/api\/content\/create/);
   assert.match(server, /contentAdapter\.createPage\(|createNewPage\(/);
   assert.match(server, /validateSite\(/);

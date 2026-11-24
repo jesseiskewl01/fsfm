@@ -99,8 +99,11 @@ export function validatePage(page, options = {}) {
     }
   }
 
-  if (['homepage', 'album'].includes(page.template) && !isRecord(page.templateData)) issue(problems, where, 'templateData object is required');
+  if (page.template === 'album' && !isRecord(page.templateData)) issue(problems, where, 'templateData object is required');
   else if (page.templateData !== undefined && !isRecord(page.templateData)) issue(problems, where, 'templateData must be an object when provided');
+  // The homepage no longer has templateData: every piece of desktop content
+  // lives on its declared chrome part. [OpenCode, 2026-11-24]
+  if (page.template === 'homepage' && page.templateData !== undefined) issue(problems, where, 'homepage content must live in appearance.parts, not templateData');
   if (!Array.isArray(page.sections)) issue(problems, where, 'sections must be an ordered array');
   else {
     const ids = new Set();

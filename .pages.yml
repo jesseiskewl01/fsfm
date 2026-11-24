@@ -857,7 +857,7 @@ components:
       label: Wallpaper
       type: object
       description: Pick one visual style. The extra technical settings are handled automatically.
-      fields:
+      fields: &wallpaperFields
       - name: choice
         label: Wallpaper style
         type: select
@@ -1012,7 +1012,7 @@ components:
     - name: effects
       label: Background and motion effects
       type: object
-      fields:
+      fields: &effectsFields
       - name: backgroundEffects
         label: Background effects
         type: boolean
@@ -1025,6 +1025,348 @@ components:
         label: Respect reduced-motion preference
         type: boolean
         default: true
+  homepageAppearance:
+    type: object
+    label: Page appearance
+    description: Choose the wallpaper and effects, then open a desktop part to edit the content it owns.
+    fields:
+    - name: wallpaper
+      label: Wallpaper
+      type: object
+      fields: *wallpaperFields
+    - name: effects
+      label: Background and motion effects
+      type: object
+      fields: *effectsFields
+    - name: parts
+      label: Visible homepage parts
+      type: object
+      fields:
+      - name: bootOverlay
+        label: Boot overlay
+        type: object
+        fields:
+        - name: enabled
+          label: Show boot overlay
+          type: boolean
+          default: true
+        - name: content
+          label: Boot overlay content
+          type: object
+          fields:
+          - name: bootLoading
+            label: Loading screen status
+            type: string
+            default: LOADING YOUR DESKTOP
+          - name: bootWelcome
+            label: Welcome status
+            type: string
+            default: WELCOME
+          - name: bootReady
+            label: Ready status
+            type: string
+            default: DESKTOP READY
+          - name: bootCaption
+            label: Loading screen caption
+            type: string
+            default: SONIC SPACE-AGE AESTHETICS
+      - name: bubbleCanvas
+        label: Ambient bubble canvas
+        type: object
+        fields:
+        - name: enabled
+          label: Show bubble canvas
+          type: boolean
+          default: true
+      - name: desktopGadgets
+        label: Desktop gadgets
+        type: object
+        fields:
+        - name: enabled
+          label: Show desktop gadgets
+          type: boolean
+          default: true
+        - name: content
+          label: Desktop gadget content
+          type: object
+          fields:
+          - name: photos
+            label: Picture frame photos
+            type: image
+            list: true
+            options:
+              media: images
+              extensions:
+              - jpg
+              - jpeg
+              - png
+              - webp
+              - gif
+              - svg
+              - ico
+              rename: false
+          - name: dates
+            label: Important dates
+            type: object
+            fields:
+            - name: title
+              label: Event title
+              type: string
+            - name: date
+              label: Date
+              type: string
+            list:
+              collapsible:
+                collapsed: true
+                summary: '{title}'
+          - name: stickyNote
+            label: Sticky note
+            type: object
+            fields:
+            - name: text
+              label: Note text
+              type: text
+          - name: funWidgets
+            label: Fun widgets
+            type: object
+            fields:
+            - name: showBarrelRoll
+              label: Show Barrel Roll button
+              type: boolean
+              default: true
+            - name: showBubbleSlider
+              label: Show bubble frequency slider
+              type: boolean
+              default: true
+            - name: showMusicPlayer
+              label: Show FSFM Radio gadget
+              type: boolean
+              default: true
+            - name: showPurblePlace
+              label: Show Purble Place shortcut
+              type: boolean
+              default: true
+          - name: visibility
+            label: Gadget visibility
+            type: object
+            fields:
+            - name: showClock
+              label: Show Clock
+              type: boolean
+              default: true
+            - name: showCalendar
+              label: Show Calendar
+              type: boolean
+              default: true
+            - name: showFeaturedRelease
+              label: Show Featured Release
+              type: boolean
+              default: true
+            - name: showPhotos
+              label: Show Picture Frame
+              type: boolean
+              default: true
+            - name: showDates
+              label: Show Important Dates
+              type: boolean
+              default: true
+            - name: showStickyNote
+              label: Show Sticky Note
+              type: boolean
+              default: true
+          - name: radioAudioUrl
+            label: FSFM Radio audio URL
+            type: string
+            default: https://github.com/jesseiskewl01/fsfm/raw/refs/heads/main/audio/groovy.mp3
+          - name: bubbleDefault
+            label: Default bubble frequency
+            type: number
+            default: 50
+          - name: purblePlaceUrl
+            label: Purble Place embed URL
+            type: string
+            default: https://www.play-games.com/iframe/37376.html
+          - name: featuredRelease
+            label: Featured release gadget
+            type: object
+            fields:
+            - name: windowTitle
+              label: Gadget title
+              type: string
+            - name: title
+              label: Release title
+              type: string
+            - name: description
+              label: Release description
+              type: string
+            - name: artwork
+              label: Artwork
+              type: image
+              options:
+                media: images
+                extensions:
+                - jpg
+                - jpeg
+                - png
+                - webp
+                - gif
+                - svg
+                - ico
+                rename: false
+            - name: linkText
+              label: Link text
+              type: string
+            - name: url
+              label: Destination URL
+              type: string
+            - name: componentType
+              label: Component type
+              type: string
+              default: featured-release
+              readonly: true
+          - name: shutdownRedirectUrl
+            label: Shutdown redirect URL
+            type: string
+          - name: labels
+            label: Gadget labels and button text
+            type: object
+            fields:
+            - name: clock
+              label: Clock gadget title
+              type: string
+              default: Clock
+            - name: calendar
+              label: Calendar gadget title
+              type: string
+              default: Calendar
+            - name: pictureFrame
+              label: Picture Frame gadget title
+              type: string
+              default: Picture Frame
+            - name: importantDates
+              label: Important Dates gadget title
+              type: string
+              default: Important Dates
+            - name: stickyNote
+              label: Sticky Note gadget title
+              type: string
+              default: Sticky Note
+            - name: barrelRoll
+              label: Barrel Roll gadget title
+              type: string
+              default: Barrel Roll
+            - name: bubbleFrequency
+              label: Bubble Frequency gadget title
+              type: string
+              default: Bubble Frequency
+            - name: radio
+              label: Radio gadget title
+              type: string
+              default: FSFM Radio
+            - name: purblePlace
+              label: Purble Place gadget title
+              type: string
+              default: Purble Place
+            - name: barrelRollButton
+              label: Barrel Roll button text
+              type: string
+              default: DO A BARREL ROLL
+            - name: bubbleFrequencyLabel
+              label: Bubble slider label
+              type: string
+              default: AMBIENT BUBBLES
+            - name: radioPlay
+              label: Radio play button text
+              type: string
+              default: PLAY MUSIC
+            - name: radioPause
+              label: Radio pause button text
+              type: string
+              default: PAUSE MUSIC
+            - name: purblePlaceButton
+              label: Purble Place button text
+              type: string
+              default: OPEN PURBLE PLACE
+      - name: desktopTaskbar
+        label: Desktop taskbar
+        type: object
+        fields:
+        - name: enabled
+          label: Show desktop taskbar
+          type: boolean
+          default: true
+        - name: content
+          label: Taskbar content
+          type: object
+          fields:
+          - name: homeNavigationLabel
+            label: Homepage navigation label
+            type: string
+            default: Home
+      - name: desktopHero
+        label: Desktop hero window
+        type: object
+        fields:
+        - name: enabled
+          label: Show desktop hero
+          type: boolean
+          default: true
+        - name: content
+          label: Hero content
+          type: object
+          fields:
+          - name: windowTitle
+            label: Hero window title
+            type: string
+          - name: badge
+            label: Hero badge
+            type: string
+          - name: title
+            label: Main heading
+            type: string
+            required: true
+          - name: subtitle
+            label: Subtitle
+            type: string
+          - name: handle
+            label: Artist handle
+            type: string
+      - name: purbleOverlay
+        label: Purble Place overlay
+        type: object
+        fields:
+        - name: enabled
+          label: Show Purble Place overlay
+          type: boolean
+          default: true
+      - name: shutdownOverlay
+        label: Shutdown overlay
+        type: object
+        fields:
+        - name: enabled
+          label: Show shutdown overlay
+          type: boolean
+          default: true
+        - name: content
+          label: Shutdown content
+          type: object
+          fields:
+          - name: shutdownTitle
+            label: Shutdown title
+            type: string
+            default: Goodnight.
+          - name: shutdownMessage
+            label: Shutdown message
+            type: string
+            default: Closing the FSFM desktop...
+      - name: themeEngine
+        label: Theme engine
+        type: object
+        fields:
+        - name: enabled
+          label: Enable theme engine
+          type: boolean
+          default: true
   homepageSections:
     type: block
     label: PAGE LAYOUT · BUILD THE HOMEPAGE
@@ -1274,276 +1616,12 @@ content:
     - name: identity
       label: Page identity
       component: identity
-    - name: templateData
-      label: Homepage content
-      type: object
-      fields:
-      - name: hero
-        label: Homepage hero window
-        type: object
-        fields:
-        - name: windowTitle
-          label: Hero window title
-          type: string
-        - name: badge
-          label: Hero badge
-          type: string
-        - name: title
-          label: Main heading
-          type: string
-          required: true
-        - name: subtitle
-          label: Subtitle
-          type: string
-        - name: handle
-          label: Artist handle
-          type: string
-      - name: desktopLabels
-        label: Desktop interface text
-        type: object
-        fields:
-        - name: bootLoading
-          label: Loading screen status
-          type: string
-          default: LOADING YOUR DESKTOP
-        - name: bootWelcome
-          label: Welcome status
-          type: string
-          default: WELCOME
-        - name: bootReady
-          label: Ready status
-          type: string
-          default: DESKTOP READY
-        - name: bootCaption
-          label: Loading screen caption
-          type: string
-          default: SONIC SPACE-AGE AESTHETICS
-        - name: shutdownTitle
-          label: Shutdown title
-          type: string
-          default: Goodnight.
-        - name: shutdownMessage
-          label: Shutdown message
-          type: string
-          default: Closing the FSFM desktop...
-        - name: homeNavigationLabel
-          label: Homepage navigation label
-          type: string
-          default: Home
-      - name: gadgets
-        label: Homepage desktop gadgets
-        type: object
-        fields:
-        - name: photos
-          label: Picture frame photos
-          type: image
-          list: true
-          options:
-            media: images
-            extensions:
-            - jpg
-            - jpeg
-            - png
-            - webp
-            - gif
-            - svg
-            - ico
-            rename: false
-        - name: dates
-          label: Important dates
-          type: object
-          fields:
-          - name: title
-            label: Event title
-            type: string
-          - name: date
-            label: Date
-            type: date
-            default: ''
-          - name: description
-            label: Description
-            type: text
-          list:
-            collapsible:
-              collapsed: true
-              summary: '{title}'
-        - name: stickyNote
-          label: Sticky note
-          type: object
-          fields:
-          - name: text
-            label: Note text
-            type: text
-        - name: labels
-          label: Gadget labels and button text
-          type: object
-          fields:
-          - name: clock
-            label: Clock gadget title
-            type: string
-            default: Clock
-          - name: calendar
-            label: Calendar gadget title
-            type: string
-            default: Calendar
-          - name: pictureFrame
-            label: Picture Frame gadget title
-            type: string
-            default: Picture Frame
-          - name: importantDates
-            label: Important Dates gadget title
-            type: string
-            default: Important Dates
-          - name: stickyNote
-            label: Sticky Note gadget title
-            type: string
-            default: Sticky Note
-          - name: barrelRoll
-            label: Barrel Roll gadget title
-            type: string
-            default: Barrel Roll
-          - name: bubbleFrequency
-            label: Bubble Frequency gadget title
-            type: string
-            default: Bubble Frequency
-          - name: radio
-            label: Radio gadget title
-            type: string
-            default: FSFM Radio
-          - name: purblePlace
-            label: Purble Place gadget title
-            type: string
-            default: Purble Place
-          - name: barrelRollButton
-            label: Barrel Roll button text
-            type: string
-            default: DO A BARREL ROLL
-          - name: bubbleFrequencyLabel
-            label: Bubble slider label
-            type: string
-            default: AMBIENT BUBBLES
-          - name: radioPlay
-            label: Radio play button text
-            type: string
-            default: PLAY MUSIC
-          - name: radioPause
-            label: Radio pause button text
-            type: string
-            default: PAUSE MUSIC
-          - name: purblePlaceButton
-            label: Purble Place button text
-            type: string
-            default: OPEN PURBLE PLACE
-        - name: funWidgets
-          label: Desktop gadget visibility
-          type: object
-          fields:
-          - name: showBarrelRoll
-            label: Show Barrel Roll button
-            type: boolean
-            default: true
-          - name: showBubbleSlider
-            label: Show bubble frequency slider
-            type: boolean
-            default: true
-          - name: showMusicPlayer
-            label: Show FSFM Radio gadget
-            type: boolean
-            default: true
-          - name: showPurblePlace
-            label: Show Purble Place shortcut
-            type: boolean
-            default: true
-        - name: visibility
-          label: Gadget visibility
-          type: object
-          fields:
-          - name: showClock
-            label: Show Clock
-            type: boolean
-            default: true
-          - name: showCalendar
-            label: Show Calendar
-            type: boolean
-            default: true
-          - name: showFeaturedRelease
-            label: Show Featured Release
-            type: boolean
-            default: true
-          - name: showPhotos
-            label: Show Picture Frame
-            type: boolean
-            default: true
-          - name: showDates
-            label: Show Important Dates
-            type: boolean
-            default: true
-          - name: showStickyNote
-            label: Show Sticky Note
-            type: boolean
-            default: true
-        - name: radioAudioUrl
-          label: FSFM Radio audio URL
-          type: string
-          default: https://github.com/jesseiskewl01/fsfm/raw/refs/heads/main/audio/groovy.mp3
-        - name: bubbleDefault
-          label: Default bubble frequency
-          type: number
-          default: 50
-        - name: purblePlaceUrl
-          label: Purble Place embed URL
-          type: string
-          default: https://www.play-games.com/iframe/37376.html
-        - name: featuredRelease
-          label: Featured release gadget
-          type: object
-          fields:
-          - name: windowTitle
-            label: Window title
-            type: string
-          - name: title
-            label: Release title
-            type: string
-          - name: description
-            label: Release description
-            type: string
-          - name: artwork
-            label: Artwork
-            type: image
-            options:
-              media: images
-              extensions:
-              - jpg
-              - jpeg
-              - png
-              - webp
-              - gif
-              - svg
-              - ico
-              rename: false
-          - name: linkText
-            label: Link text
-            type: string
-          - name: url
-            label: Destination URL
-            type: string
-          - name: componentType
-            label: Component type
-            type: string
-            default: featured-release
-            readonly: true
-        - name: shutdownRedirectUrl
-          label: Hero shutdown redirect URL
-          type: string
-      - name: footerText
-        label: Footer text
-        type: string
     - name: seo
       label: Page title and sharing
       component: seo
     - name: appearance
       label: Page appearance
-      component: appearance
+      component: homepageAppearance
     - name: publishing
       label: Publishing and navigation
       component: publishing
