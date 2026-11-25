@@ -299,9 +299,10 @@ body.template-album[data-atmosphere-mode="off"] .bloom-vignette::after { display
 /* Album Spotify embed: keep the frame rectangular and mask Spotify's own
    rounded corners with the same two-tone squares used on the homepage.
    Colors are intentionally identical: #1F1F1F top, #121212 bottom.
-   [Jesse + OpenCode, 2026-11-25] */
-.player-listen .fsfm-spotify-frame { position: relative; overflow: hidden; border: 1px solid rgba(254,245,222,.2); border-radius: 0; background: linear-gradient(#1F1F1F 0 50%, #121212 50% 100%); }
-.player-listen .fsfm-spotify-frame iframe { min-height: 352px; }
+   The live cross-origin iframe is paint-contained and promoted so its own
+   rendering cannot stall page scrolling. [Jesse + OpenCode, 2026-11-25] */
+.player-listen .fsfm-spotify-frame { position: relative; overflow: hidden; contain: paint; isolation: isolate; border: 1px solid rgba(254,245,222,.2); border-radius: 0; background: linear-gradient(#1F1F1F 0 50%, #121212 50% 100%); }
+.player-listen .fsfm-spotify-frame iframe { min-height: 352px; transform: translateZ(0); backface-visibility: hidden; }
 .player-listen .fsfm-spotify-corner { position: absolute; width: 15px; height: 15px; pointer-events: none; z-index: 2; }
 .player-listen .fsfm-spotify-corner[data-corner="tl"] { left: 0; top: 0; background: #1F1F1F; }
 .player-listen .fsfm-spotify-corner[data-corner="tr"] { right: 0; top: 0; background: #1F1F1F; }

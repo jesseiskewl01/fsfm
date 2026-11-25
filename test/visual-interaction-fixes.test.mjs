@@ -111,6 +111,13 @@ test('the album Spotify embed uses the homepage two-tone corner mask without tou
   assert.doesNotMatch(albumCss, /\.player-listen \.embed-frame \{[^}]*border-radius: 4px/);
 });
 
+test('the live album iframe is paint-contained without being hidden', () => {
+  assert.match(albumCss, /\.player-listen \.fsfm-spotify-frame \{[^}]*contain: paint; isolation: isolate/);
+  assert.match(albumCss, /\.player-listen \.fsfm-spotify-frame iframe \{[^}]*transform: translateZ\(0\); backface-visibility: hidden/);
+  assert.doesNotMatch(albumCss, /\.player-listen \.fsfm-spotify-frame iframe \{[^\n]*[;\s]visibility: hidden/);
+  assert.doesNotMatch(albumCss, /\.player-listen \.fsfm-spotify-frame \{[^\n]*content-visibility: hidden/);
+});
+
 test('the album header uses the same inset and control geometry as the homepage taskbar', () => {
   assert.match(albumCss, /padding: 3px max\(12px, calc\(\(100% - 920px\) \/ 2\)\)/);
   assert.doesNotMatch(albumCss, /100vw - 880px/);
