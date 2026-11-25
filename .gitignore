@@ -10,3 +10,11 @@ preview-v13-stage6/
 !.env.example
 admin/
 tina/__generated__/
+
+# Private working notes and local QA artifacts stay local, not in the public repo.
+*.md
+!README.md
+archive/
+firefoxrecordings/
+qa/
+LIVE-MEDIA-VERIFIED.json
