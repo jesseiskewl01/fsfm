@@ -508,10 +508,10 @@ text-shadow: 0 1px 3px rgb(var(--deep-rgb)), 0 0 8px rgba(var(--deep-rgb), 0.8);
 .window-minimized > .window-body { display:none !important; }
 .home-window-grid:has(> .content-window[hidden]) { grid-template-columns:minmax(0,1fr); }
 
-/* Keep the About window pinned while the rest of the desktop scrolls. The grid
-   wrapper is flattened on desktop so its two windows and the later full-width
-   windows share one containing grid; the bio window then sticks through the
-   content rows and stops before the footer. [Jesse + OpenCode, 2026-11-24] */
+/* The grid wrapper is flattened on desktop so its two windows and the later
+   full-width windows share one containing grid. The About window stays in its
+   grid row and scrolls normally with the rest of the page.
+   [Jesse + OpenCode, 2026-11-25] */
 @media (min-width: 761px) {
   body.template-homepage .wrap {
     display:grid; grid-template-columns:minmax(245px,.86fr) minmax(0,1.14fr);
@@ -523,7 +523,7 @@ text-shadow: 0 1px 3px rgb(var(--deep-rgb)), 0 0 8px rgba(var(--deep-rgb), 0.8);
   body.template-homepage .wrap > .fsfm-gadgets-extras { grid-column:1 / -1; }
   body.template-homepage .home-window-grid { display:contents; }
   body.template-homepage .home-window-grid > .bio-window {
-    grid-column:1; grid-row:3; position:sticky; top:48px; align-self:start; z-index:20;
+    grid-column:1; grid-row:3; align-self:start;
   }
   body.template-homepage .home-window-grid > .spotify-window { grid-column:2; grid-row:3; }
   /* The flattened grid has no row gap, so the first window row needs its own

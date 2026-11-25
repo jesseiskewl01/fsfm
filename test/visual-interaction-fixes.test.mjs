@@ -37,7 +37,8 @@ test('widgets live in hero gutters and settle without overlap after a drag', () 
 });
 
 test('the homepage windows keep their order while the lower pair spans both columns', () => {
-  assert.match(css, /@media \(min-width: 761px\) \{[\s\S]*?body\.template-homepage \.home-window-grid > \.bio-window \{[\s\S]*?grid-column:1; grid-row:3; position:sticky; top:48px; align-self:start; z-index:20;/);
+  assert.match(css, /@media \(min-width: 761px\) \{[\s\S]*?body\.template-homepage \.home-window-grid > \.bio-window \{[\s\S]*?grid-column:1; grid-row:3; align-self:start;/);
+  assert.doesNotMatch(css, /body\.template-homepage \.home-window-grid > \.bio-window \{[^}]*position:sticky/);
   assert.match(css, /body\.template-homepage \.home-window-grid \{ display:contents; \}/);
   assert.match(css, /body\.template-homepage \.wrap > \.events-window \{ grid-column:1 \/ -1; grid-row:4; \}/);
   assert.match(css, /body\.template-homepage \.wrap > \.social-window \{ grid-column:1 \/ -1; grid-row:5; \}/);
