@@ -31,15 +31,15 @@ test('V15 homepage ambient bubbles use cached sprites and a 30 FPS cap', () => {
   assert.doesNotMatch(draw, /createRadialGradient/);
 });
 
-test('V15 album atmosphere has a bounded canvas workload', () => {
+test('V15 album atmosphere paints once and keeps motion on the compositor', () => {
   const js = read('src/client/album-atmosphere.js');
-  assert.match(js, /var FRAME_MS = 1000 \/ 24/);
-  assert.match(js, /var baseLayer = null, smokeLayer = null, coreLayer = null, starLayer = null, stillLayer = null/);
-  assert.match(js, /function buildLayers\(\)/);
-  const draw = js.slice(js.indexOf('function drawScene'), js.indexOf('function restartScene'));
-  assert.match(draw, /drawLayer\(/);
-  assert.match(draw, /ctx\.drawImage\(/);
-  assert.doesNotMatch(draw, /create(Linear|Radial)Gradient|beginPath|bezierCurveTo|filter\s*:/);
+  const css = read('src/styles/v13.css');
+  assert.match(js, /function paint\(\)/);
+  assert.match(js, /paint\(\);/);
+  assert.match(js, /window\.addEventListener\('resize', paint, \{ passive: true \}\)/);
+  assert.doesNotMatch(js, /requestAnimationFrame|FRAME_MS|drawScene|makeLayer|drawLayer/);
+  assert.match(css, /\.template-album \.album-atmosphere \{[^}]*animation: golden-sky-drift/);
+  assert.doesNotMatch(css, /@keyframes nebula-/);
   assert.doesNotMatch(js, /Math\.min\(190,/);
   assert.doesNotMatch(js, /var steps = 22/);
   assert.doesNotMatch(js, /cathedral/);

@@ -144,65 +144,64 @@ body[data-page-transition="true"] .site-shell { animation: fsfm-page-enter .48s 
   body[data-respect-reduced-motion="true"][data-page-transition="true"] .site-shell { animation: none; }
 }
 
-/* ---------- ALBUM TEMPLATE: SMOKEY STARRY NEBULA ---------- */
+/* ---------- ALBUM TEMPLATE: GOLDEN GLITTER SKY ---------- */
 body.template-album {
   min-height: 100vh;
   overflow-x: hidden;
   color: #fef5de;
   background:
-    radial-gradient(ellipse 60% 50% at 54% 58%, rgba(189,139,78,.16) 0%, transparent 74%),
-    radial-gradient(ellipse 52% 46% at 18% 24%, rgba(124,77,230,.18) 0%, transparent 76%),
-    linear-gradient(180deg, #03020a 0%, #0b0718 30%, #1b1030 58%, #0a0616 84%, #030208 100%);
+    radial-gradient(ellipse 64% 52% at 50% 48%, rgba(189,139,78,.18) 0%, transparent 72%),
+    radial-gradient(ellipse 42% 38% at 18% 26%, rgba(255,220,165,.10) 0%, transparent 76%),
+    linear-gradient(180deg, #050308 0%, #120b0e 42%, #0a0608 78%, #050308 100%);
   --ink: #fef5de;
   --muted: rgba(254,245,222,.70);
   --line: rgba(189,139,78,.42);
   --accent: #bd8b4e;
 }
-.template-album .site-wallpaper { opacity: .10; }
-.template-album .album-atmosphere { position: fixed; inset: 0; z-index: 0; display: block; width: 100%; height: 100%; pointer-events: none; opacity: 1; mix-blend-mode: normal; }
-/* Nebula veil: static gradients plus compositor-only transform and opacity
-   drift. The moving smoke and stars live in cached canvas layers.
+.template-album .site-wallpaper { opacity: .08; }
+.template-album .album-atmosphere { position: fixed; top: -9%; left: -9%; z-index: 0; display: block; width: 118%; height: 118%; pointer-events: none; opacity: .94; mix-blend-mode: normal; animation: golden-sky-drift 46s ease-in-out infinite alternate; will-change: transform, opacity; }
+/* Warm bloom wash. Everything here is static paint plus compositor-only
+   transform/opacity drift, so the star canvas never repaints per frame.
    [Jesse + OpenCode, 2026-11-25] */
-.template-album .bloom-vignette { position: fixed; inset: -10%; z-index: 1; pointer-events: none; overflow: hidden;
+.template-album .bloom-vignette { position: fixed; inset: -8%; z-index: 1; pointer-events: none; overflow: hidden;
   background:
-    radial-gradient(ellipse 34% 28% at 54% 6%, rgba(218,183,255,.15), transparent 74%),
-    radial-gradient(ellipse 30% 44% at 14% 38%, rgba(124,77,230,.16), transparent 76%),
-    radial-gradient(ellipse 32% 46% at 88% 34%, rgba(189,139,78,.13), transparent 78%),
-    radial-gradient(ellipse 58% 26% at 52% 92%, rgba(255,220,165,.12), transparent 80%),
-    radial-gradient(ellipse at 50% 48%, transparent 30%, rgba(3,2,8,.42) 100%);
-  opacity: .86;
-  animation: nebula-veil-breathe 24s ease-in-out infinite alternate;
+    radial-gradient(ellipse 42% 36% at 50% 44%, rgba(255,236,194,.22), transparent 72%),
+    radial-gradient(ellipse 30% 40% at 18% 28%, rgba(189,139,78,.18), transparent 74%),
+    radial-gradient(ellipse 32% 36% at 82% 66%, rgba(255,220,165,.16), transparent 76%),
+    radial-gradient(ellipse 44% 20% at 50% 92%, rgba(255,214,130,.10), transparent 80%),
+    radial-gradient(ellipse at 50% 50%, transparent 32%, rgba(5,3,8,.52) 100%);
+  opacity: .82;
+  animation: golden-bloom-breathe 27s ease-in-out infinite alternate;
   will-change: transform, opacity;
 }
 .template-album .bloom-vignette::before,
-.template-album .bloom-vignette::after { content: ""; position: absolute; inset: -14%; pointer-events: none; }
+.template-album .bloom-vignette::after { content: ""; position: absolute; inset: -12%; pointer-events: none; }
 .template-album .bloom-vignette::before {
   background:
-    linear-gradient(92deg, transparent 0%, transparent 10%, rgba(124,77,230,.11) 16%, transparent 24%, transparent 36%, rgba(189,139,78,.10) 42%, transparent 51%, transparent 63%, rgba(218,183,255,.09) 69%, transparent 78%, transparent 88%, rgba(106,43,217,.08) 94%, transparent 100%),
-    radial-gradient(ellipse 44% 30% at 46% 20%, rgba(218,183,255,.10), transparent 74%),
-    radial-gradient(ellipse 38% 26% at 68% 70%, rgba(255,220,165,.08), transparent 76%);
-  opacity: .74;
-  animation: nebula-smoke-drift 30s ease-in-out infinite alternate;
+    radial-gradient(circle at 14% 18%, rgba(254,245,222,.42) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 31% 9%, rgba(255,220,165,.38) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 68% 14%, rgba(255,243,207,.40) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 86% 27%, rgba(254,245,222,.34) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 9% 64%, rgba(255,217,160,.32) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 57% 83%, rgba(254,245,222,.30) 0 1px, transparent 1.8px);
+  opacity: .7;
+  animation: golden-sparkle 18s ease-in-out infinite alternate;
   will-change: transform, opacity;
 }
 .template-album .bloom-vignette::after {
   background:
-    radial-gradient(ellipse 16% 10% at 54% 54%, rgba(254,245,222,.16), transparent 74%),
-    radial-gradient(circle at 19% 17%, rgba(254,245,222,.24) 0 1px, transparent 1.6px),
-    radial-gradient(circle at 34% 9%, rgba(218,183,255,.22) 0 1px, transparent 1.6px),
-    radial-gradient(circle at 71% 14%, rgba(255,220,165,.26) 0 1px, transparent 1.6px),
-    radial-gradient(circle at 86% 24%, rgba(254,245,222,.18) 0 1px, transparent 1.6px),
-    radial-gradient(circle at 12% 62%, rgba(218,183,255,.16) 0 1px, transparent 1.6px);
-  opacity: .7;
-  animation: nebula-core-pulse 19s ease-in-out infinite alternate;
+    radial-gradient(ellipse 28% 22% at 50% 48%, rgba(255,236,194,.15), transparent 74%),
+    radial-gradient(ellipse 22% 18% at 24% 72%, rgba(189,139,78,.12), transparent 76%);
+  opacity: .68;
+  animation: golden-bloom-breathe 21s ease-in-out infinite alternate;
   will-change: transform, opacity;
 }
-@keyframes nebula-veil-breathe { from { transform: scale(1); opacity: .74; } to { transform: scale(1.05); opacity: .94; } }
-@keyframes nebula-smoke-drift { from { transform: translate3d(-2.5%,1%,0) rotate(-2deg) scale(1); opacity: .58; } to { transform: translate3d(2.5%,-1%,0) rotate(2deg) scale(1.06); opacity: .84; } }
-@keyframes nebula-core-pulse { from { transform: translate3d(0,1.5%,0) scale(1); opacity: .56; } to { transform: translate3d(0,-1.5%,0) scale(1.04); opacity: .82; } }
+@keyframes golden-sky-drift { from { transform: translate3d(-1.5%,-1%,0) scale(1.01); opacity: .9; } to { transform: translate3d(1.5%,1%,0) scale(1.05); opacity: 1; } }
+@keyframes golden-bloom-breathe { from { transform: scale(1); opacity: .68; } to { transform: scale(1.04); opacity: .9; } }
+@keyframes golden-sparkle { from { transform: translate3d(-.8%,.6%,0); opacity: .5; } to { transform: translate3d(.8%,-.6%,0); opacity: .82; } }
 body.template-album[data-atmosphere-mode="lite"] .bloom-vignette { animation: none; opacity: .72; }
 body.template-album[data-atmosphere-mode="lite"] .bloom-vignette::before,
-body.template-album[data-atmosphere-mode="lite"] .bloom-vignette::after { animation: none; opacity: .48; }
+body.template-album[data-atmosphere-mode="lite"] .bloom-vignette::after { animation: none; opacity: .46; }
 body.template-album[data-atmosphere-mode="off"] .bloom-vignette { opacity: .68; animation: none; }
 body.template-album[data-atmosphere-mode="off"] .bloom-vignette::before,
 body.template-album[data-atmosphere-mode="off"] .bloom-vignette::after { display: none; }
@@ -328,6 +327,7 @@ body.template-album[data-atmosphere-mode="off"] .bloom-vignette::after { display
   .player-listen { padding: 9px; }
 }
 @media (prefers-reduced-motion: reduce) {
+  .template-album .album-atmosphere,
   .template-album .bloom-vignette,
   .template-album .bloom-vignette::before,
   .template-album .bloom-vignette::after { animation: none; }
