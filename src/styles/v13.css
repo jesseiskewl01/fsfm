@@ -150,9 +150,10 @@ body.template-album {
   overflow-x: hidden;
   color: #fef5de;
   background:
-    radial-gradient(ellipse 64% 52% at 50% 48%, rgba(189,139,78,.18) 0%, transparent 72%),
-    radial-gradient(ellipse 42% 38% at 18% 26%, rgba(255,220,165,.10) 0%, transparent 76%),
-    linear-gradient(180deg, #050308 0%, #120b0e 42%, #0a0608 78%, #050308 100%);
+    radial-gradient(ellipse 54% 44% at 48% 46%, rgba(255,236,194,.24) 0%, transparent 70%),
+    radial-gradient(ellipse 34% 30% at 18% 24%, rgba(189,139,78,.16) 0%, transparent 72%),
+    radial-gradient(ellipse 26% 24% at 88% 16%, rgba(2,1,4,.72) 0%, transparent 76%),
+    linear-gradient(180deg, #020104 0%, #0b060a 44%, #050204 80%, #020104 100%);
   --ink: #fef5de;
   --muted: rgba(254,245,222,.70);
   --line: rgba(189,139,78,.42);
@@ -165,12 +166,13 @@ body.template-album {
    [Jesse + OpenCode, 2026-11-25] */
 .template-album .bloom-vignette { position: fixed; inset: -8%; z-index: 1; pointer-events: none; overflow: hidden;
   background:
-    radial-gradient(ellipse 42% 36% at 50% 44%, rgba(255,236,194,.22), transparent 72%),
-    radial-gradient(ellipse 30% 40% at 18% 28%, rgba(189,139,78,.18), transparent 74%),
-    radial-gradient(ellipse 32% 36% at 82% 66%, rgba(255,220,165,.16), transparent 76%),
-    radial-gradient(ellipse 44% 20% at 50% 92%, rgba(255,214,130,.10), transparent 80%),
-    radial-gradient(ellipse at 50% 50%, transparent 32%, rgba(5,3,8,.52) 100%);
-  opacity: .82;
+    radial-gradient(ellipse 38% 32% at 48% 44%, rgba(255,236,194,.28), transparent 70%),
+    radial-gradient(ellipse 26% 34% at 18% 28%, rgba(189,139,78,.20), transparent 74%),
+    radial-gradient(ellipse 28% 32% at 82% 66%, rgba(255,220,165,.18), transparent 76%),
+    radial-gradient(ellipse 20% 18% at 8% 74%, rgba(2,1,4,.80), transparent 78%),
+    radial-gradient(ellipse 18% 16% at 92% 18%, rgba(2,1,4,.76), transparent 78%),
+    radial-gradient(ellipse at 50% 50%, transparent 26%, rgba(2,1,4,.68) 100%);
+  opacity: .86;
   animation: golden-bloom-breathe 12s ease-in-out infinite alternate;
   will-change: transform, opacity;
 }
@@ -206,16 +208,12 @@ body.template-album {
 @keyframes golden-sky-twinkle { from { opacity: .86; } to { opacity: 1; } }
 @keyframes golden-bloom-breathe { from { transform: scale(1); opacity: .64; } to { transform: scale(1.07); opacity: .94; } }
 @keyframes golden-sparkle { from { transform: translate3d(-1.6%,1%,0) scale(.98); opacity: .42; } to { transform: translate3d(1.6%,-1%,0) scale(1.04); opacity: .9; } }
-@keyframes glitter-shoot { 0% { transform: translate3d(0,0,0) rotate(var(--angle, 24deg)) scaleX(.55); opacity: 0; } 9% { opacity: .95; } 62% { opacity: .78; } 100% { transform: translate3d(42vw,30vh,0) rotate(var(--angle, 24deg)) scaleX(1.25); opacity: 0; } }
-.template-album .glitter-streak { position: fixed; z-index: 1; width: 150px; height: 2px; border-radius: 999px; pointer-events: none; background: linear-gradient(90deg, transparent, rgba(255,236,194,.18) 18%, rgba(255,243,207,.92) 88%, #fff); box-shadow: 0 0 10px rgba(255,236,194,.85), 0 0 26px rgba(189,139,78,.45); opacity: 0; transform-origin: left center; animation: glitter-shoot var(--duration, 7s) linear var(--delay, 0s) infinite; will-change: transform, opacity; }
 body.template-album[data-atmosphere-mode="lite"] .bloom-vignette { animation: none; opacity: .72; }
 body.template-album[data-atmosphere-mode="lite"] .bloom-vignette::before,
 body.template-album[data-atmosphere-mode="lite"] .bloom-vignette::after { animation: none; opacity: .46; }
-body.template-album[data-atmosphere-mode="lite"] .glitter-streak { opacity: .7; }
 body.template-album[data-atmosphere-mode="off"] .bloom-vignette { opacity: .68; animation: none; }
 body.template-album[data-atmosphere-mode="off"] .bloom-vignette::before,
-body.template-album[data-atmosphere-mode="off"] .bloom-vignette::after,
-body.template-album[data-atmosphere-mode="off"] .glitter-streak { display: none; }
+body.template-album[data-atmosphere-mode="off"] .bloom-vignette::after { display: none; }
 .template-album .album-grain { position: fixed; inset: 0; z-index: 998; pointer-events: none; opacity: .055; mix-blend-mode: soft-light; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.98' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
 .template-album .site-shell { position: relative; z-index: 10; width: min(920px, calc(100% - 32px)); max-width: 920px; margin: 0 auto; padding: 52px 0 30px; }
 .template-album .global-header { position: fixed; top: 0; left: 0; right: 0; z-index: 500; width: 100%; min-height: 38px; height: auto; padding: 3px max(12px, calc((100% - 920px) / 2)); display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; border: 0; border-bottom: 1px solid rgba(254,245,222,.42); border-radius: 0; background: linear-gradient(180deg,rgba(189,139,78,.35),rgba(189,139,78,.12) 49%,rgba(189,139,78,.04) 50%,rgba(189,139,78,.20)); box-shadow: 0 4px 18px rgba(10,8,6,.5),inset 0 1px 2px rgba(254,245,222,.95); backdrop-filter: blur(28px) saturate(220%); -webkit-backdrop-filter: blur(28px) saturate(220%); }
@@ -342,7 +340,6 @@ body.template-album[data-atmosphere-mode="off"] .glitter-streak { display: none;
   .template-album .bloom-vignette,
   .template-album .bloom-vignette::before,
   .template-album .bloom-vignette::after { animation: none; }
-  .template-album .glitter-streak { display: none; }
   .lyrics-line.current.line-enter, .lyrics-note.instrumental { animation: none; }
   .template-album .content-section.reveal { opacity: 1; transform: none; }
 }

@@ -1,8 +1,8 @@
 'use strict';
 (function() {
 
-// Golden Glitter Sky: one oversized canvas painted once. The drift and twinkle
-// are compositor-only CSS transforms, so no frame creates geometry or gradient.
+// Golden Glitter Sky: one oversized canvas painted once. Dark voids, clustered
+// stars and warm bloom create contrast; CSS handles the drift and twinkle.
 // [Jesse + OpenCode, 2026-11-25]
 try {
   var canvas = document.getElementById('nebulaCanvas');
@@ -11,7 +11,14 @@ try {
     var mode = canvas.getAttribute('data-atmosphere-mode') || 'full';
     var lite = mode === 'lite';
     var seed = 20261125;
-    var GOLD = ['#fef5de', '#fff3cf', '#ffe6b8', '#ffd9a0', '#ffffff', '#bd8b4e'];
+    var GOLD = ['#ffffff', '#fef5de', '#fff3cf', '#ffe6b8', '#ffd9a0', '#bd8b4e'];
+    var CLUSTERS = [
+      [0.22, 0.26, 0.18],
+      [0.72, 0.34, 0.15],
+      [0.48, 0.60, 0.20],
+      [0.84, 0.76, 0.13],
+      [0.14, 0.82, 0.12]
+    ];
 
     function random(min, max) {
       seed = (seed * 1664525 + 1013904223) >>> 0;
@@ -19,46 +26,78 @@ try {
     }
 
     function paintSky(g, width, height) {
+      var reach = Math.max(width, height);
       var sky = g.createLinearGradient(0, 0, 0, height);
-      sky.addColorStop(0, '#050308');
-      sky.addColorStop(0.42, '#120b0e');
-      sky.addColorStop(1, '#070408');
+      sky.addColorStop(0, '#020104');
+      sky.addColorStop(0.42, '#0b060a');
+      sky.addColorStop(1, '#030104');
       g.fillStyle = sky;
       g.fillRect(0, 0, width, height);
 
       g.save();
       g.globalCompositeOperation = 'screen';
       var glows = [
-        [0.50, 0.46, 0.58, 'rgba(254,245,222,0.20)'],
-        [0.26, 0.30, 0.42, 'rgba(189,139,78,0.16)'],
-        [0.76, 0.64, 0.44, 'rgba(255,220,165,0.15)'],
-        [0.52, 0.88, 0.30, 'rgba(255,214,130,0.08)']
+        [0.48, 0.46, 0.56, 'rgba(255,236,194,0.26)'],
+        [0.22, 0.24, 0.38, 'rgba(189,139,78,0.20)'],
+        [0.78, 0.68, 0.42, 'rgba(255,220,165,0.18)'],
+        [0.52, 0.90, 0.28, 'rgba(255,214,130,0.10)']
       ];
       for (var i = 0; i < glows.length; i += 1) {
         var glow = glows[i];
-        var x = glow[0] * width;
-        var y = glow[1] * height;
-        var radius = glow[2] * Math.max(width, height);
-        var wash = g.createRadialGradient(x, y, 0, x, y, radius);
+        var gx = glow[0] * width;
+        var gy = glow[1] * height;
+        var gr = glow[2] * reach;
+        var wash = g.createRadialGradient(gx, gy, 0, gx, gy, gr);
         wash.addColorStop(0, glow[3]);
         wash.addColorStop(1, 'rgba(189,139,78,0)');
         g.fillStyle = wash;
-        g.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+        g.fillRect(gx - gr, gy - gr, gr * 2, gr * 2);
       }
       g.restore();
 
+      // Carve dark pockets through the bloom so the glitter has real contrast.
+      var voids = [
+        [0.08, 0.74, 0.30, 'rgba(2,1,4,0.88)'],
+        [0.92, 0.18, 0.26, 'rgba(2,1,4,0.82)'],
+        [0.36, 0.10, 0.24, 'rgba(2,1,4,0.66)'],
+        [0.62, 0.96, 0.22, 'rgba(2,1,4,0.70)']
+      ];
+      for (var v = 0; v < voids.length; v += 1) {
+        var voidSpot = voids[v];
+        var vx = voidSpot[0] * width;
+        var vy = voidSpot[1] * height;
+        var vr = voidSpot[2] * reach;
+        var dark = g.createRadialGradient(vx, vy, 0, vx, vy, vr);
+        dark.addColorStop(0, voidSpot[3]);
+        dark.addColorStop(1, 'rgba(2,1,4,0)');
+        g.fillStyle = dark;
+        g.fillRect(vx - vr, vy - vr, vr * 2, vr * 2);
+      }
+
       var count = lite ? 420 : 900;
       for (var s = 0; s < count; s += 1) {
-        var sx = random(0, width);
-        var sy = random(0, height);
-        var big = random(0, 1) > 0.94;
-        var radius = big ? random(1.2, 2.6) : random(0.35, 1.15);
+        var clustered = random(0, 1) < 0.46;
+        var sx;
+        var sy;
+        if (clustered) {
+          var cluster = CLUSTERS[s % CLUSTERS.length];
+          var angle = random(0, Math.PI * 2);
+          var distance = Math.pow(random(0, 1), 0.55) * cluster[2] * reach;
+          sx = cluster[0] * width + Math.cos(angle) * distance;
+          sy = cluster[1] * height + Math.sin(angle) * distance;
+        } else {
+          sx = random(0, width);
+          sy = random(0, height);
+        }
+
+        var big = random(0, 1) > (clustered ? 0.90 : 0.96);
+        var radius = big ? random(1.3, 2.8) : random(0.4, 1.25);
         var tint = GOLD[s % GOLD.length];
 
         if (big) {
-          var haloRadius = radius * random(7, 14);
+          var haloRadius = radius * random(8, 16);
           var halo = g.createRadialGradient(sx, sy, 0, sx, sy, haloRadius);
-          halo.addColorStop(0, 'rgba(255,236,194,0.34)');
+          halo.addColorStop(0, 'rgba(255,236,194,0.42)');
           halo.addColorStop(1, 'rgba(255,220,165,0)');
           g.save();
           g.globalCompositeOperation = 'screen';
@@ -67,16 +106,16 @@ try {
           g.restore();
         }
 
-        g.globalAlpha = big ? random(0.72, 1) : random(0.25, 0.78);
+        g.globalAlpha = big ? random(0.82, 1) : random(0.30, 0.86);
         g.fillStyle = tint;
         g.beginPath();
         g.arc(sx, sy, radius, 0, Math.PI * 2);
         g.fill();
 
         if (big) {
-          g.globalAlpha *= 0.45;
+          g.globalAlpha *= 0.5;
           g.strokeStyle = tint;
-          g.lineWidth = 0.75;
+          g.lineWidth = 0.8;
           g.beginPath();
           g.moveTo(sx - radius * 4, sy);
           g.lineTo(sx + radius * 4, sy);
@@ -99,27 +138,7 @@ try {
       paintSky(ctx, width, height);
     }
 
-    function addStreaks() {
-      var existing = document.querySelectorAll('.glitter-streak');
-      if (existing.length) return;
-      seed = 20261125;
-      var angles = [-28, 24, -18, 32, -35, 20];
-      var total = lite ? 3 : 6;
-      for (var i = 0; i < total; i += 1) {
-        var streak = document.createElement('div');
-        streak.className = 'glitter-streak';
-        streak.setAttribute('aria-hidden', 'true');
-        streak.style.left = random(4, 72) + '%';
-        streak.style.top = random(8, 78) + '%';
-        streak.style.setProperty('--angle', angles[i % angles.length] + 'deg');
-        streak.style.setProperty('--duration', (6 + i * 1.3).toFixed(1) + 's');
-        streak.style.setProperty('--delay', (-i * 1.7).toFixed(1) + 's');
-        (document.body || document.documentElement).appendChild(streak);
-      }
-    }
-
     paint();
-    addStreaks();
     window.addEventListener('resize', paint, { passive: true });
   }
 } catch (err) {}

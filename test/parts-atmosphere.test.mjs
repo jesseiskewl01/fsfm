@@ -87,15 +87,17 @@ test('invalid modes fall back safely and fail validation from the same definitio
 test('the lite client path is a real reduction, not a cosmetic flag', () => {
   const js = fs.readFileSync(path.join(root, 'src/client/album-atmosphere.js'), 'utf8');
   assert.match(js, /getAttribute\('data-atmosphere-mode'\)/);
-  assert.match(js, /var GOLD = \['#fef5de', '#fff3cf', '#ffe6b8', '#ffd9a0', '#ffffff', '#bd8b4e'\]/);
+  assert.match(js, /var GOLD = \['#ffffff', '#fef5de', '#fff3cf', '#ffe6b8', '#ffd9a0', '#bd8b4e'\]/);
   assert.match(js, /var count = lite \? 420 : 900/);
   assert.match(js, /dpr = Math\.min\(window\.devicePixelRatio \|\| 1, lite \? 0\.75 : 1\)/);
   assert.match(js, /function paintSky\(g, width, height\)/);
   assert.match(js, /function paint\(\)/);
-  assert.match(js, /function addStreaks\(\)/);
-  assert.match(js, /var total = lite \? 3 : 6/);
-  assert.match(js, /className = 'glitter-streak'/);
-  assert.match(js, /addStreaks\(\);/);
+  assert.match(js, /var CLUSTERS = \[/);
+  assert.match(js, /var clustered = random\(0, 1\) < 0\.46/);
+  assert.match(js, /var voids = \[/);
+  assert.match(js, /rgba\(2,1,4,0\.88\)/);
+  assert.match(js, /var haloRadius = radius \* random\(8, 16\)/);
+  assert.doesNotMatch(js, /glitter-streak|glitter-shoot|addStreaks/);
   assert.match(js, /canvas\.clientWidth \|\| window\.innerWidth/);
   assert.match(js, /window\.addEventListener\('resize', paint, \{ passive: true \}\)/);
   assert.doesNotMatch(js, /requestAnimationFrame|FRAME_MS|drawScene|makeLayer|drawLayer|smokeLayer|coreLayer|starLayer|cathedral/);
@@ -114,9 +116,10 @@ test('the album bloom is album-scoped, golden, and honest about modes', () => {
   assert.match(css, /@keyframes golden-sky-twinkle/);
   assert.match(css, /@keyframes golden-bloom-breathe/);
   assert.match(css, /@keyframes golden-sparkle/);
-  assert.match(css, /@keyframes glitter-shoot/);
   assert.match(css, /\.template-album \.album-atmosphere \{[^}]*animation: golden-sky-drift 18s/);
-  assert.match(css, /\.template-album \.glitter-streak \{[^}]*animation: glitter-shoot/);
+  assert.match(css, /rgba\(2,1,4,\.68\) 100%/);
+  assert.match(css, /radial-gradient\(ellipse 20% 18% at 8% 74%, rgba\(2,1,4,\.80\)/);
+  assert.doesNotMatch(css, /glitter-streak|glitter-shoot/);
   assert.match(css, /\.template-album \.album-atmosphere \{[^}]*mix-blend-mode: normal/);
   const vignette = css.slice(css.indexOf('.template-album .bloom-vignette {'), css.indexOf('.template-album .album-grain'));
   assert.doesNotMatch(vignette, /filter:\s*blur/);
@@ -125,7 +128,6 @@ test('the album bloom is album-scoped, golden, and honest about modes', () => {
   assert.match(css, /body\.template-album\[data-atmosphere-mode="lite"\]/);
   assert.match(css, /body\.template-album\[data-atmosphere-mode="off"\] \.bloom-vignette \{ opacity: \.68; animation: none; \}/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\) \{\s*\.template-album \.album-atmosphere/);
-  assert.match(css, /\.template-album \.glitter-streak \{ display: none; \}/);
 });
 
 test('the atmosphere client does not duplicate the canonical album player', () => {
