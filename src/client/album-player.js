@@ -35,7 +35,6 @@
   let currentLyricIndex = -1;
   let isSeeking = false;
   let lyricRequestId = 0;
-  let karaokeFrame = 0;
 
   const formatTime = (seconds) => {
     if (!Number.isFinite(seconds) || seconds < 0) return '--:--';
@@ -82,7 +81,6 @@
       setLyricText(lyricPrevious, '');
       setLyricText(lyricCurrent, track.instrumental ? '♪' : 'LYRICS UNAVAILABLE');
       setLyricText(lyricNext, '');
-      lyricCurrent.style.setProperty('--fill', '0%');
       lyricCurrent.classList.remove('line-enter');
       lyricStatus.classList.toggle('instrumental', Boolean(track.instrumental));
       lyricStatus.textContent = track.instrumental ? 'INSTRUMENTAL TRACK' : 'LYRIC FILE COULD NOT BE LOADED';
@@ -98,7 +96,6 @@
       setLyricText(lyricPrevious, '');
       setLyricText(lyricCurrent, '♪');
       setLyricText(lyricNext, currentLyrics[0].text);
-      lyricCurrent.style.setProperty('--fill', '0%');
       if (changed) animateLyricLine();
       const introIsLong = currentLyrics[0].time >= 15 && time >= 15;
       lyricStatus.classList.toggle('instrumental', introIsLong);
@@ -110,10 +107,7 @@
     const nextTime = next ? next.time : (Number.isFinite(audio.duration) ? audio.duration : active.time + 5);
     const span = Math.max(0.001, nextTime - active.time);
     const elapsed = Math.max(0, time - active.time);
-    const isLongSilence = span >= 15;
-    const karaokeWindow = isLongSilence ? Math.min(span, 6.5) : span;
-    const fill = Math.max(0, Math.min(100, (elapsed / Math.max(0.001, karaokeWindow)) * 100));
-    const instrumentalGap = isLongSilence && elapsed >= 15 && time < nextTime;
+    const instrumentalGap = span >= 15 && elapsed >= 15 && time < nextTime;
 
     if (changed) {
       setLyricText(lyricPrevious, found > 0 ? currentLyrics[found - 1].text : '');
@@ -121,23 +115,10 @@
       setLyricText(lyricNext, next ? next.text : '');
       animateLyricLine();
     }
-    lyricCurrent.style.setProperty('--fill', config.lineWideLyricHighlight === false ? '100%' : `${fill.toFixed(2)}%`);
+    // The active line is fully lit. Only a line change triggers the short glow;
+    // there is no per-frame fill width to animate. [Jesse + OpenCode, 2026-11-25]
     lyricStatus.classList.toggle('instrumental', instrumentalGap);
     lyricStatus.textContent = instrumentalGap ? 'INSTRUMENTAL SECTION' : ' ';
-  }
-
-  function animateKaraoke() {
-    syncLyrics();
-    if (!audio.paused && !audio.ended) karaokeFrame = window.requestAnimationFrame(animateKaraoke);
-  }
-  function startKaraokeAnimation() {
-    if (karaokeFrame) window.cancelAnimationFrame(karaokeFrame);
-    karaokeFrame = window.requestAnimationFrame(animateKaraoke);
-  }
-  function stopKaraokeAnimation() {
-    if (karaokeFrame) window.cancelAnimationFrame(karaokeFrame);
-    karaokeFrame = 0;
-    syncLyrics();
   }
 
   function renderTrackList() {
@@ -226,8 +207,8 @@
     selectTrack(currentIndex - 1, !audio.paused);
   });
   nextButton.addEventListener('click', () => selectTrack(currentIndex + 1, !audio.paused));
-  audio.addEventListener('play', () => { updatePlayButton(); startKaraokeAnimation(); });
-  audio.addEventListener('pause', () => { updatePlayButton(); stopKaraokeAnimation(); });
+  audio.addEventListener('play', updatePlayButton);
+  audio.addEventListener('pause', updatePlayButton);
   audio.addEventListener('ended', () => {
     if (config.autoAdvance !== false && currentIndex < tracks.length - 1) selectTrack(currentIndex + 1, true);
     else { updatePlayButton(); setStatus('ALBUM PLAYBACK COMPLETE'); }

@@ -135,3 +135,12 @@ test('play, next and automatic progression update player state', async () => {
   await tick();
   assert.equal(elements.currentTrackTitle.textContent, 'INSTRUMENTAL');
 });
+
+test('lyric lines glow once per line change without a karaoke frame loop', () => {
+  const css = fs.readFileSync(path.join(rootDir, 'src/styles/v13.css'), 'utf8');
+  assert.doesNotMatch(playerSource, /requestAnimationFrame|cancelAnimationFrame|karaokeFrame|--fill/);
+  assert.doesNotMatch(css, /var\(--fill|background-clip:\s*text|@keyframes lyric-arrive/);
+  assert.match(css, /\.lyrics-line\.current \{ color: #fef5de;/);
+  assert.match(css, /\.lyrics-line\.current\.line-enter \{ animation: lyric-glow \.72s ease-out both/);
+  assert.match(css, /@keyframes lyric-glow/);
+});
