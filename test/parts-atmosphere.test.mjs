@@ -123,7 +123,14 @@ test('the album bloom is album-scoped, golden, and honest about modes', () => {
   assert.match(css, /@keyframes golden-sky-twinkle/);
   assert.match(css, /@keyframes golden-bloom-breathe/);
   assert.match(css, /@keyframes golden-sparkle/);
-  assert.match(css, /\.template-album \.album-atmosphere \{[^}]*animation: golden-sky-drift 18s/);
+  assert.match(css, /\.template-album \.album-atmosphere \{[^}]*animation: golden-sky-drift 40s[^}]*golden-sky-twinkle 14s/);
+  assert.match(css, /golden-bloom-breathe 26s/);
+  assert.match(css, /golden-bloom-breathe 20s/);
+  assert.match(css, /golden-sparkle 16s/);
+  assert.match(css, /@keyframes golden-sky-drift \{ from \{ transform: translate3d\(-2%,-1\.5%,0\) scale\(1\.02\); \} to \{ transform: translate3d\(2%,1\.5%,0\) scale\(1\.06\); \} \}/);
+  assert.match(css, /@keyframes golden-sky-twinkle \{ from \{ opacity: \.9; \} to \{ opacity: 1; \} \}/);
+  assert.match(css, /@keyframes golden-bloom-breathe \{ from \{ transform: scale\(1\); opacity: \.7; \} to \{ transform: scale\(1\.04\); opacity: \.9; \} \}/);
+  assert.match(css, /@keyframes golden-sparkle \{ from \{ transform: translate3d\(-1%,\.6%,0\) scale\(\.99\); opacity: \.55; \} to \{ transform: translate3d\(1%,-\.6%,0\) scale\(1\.02\); opacity: \.82; \} \}/);
   assert.match(css, /rgba\(2,1,4,\.68\) 100%/);
   assert.match(css, /radial-gradient\(ellipse 20% 18% at 8% 74%, rgba\(2,1,4,\.80\)/);
   assert.doesNotMatch(css, /glitter-streak|glitter-shoot/);
