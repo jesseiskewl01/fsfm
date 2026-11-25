@@ -159,7 +159,7 @@ body.template-album {
   --accent: #bd8b4e;
 }
 .template-album .site-wallpaper { opacity: .08; }
-.template-album .album-atmosphere { position: fixed; top: -9%; left: -9%; z-index: 0; display: block; width: 118%; height: 118%; pointer-events: none; opacity: .94; mix-blend-mode: normal; animation: golden-sky-drift 46s ease-in-out infinite alternate; will-change: transform, opacity; }
+.template-album .album-atmosphere { position: fixed; top: -9%; left: -9%; z-index: 0; display: block; width: 118%; height: 118%; pointer-events: none; opacity: .92; mix-blend-mode: normal; animation: golden-sky-drift 18s ease-in-out infinite alternate, golden-sky-twinkle 5.5s ease-in-out infinite alternate; will-change: transform, opacity; }
 /* Warm bloom wash. Everything here is static paint plus compositor-only
    transform/opacity drift, so the star canvas never repaints per frame.
    [Jesse + OpenCode, 2026-11-25] */
@@ -171,7 +171,7 @@ body.template-album {
     radial-gradient(ellipse 44% 20% at 50% 92%, rgba(255,214,130,.10), transparent 80%),
     radial-gradient(ellipse at 50% 50%, transparent 32%, rgba(5,3,8,.52) 100%);
   opacity: .82;
-  animation: golden-bloom-breathe 27s ease-in-out infinite alternate;
+  animation: golden-bloom-breathe 12s ease-in-out infinite alternate;
   will-change: transform, opacity;
 }
 .template-album .bloom-vignette::before,
@@ -183,9 +183,15 @@ body.template-album {
     radial-gradient(circle at 68% 14%, rgba(255,243,207,.40) 0 1px, transparent 1.8px),
     radial-gradient(circle at 86% 27%, rgba(254,245,222,.34) 0 1px, transparent 1.8px),
     radial-gradient(circle at 9% 64%, rgba(255,217,160,.32) 0 1px, transparent 1.8px),
-    radial-gradient(circle at 57% 83%, rgba(254,245,222,.30) 0 1px, transparent 1.8px);
+    radial-gradient(circle at 57% 83%, rgba(254,245,222,.30) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 22% 46%, rgba(255,243,207,.34) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 42% 28%, rgba(254,245,222,.36) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 61% 42%, rgba(255,220,165,.34) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 78% 64%, rgba(254,245,222,.32) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 34% 74%, rgba(255,217,160,.30) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 92% 48%, rgba(255,243,207,.30) 0 1px, transparent 1.8px);
   opacity: .7;
-  animation: golden-sparkle 18s ease-in-out infinite alternate;
+  animation: golden-sparkle 7s ease-in-out infinite alternate;
   will-change: transform, opacity;
 }
 .template-album .bloom-vignette::after {
@@ -193,18 +199,23 @@ body.template-album {
     radial-gradient(ellipse 28% 22% at 50% 48%, rgba(255,236,194,.15), transparent 74%),
     radial-gradient(ellipse 22% 18% at 24% 72%, rgba(189,139,78,.12), transparent 76%);
   opacity: .68;
-  animation: golden-bloom-breathe 21s ease-in-out infinite alternate;
+  animation: golden-bloom-breathe 9s ease-in-out infinite alternate;
   will-change: transform, opacity;
 }
-@keyframes golden-sky-drift { from { transform: translate3d(-1.5%,-1%,0) scale(1.01); opacity: .9; } to { transform: translate3d(1.5%,1%,0) scale(1.05); opacity: 1; } }
-@keyframes golden-bloom-breathe { from { transform: scale(1); opacity: .68; } to { transform: scale(1.04); opacity: .9; } }
-@keyframes golden-sparkle { from { transform: translate3d(-.8%,.6%,0); opacity: .5; } to { transform: translate3d(.8%,-.6%,0); opacity: .82; } }
+@keyframes golden-sky-drift { from { transform: translate3d(-3%,-2%,0) scale(1.03); } to { transform: translate3d(3%,2%,0) scale(1.09); } }
+@keyframes golden-sky-twinkle { from { opacity: .86; } to { opacity: 1; } }
+@keyframes golden-bloom-breathe { from { transform: scale(1); opacity: .64; } to { transform: scale(1.07); opacity: .94; } }
+@keyframes golden-sparkle { from { transform: translate3d(-1.6%,1%,0) scale(.98); opacity: .42; } to { transform: translate3d(1.6%,-1%,0) scale(1.04); opacity: .9; } }
+@keyframes glitter-shoot { 0% { transform: translate3d(0,0,0) rotate(var(--angle, 24deg)) scaleX(.55); opacity: 0; } 9% { opacity: .95; } 62% { opacity: .78; } 100% { transform: translate3d(42vw,30vh,0) rotate(var(--angle, 24deg)) scaleX(1.25); opacity: 0; } }
+.template-album .glitter-streak { position: fixed; z-index: 1; width: 150px; height: 2px; border-radius: 999px; pointer-events: none; background: linear-gradient(90deg, transparent, rgba(255,236,194,.18) 18%, rgba(255,243,207,.92) 88%, #fff); box-shadow: 0 0 10px rgba(255,236,194,.85), 0 0 26px rgba(189,139,78,.45); opacity: 0; transform-origin: left center; animation: glitter-shoot var(--duration, 7s) linear var(--delay, 0s) infinite; will-change: transform, opacity; }
 body.template-album[data-atmosphere-mode="lite"] .bloom-vignette { animation: none; opacity: .72; }
 body.template-album[data-atmosphere-mode="lite"] .bloom-vignette::before,
 body.template-album[data-atmosphere-mode="lite"] .bloom-vignette::after { animation: none; opacity: .46; }
+body.template-album[data-atmosphere-mode="lite"] .glitter-streak { opacity: .7; }
 body.template-album[data-atmosphere-mode="off"] .bloom-vignette { opacity: .68; animation: none; }
 body.template-album[data-atmosphere-mode="off"] .bloom-vignette::before,
-body.template-album[data-atmosphere-mode="off"] .bloom-vignette::after { display: none; }
+body.template-album[data-atmosphere-mode="off"] .bloom-vignette::after,
+body.template-album[data-atmosphere-mode="off"] .glitter-streak { display: none; }
 .template-album .album-grain { position: fixed; inset: 0; z-index: 998; pointer-events: none; opacity: .055; mix-blend-mode: soft-light; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.98' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
 .template-album .site-shell { position: relative; z-index: 10; width: min(920px, calc(100% - 32px)); max-width: 920px; margin: 0 auto; padding: 52px 0 30px; }
 .template-album .global-header { position: fixed; top: 0; left: 0; right: 0; z-index: 500; width: 100%; min-height: 38px; height: auto; padding: 3px max(12px, calc((100% - 920px) / 2)); display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; border: 0; border-bottom: 1px solid rgba(254,245,222,.42); border-radius: 0; background: linear-gradient(180deg,rgba(189,139,78,.35),rgba(189,139,78,.12) 49%,rgba(189,139,78,.04) 50%,rgba(189,139,78,.20)); box-shadow: 0 4px 18px rgba(10,8,6,.5),inset 0 1px 2px rgba(254,245,222,.95); backdrop-filter: blur(28px) saturate(220%); -webkit-backdrop-filter: blur(28px) saturate(220%); }
@@ -331,6 +342,7 @@ body.template-album[data-atmosphere-mode="off"] .bloom-vignette::after { display
   .template-album .bloom-vignette,
   .template-album .bloom-vignette::before,
   .template-album .bloom-vignette::after { animation: none; }
+  .template-album .glitter-streak { display: none; }
   .lyrics-line.current.line-enter, .lyrics-note.instrumental { animation: none; }
   .template-album .content-section.reveal { opacity: 1; transform: none; }
 }

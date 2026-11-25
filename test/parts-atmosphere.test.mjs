@@ -92,6 +92,10 @@ test('the lite client path is a real reduction, not a cosmetic flag', () => {
   assert.match(js, /dpr = Math\.min\(window\.devicePixelRatio \|\| 1, lite \? 0\.75 : 1\)/);
   assert.match(js, /function paintSky\(g, width, height\)/);
   assert.match(js, /function paint\(\)/);
+  assert.match(js, /function addStreaks\(\)/);
+  assert.match(js, /var total = lite \? 3 : 6/);
+  assert.match(js, /className = 'glitter-streak'/);
+  assert.match(js, /addStreaks\(\);/);
   assert.match(js, /canvas\.clientWidth \|\| window\.innerWidth/);
   assert.match(js, /window\.addEventListener\('resize', paint, \{ passive: true \}\)/);
   assert.doesNotMatch(js, /requestAnimationFrame|FRAME_MS|drawScene|makeLayer|drawLayer|smokeLayer|coreLayer|starLayer|cathedral/);
@@ -107,9 +111,12 @@ test('the album bloom is album-scoped, golden, and honest about modes', () => {
   assert.match(css, /\.template-album \.bloom-vignette::before/);
   assert.match(css, /\.template-album \.bloom-vignette::after/);
   assert.match(css, /@keyframes golden-sky-drift/);
+  assert.match(css, /@keyframes golden-sky-twinkle/);
   assert.match(css, /@keyframes golden-bloom-breathe/);
   assert.match(css, /@keyframes golden-sparkle/);
-  assert.match(css, /\.template-album \.album-atmosphere \{[^}]*animation: golden-sky-drift/);
+  assert.match(css, /@keyframes glitter-shoot/);
+  assert.match(css, /\.template-album \.album-atmosphere \{[^}]*animation: golden-sky-drift 18s/);
+  assert.match(css, /\.template-album \.glitter-streak \{[^}]*animation: glitter-shoot/);
   assert.match(css, /\.template-album \.album-atmosphere \{[^}]*mix-blend-mode: normal/);
   const vignette = css.slice(css.indexOf('.template-album .bloom-vignette {'), css.indexOf('.template-album .album-grain'));
   assert.doesNotMatch(vignette, /filter:\s*blur/);
@@ -118,6 +125,7 @@ test('the album bloom is album-scoped, golden, and honest about modes', () => {
   assert.match(css, /body\.template-album\[data-atmosphere-mode="lite"\]/);
   assert.match(css, /body\.template-album\[data-atmosphere-mode="off"\] \.bloom-vignette \{ opacity: \.68; animation: none; \}/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\) \{\s*\.template-album \.album-atmosphere/);
+  assert.match(css, /\.template-album \.glitter-streak \{ display: none; \}/);
 });
 
 test('the atmosphere client does not duplicate the canonical album player', () => {

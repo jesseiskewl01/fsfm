@@ -99,7 +99,27 @@ try {
       paintSky(ctx, width, height);
     }
 
+    function addStreaks() {
+      var existing = document.querySelectorAll('.glitter-streak');
+      if (existing.length) return;
+      seed = 20261125;
+      var angles = [-28, 24, -18, 32, -35, 20];
+      var total = lite ? 3 : 6;
+      for (var i = 0; i < total; i += 1) {
+        var streak = document.createElement('div');
+        streak.className = 'glitter-streak';
+        streak.setAttribute('aria-hidden', 'true');
+        streak.style.left = random(4, 72) + '%';
+        streak.style.top = random(8, 78) + '%';
+        streak.style.setProperty('--angle', angles[i % angles.length] + 'deg');
+        streak.style.setProperty('--duration', (6 + i * 1.3).toFixed(1) + 's');
+        streak.style.setProperty('--delay', (-i * 1.7).toFixed(1) + 's');
+        (document.body || document.documentElement).appendChild(streak);
+      }
+    }
+
     paint();
+    addStreaks();
     window.addEventListener('resize', paint, { passive: true });
   }
 } catch (err) {}
