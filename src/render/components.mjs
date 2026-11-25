@@ -125,13 +125,20 @@ function renderMarquee(content = {}) {
   return `<div class="marquee-track" role="group" aria-label="${escapeHtml(messages.join(' • '))}"><div class="marquee-run">${run}</div><div class="marquee-run" aria-hidden="true">${run}</div></div>`;
 }
 
-function renderEmbed(content = {}, preview = false) {
+function renderEmbed(content = {}, preview = false, options = {}) {
   const url = safeEmbedUrl(content.url);
   if (preview) return `<div class="embed-preview"><span class="embed-preview-mark" aria-hidden="true">♫</span><strong>${escapeHtml(content.title || 'External media embed')}</strong><span>Live media embed shown on the actual page.</span></div>`;
   if (!url) return `<p class="component-fallback">This embed needs a valid HTTPS URL.</p>`;
   const height = Math.max(180, Math.min(900, Number(content.height) || 352));
   const title = content.title || `${content.provider || 'External'} embed`;
-  return `<div class="embed-frame"><iframe src="${escapeHtml(url)}" title="${escapeHtml(title)}" loading="lazy" height="${height}" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>`;
+  // Album player only: same two-tone corner mask as the homepage Spotify window.
+  // [Jesse + OpenCode, 2026-11-25]
+  const corners = options.corners
+    ? '<span class="fsfm-spotify-corner" data-corner="tl" aria-hidden="true"></span><span class="fsfm-spotify-corner" data-corner="tr" aria-hidden="true"></span><span class="fsfm-spotify-corner" data-corner="bl" aria-hidden="true"></span><span class="fsfm-spotify-corner" data-corner="br" aria-hidden="true"></span>'
+    : '';
+  const frameClass = options.corners ? 'embed-frame fsfm-spotify-frame' : 'embed-frame';
+  const iframeStyle = options.corners ? ' style="border-radius:12px"' : '';
+  return `<div class="${frameClass}"><iframe${iframeStyle} src="${escapeHtml(url)}" title="${escapeHtml(title)}" loading="lazy" height="${height}" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>${corners}</div>`;
 }
 
 function renderSocialLinks(content = {}) {
@@ -295,7 +302,7 @@ function renderSectionInner(section, context = {}) {
     case 'album-player': return renderAlbumPlayer(context.page);
     case 'spotify-embed': {
       const spotify = context.page?.templateData?.spotify || {};
-      return `<div class="player-listen"><div class="player-listen-label">${escapeHtml(spotify.label || 'OUT ON SPOTIFY')}</div>${renderEmbed({ url: spotify.embedUrl, title: `${context.page?.templateData?.album?.title || 'Album'} on Spotify`, height: spotify.height }, context.preview)}</div>`;
+      return `<div class="player-listen"><div class="player-listen-label">${escapeHtml(spotify.label || 'OUT ON SPOTIFY')}</div>${renderEmbed({ url: spotify.embedUrl, title: `${context.page?.templateData?.album?.title || 'Album'} on Spotify`, height: spotify.height }, context.preview, { corners: true })}</div>`;
     }
     default: return '';
   }

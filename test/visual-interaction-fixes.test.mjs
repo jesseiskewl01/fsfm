@@ -94,6 +94,22 @@ test('the Spotify embed uses the black color and runtime two-tone corner squares
   assert.doesNotMatch(gadgets, /#372828|#493A3A/);
 });
 
+test('the album Spotify embed uses the homepage two-tone corner mask without touching homepage output', () => {
+  assert.match(components, /function renderEmbed\(content = \{\}, preview = false, options = \{\}\)/);
+  assert.match(components, /const corners = options\.corners/);
+  assert.match(components, /data-corner="tl"[\s\S]*data-corner="tr"[\s\S]*data-corner="bl"[\s\S]*data-corner="br"/);
+  assert.match(components, /const iframeStyle = options\.corners \? ' style="border-radius:12px"' : ''/);
+  assert.match(components, /renderEmbed\(\{ url: spotify\.embedUrl[\s\S]*?\}, context\.preview, \{ corners: true \}\)/);
+  assert.equal((components.match(/\{ corners: true \}/g) || []).length, 1);
+  assert.match(albumCss, /\.player-listen \.fsfm-spotify-frame \{[^}]*border-radius: 0;[^}]*linear-gradient\(#1F1F1F 0 50%, #121212 50% 100%\)/);
+  assert.match(albumCss, /\.player-listen \.fsfm-spotify-corner \{[^}]*width: 15px; height: 15px;[^}]*pointer-events: none; z-index: 2/);
+  assert.match(albumCss, /\[data-corner="tl"\][^}]*background: #1F1F1F/);
+  assert.match(albumCss, /\[data-corner="tr"\][^}]*background: #1F1F1F/);
+  assert.match(albumCss, /\[data-corner="bl"\][^}]*background: #121212/);
+  assert.match(albumCss, /\[data-corner="br"\][^}]*background: #121212/);
+  assert.doesNotMatch(albumCss, /\.player-listen \.embed-frame \{[^}]*border-radius: 4px/);
+});
+
 test('the album header uses the same inset and control geometry as the homepage taskbar', () => {
   assert.match(albumCss, /padding: 3px max\(12px, calc\(\(100% - 920px\) \/ 2\)\)/);
   assert.doesNotMatch(albumCss, /100vw - 880px/);

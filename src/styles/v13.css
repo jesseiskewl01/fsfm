@@ -292,8 +292,17 @@ body.template-album[data-atmosphere-mode="off"] .bloom-vignette::after { display
 .player-audio { display: none; }
 .player-listen { min-width: 0; margin-top: 0; padding: 12px; border: 1px solid rgba(254,245,222,.24); border-radius: 4px; background: rgba(10,8,6,.34); }
 .player-listen-label { margin-bottom: 8px; color: #fef5de; font: 10px 'Roboto Mono',Consolas,monospace; letter-spacing: .12em; }
-.player-listen .embed-frame { border: 1px solid rgba(254,245,222,.2); border-radius: 4px; background: #121212; }
-.player-listen .embed-frame iframe { min-height: 352px; }
+/* Album Spotify embed: keep the frame rectangular and mask Spotify's own
+   rounded corners with the same two-tone squares used on the homepage.
+   Colors are intentionally identical: #1F1F1F top, #121212 bottom.
+   [Jesse + OpenCode, 2026-11-25] */
+.player-listen .fsfm-spotify-frame { position: relative; overflow: hidden; border: 1px solid rgba(254,245,222,.2); border-radius: 0; background: linear-gradient(#1F1F1F 0 50%, #121212 50% 100%); }
+.player-listen .fsfm-spotify-frame iframe { min-height: 352px; }
+.player-listen .fsfm-spotify-corner { position: absolute; width: 15px; height: 15px; pointer-events: none; z-index: 2; }
+.player-listen .fsfm-spotify-corner[data-corner="tl"] { left: 0; top: 0; background: #1F1F1F; }
+.player-listen .fsfm-spotify-corner[data-corner="tr"] { right: 0; top: 0; background: #1F1F1F; }
+.player-listen .fsfm-spotify-corner[data-corner="bl"] { left: 0; bottom: 0; background: #121212; }
+.player-listen .fsfm-spotify-corner[data-corner="br"] { right: 0; bottom: 0; background: #121212; }
 .template-album .global-footer { justify-content: center; padding: 36px 0 50px; color: #fef5de; font-size: 11.5px; font-weight: 700; letter-spacing: .2em; opacity: .85; text-align: center; }
 .template-album .footer-socials { justify-content: center; }
 @media (max-width: 760px) {
