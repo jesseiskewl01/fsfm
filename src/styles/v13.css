@@ -160,11 +160,11 @@ body.template-album {
   --accent: #bd8b4e;
 }
 .template-album .site-wallpaper { opacity: .08; }
-.template-album .album-atmosphere { position: fixed; top: -9%; left: -9%; z-index: 0; display: block; width: 118%; height: 118%; pointer-events: none; opacity: .92; mix-blend-mode: normal; animation: golden-sky-drift 40s ease-in-out infinite alternate, golden-sky-twinkle 14s ease-in-out infinite alternate; will-change: transform, opacity; }
+.template-album .album-atmosphere { position: fixed; top: -4%; left: -4%; z-index: 0; display: block; width: 108%; height: 108%; pointer-events: none; opacity: .92; mix-blend-mode: normal; animation: golden-sky-drift 40s ease-in-out infinite alternate, golden-sky-twinkle 14s ease-in-out infinite alternate; will-change: transform; }
 /* Warm bloom wash. Everything here is static paint plus compositor-only
    transform/opacity drift, so the star canvas never repaints per frame.
    [Jesse + OpenCode, 2026-11-25] */
-.template-album .bloom-vignette { position: fixed; inset: -8%; z-index: 1; pointer-events: none; overflow: hidden;
+.template-album .bloom-vignette { position: fixed; inset: -4%; z-index: 1; pointer-events: none; overflow: hidden;
   background:
     radial-gradient(ellipse 38% 32% at 48% 44%, rgba(255,236,194,.28), transparent 70%),
     radial-gradient(ellipse 26% 34% at 18% 28%, rgba(189,139,78,.20), transparent 74%),
@@ -174,10 +174,9 @@ body.template-album {
     radial-gradient(ellipse at 50% 50%, transparent 26%, rgba(2,1,4,.68) 100%);
   opacity: .86;
   animation: golden-bloom-breathe 26s ease-in-out infinite alternate;
-  will-change: transform, opacity;
 }
 .template-album .bloom-vignette::before,
-.template-album .bloom-vignette::after { content: ""; position: absolute; inset: -12%; pointer-events: none; }
+.template-album .bloom-vignette::after { content: ""; position: absolute; inset: -6%; pointer-events: none; }
 .template-album .bloom-vignette::before {
   background:
     radial-gradient(circle at 14% 18%, rgba(254,245,222,.42) 0 1px, transparent 1.8px),
@@ -194,7 +193,6 @@ body.template-album {
     radial-gradient(circle at 92% 48%, rgba(255,243,207,.30) 0 1px, transparent 1.8px);
   opacity: .7;
   animation: golden-sparkle 16s ease-in-out infinite alternate;
-  will-change: transform, opacity;
 }
 .template-album .bloom-vignette::after {
   background:
@@ -202,12 +200,18 @@ body.template-album {
     radial-gradient(ellipse 22% 18% at 24% 72%, rgba(189,139,78,.12), transparent 76%);
   opacity: .68;
   animation: golden-bloom-breathe 20s ease-in-out infinite alternate;
-  will-change: transform, opacity;
 }
 @keyframes golden-sky-drift { from { transform: translate3d(-2%,-1.5%,0) scale(1.02); } to { transform: translate3d(2%,1.5%,0) scale(1.06); } }
 @keyframes golden-sky-twinkle { from { opacity: .9; } to { opacity: 1; } }
 @keyframes golden-bloom-breathe { from { transform: scale(1); opacity: .7; } to { transform: scale(1.04); opacity: .9; } }
 @keyframes golden-sparkle { from { transform: translate3d(-1%,.6%,0) scale(.99); opacity: .55; } to { transform: translate3d(1%,-.6%,0) scale(1.02); opacity: .82; } }
+/* Scrolling is the priority: pause the ambient layers while the page moves,
+   then resume after the scroll settles. Still static paint, no JS frames.
+   [Jesse + OpenCode, 2026-11-25] */
+body.album-scroll-calm.template-album .album-atmosphere,
+body.album-scroll-calm.template-album .bloom-vignette,
+body.album-scroll-calm.template-album .bloom-vignette::before,
+body.album-scroll-calm.template-album .bloom-vignette::after { animation-play-state: paused; }
 body.template-album[data-atmosphere-mode="lite"] .bloom-vignette { animation: none; opacity: .72; }
 body.template-album[data-atmosphere-mode="lite"] .bloom-vignette::before,
 body.template-album[data-atmosphere-mode="lite"] .bloom-vignette::after { animation: none; opacity: .46; }

@@ -36,10 +36,12 @@ test('V15 album atmosphere paints once and keeps motion on the compositor', () =
   const css = read('src/styles/v13.css');
   assert.match(js, /function paint\(\)/);
   assert.match(js, /function starAlpha\(big\)/);
+  assert.match(js, /album-scroll-calm/);
   assert.match(js, /paint\(\);/);
   assert.match(js, /window\.addEventListener\('resize', paint, \{ passive: true \}\)/);
   assert.doesNotMatch(js, /requestAnimationFrame|FRAME_MS|drawScene|makeLayer|drawLayer|glitter-streak/);
   assert.match(css, /\.template-album \.album-atmosphere \{[^}]*animation: golden-sky-drift 40s/);
+  assert.match(css, /animation-play-state: paused/);
   assert.doesNotMatch(css, /@keyframes nebula-|glitter-shoot/);
   assert.doesNotMatch(js, /Math\.min\(190,/);
   assert.doesNotMatch(js, /var steps = 22/);

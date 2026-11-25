@@ -144,6 +144,22 @@ test('the album bloom is album-scoped, golden, and honest about modes', () => {
   assert.match(css, /@media \(prefers-reduced-motion: reduce\) \{\s*\.template-album \.album-atmosphere/);
 });
 
+test('the album sky pauses during scroll and keeps animated layers small', () => {
+  const js = fs.readFileSync(path.join(root, 'src/client/album-atmosphere.js'), 'utf8');
+  const css = fs.readFileSync(path.join(root, 'src/styles/v13.css'), 'utf8');
+  assert.match(js, /album-scroll-calm/);
+  assert.match(js, /function setScrollCalm\(on\)/);
+  assert.match(js, /window\.addEventListener\('scroll', function\(\) \{/);
+  assert.match(js, /window\.setTimeout\(function\(\) \{ setScrollCalm\(false\); \}, 180\)/);
+  assert.doesNotMatch(js, /requestAnimationFrame/);
+  assert.match(css, /body\.album-scroll-calm\.template-album \.album-atmosphere/);
+  assert.match(css, /animation-play-state: paused/);
+  assert.match(css, /\.template-album \.album-atmosphere \{[^}]*width: 108%; height: 108%/);
+  assert.match(css, /\.template-album \.bloom-vignette \{[^}]*inset: -4%/);
+  assert.match(css, /\.template-album \.bloom-vignette::before,\s*\.template-album \.bloom-vignette::after \{[^}]*inset: -6%/);
+  assert.doesNotMatch(css, /will-change: transform, opacity/);
+});
+
 test('the atmosphere client does not duplicate the canonical album player', () => {
   const js = fs.readFileSync(path.join(root, 'src/client/album-atmosphere.js'), 'utf8');
   assert.match(js, /getElementById\('nebulaCanvas'\)/);
