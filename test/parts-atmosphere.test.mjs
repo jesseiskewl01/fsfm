@@ -97,6 +97,13 @@ test('the lite client path is a real reduction, not a cosmetic flag', () => {
   assert.match(js, /var voids = \[/);
   assert.match(js, /rgba\(2,1,4,0\.88\)/);
   assert.match(js, /var haloRadius = radius \* random\(8, 16\)/);
+  assert.match(js, /function starAlpha\(big\)/);
+  assert.match(js, /if \(roll < 0\.18\) return random\(0\.08, 0\.20\)/);
+  assert.match(js, /if \(roll < 0\.72\) return random\(0\.22, 0\.52\)/);
+  assert.match(js, /if \(roll < 0\.95\) return random\(0\.56, 0\.86\)/);
+  assert.match(js, /return random\(0\.90, 1\)/);
+  assert.match(js, /g\.globalAlpha = starAlpha\(big\)/);
+  assert.doesNotMatch(js, /g\.globalAlpha = big \? random\(0\.82, 1\) : random\(0\.30, 0\.86\)/);
   assert.doesNotMatch(js, /glitter-streak|glitter-shoot|addStreaks/);
   assert.match(js, /canvas\.clientWidth \|\| window\.innerWidth/);
   assert.match(js, /window\.addEventListener\('resize', paint, \{ passive: true \}\)/);

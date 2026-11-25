@@ -35,6 +35,7 @@ test('V15 album atmosphere paints once and keeps motion on the compositor', () =
   const js = read('src/client/album-atmosphere.js');
   const css = read('src/styles/v13.css');
   assert.match(js, /function paint\(\)/);
+  assert.match(js, /function starAlpha\(big\)/);
   assert.match(js, /paint\(\);/);
   assert.match(js, /window\.addEventListener\('resize', paint, \{ passive: true \}\)/);
   assert.doesNotMatch(js, /requestAnimationFrame|FRAME_MS|drawScene|makeLayer|drawLayer|glitter-streak/);

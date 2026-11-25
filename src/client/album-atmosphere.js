@@ -25,6 +25,17 @@ try {
       return min + (seed / 4294967296) * (max - min);
     }
 
+    // Four brightness tiers: faint dust, soft mid-tones, bright glitter, and
+    // rare near-white hero stars. Big stars always stay in the upper tiers.
+    function starAlpha(big) {
+      var roll = random(0, 1);
+      if (big) return roll < 0.72 ? random(0.76, 0.92) : random(0.93, 1);
+      if (roll < 0.18) return random(0.08, 0.20);
+      if (roll < 0.72) return random(0.22, 0.52);
+      if (roll < 0.95) return random(0.56, 0.86);
+      return random(0.90, 1);
+    }
+
     function paintSky(g, width, height) {
       var reach = Math.max(width, height);
       var sky = g.createLinearGradient(0, 0, 0, height);
@@ -106,7 +117,7 @@ try {
           g.restore();
         }
 
-        g.globalAlpha = big ? random(0.82, 1) : random(0.30, 0.86);
+        g.globalAlpha = starAlpha(big);
         g.fillStyle = tint;
         g.beginPath();
         g.arc(sx, sy, radius, 0, Math.PI * 2);
