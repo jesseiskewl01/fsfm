@@ -144,61 +144,62 @@ body[data-page-transition="true"] .site-shell { animation: fsfm-page-enter .48s 
   body[data-respect-reduced-motion="true"][data-page-transition="true"] .site-shell { animation: none; }
 }
 
-/* ---------- ALBUM TEMPLATE: SUNRISE CATHEDRAL ---------- */
+/* ---------- ALBUM TEMPLATE: SMOKEY STARRY NEBULA ---------- */
 body.template-album {
   min-height: 100vh;
   overflow-x: hidden;
   color: #fef5de;
   background:
-    radial-gradient(ellipse 46% 34% at 50% 101%, rgba(255,232,178,.34) 0%, rgba(189,139,78,.18) 42%, transparent 76%),
-    radial-gradient(ellipse 70% 50% at 50% 78%, rgba(189,139,78,.20) 0%, transparent 74%),
-    linear-gradient(180deg, #050409 0%, #120b09 28%, #321c0d 58%, #150c06 82%, #070403 100%);
+    radial-gradient(ellipse 60% 50% at 54% 58%, rgba(189,139,78,.16) 0%, transparent 74%),
+    radial-gradient(ellipse 52% 46% at 18% 24%, rgba(124,77,230,.18) 0%, transparent 76%),
+    linear-gradient(180deg, #03020a 0%, #0b0718 30%, #1b1030 58%, #0a0616 84%, #030208 100%);
   --ink: #fef5de;
   --muted: rgba(254,245,222,.70);
   --line: rgba(189,139,78,.42);
   --accent: #bd8b4e;
 }
-.template-album .site-wallpaper { opacity: .12; }
+.template-album .site-wallpaper { opacity: .10; }
 .template-album .album-atmosphere { position: fixed; inset: 0; z-index: 0; display: block; width: 100%; height: 100%; pointer-events: none; opacity: 1; mix-blend-mode: normal; }
-/* Sunrise Cathedral bloom: static gradients plus compositor-only transform and
-   opacity drift. No per-frame gradient, path, or blur work.
-   [Jesse + OpenCode, 2026-11-24] */
-.template-album .bloom-vignette { position: fixed; inset: -8%; z-index: 1; pointer-events: none; overflow: hidden;
+/* Nebula veil: static gradients plus compositor-only transform and opacity
+   drift. The moving smoke and stars live in cached canvas layers.
+   [Jesse + OpenCode, 2026-11-25] */
+.template-album .bloom-vignette { position: fixed; inset: -10%; z-index: 1; pointer-events: none; overflow: hidden;
   background:
-    radial-gradient(ellipse 32% 22% at 50% 3%, rgba(254,245,222,.16), transparent 72%),
-    radial-gradient(ellipse 24% 58% at 11% 42%, rgba(255,205,132,.10), transparent 76%),
-    radial-gradient(ellipse 22% 54% at 89% 38%, rgba(189,139,78,.09), transparent 78%),
-    radial-gradient(ellipse 68% 20% at 50% 94%, rgba(255,221,160,.16), transparent 80%),
-    radial-gradient(ellipse at 50% 46%, transparent 34%, rgba(5,4,9,.36) 100%);
-  opacity: .88;
-  animation: cathedral-bloom-breathe 26s ease-in-out infinite alternate;
+    radial-gradient(ellipse 34% 28% at 54% 6%, rgba(218,183,255,.15), transparent 74%),
+    radial-gradient(ellipse 30% 44% at 14% 38%, rgba(124,77,230,.16), transparent 76%),
+    radial-gradient(ellipse 32% 46% at 88% 34%, rgba(189,139,78,.13), transparent 78%),
+    radial-gradient(ellipse 58% 26% at 52% 92%, rgba(255,220,165,.12), transparent 80%),
+    radial-gradient(ellipse at 50% 48%, transparent 30%, rgba(3,2,8,.42) 100%);
+  opacity: .86;
+  animation: nebula-veil-breathe 24s ease-in-out infinite alternate;
   will-change: transform, opacity;
 }
 .template-album .bloom-vignette::before,
-.template-album .bloom-vignette::after { content: ""; position: absolute; inset: -12%; pointer-events: none; }
+.template-album .bloom-vignette::after { content: ""; position: absolute; inset: -14%; pointer-events: none; }
 .template-album .bloom-vignette::before {
   background:
-    linear-gradient(90deg, transparent 0%, transparent 13%, rgba(254,245,222,.09) 17%, transparent 22%, transparent 34%, rgba(255,220,165,.10) 38%, transparent 44%, transparent 57%, rgba(254,245,222,.075) 61%, transparent 67%, transparent 80%, rgba(189,139,78,.07) 84%, transparent 90%),
-    radial-gradient(ellipse 38% 24% at 50% 2%, rgba(255,244,214,.12), transparent 72%);
-  opacity: .72;
-  animation: cathedral-shaft-drift 34s ease-in-out infinite alternate;
+    linear-gradient(92deg, transparent 0%, transparent 10%, rgba(124,77,230,.11) 16%, transparent 24%, transparent 36%, rgba(189,139,78,.10) 42%, transparent 51%, transparent 63%, rgba(218,183,255,.09) 69%, transparent 78%, transparent 88%, rgba(106,43,217,.08) 94%, transparent 100%),
+    radial-gradient(ellipse 44% 30% at 46% 20%, rgba(218,183,255,.10), transparent 74%),
+    radial-gradient(ellipse 38% 26% at 68% 70%, rgba(255,220,165,.08), transparent 76%);
+  opacity: .74;
+  animation: nebula-smoke-drift 30s ease-in-out infinite alternate;
   will-change: transform, opacity;
 }
 .template-album .bloom-vignette::after {
   background:
-    radial-gradient(ellipse 12% 2.4% at 50% 88%, rgba(254,245,222,.22), transparent 72%),
-    radial-gradient(ellipse 40% 16% at 50% 92%, rgba(255,205,132,.16), transparent 78%),
-    radial-gradient(circle at 17% 15%, rgba(254,245,222,.28) 0 1px, transparent 1.6px),
-    radial-gradient(circle at 31% 8%, rgba(254,245,222,.20) 0 1px, transparent 1.6px),
-    radial-gradient(circle at 69% 12%, rgba(255,220,165,.24) 0 1px, transparent 1.6px),
-    radial-gradient(circle at 84% 20%, rgba(254,245,222,.18) 0 1px, transparent 1.6px);
-  opacity: .68;
-  animation: cathedral-horizon-glow 30s ease-in-out infinite alternate;
+    radial-gradient(ellipse 16% 10% at 54% 54%, rgba(254,245,222,.16), transparent 74%),
+    radial-gradient(circle at 19% 17%, rgba(254,245,222,.24) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 34% 9%, rgba(218,183,255,.22) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 71% 14%, rgba(255,220,165,.26) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 86% 24%, rgba(254,245,222,.18) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 12% 62%, rgba(218,183,255,.16) 0 1px, transparent 1.6px);
+  opacity: .7;
+  animation: nebula-core-pulse 19s ease-in-out infinite alternate;
   will-change: transform, opacity;
 }
-@keyframes cathedral-bloom-breathe { from { transform: scale(1); opacity: .78; } to { transform: scale(1.04); opacity: .96; } }
-@keyframes cathedral-shaft-drift { from { transform: translate3d(-1.6%,0,0) scaleX(1); opacity: .56; } to { transform: translate3d(1.6%,0,0) scaleX(1.05); opacity: .82; } }
-@keyframes cathedral-horizon-glow { from { transform: translate3d(0,1%,0) scale(1); opacity: .55; } to { transform: translate3d(0,-1%,0) scale(1.03); opacity: .8; } }
+@keyframes nebula-veil-breathe { from { transform: scale(1); opacity: .74; } to { transform: scale(1.05); opacity: .94; } }
+@keyframes nebula-smoke-drift { from { transform: translate3d(-2.5%,1%,0) rotate(-2deg) scale(1); opacity: .58; } to { transform: translate3d(2.5%,-1%,0) rotate(2deg) scale(1.06); opacity: .84; } }
+@keyframes nebula-core-pulse { from { transform: translate3d(0,1.5%,0) scale(1); opacity: .56; } to { transform: translate3d(0,-1.5%,0) scale(1.04); opacity: .82; } }
 body.template-album[data-atmosphere-mode="lite"] .bloom-vignette { animation: none; opacity: .72; }
 body.template-album[data-atmosphere-mode="lite"] .bloom-vignette::before,
 body.template-album[data-atmosphere-mode="lite"] .bloom-vignette::after { animation: none; opacity: .48; }
@@ -207,7 +208,7 @@ body.template-album[data-atmosphere-mode="off"] .bloom-vignette::before,
 body.template-album[data-atmosphere-mode="off"] .bloom-vignette::after { display: none; }
 .template-album .album-grain { position: fixed; inset: 0; z-index: 998; pointer-events: none; opacity: .055; mix-blend-mode: soft-light; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.98' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
 .template-album .site-shell { position: relative; z-index: 10; width: min(920px, calc(100% - 32px)); max-width: 920px; margin: 0 auto; padding: 52px 0 30px; }
-.template-album .global-header { position: fixed; top: 0; left: 0; right: 0; z-index: 500; width: 100%; min-height: 38px; height: auto; padding: 3px max(12px, calc((100% - 880px) / 2)); display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; border: 0; border-bottom: 1px solid rgba(254,245,222,.42); border-radius: 0; background: linear-gradient(180deg,rgba(189,139,78,.35),rgba(189,139,78,.12) 49%,rgba(189,139,78,.04) 50%,rgba(189,139,78,.20)); box-shadow: 0 4px 18px rgba(10,8,6,.5),inset 0 1px 2px rgba(254,245,222,.95); backdrop-filter: blur(28px) saturate(220%); -webkit-backdrop-filter: blur(28px) saturate(220%); }
+.template-album .global-header { position: fixed; top: 0; left: 0; right: 0; z-index: 500; width: 100%; min-height: 38px; height: auto; padding: 3px max(12px, calc((100% - 920px) / 2)); display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; border: 0; border-bottom: 1px solid rgba(254,245,222,.42); border-radius: 0; background: linear-gradient(180deg,rgba(189,139,78,.35),rgba(189,139,78,.12) 49%,rgba(189,139,78,.04) 50%,rgba(189,139,78,.20)); box-shadow: 0 4px 18px rgba(10,8,6,.5),inset 0 1px 2px rgba(254,245,222,.95); backdrop-filter: blur(28px) saturate(220%); -webkit-backdrop-filter: blur(28px) saturate(220%); }
 .template-album .brand-link { min-width: 0; gap: 10px; color: #fef5de; font-size: 12px; font-weight: 700; letter-spacing: normal; text-shadow: 0 2px 10px rgba(189,139,78,.7); white-space: nowrap; }
 .template-album .brand-mark { width: 26px; height: 26px; flex: 0 0 auto; padding: 0; border-radius: 50%; border-color: #fef5de; background: radial-gradient(circle at 35% 35%,#fef5de 0%,#634123 60%,#22160d 100%); box-shadow: 0 2px 10px rgba(189,139,78,.7),inset 0 1px 3px #fef5de; font-size: 0; line-height: 1; }
 .template-album .brand-mark::after { content: "✧"; display: block; font-size: 15px; line-height: 1; transform: translateY(-.5px); }

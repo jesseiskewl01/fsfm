@@ -34,13 +34,15 @@ test('V15 homepage ambient bubbles use cached sprites and a 30 FPS cap', () => {
 test('V15 album atmosphere has a bounded canvas workload', () => {
   const js = read('src/client/album-atmosphere.js');
   assert.match(js, /var FRAME_MS = 1000 \/ 24/);
-  assert.match(js, /var skyLayer = null, shaftLayer = null, starLayer = null, stillLayer = null/);
+  assert.match(js, /var baseLayer = null, smokeLayer = null, coreLayer = null, starLayer = null, stillLayer = null/);
   assert.match(js, /function buildLayers\(\)/);
   const draw = js.slice(js.indexOf('function drawScene'), js.indexOf('function restartScene'));
+  assert.match(draw, /drawLayer\(/);
   assert.match(draw, /ctx\.drawImage\(/);
-  assert.doesNotMatch(draw, /create(Linear|Radial)Gradient|beginPath|filter\s*:/);
+  assert.doesNotMatch(draw, /create(Linear|Radial)Gradient|beginPath|bezierCurveTo|filter\s*:/);
   assert.doesNotMatch(js, /Math\.min\(190,/);
   assert.doesNotMatch(js, /var steps = 22/);
+  assert.doesNotMatch(js, /cathedral/);
 });
 
 test('V15 homepage widgets form the intended six-window frame with loose bonus positions', () => {

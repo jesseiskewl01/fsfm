@@ -95,7 +95,7 @@ test('the Spotify embed uses the black color and runtime two-tone corner squares
 });
 
 test('the album header uses the same inset and control geometry as the homepage taskbar', () => {
-  assert.match(albumCss, /padding: 3px max\(12px, calc\(\(100% - 880px\) \/ 2\)\)/);
+  assert.match(albumCss, /padding: 3px max\(12px, calc\(\(100% - 920px\) \/ 2\)\)/);
   assert.doesNotMatch(albumCss, /100vw - 880px/);
   assert.match(albumCss, /\.template-album \.brand-mark \{ width: 26px; height: 26px/);
   assert.match(albumCss, /\.template-album \.brand-link \{[^}]*font-size: 12px; font-weight: 700; letter-spacing: normal/);
