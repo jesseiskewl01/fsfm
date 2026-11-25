@@ -49,12 +49,12 @@ test('Player exposes accessible transport, track selection and lyric controls', 
   assert.match(html, /aria-live="polite"/);
 });
 
-test('Player script includes synchronised LRC parsing, line fill and auto progression', () => {
+test('Player script includes synchronised LRC parsing, line glow and auto progression', () => {
   const script = fs.readFileSync(path.join(root, 'src/client/album-player.js'), 'utf8');
   assert.match(script, /parseLrc/);
-  assert.match(script, /--fill/);
+  assert.doesNotMatch(script, /--fill|requestAnimationFrame|cancelAnimationFrame/);
+  assert.match(script, /animateLyricLine\(\)/);
   assert.match(script, /autoAdvance/);
-  assert.match(script, /requestAnimationFrame/);
 });
 
 test('Album page preserves the amber hero, quote, Spotify embed and canonical URL', () => {

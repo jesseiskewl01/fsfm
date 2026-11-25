@@ -169,23 +169,6 @@ try {
   }
 } catch (err) {}
 
-// Pause the ambient layers while scrolling, then resume shortly after the
-// page settles. Passive listener plus one debounce timer: no animation frames.
-// [Jesse + OpenCode, 2026-11-25]
-try {
-  var scrollHost = document.body || document.documentElement;
-  var scrollCalm = false;
-  var scrollTimer = 0;
-  function setScrollCalm(on) {
-    if (scrollCalm === on) return;
-    scrollCalm = on;
-    if (on) scrollHost.classList.add('album-scroll-calm');
-    else scrollHost.classList.remove('album-scroll-calm');
-  }
-  window.addEventListener('scroll', function() {
-    setScrollCalm(true);
-    window.clearTimeout(scrollTimer);
-    scrollTimer = window.setTimeout(function() { setScrollCalm(false); }, 180);
-  }, { passive: true });
-} catch (err) {}
+// The sky is painted once and stays static. No scroll listener, timer, or
+// animation loop is attached. [Jesse + OpenCode, 2026-11-25]
 })();

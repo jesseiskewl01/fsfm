@@ -66,6 +66,13 @@
   // [Jesse + OpenCode, 2026-11-24]
   var desktopQuery = window.matchMedia('(min-width: 1180px) and (min-height: 600px)');
 
+  // Keep the desktop layer invisible until every gadget has real coordinates;
+  // CSS otherwise parks them all at the same spawn point for one frame.
+  // [Jesse + OpenCode, 2026-11-25]
+  function markGadgetsPositioned() {
+    if (desktopQuery.matches) layer.classList.add('is-positioned');
+  }
+
   var STORAGE_KEY = 'fsfm_gadget_positions_v2';
   var LEGACY_STORAGE_KEY = 'fsfm_gadget_positions_v1';
   var gadgetConfig = {};
@@ -270,6 +277,7 @@
     });
 
     settleWidgets(null);
+    markGadgetsPositioned();
   }
 
   function applyInitialPosition(widget, x, y) {
@@ -455,6 +463,7 @@
       }
     });
     settleWidgets(null);
+    markGadgetsPositioned();
     // Reflow is layout repair, not a user move: never persist clamped positions.
   }
   // The reset icon clears storage first; restore the computed spawn points

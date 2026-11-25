@@ -160,9 +160,9 @@ body.template-album {
   --accent: #bd8b4e;
 }
 .template-album .site-wallpaper { opacity: .08; }
-.template-album .album-atmosphere { position: fixed; top: -4%; left: -4%; z-index: 0; display: block; width: 108%; height: 108%; pointer-events: none; opacity: .92; mix-blend-mode: normal; animation: golden-sky-drift 40s ease-in-out infinite alternate, golden-sky-twinkle 14s ease-in-out infinite alternate; will-change: transform; }
-/* Warm bloom wash. Everything here is static paint plus compositor-only
-   transform/opacity drift, so the star canvas never repaints per frame.
+.template-album .album-atmosphere { position: fixed; top: -4%; left: -4%; z-index: 0; display: block; width: 108%; height: 108%; pointer-events: none; opacity: .92; mix-blend-mode: normal; }
+/* Warm bloom wash. The sky is painted once and stays still: no ambient
+   animation, no compositor promotion, and no scroll listener.
    [Jesse + OpenCode, 2026-11-25] */
 .template-album .bloom-vignette { position: fixed; inset: -4%; z-index: 1; pointer-events: none; overflow: hidden;
   background:
@@ -173,7 +173,6 @@ body.template-album {
     radial-gradient(ellipse 18% 16% at 92% 18%, rgba(2,1,4,.76), transparent 78%),
     radial-gradient(ellipse at 50% 50%, transparent 26%, rgba(2,1,4,.68) 100%);
   opacity: .86;
-  animation: golden-bloom-breathe 26s ease-in-out infinite alternate;
 }
 .template-album .bloom-vignette::before,
 .template-album .bloom-vignette::after { content: ""; position: absolute; inset: -6%; pointer-events: none; }
@@ -192,30 +191,19 @@ body.template-album {
     radial-gradient(circle at 34% 74%, rgba(255,217,160,.30) 0 1px, transparent 1.8px),
     radial-gradient(circle at 92% 48%, rgba(255,243,207,.30) 0 1px, transparent 1.8px);
   opacity: .7;
-  animation: golden-sparkle 16s ease-in-out infinite alternate;
 }
 .template-album .bloom-vignette::after {
   background:
     radial-gradient(ellipse 28% 22% at 50% 48%, rgba(255,236,194,.15), transparent 74%),
     radial-gradient(ellipse 22% 18% at 24% 72%, rgba(189,139,78,.12), transparent 76%);
   opacity: .68;
-  animation: golden-bloom-breathe 20s ease-in-out infinite alternate;
 }
-@keyframes golden-sky-drift { from { transform: translate3d(-2%,-1.5%,0) scale(1.02); } to { transform: translate3d(2%,1.5%,0) scale(1.06); } }
-@keyframes golden-sky-twinkle { from { opacity: .9; } to { opacity: 1; } }
-@keyframes golden-bloom-breathe { from { transform: scale(1); opacity: .7; } to { transform: scale(1.04); opacity: .9; } }
-@keyframes golden-sparkle { from { transform: translate3d(-1%,.6%,0) scale(.99); opacity: .55; } to { transform: translate3d(1%,-.6%,0) scale(1.02); opacity: .82; } }
-/* Scrolling is the priority: pause the ambient layers while the page moves,
-   then resume after the scroll settles. Still static paint, no JS frames.
+/* Static sky: no ambient keyframes and no scroll-time pausing are needed.
    [Jesse + OpenCode, 2026-11-25] */
-body.album-scroll-calm.template-album .album-atmosphere,
-body.album-scroll-calm.template-album .bloom-vignette,
-body.album-scroll-calm.template-album .bloom-vignette::before,
-body.album-scroll-calm.template-album .bloom-vignette::after { animation-play-state: paused; }
-body.template-album[data-atmosphere-mode="lite"] .bloom-vignette { animation: none; opacity: .72; }
+body.template-album[data-atmosphere-mode="lite"] .bloom-vignette { opacity: .72; }
 body.template-album[data-atmosphere-mode="lite"] .bloom-vignette::before,
-body.template-album[data-atmosphere-mode="lite"] .bloom-vignette::after { animation: none; opacity: .46; }
-body.template-album[data-atmosphere-mode="off"] .bloom-vignette { opacity: .68; animation: none; }
+body.template-album[data-atmosphere-mode="lite"] .bloom-vignette::after { opacity: .46; }
+body.template-album[data-atmosphere-mode="off"] .bloom-vignette { opacity: .68; }
 body.template-album[data-atmosphere-mode="off"] .bloom-vignette::before,
 body.template-album[data-atmosphere-mode="off"] .bloom-vignette::after { display: none; }
 .template-album .album-grain { position: fixed; inset: 0; z-index: 998; pointer-events: none; opacity: .055; mix-blend-mode: soft-light; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.98' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
@@ -271,9 +259,9 @@ body.template-album[data-atmosphere-mode="off"] .bloom-vignette::after { display
 .lyrics-screen-heading { position: relative; z-index: 1; margin: 0 0 18px; color: #fef5de; font: 10px 'Roboto Mono',Consolas,monospace; letter-spacing: .2em; }
 .lyrics-line { position: relative; z-index: 1; width: 100%; min-height: 1.45em; margin: 3px 0; line-height: 1.45; overflow-wrap: anywhere; transition: opacity .45s ease,transform .45s ease,filter .45s ease; }
 .lyrics-line.previous, .lyrics-line.next { color: rgba(254,245,222,.38); font-size: 12px; }
-.lyrics-line.current { color: transparent; font-size: clamp(17px,2.5vw,23px); font-weight: 700; background: linear-gradient(90deg,#fef5de 0%,#fef5de var(--fill,0%),rgba(254,245,222,.36) var(--fill,0%),rgba(254,245,222,.36) 100%); -webkit-background-clip: text; background-clip: text; filter: drop-shadow(0 0 12px rgba(254,245,222,.18)); text-shadow: none; }
-.lyrics-line.current.line-enter { animation: lyric-arrive .58s cubic-bezier(.2,.75,.25,1) both; }
-@keyframes lyric-arrive { from { opacity: 0; transform: translateY(12px) scale(.985); filter: blur(5px); } to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); } }
+.lyrics-line.current { color: #fef5de; font-size: clamp(17px,2.5vw,23px); font-weight: 700; text-shadow: 0 0 10px rgba(254,245,222,.26),0 0 28px rgba(189,139,78,.18); }
+.lyrics-line.current.line-enter { animation: lyric-glow .72s ease-out both; }
+@keyframes lyric-glow { 0% { opacity: .72; text-shadow: 0 0 0 rgba(254,245,222,0),0 0 0 rgba(189,139,78,0); } 38% { opacity: 1; text-shadow: 0 0 15px rgba(254,245,222,.55),0 0 38px rgba(189,139,78,.32); } 100% { opacity: 1; text-shadow: 0 0 10px rgba(254,245,222,.26),0 0 28px rgba(189,139,78,.18); } }
 .lyrics-note { position: relative; z-index: 1; min-height: 1.6em; margin: 18px 0 0; padding: 4px 10px; border-radius: 999px; color: rgba(254,245,222,.62); font: 9px 'Roboto Mono',Consolas,monospace; letter-spacing: .14em; transition: color .25s ease,background .25s ease,box-shadow .25s ease; }
 .lyrics-note.instrumental { color: #fef5de; background: rgba(99,65,35,.36); box-shadow: 0 0 24px rgba(189,139,78,.22),inset 0 0 0 1px rgba(254,245,222,.20); animation: instrumental-breathe 2.8s ease-in-out infinite alternate; }
 @keyframes instrumental-breathe { from { opacity: .68; letter-spacing: .12em; } to { opacity: 1; letter-spacing: .18em; } }
@@ -350,10 +338,6 @@ body.template-album[data-atmosphere-mode="off"] .bloom-vignette::after { display
   .player-listen { padding: 9px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .template-album .album-atmosphere,
-  .template-album .bloom-vignette,
-  .template-album .bloom-vignette::before,
-  .template-album .bloom-vignette::after { animation: none; }
   .lyrics-line.current.line-enter, .lyrics-note.instrumental { animation: none; }
   .template-album .content-section.reveal { opacity: 1; transform: none; }
 }

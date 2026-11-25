@@ -115,22 +115,14 @@ test('the lite client path is a real reduction, not a cosmetic flag', () => {
   assert.match(paint, /g\.moveTo\(/);
 });
 
-test('the album bloom is album-scoped, golden, and honest about modes', () => {
+test('the album bloom is album-scoped, golden, and static', () => {
   const css = fs.readFileSync(path.join(root, 'src/styles/v13.css'), 'utf8');
   assert.match(css, /\.template-album \.bloom-vignette::before/);
   assert.match(css, /\.template-album \.bloom-vignette::after/);
-  assert.match(css, /@keyframes golden-sky-drift/);
-  assert.match(css, /@keyframes golden-sky-twinkle/);
-  assert.match(css, /@keyframes golden-bloom-breathe/);
-  assert.match(css, /@keyframes golden-sparkle/);
-  assert.match(css, /\.template-album \.album-atmosphere \{[^}]*animation: golden-sky-drift 40s[^}]*golden-sky-twinkle 14s/);
-  assert.match(css, /golden-bloom-breathe 26s/);
-  assert.match(css, /golden-bloom-breathe 20s/);
-  assert.match(css, /golden-sparkle 16s/);
-  assert.match(css, /@keyframes golden-sky-drift \{ from \{ transform: translate3d\(-2%,-1\.5%,0\) scale\(1\.02\); \} to \{ transform: translate3d\(2%,1\.5%,0\) scale\(1\.06\); \} \}/);
-  assert.match(css, /@keyframes golden-sky-twinkle \{ from \{ opacity: \.9; \} to \{ opacity: 1; \} \}/);
-  assert.match(css, /@keyframes golden-bloom-breathe \{ from \{ transform: scale\(1\); opacity: \.7; \} to \{ transform: scale\(1\.04\); opacity: \.9; \} \}/);
-  assert.match(css, /@keyframes golden-sparkle \{ from \{ transform: translate3d\(-1%,\.6%,0\) scale\(\.99\); opacity: \.55; \} to \{ transform: translate3d\(1%,-\.6%,0\) scale\(1\.02\); opacity: \.82; \} \}/);
+  assert.doesNotMatch(css, /@keyframes golden-(sky-drift|sky-twinkle|bloom-breathe|sparkle)/);
+  assert.doesNotMatch(css, /animation:\s*golden-/);
+  assert.match(css, /\.template-album \.album-atmosphere \{[^}]*opacity: \.92; mix-blend-mode: normal; \}/);
+  assert.doesNotMatch(css, /\.template-album \.album-atmosphere \{[^}]*will-change/);
   assert.match(css, /rgba\(2,1,4,\.68\) 100%/);
   assert.match(css, /radial-gradient\(ellipse 20% 18% at 8% 74%, rgba\(2,1,4,\.80\)/);
   assert.doesNotMatch(css, /glitter-streak|glitter-shoot/);
@@ -140,24 +132,22 @@ test('the album bloom is album-scoped, golden, and honest about modes', () => {
   assert.doesNotMatch(vignette, /mix-blend-mode:\s*screen/);
   assert.doesNotMatch(vignette, /124,77,230|218,183,255|106,43,217|cathedral|nebula/);
   assert.match(css, /body\.template-album\[data-atmosphere-mode="lite"\]/);
-  assert.match(css, /body\.template-album\[data-atmosphere-mode="off"\] \.bloom-vignette \{ opacity: \.68; animation: none; \}/);
-  assert.match(css, /@media \(prefers-reduced-motion: reduce\) \{\s*\.template-album \.album-atmosphere/);
+  assert.match(css, /body\.template-album\[data-atmosphere-mode="off"\] \.bloom-vignette \{ opacity: \.68; \}/);
 });
 
-test('the album sky pauses during scroll and keeps animated layers small', () => {
+test('the album sky is painted once and needs no scroll listener', () => {
   const js = fs.readFileSync(path.join(root, 'src/client/album-atmosphere.js'), 'utf8');
   const css = fs.readFileSync(path.join(root, 'src/styles/v13.css'), 'utf8');
-  assert.match(js, /album-scroll-calm/);
-  assert.match(js, /function setScrollCalm\(on\)/);
-  assert.match(js, /window\.addEventListener\('scroll', function\(\) \{/);
-  assert.match(js, /window\.setTimeout\(function\(\) \{ setScrollCalm\(false\); \}, 180\)/);
-  assert.doesNotMatch(js, /requestAnimationFrame/);
-  assert.match(css, /body\.album-scroll-calm\.template-album \.album-atmosphere/);
-  assert.match(css, /animation-play-state: paused/);
+  assert.match(js, /function paint\(\)/);
+  assert.match(js, /paint\(\);/);
+  assert.match(js, /window\.addEventListener\('resize', paint, \{ passive: true \}\)/);
+  assert.doesNotMatch(js, /requestAnimationFrame|FRAME_MS|drawScene|makeLayer|drawLayer|glitter-streak/);
+  assert.doesNotMatch(js, /album-scroll-calm|setScrollCalm|addEventListener\('scroll'|setTimeout/);
+  const atmosphere = css.slice(css.indexOf('.template-album .album-atmosphere {'), css.indexOf('.template-album .album-grain'));
+  assert.doesNotMatch(atmosphere, /album-scroll-calm|animation-play-state|golden-sky-drift|golden-bloom-breathe|golden-sparkle|will-change:\s*transform/);
   assert.match(css, /\.template-album \.album-atmosphere \{[^}]*width: 108%; height: 108%/);
   assert.match(css, /\.template-album \.bloom-vignette \{[^}]*inset: -4%/);
   assert.match(css, /\.template-album \.bloom-vignette::before,\s*\.template-album \.bloom-vignette::after \{[^}]*inset: -6%/);
-  assert.doesNotMatch(css, /will-change: transform, opacity/);
 });
 
 test('the atmosphere client does not duplicate the canonical album player', () => {
