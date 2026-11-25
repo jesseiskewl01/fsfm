@@ -12,7 +12,7 @@
       "windowTitle": "The Early Bird....",
       "title": "The Early Bird....",
       "artistLine": "by Fake Space Fog Machine",
-      "eyebrow": "08/21",
+      "eyebrow": "08/21/2026",
       "artwork": "/media/images/cover.png"
     },
     "player": {
@@ -136,7 +136,6 @@
     "wallpaper": {
       "mode": "preset",
       "preset": "album-amber",
-      "customImage": "",
       "cycle": {
         "enabled": false,
         "mode": "sequential",
@@ -148,7 +147,17 @@
     "effects": {
       "backgroundEffects": true,
       "pageTransition": true,
-      "respectReducedMotion": true
+      "respectReducedMotion": true,
+      "albumAtmosphere": {
+        "mode": "full"
+      }
+    },
+    "parts": {
+      "siteHeader": { "enabled": true },
+      "siteMenu": { "enabled": true },
+      "pageFooter": { "enabled": true },
+      "pageIntro": { "enabled": true },
+      "wallpaperLayer": { "enabled": true }
     }
   },
   "seo": {

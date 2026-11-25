@@ -5,3 +5,8 @@ dist-stage6/
 preview-v13-stage6/
 .DS_Store
 *.log
+.env
+.env.*
+!.env.example
+admin/
+tina/__generated__/

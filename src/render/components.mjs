@@ -1,7 +1,8 @@
 import { escapeHtml, safeUrl, safeImageUrl, safeEmbedUrl, renderRichText } from './html.mjs';
 import { renderAlbumPlayer } from './album-player.mjs';
+import { COMPONENT_TYPES, PRESENTATION_VARIANTS } from '../core/parts.mjs';
 
-const VARIANTS = new Set(['vista-window', 'vista-desktop', 'editorial', 'amber-editorial', 'amber-player', 'plain', '']);
+const VARIANTS = new Set(PRESENTATION_VARIANTS);
 const ICONS = {
   Spotify: '♫', TikTok: '♪', Bandcamp: 'B', Instagram: '◎', Twitter: '𝕏', YouTube: '▶'
 };
@@ -23,16 +24,98 @@ function defaultVariant(section, context = {}) {
   return 'plain';
 }
 
+function vistaWindowTitle(section) {
+  const labels = {
+    'site-header': 'SITE IDENTITY', hero: 'FEATURED WINDOW',
+    'artist-statement': 'ABOUT', 'embed-window': 'MEDIA PLAYER',
+    'bandsintown-events': 'EVENTS', 'social-links': 'SOCIAL LINKS',
+    'featured-release': 'FEATURED RELEASE', 'rich-text': 'NOTES',
+    image: 'IMAGE VIEWER', gallery: 'IMAGE GALLERY', quote: 'QUOTE', 'link-button': 'LINK'
+  };
+  return (section.presentation?.windowTitle || labels[section.type] || String(section.type || 'FSFM WINDOW').replace(/[-_]/g, ' ').toUpperCase()).trim();
+}
+
+/* ------------------------------------------------------------------ N2.3: canonical Vista window
+ * One shared Aero-window renderer used by homepage hero/content windows and
+ * vista-window template sections. Variants control behavior (draggable/dock,
+ * shutdown, in-place minimize) without creating separate window systems.
+ * Legacy class names are preserved as aliases for compatibility. [OpenCode, 2026-11-22]
+ */
+export function renderWindow({
+  tag = 'section',
+  id = '',
+  className = '',
+  ariaLabel = '',
+  title = '',
+  iconHtml = '<span class="window-mini-icon" aria-hidden="true">✧</span>',
+  controls = 'minimize-close',
+  draggable = false,
+  dataAttrs = '',
+  bodyClass = '',
+  bodyHtml = '',
+  titleId = '',
+} = {}) {
+  const safeTag = tag === 'div' ? 'div' : 'section';
+  const classTokens = [...new Set([...(className || '').split(/\s+/).filter(Boolean), 'vista-window'])];
+  const attrs = [
+    id ? `id="${escapeHtml(id)}"` : '',
+    `class="${escapeHtml(classTokens.join(' '))}"`,
+    ariaLabel ? `aria-label="${escapeHtml(ariaLabel)}"` : '',
+    dataAttrs,
+  ].filter(Boolean).join(' ');
+  const vistaActions = draggable || /data-vista-window/.test(dataAttrs || '');
+  const titlebarClass = vistaActions ? 'titlebar vista-window-titlebar' : 'titlebar';
+  const titlebarAttrs = draggable
+    ? ' class="' + titlebarClass + '" data-vista-drag-handle tabindex="0" aria-label="Move ' + escapeHtml(title) + ' window" title="Drag to move · Use arrow keys to nudge"'
+    : ' class="' + titlebarClass + '"';
+  const icon = iconHtml || '<span class="window-mini-icon" aria-hidden="true">✧</span>';
+  const titleSpan = titleId
+    ? `<span id="${escapeHtml(titleId)}">${escapeHtml(title)}</span>`
+    : `<span>${escapeHtml(title)}</span>`;
+  const controlButtons = [];
+  if (controls === 'minimize-close' || controls === 'minimize') {
+    controlButtons.push(`<button type="button" class="caption-button vista-window-button minimize" data-window-action="minimize"${vistaActions ? ' data-vista-window-action="minimize"' : ''} aria-label="Minimize ${escapeHtml(title)} window" title="Minimize">−</button>`);
+  }
+  if (controls === 'minimize-close' || controls === 'close') {
+    controlButtons.push(`<button type="button" class="caption-button vista-window-button close" data-window-action="close"${vistaActions ? ' data-vista-window-action="close"' : ''} aria-label="Close ${escapeHtml(title)} window" title="Close">×</button>`);
+  }
+  const controlsHtml = controlButtons.length ? `<div class="caption-buttons vista-window-controls">${controlButtons.join('')}</div>` : '';
+  return `<${safeTag} ${attrs}><div${titlebarAttrs}><div class="window-title">${icon}${titleSpan}</div>${controlsHtml}</div><div class="window-body ${escapeHtml(bodyClass)}">${bodyHtml}</div></${safeTag}>`;
+}
+
 function windowWrap(section, inner, extraClass = '', context = {}) {
   const presentation = section.presentation || {};
   const variant = defaultVariant(section, context);
+  const isVistaWindow = context.page?.template === 'vista-window' && ['vista-window', 'vista-desktop'].includes(variant) && !['divider', 'spacer'].includes(section.type);
   const title = ['album-header', 'album-player'].includes(section.type) ? '' : (presentation.windowTitle || '').trim();
-  const classes = ['content-section', `variant-${variant}`, extraClass].filter(Boolean).join(' ');
+  const windowTitle = isVistaWindow ? vistaWindowTitle(section) : title;
+  const groupId = section.group?.id ? ' data-layout-group="' + escapeHtml(section.group.id) + '"' : '';
+  const presPad = ['compact', 'roomy'].includes(presentation.padding) ? 'pad-' + presentation.padding : '';
+  const presBg = ['soft', 'glass', 'dark'].includes(presentation.background) ? 'bg-' + presentation.background : '';
+
+  if (isVistaWindow) {
+    const classes = ['content-section', 'variant-' + variant, 'vista-window-frame', presPad, presBg, extraClass].filter(Boolean).join(' ');
+    const dataAttrs = `data-component="${escapeHtml(section.type)}"${groupId} data-vista-window data-vista-window-id="${escapeHtml(section.id || section.type)}" data-vista-window-title="${escapeHtml(windowTitle)}"`;
+    return renderWindow({
+      id: 'section-' + (section.id || section.type),
+      className: classes,
+      ariaLabel: windowTitle,
+      title: windowTitle,
+      iconHtml: vistaWindowIcon(section.type),
+      controls: 'minimize-close',
+      draggable: false,
+      dataAttrs,
+      bodyClass: 'component-body',
+      bodyHtml: inner,
+    });
+  }
+
+  const classes = ['content-section', 'variant-' + variant, presPad, presBg, extraClass].filter(Boolean).join(' ');
   const titlebar = title
-    ? `<div class="component-titlebar"><span class="component-title">${escapeHtml(title)}</span></div>`
+    ? '<div class="component-titlebar"><span class="component-title">' + escapeHtml(title) + '</span></div>'
     : '';
-  const groupId = section.group?.id ? ` data-layout-group="${escapeHtml(section.group.id)}"` : '';
-  return `<section class="${classes}" id="section-${escapeHtml(section.id || section.type)}" data-component="${escapeHtml(section.type)}"${groupId}>${titlebar}<div class="component-body">${inner}</div></section>`;
+  const bodyClass = 'component-body';
+  return '<section class="' + classes + '" id="section-' + escapeHtml(section.id || section.type) + '" data-component="' + escapeHtml(section.type) + '"' + groupId + '>' + titlebar + '<div class="' + bodyClass + '">' + inner + '</div></section>';
 }
 
 function renderMarquee(content = {}) {
@@ -42,13 +125,20 @@ function renderMarquee(content = {}) {
   return `<div class="marquee-track" role="group" aria-label="${escapeHtml(messages.join(' • '))}"><div class="marquee-run">${run}</div><div class="marquee-run" aria-hidden="true">${run}</div></div>`;
 }
 
-function renderEmbed(content = {}, preview = false) {
+function renderEmbed(content = {}, preview = false, options = {}) {
   const url = safeEmbedUrl(content.url);
   if (preview) return `<div class="embed-preview"><span class="embed-preview-mark" aria-hidden="true">♫</span><strong>${escapeHtml(content.title || 'External media embed')}</strong><span>Live media embed shown on the actual page.</span></div>`;
   if (!url) return `<p class="component-fallback">This embed needs a valid HTTPS URL.</p>`;
   const height = Math.max(180, Math.min(900, Number(content.height) || 352));
   const title = content.title || `${content.provider || 'External'} embed`;
-  return `<div class="embed-frame"><iframe src="${escapeHtml(url)}" title="${escapeHtml(title)}" loading="lazy" height="${height}" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>`;
+  // Album player only: same two-tone corner mask as the homepage Spotify window.
+  // [Jesse + OpenCode, 2026-11-25]
+  const corners = options.corners
+    ? '<span class="fsfm-spotify-corner" data-corner="tl" aria-hidden="true"></span><span class="fsfm-spotify-corner" data-corner="tr" aria-hidden="true"></span><span class="fsfm-spotify-corner" data-corner="bl" aria-hidden="true"></span><span class="fsfm-spotify-corner" data-corner="br" aria-hidden="true"></span>'
+    : '';
+  const frameClass = options.corners ? 'embed-frame fsfm-spotify-frame' : 'embed-frame';
+  const iframeStyle = options.corners ? ' style="border-radius:12px"' : '';
+  return `<div class="${frameClass}"><iframe${iframeStyle} src="${escapeHtml(url)}" title="${escapeHtml(title)}" loading="lazy" height="${height}" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>${corners}</div>`;
 }
 
 function renderSocialLinks(content = {}) {
@@ -87,6 +177,21 @@ function homeTitleIcon(type) {
   return icons[type] || '<span class="window-mini-icon" aria-hidden="true">✧</span>';
 }
 
+function vistaWindowIcon(type) {
+  const icons = {
+    'artist-statement': 'i',
+    'embed-window': '♫',
+    'bandsintown-events': '▦',
+    'social-links': '✧',
+    'hero': '✦',
+    'featured-release': '◉',
+    'rich-text': '✎',
+    'marquee': '✦',
+  };
+  const glyph = icons[type] || '✦';
+  return `<span class="window-mini-icon vista-window-icon" aria-hidden="true">${glyph}</span>`;
+}
+
 function renderHomeWindow(section, inner, preview = false) {
   const type = section.type;
   if (type === 'marquee') {
@@ -100,6 +205,9 @@ function renderHomeWindow(section, inner, preview = false) {
   const id = `home-${ids[type] || (section.id || type)}`;
   const bodyClass = type === 'artist-statement' ? 'bio-window-body' : type === 'embed-window' ? 'spotify-window-body' : type === 'bandsintown-events' ? 'bit-container' : type === 'social-links' ? 'social-window-body' : 'home-component-body';
   const aria = type === 'artist-statement' ? 'About Fake Space Fog Machine' : type === 'embed-window' ? 'Fake Space Fog Machine on Spotify' : type === 'bandsintown-events' ? 'Upcoming events' : type === 'social-links' ? 'Social links' : title;
+  const presentation = section.presentation || {};
+  const presPad = ['compact', 'roomy'].includes(presentation.padding) ? 'pad-' + presentation.padding : '';
+  const presBg = ['soft', 'glass', 'dark'].includes(presentation.background) ? 'bg-' + presentation.background : '';
   const body = type === 'artist-statement'
     ? `<div class="bio-text">${renderRichText(section.content?.body || '')}</div>`
     : type === 'embed-window'
@@ -107,7 +215,18 @@ function renderHomeWindow(section, inner, preview = false) {
       : type === 'social-links' ? renderHomeSocialLinks(section.content || {})
       : type === 'bandsintown-events' ? renderBandsintown(section.content || {}, preview)
       : inner;
-  return `<section class="reveal content-window ${extras[type] || 'home-component-window'}" id="${escapeHtml(id)}" aria-label="${escapeHtml(aria)}" data-component="${escapeHtml(type)}"><div class="titlebar"><div class="window-title">${homeTitleIcon(type)}<span>${escapeHtml(title)}</span></div><div class="caption-buttons"><button type="button" class="caption-button minimize" data-window-action="minimize" aria-label="Minimize ${escapeHtml(title)} window" title="Minimize">−</button><button type="button" class="caption-button close" data-window-action="close" aria-label="Close ${escapeHtml(title)} window" title="Close">×</button></div></div><div class="window-body ${bodyClass}">${body}</div></section>`;
+  return renderWindow({
+    id,
+    className: ['reveal', 'content-window', extras[type] || 'home-component-window', presPad, presBg].filter(Boolean).join(' '),
+    ariaLabel: aria,
+    title,
+    iconHtml: homeTitleIcon(type),
+    controls: 'minimize-close',
+    draggable: false,
+    dataAttrs: `data-component="${escapeHtml(type)}"`,
+    bodyClass,
+    bodyHtml: body,
+  });
 }
 
 function renderFeaturedRelease(content = {}) {
@@ -177,18 +296,19 @@ function renderSectionInner(section, context = {}) {
       const a = context.page?.templateData?.album || {};
       const art = safeImageUrl(a.artwork);
       const artworkLayers = art ? `<div class="album-hero-art" aria-hidden="true"><img class="album-hero-blur" src="${escapeHtml(art)}" alt=""><img class="album-hero-sharp" src="${escapeHtml(art)}" alt=""></div>` : '';
-      return `<div class="album-hero-window"><div class="album-window-titlebar"><span class="album-window-symbol" aria-hidden="true">◉</span><span>${escapeHtml(a.windowTitle || a.title || context.page.identity.name)}</span></div><header class="album-hero">${artworkLayers}<div class="album-hero-shade" aria-hidden="true"></div><div class="album-hero-inner">${a.eyebrow ? `<p class="album-eyebrow">${escapeHtml(a.eyebrow)}</p>` : ''}<h1>${escapeHtml(a.title || context.page.identity.name)}</h1><p class="album-artist-line">${escapeHtml(a.artistLine || context.site.siteName)}</p></div></header></div>`;
+      const windowIcon = art ? `<img class="album-window-symbol album-window-symbol-art" src="${escapeHtml(art)}" alt="" aria-hidden="true">` : '<span class="album-window-symbol" aria-hidden="true">◉</span>';
+      return `<div class="album-hero-window"><div class="album-window-titlebar">${windowIcon}<span>${escapeHtml(a.windowTitle || a.title || context.page.identity.name)}</span></div><header class="album-hero">${artworkLayers}<div class="album-hero-shade" aria-hidden="true"></div><div class="album-hero-inner">${a.eyebrow ? `<p class="album-eyebrow">${escapeHtml(a.eyebrow)}</p>` : ''}<h1>${escapeHtml(a.title || context.page.identity.name)}</h1><p class="album-artist-line">${escapeHtml(a.artistLine || context.site.siteName)}</p></div></header></div>`;
     }
     case 'album-player': return renderAlbumPlayer(context.page);
     case 'spotify-embed': {
       const spotify = context.page?.templateData?.spotify || {};
-      return `<div class="player-listen"><div class="player-listen-label">${escapeHtml(spotify.label || 'OUT ON SPOTIFY')}</div>${renderEmbed({ url: spotify.embedUrl, title: `${context.page?.templateData?.album?.title || 'Album'} on Spotify`, height: spotify.height }, context.preview)}</div>`;
+      return `<div class="player-listen"><div class="player-listen-label">${escapeHtml(spotify.label || 'OUT ON SPOTIFY')}</div>${renderEmbed({ url: spotify.embedUrl, title: `${context.page?.templateData?.album?.title || 'Album'} on Spotify`, height: spotify.height }, context.preview, { corners: true })}</div>`;
     }
     default: return '';
   }
 }
 
-export const RENDERED_COMPONENT_TYPES = Object.freeze(['site-header','hero','marquee','artist-statement','embed-window','bandsintown-events','social-links','featured-release','rich-text','image','gallery','quote','link-button','divider','spacer','album-header','album-player','spotify-embed']);
+export const RENDERED_COMPONENT_TYPES = COMPONENT_TYPES;
 
 export function renderComponent(section, context = {}) {
   if (!section || section.enabled === false) return { html: '', scripts: [] };
@@ -201,7 +321,7 @@ export function renderComponent(section, context = {}) {
     if (section.type === 'marquee') return { html: renderHomeWindow(section, inner, context.preview), scripts: [] };
     return { html: renderHomeWindow(section, inner, context.preview), scripts };
   }
-  if (section.type === 'divider' || section.type === 'spacer' || section.type === 'marquee') {
+  if (section.type === 'divider' || section.type === 'spacer') {
     return { html: windowWrap(section, inner, `component-${section.type}`, context), scripts: [] };
   }
   return { html: windowWrap(section, inner, '', context), scripts };

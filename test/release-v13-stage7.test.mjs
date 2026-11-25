@@ -10,18 +10,38 @@ const homepage = readJson('content/v13/homepage.json');
 const liveGadgets = readJson('data/homepage-gadgets.json');
 
 test('Current live Homepage gadget data is merged into the V13 canonical record', () => {
-  const migrated = homepage.templateData.gadgets;
-  for (const key of ['photos', 'dates', 'stickyNote', 'funWidgets']) {
+  const migrated = homepage.appearance.parts.desktopGadgets.content;
+  for (const key of ['photos', 'dates', 'stickyNote']) {
     assert.deepEqual(migrated[key], liveGadgets[key], `${key} should match the live repository record`);
   }
+  // Canonical content intentionally enables radio and Purble after migration. [OpenCode, 2026-11-24]
+  assert.deepEqual(migrated.funWidgets, {
+    showBarrelRoll: false,
+    showBubbleSlider: true,
+    showMusicPlayer: true,
+    showPurblePlace: true
+  });
   assert.deepEqual(liveGadgets.photos, ['/media/images/earlybirdcd.jpg']);
   assert.equal(liveGadgets.dates[0].date, '2026-11-16');
   assert.equal(liveGadgets.stickyNote.text, 'typa shit that make you wanna grab a penguin');
 });
 
+test('The placeholder editorial page stays private', () => {
+  const placeholder = readJson('content/v13/editorial-pages/new-editorial-page.json');
+  assert.equal(placeholder.publishing.published, false);
+  assert.equal(placeholder.publishing.showInNavigation, false);
+});
+
 test('The V14 default build emits a clean dist directory', () => {
   const pkg = readJson('package.json');
   assert.equal(pkg.scripts.build, 'node scripts/build-v13.mjs');
+  assert.equal(pkg.scripts['check:all'], 'npm test && npm run validate:v14 && npm run check:v14');
+  assert.equal(pkg.scripts['preview:v13:templates'], undefined);
+  assert.equal(pkg.scripts['preview:v14:templates'], undefined);
+  for (const [name, value] of Object.entries(pkg.scripts)) {
+    assert.doesNotMatch(name, /stage[3-6]|legacy/i, `${name} should not be exposed as an npm script`);
+    assert.doesNotMatch(value, /build-v13-template-previews\.mjs/i, `${name} should not expose the stage-era template preview builder`);
+  }
   const builder = fs.readFileSync(path.join(root, 'scripts/build-v13.mjs'), 'utf8');
   assert.match(builder, /isPreview \? 'preview-v13' : 'dist'/);
   assert.match(pkg.scripts['predeploy-check'], /--require-media/);

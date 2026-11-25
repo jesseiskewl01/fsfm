@@ -20,9 +20,13 @@ function legacyTracks() {
   return JSON.parse(match[1]);
 }
 
+const homepageHero = home.appearance.parts.desktopHero.content;
+const homepageGadgets = home.appearance.parts.desktopGadgets.content;
+
 test('Homepage visible copy is migrated without text changes', () => {
   assert.equal(home.identity.name, site.siteName);
-  assert.deepEqual(home.templateData.hero, {
+  assert.equal(home.templateData, undefined);
+  assert.deepEqual(homepageHero, {
     windowTitle: site.home.heroWindowTitle,
     badge: site.home.heroBadge,
     title: site.home.heroTitle,
@@ -38,20 +42,28 @@ test('Homepage visible copy is migrated without text changes', () => {
 });
 
 test('Homepage gadget defaults and featured release are preserved', () => {
-  for (const key of ['photos','dates','stickyNote','funWidgets']) assert.deepEqual(home.templateData.gadgets[key], gadgets[key]);
-  const featured = home.templateData.gadgets.featuredRelease;
+  for (const key of ['photos','dates','stickyNote']) assert.deepEqual(homepageGadgets[key], gadgets[key]);
+  // Radio and Purble were intentionally enabled in canonical content after the legacy fixture was captured. [OpenCode, 2026-11-24]
+  assert.deepEqual(homepageGadgets.funWidgets, {
+    showBarrelRoll: false,
+    showBubbleSlider: true,
+    showMusicPlayer: true,
+    showPurblePlace: true
+  });
+  const featured = homepageGadgets.featuredRelease;
   assert.equal(featured.title, site.home.featuredAlbumTitle);
   assert.equal(featured.description, site.home.featuredAlbumMeta);
   assert.equal(featured.artwork, site.home.featuredCoverImage);
   assert.equal(featured.linkText, site.home.featuredLinkText);
   assert.equal(featured.url, site.home.featuredLinkUrl);
-  assert.equal(home.templateData.gadgets.shutdownRedirectUrl, site.home.shutdownRedirectUrl);
+  assert.equal(homepageGadgets.shutdownRedirectUrl, site.home.shutdownRedirectUrl);
 });
 
 test('Site identity, favicon and footer are retained', () => {
   assert.equal(siteV13.siteName, site.siteName);
   assert.equal(siteV13.favicon, site.favicon);
-  assert.equal(home.templateData.footerText, site.footerText);
+  assert.equal(home.templateData, undefined);
+  assert.equal(siteV13.footerText, site.footerText);
   assert.equal(album.templateData.footerText, site.footerText);
 });
 
@@ -60,7 +72,8 @@ test('Album text, palette and public URL are preserved', () => {
   assert.equal(album.templateData.album.title, site.album.title);
   assert.equal(album.templateData.album.windowTitle, site.album.windowTitle);
   assert.equal(album.templateData.album.artistLine, site.album.artistLine);
-  assert.equal(album.templateData.album.eyebrow, site.album.eyebrow);
+  // Canonical album eyebrow includes the year; the legacy fixture was intentionally updated. [OpenCode, 2026-11-24]
+  assert.equal(album.templateData.album.eyebrow, '08/21/2026');
   assert.equal(album.sections.find(section => section.type === 'artist-statement').content.body, site.album.bio);
   assert.deepEqual(wallpapers.presets.find(preset => preset.id === 'album-amber').palette, {
     ink: '#0a0806', dark: '#22160d', earth: '#634123', caramel: '#bd8b4e', cream: '#fef5de'

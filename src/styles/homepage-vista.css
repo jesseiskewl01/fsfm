@@ -1,4 +1,4 @@
-/* ==========================================
+﻿/* ==========================================
 
 WINDOWS VISTA CORE THEME DYNAMICS & CSS
 
@@ -90,7 +90,7 @@ opacity: 0; transition: opacity 0.9s ease;
   color: #f4f7fb;
   transition: opacity 0.55s ease, visibility 0.55s ease;
 }
-.fsfm-boot-overlay.loaded { opacity: 0; visibility: hidden; pointer-events: none; }
+.fsfm-boot-overlay.loaded, .fsfm-boot-seen .fsfm-boot-overlay { opacity: 0; visibility: hidden; pointer-events: none; }
 .boot-brand {
   font-family: "Segoe UI", Tahoma, Arial, sans-serif;
   font-size: clamp(12px, 2vw, 15px); font-weight: 600;
@@ -128,7 +128,7 @@ opacity: 0; transition: opacity 0.9s ease;
   font: 8px var(--font-mono); letter-spacing: 0.2em;
 }
 @media (prefers-reduced-motion: reduce) {
-  .boot-progress-bar { animation: none; width: 58px; left: calc(50% - 29px); }
+  body[data-respect-reduced-motion="true"] .boot-progress-bar { animation: none; width: 58px; left: calc(50% - 29px); }
 }
 
 /* ---------- DESKTOP CANVAS & DECORATION ---------- */
@@ -171,7 +171,7 @@ backdrop-filter: blur(14px);
 
 .start-orb {
 
-width: 32px; height: 32px; border-radius: 50%; border: 1px solid #ffffff;
+width: 26px; height: 26px; border-radius: 50%; border: 1px solid #ffffff;
 
 background: radial-gradient(circle at 35% 35%, rgb(var(--hi-rgb)) 0%, rgb(var(--glass-rgb)) 45%, rgb(var(--deep-rgb)) 100%);
 
@@ -185,7 +185,7 @@ position: relative; overflow: hidden; flex-shrink: 0; cursor: pointer;
 
 .start-orb::after {
 
-content: ''; position: absolute; top: 1px; left: 2px; right: 2px; height: 10px; border-radius: 50%;
+content: ''; position: absolute; top: 1px; left: 2px; right: 2px; height: 8px; border-radius: 50%;
 
 background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.1));
 
@@ -269,7 +269,7 @@ display: flex; align-items: center; gap: 6px; flex: 1;
 
 }
 
-.caption-buttons { display: flex; height: 20px; filter: drop-shadow(0 1px 1px #0005); }
+.caption-buttons { display: flex; align-items: stretch; height: 20px; filter: drop-shadow(0 1px 1px #0005); }
 
 .caption-button {
 
@@ -281,7 +281,7 @@ background: linear-gradient(rgba(var(--hi-rgb), 0.4), rgba(var(--hi-rgb), 0.15) 
 
 width: 27px; height: 20px; color: #fff; text-shadow: 0 0 1px #000, 1px 1px 1px #000;
 
-font: 700 14px Arial; display: flex; align-items: center; justify-content: center; cursor: pointer;
+padding: 0; text-decoration: none; font: 700 14px Arial; display: flex; align-items: center; justify-content: center; cursor: pointer;
 
 }
 
@@ -477,36 +477,68 @@ text-shadow: 0 1px 3px rgb(var(--deep-rgb)), 0 0 8px rgba(var(--deep-rgb), 0.8);
   display:grid; grid-template-columns:minmax(245px,.86fr) minmax(0,1.14fr);
   gap:18px; align-items:stretch; padding:20px 0 2px;
 }
-.content-window {
+/* Canonical Vista window base (homepage Aero family). .content-window kept as alias. [OpenCode, 2026-11-22] */
+.vista-window.content-window, .content-window {
   min-width:0; overflow:hidden; padding:0 6px 6px; border:1px solid rgba(var(--deep-rgb),.72);
   border-radius:7px 7px 4px 4px;
   background:linear-gradient(130deg,#effbff70 0%,#bfe9ff18 15%,#102c3e50 29%,#e7f8ff2f 30%,#6aa6b515 36%,#1a485451 60%,#e1f7ff45 82%,#8acde826 92%),rgba(var(--glass-rgb),.52);
   backdrop-filter:blur(14px) saturate(1.25);
   box-shadow:0 7px 23px rgba(0,0,0,.42),inset 0 0 0 1px #effbffc0;
 }
-.content-window .titlebar { height:30px; padding:0 4px; }
-.content-window .window-body { height:calc(100% - 30px); }
+.vista-window.content-window .window-body, .content-window .window-body { height:calc(100% - 30px); }
 .window-mini-icon { width:17px; height:17px; display:inline-flex; align-items:center; justify-content:center; border-radius:4px; color:#164968; font:700 12px Georgia,serif; background:linear-gradient(145deg,#fff,#dff4ff 48%,#83bbd8 51%,#e9f8ff); border:1px solid rgba(36,95,130,.55); box-shadow:inset 0 1px 2px #fff,0 1px 2px #0003; }
 .window-mini-icon.music { font:700 13px Georgia,serif; }
 .window-mini-icon.calendar { font:700 12px Arial,sans-serif; }
 .window-mini-icon.social { font-size:15px; }
 .bio-window-body { min-height:352px; display:flex; align-items:center; justify-content:center; padding:28px 24px; background:linear-gradient(145deg,#fff,#f1f8fb); }
 .bio-window-body .bio-text { max-width:39ch; font-size:14px; line-height:1.85; text-align:left; }
+/* Original vanilla Spotify window rules, restored as the clean base. Normal
+   Vista chrome and padding apply; no corner masks, clipping, or overlays. [Jesse + OpenCode, 2026-11-24] */
 .spotify-window-body { padding:0; background:#121212; }
 .spotify-window-body iframe { width:100%; max-width:none; height:352px; min-height:352px; display:block; border:0; border-radius:0; box-shadow:none; background:#121212; }
 .events-window { margin-top:20px; }
-.events-window .bit-container { min-height:100px; padding:15px; border:0; border-radius:0; box-shadow:none; background:linear-gradient(145deg,#fff,#f4f9fc) !important; }
+.events-window .bit-container { min-height:100px; padding:15px; border:0; border-radius:0; box-shadow:none; background:linear-gradient(145deg,#fff,#f4f9fc) !important; display:flex; align-items:center; justify-content:center; text-align:center; }
+.events-window .bandsintown-widget, .events-window .component-fallback { max-width:100%; margin-inline:auto; }
 .social-window { margin-top:20px; }
 .social-window-body { padding:18px; background:linear-gradient(145deg,#fff,#f4f9fc); }
 .site-footer { margin-top:16px; }
 
 /* Window controls behave like actual Vista windows. */
-.caption-buttons { align-items:stretch; }
-.caption-button { padding:0; text-decoration:none; }
-.caption-button.minimize { border-radius:0 0 0 4px; }
 .window-minimized { padding-bottom:0 !important; }
 .window-minimized > .window-body { display:none !important; }
 .home-window-grid:has(> .content-window[hidden]) { grid-template-columns:minmax(0,1fr); }
+
+/* The grid wrapper is flattened on desktop so its two windows and the later
+   full-width windows share one containing grid. The About window stays in its
+   grid row and scrolls normally with the rest of the page.
+   [Jesse + OpenCode, 2026-11-25] */
+@media (min-width: 761px) {
+  body.template-homepage .wrap {
+    display:grid; grid-template-columns:minmax(245px,.86fr) minmax(0,1.14fr);
+    column-gap:18px; align-items:start;
+  }
+  body.template-homepage .wrap > .hero-window,
+  body.template-homepage .wrap > .marquee,
+  body.template-homepage .wrap > .site-footer,
+  body.template-homepage .wrap > .fsfm-gadgets-extras { grid-column:1 / -1; }
+  body.template-homepage .home-window-grid { display:contents; }
+  body.template-homepage .home-window-grid > .bio-window {
+    grid-column:1; grid-row:3; align-self:start;
+  }
+  body.template-homepage .home-window-grid > .spotify-window { grid-column:2; grid-row:3; }
+  /* The flattened grid has no row gap, so the first window row needs its own
+     breathing room under the marquee. [Jesse + OpenCode, 2026-11-24] */
+  body.template-homepage .home-window-grid > .bio-window,
+  body.template-homepage .home-window-grid > .spotify-window { margin-top:20px; }
+  body.template-homepage .wrap > .events-window { grid-column:1 / -1; grid-row:4; }
+  body.template-homepage .wrap > .social-window { grid-column:1 / -1; grid-row:5; }
+  body.template-homepage .wrap > .site-footer { grid-row:6; }
+  body.template-homepage .wrap > .fsfm-gadgets-extras { grid-row:7; }
+  body.template-homepage:has(.home-window-grid > .bio-window[hidden]) .wrap { grid-template-columns:minmax(0,1fr); }
+  body.template-homepage:has(.home-window-grid > .bio-window[hidden]) .home-window-grid > .spotify-window,
+  body.template-homepage:has(.home-window-grid > .bio-window[hidden]) .wrap > .events-window,
+  body.template-homepage:has(.home-window-grid > .bio-window[hidden]) .wrap > .social-window { grid-column:1; }
+}
 
 /* Interactive controls use the same draggable Vista desktop-gadget language as Clock and Calendar. */
 .fsfm-gadget.gadget-compact { width:176px; }
@@ -534,7 +566,7 @@ text-shadow: 0 1px 3px rgb(var(--deep-rgb)), 0 0 8px rgba(var(--deep-rgb), 0.8);
   .taskbar { padding: 0 9px; }
   .taskbar-inner { gap: 8px; }
   .brand-title { font-size: 10px; gap: 7px; }
-  .start-orb { width: 28px; height: 28px; }
+  .start-orb { width: 22px; height: 22px; }
   .task-buttons { gap: 4px; }
   .task-button { padding: 5px 9px; font-size: 10px; }
   .wrap { padding: 0 10px 28px; }
@@ -554,8 +586,11 @@ text-shadow: 0 1px 3px rgb(var(--deep-rgb)), 0 0 8px rgba(var(--deep-rgb), 0.8);
   .marquee-track span { font-size: 11px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
-  .reveal { opacity: 1; transform: none; }
+  body[data-respect-reduced-motion="true"],
+  body[data-respect-reduced-motion="true"] *,
+  body[data-respect-reduced-motion="true"] *::before,
+  body[data-respect-reduced-motion="true"] *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  body[data-respect-reduced-motion="true"] .reveal { opacity: 1; transform: none; }
 }
 
 
@@ -563,7 +598,7 @@ text-shadow: 0 1px 3px rgb(var(--deep-rgb)), 0 0 8px rgba(var(--deep-rgb), 0.8);
 /* ---------- FSFM VISTA DESKTOP GADGETS ---------- */
 .sr-only { position:absolute !important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
 .fsfm-gadgets-desktop { display:none; }
-@media (min-width: 1320px) and (min-height: 700px) {
+@media (min-width: 1180px) and (min-height: 600px) {
   .fsfm-gadgets-desktop { display:block; position:relative; z-index:35; }
   .fsfm-gadget {
     position:fixed; left:16px; top:90px; width:184px; z-index:35;
@@ -581,6 +616,8 @@ text-shadow: 0 1px 3px rgb(var(--deep-rgb)), 0 0 8px rgba(var(--deep-rgb), 0.8);
   }
   .gadget-titlebar:active { cursor:grabbing; }
   .gadget-titlebar:focus-visible { outline:2px solid #fff; outline-offset:-3px; }
+  .fsfm-gadget.is-dragging { transition:none; box-shadow:0 18px 42px rgba(0,0,0,.50),0 0 0 1px #8ee7ff,0 0 26px rgba(142,231,255,.55),inset 0 0 0 1px rgba(255,255,255,.7); }
+  .fsfm-gadget.gadget-pushed { transition:left .16s ease,top .16s ease,box-shadow .18s ease; box-shadow:0 12px 30px rgba(0,0,0,.38),0 0 0 1px #c9aaff,0 0 20px rgba(201,170,255,.45),inset 0 0 0 1px rgba(255,255,255,.7); }
   .gadget-grip { font-size:13px; color:rgba(30,69,94,.75); line-height:1; }
   .gadget-title { flex:1; }
   .gadget-mark { font:7px "Roboto Mono",monospace; letter-spacing:.08em; color:rgba(27,62,85,.68); }
@@ -638,11 +675,11 @@ text-shadow: 0 1px 3px rgb(var(--deep-rgb)), 0 0 8px rgba(var(--deep-rgb), 0.8);
   .note-body p { min-height:61px; white-space:pre-wrap; overflow-wrap:anywhere; font:11px/1.5 "Segoe UI",Tahoma,sans-serif; }
   .note-pin { position:absolute; top:7px; right:9px; width:7px; height:7px; border-radius:50%; background:radial-gradient(circle at 30% 25%,#fff,#bd8b4e 45%,#77512a); box-shadow:0 1px 2px rgba(0,0,0,.35); }
 }
-@media (max-width: 1319px), (max-height: 699px) {
+@media (max-width: 1179px), (max-height: 599px) {
   .fsfm-gadgets-desktop { display:none !important; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .fsfm-gadget, .fsfm-gadget * { scroll-behavior:auto !important; transition:none !important; }
+  body[data-respect-reduced-motion="true"] .fsfm-gadget, body[data-respect-reduced-motion="true"] .fsfm-gadget * { scroll-behavior:auto !important; transition:none !important; }
 }
 
 /* V13 reusable blocks hosted in the original FSFM Vista desktop frame. */
@@ -661,19 +698,26 @@ html, body, * {
   scrollbar-width: thin;
   scrollbar-color: rgba(154,204,240,.9) rgba(8,18,40,.86);
 }
-*::-webkit-scrollbar { width: 12px; height: 12px; }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
 *::-webkit-scrollbar-track {
-  background: rgba(8,18,40,.86);
+  background: linear-gradient(90deg, rgba(3,10,22,.96), rgba(9,24,44,.88));
+  box-shadow: inset 1px 0 rgba(255,255,255,.06);
 }
 *::-webkit-scrollbar-thumb {
-  border: 2px solid rgba(8,18,40,.86);
-  border-radius: 10px;
-  background: linear-gradient(180deg, rgba(255,255,255,.94), rgba(154,204,240,.88) 48%, rgba(83,146,193,.94));
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.42);
+  border: 1px solid rgba(129,254,250,.55);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(154,204,240,.9) 46%, rgba(72,138,186,.95) 54%, rgba(210,239,255,.92));
+  box-shadow: 0 0 10px rgba(129,254,250,.28), inset 0 1px rgba(255,255,255,.9), inset 0 -1px rgba(0,0,0,.22);
 }
 *::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #fff, rgba(190,225,255,.98) 48%, rgba(116,184,226,.98));
+  border-color: rgba(255,255,255,.78);
+  background: linear-gradient(180deg, #fff, rgba(190,225,255,.98) 46%, rgba(96,176,224,.98) 54%, #fff);
+  box-shadow: 0 0 14px rgba(129,254,250,.5), inset 0 1px #fff;
 }
+*::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(180deg, rgba(190,225,255,.98), rgba(83,146,193,.98));
+}
+*::-webkit-scrollbar-corner { background: rgba(3,10,22,.96); }
 .hero-favicon { object-fit: contain; filter: drop-shadow(0 0 3px rgba(255,255,255,.95)); }
 .task-menu { position: relative; flex: 0 0 auto; z-index: 9500; }
 .task-menu > summary {
@@ -712,3 +756,45 @@ html, body, * {
 @media (max-width: 640px) {
   .task-menu > summary { padding: 3px 10px; }
 }
+
+ /* Purble Place + shutdown overlays (homepage) [OpenCode, 2026-11-22] */
+ .purble-overlay,.fsfm-shutdown{position:fixed;inset:0;z-index:12000;display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;background:rgba(5,16,32,.52);backdrop-filter:blur(4px);}
+ .purble-overlay[hidden],.fsfm-shutdown[hidden]{display:none!important;}
+  body.purble-open{overflow:hidden;padding-right:var(--purble-scrollbar-gutter,0px);}
+ .purble-dialog,.shutdown-dialog{max-height:calc(100vh - 48px);overflow:hidden;border:1px solid rgba(255,255,255,.72);border-radius:8px;background:linear-gradient(145deg,rgba(255,255,255,.92),rgba(224,242,255,.88));box-shadow:0 24px 60px rgba(0,0,0,.45),inset 0 1px rgba(255,255,255,.9);}
+ .purble-dialog{width:min(920px,100%);height:min(760px,100%);max-height:none;display:flex;flex-direction:column;box-sizing:border-box;border-color:rgba(127,238,255,.62);border-radius:7px 7px 4px 4px;background:linear-gradient(130deg,rgba(239,251,255,.20),rgba(16,48,63,.92) 30%,rgba(10,16,18,.97));box-shadow:0 24px 60px rgba(0,0,0,.55),inset 0 0 0 1px rgba(239,251,255,.42);}
+  .purble-titlebar{height:32px;flex:0 0 32px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 10px 0 14px;color:#f2fbff;font:700 12px/1.2 "Segoe UI",Tahoma,Arial,sans-serif;text-shadow:0 1px 2px rgba(0,0,0,.7);background:linear-gradient(180deg,rgba(48,94,112,.96),rgba(12,28,36,.97) 49%,rgba(8,18,24,.98));border-bottom:1px solid rgba(127,238,255,.4);}
+  .purble-titlebar::before{content:"◆";color:#f2fbff;font-size:11px;line-height:1;}
+ .purble-titlebar button{width:30px;height:24px;border:1px solid rgba(255,166,142,.55);border-radius:4px;background:linear-gradient(rgba(176,74,58,.94),rgba(96,31,24,.96) 50%,rgba(58,18,14,.98));color:#fff;font:700 18px/1 Arial,sans-serif;cursor:pointer;}
+ .purble-frame{display:block;flex:1 1 auto;width:100%;min-height:0;border:0;background:#0b1013;}
+ .purble-fallback{flex:0 0 auto;padding:10px 14px;font:12px/1.4 "Segoe UI",Tahoma,Arial,sans-serif;color:#bfe2ee;background:rgba(8,18,24,.92);}
+ .purble-fallback a{color:#8ee7ff;}
+ .shutdown-dialog{width:min(420px,calc(100vw - 32px));padding:28px 24px;text-align:center;color:#15354a;}
+ .shutdown-dialog strong{display:block;margin-bottom:8px;font:700 28px/1.1 "Segoe UI",Tahoma,Arial,sans-serif;}
+ .shutdown-dialog p{margin:0;font:14px/1.5 "Segoe UI",Tahoma,Arial,sans-serif;color:#345a70;}
+
+ /* Extra homepage gadgets below footer [OpenCode, 2026-11-22] */
+ .fsfm-gadgets-extras{display:flex;flex-wrap:wrap;gap:18px;justify-content:center;align-items:stretch;padding:18px 0 8px;}
+ .fsfm-gadgets-extras .fsfm-gadget{position:relative;left:auto!important;top:auto!important;width:176px;z-index:1;overflow:hidden;border:1px solid rgba(255,255,255,.9);border-radius:9px;color:#172b3a;background:linear-gradient(135deg,rgba(255,255,255,.82),rgba(221,243,255,.55) 38%,rgba(95,153,184,.32) 100%);box-shadow:0 8px 22px rgba(0,0,0,.30),inset 0 1px 0 rgba(255,255,255,.72);backdrop-filter:blur(18px) saturate(1.55);-webkit-backdrop-filter:blur(18px) saturate(1.55);}
+ .fsfm-gadgets-extras .gadget-titlebar{height:26px;display:flex;align-items:center;gap:6px;padding:0 10px;cursor:default;color:#17344b;font:600 10px "Segoe UI",Tahoma,Arial,sans-serif;text-shadow:0 1px 0 rgba(255,255,255,.95);background:linear-gradient(180deg,rgba(255,255,255,.72),rgba(228,245,255,.34));border-bottom:1px solid rgba(255,255,255,.7);}
+ .fsfm-gadgets-extras .gadget-grip{display:none;}
+ .fsfm-gadgets-extras .gadget-title{flex:1;}
+ .fsfm-gadgets-extras .gadget-mark{font:7px "Roboto Mono",monospace;letter-spacing:.08em;color:rgba(27,62,85,.68);}
+ .fsfm-gadgets-extras .gadget-body{position:relative;padding:9px;}
+ .fsfm-gadgets-extras .gadget-body.control-body{display:flex;align-items:center;justify-content:center;padding:10px;}
+ .fsfm-gadgets-extras .gadget-range-body{display:flex;flex-direction:column;gap:8px;padding:10px 12px 10px;}
+ .fsfm-gadgets-extras .gadget-range-label{color:#173f57;font:700 9px "Roboto Mono",monospace;letter-spacing:.07em;}
+ .fsfm-gadgets-extras .gadget-range-body input[type="range"]{-webkit-appearance:none;appearance:none;width:100%;height:16px;margin:0;background:transparent;cursor:pointer;}
+  .fsfm-gadgets-extras .gadget-range-body input[type="range"]::-webkit-slider-runnable-track{height:6px;border-radius:999px;border:1px solid rgba(39,89,120,.6);background:linear-gradient(180deg,#cfe9f5,#88bcd4 45%,#5997b6 55%,#d9eff9);box-shadow:inset 0 1px 2px rgba(18,52,72,.32),0 1px 0 rgba(255,255,255,.85);}
+  .fsfm-gadgets-extras .gadget-range-body input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;margin-top:-6px;border-radius:50%;border:1px solid #235876;background:radial-gradient(circle at 35% 28%,#fff,#ddf3fc 42%,#71aecb 76%,#3d7f9f);box-shadow:0 1px 4px rgba(0,0,0,.42),inset 0 1px 0 #fff;}
+  .fsfm-gadgets-extras .gadget-range-body input[type="range"]::-moz-range-track{height:6px;border-radius:999px;border:1px solid rgba(39,89,120,.6);background:linear-gradient(180deg,#cfe9f5,#88bcd4 45%,#5997b6 55%,#d9eff9);}
+  .fsfm-gadgets-extras .gadget-range-body input[type="range"]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;border:1px solid #235876;background:radial-gradient(circle at 35% 28%,#fff,#ddf3fc 42%,#71aecb 76%,#3d7f9f);box-shadow:0 1px 4px rgba(0,0,0,.42);}
+ .fsfm-gadgets-extras .gadget-range-output{color:#173f57;text-align:center;font:700 10px "Roboto Mono",monospace;min-height:14px;padding:2px 0;border:1px solid rgba(66,105,132,.34);border-radius:5px;background:rgba(255,255,255,.7);}
+ .fsfm-gadgets-extras .gadget-control-button{width:100%;min-height:34px;padding:7px 9px;border:1px solid rgba(66,105,132,.48);border-radius:5px;color:#173b53;font:700 8px "Roboto Mono",monospace;letter-spacing:.025em;text-align:center;background:linear-gradient(#fff 0%,#e7f6ff 47%,#c6e5f5 52%,#f8fcff 100%);box-shadow:inset 0 1px #fff,0 2px 4px rgba(0,0,0,.16);cursor:pointer;}
+ .fsfm-gadgets-extras .gadget-control-button:hover,.fsfm-gadgets-extras .gadget-control-button:focus-visible{filter:brightness(1.04);box-shadow:0 0 9px rgba(255,255,255,.9),inset 0 1px #fff;}
+ .fsfm-gadgets-extras .gadget-control-button[aria-pressed="true"]{background:linear-gradient(#dff8ff,#a9dff1 48%,#83c2df 52%,#e8faff);}
+ /* Bottom reset icon: same Vista glass button language as the window captions. [Jesse + OpenCode, 2026-11-24] */
+ .fsfm-gadget-reset{display:flex;align-items:center;justify-content:center;width:100%;padding:8px 0 2px;}
+ .gadget-reset-button{width:27px;height:20px;display:flex;align-items:center;justify-content:center;padding:0;border:1px solid rgba(var(--deep-rgb),.5);border-radius:3px;box-shadow:inset 0 0 0 1px #ffffff65;color:#fff;text-shadow:0 0 1px #000,1px 1px 1px #000;font:700 14px Arial;background:linear-gradient(rgba(var(--hi-rgb),.4),rgba(var(--hi-rgb),.15) 46%,rgba(var(--deep-rgb),.4) 50%,rgba(var(--mid-rgb),.3));cursor:pointer;transition:background .15s ease,box-shadow .15s ease;}
+ .gadget-reset-button:hover,.gadget-reset-button:focus-visible{background:linear-gradient(rgb(var(--hi-rgb)),rgb(var(--bright-rgb)) 45%,rgb(var(--glass-rgb)) 50%,rgb(var(--bright-rgb)));box-shadow:0 0 12px rgb(var(--bright-rgb)),inset 0 0 0 1px #fff9;}
+ .gadget-reset-button.is-resetting{box-shadow:0 0 18px rgb(var(--bright-rgb)),inset 0 0 0 1px #fff;color:#fff;}

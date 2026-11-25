@@ -13,22 +13,36 @@ var wallBack = document.getElementById('wallB');
 var currentTheme = Number.isInteger(window.__themeIdx) ? window.__themeIdx : 0;
 var themeImages = [];
 var applyToken = 0;
+var cycleTimer = null;
 var runtimeConfig = {};
 try { runtimeConfig = JSON.parse((document.getElementById('fsfmHomeRuntimeConfig') || {}).textContent || '{}'); } catch (e) { runtimeConfig = {}; }
 window.__FSFM_HOME_RUNTIME__ = runtimeConfig;
 
+// Theme data normally comes from the theme-engine part in <head>. When that
+// part is switched off in content, fall back to an empty set so the rest of
+// the desktop still starts cleanly. [OpenCode, 2026-11-22]
+var themes = Array.isArray(window.VISTA_THEMES) ? window.VISTA_THEMES : [];
+var setPalette = typeof window.paintPalette === 'function' ? window.paintPalette : function() {};
+
 var bootStartedAt = Date.now();
-var bootMinimumTime = 2400;
+var bootSeen = false;
+try { bootSeen = sessionStorage.getItem('fsfm_boot_seen_v1') === '1'; } catch (e) { bootSeen = false; }
+var bootMinimumTime = bootSeen ? 0 : 2400;
 function updateBootProgress(done, total) {
   var status = document.getElementById('bootStatus');
   if (!status) return;
+  if (bootSeen) return;
   status.textContent = done < total ? 'LOADING YOUR DESKTOP' : 'STARTING ARTIST DESKTOP';
+}
+if (bootSeen) {
+  var existingBoot = document.getElementById('fsfmBootScreen');
+  if (existingBoot) existingBoot.classList.add('loaded');
 }
 
 function preloadAllThemes() {
   var completed = 0;
-  updateBootProgress(0, VISTA_THEMES.length);
-  return Promise.all(VISTA_THEMES.map(function(theme, index) {
+  updateBootProgress(0, themes.length);
+  return Promise.all(themes.map(function(theme, index) {
     return new Promise(function(resolve) {
       var image = new Image();
       var settled = false;
@@ -39,7 +53,7 @@ function preloadAllThemes() {
         window.clearTimeout(failSafe);
         themeImages[index] = { image: ok ? image : null, ready: ok };
         completed += 1;
-        updateBootProgress(completed, VISTA_THEMES.length);
+        updateBootProgress(completed, themes.length);
         resolve({ ok: ok, index: index });
       }
       image.onload = function() { finish(true); };
@@ -50,22 +64,25 @@ function preloadAllThemes() {
 }
 
 function applyTheme(index) {
+  if (!themes.length) return;
   var token = ++applyToken;
-  currentTheme = (index + VISTA_THEMES.length) % VISTA_THEMES.length;
-  var theme = VISTA_THEMES[currentTheme];
-  paintPalette(theme);
+  currentTheme = (index + themes.length) % themes.length;
+  var theme = themes[currentTheme];
+  setPalette(theme);
 
   var url = theme.background || (theme.img ? "url('" + theme.img + "')" : 'none');
   var incoming = wallBack;
   var outgoing = wallFront;
-  incoming.style.backgroundSize = (runtimeConfig.wallpaper && runtimeConfig.wallpaper.fit === 'contain') ? 'contain' : 'cover';
-  incoming.style.backgroundRepeat = 'no-repeat';
-  incoming.style.backgroundPosition = (runtimeConfig.wallpaper && runtimeConfig.wallpaper.position) || 'center';
-  incoming.style.backgroundImage = url;
-  requestAnimationFrame(function() { incoming.classList.add('show'); });
-  window.setTimeout(function() { if (token === applyToken) outgoing.classList.remove('show'); }, 950);
-  wallFront = incoming;
-  wallBack = outgoing;
+  if (incoming && outgoing) {
+    incoming.style.backgroundSize = (runtimeConfig.wallpaper && runtimeConfig.wallpaper.fit === 'contain') ? 'contain' : 'cover';
+    incoming.style.backgroundRepeat = 'no-repeat';
+    incoming.style.backgroundPosition = (runtimeConfig.wallpaper && runtimeConfig.wallpaper.position) || 'center';
+    incoming.style.backgroundImage = url;
+    requestAnimationFrame(function() { incoming.classList.add('show'); });
+    window.setTimeout(function() { if (token === applyToken) outgoing.classList.remove('show'); }, 950);
+    wallFront = incoming;
+    wallBack = outgoing;
+  }
 
   var hero = document.getElementById('heroSection');
   if (hero) hero.style.backgroundImage = url;
@@ -77,10 +94,21 @@ function applyTheme(index) {
 }
 
 function cycleTheme() {
+  if (!themes.length) return;
   var settings = runtimeConfig.wallpaper || {}; var cycle = settings.cycle || {};
-  if (cycle.mode === 'random' && VISTA_THEMES.length > 1) { var choices = VISTA_THEMES.map(function(_,i){return i;}).filter(function(i){return i !== currentTheme;}); applyTheme(choices[Math.floor(Math.random()*choices.length)]); }
+  if (cycle.mode === 'random' && themes.length > 1) { var choices = themes.map(function(_,i){return i;}).filter(function(i){return i !== currentTheme;}); applyTheme(choices[Math.floor(Math.random()*choices.length)]); }
   else applyTheme(currentTheme + 1);
 }
+
+// A visitor-chosen wallpaper is sticky: the first star press ends auto-cycling.
+function stopAutomaticCycle() {
+  if (cycleTimer !== null) {
+    window.clearInterval(cycleTimer);
+    cycleTimer = null;
+  }
+  document.documentElement.dataset.wallpaperChoiceMade = 'true';
+}
+window.__fsfmStopWallpaperCycle = stopAutomaticCycle;
 
 // Marquee copy is rendered into the static HTML for crawlability. This script
 // only enhances the server-rendered wallpaper stars with their click behaviour.
@@ -92,7 +120,7 @@ function renderMarquee(messages) {
   marqueeTrack.querySelectorAll('.star-icon').forEach(function(star) {
     star.setAttribute('aria-label', 'Change wallpaper theme');
     if (!runtimeConfig.wallpaper || !runtimeConfig.wallpaper.cycle || runtimeConfig.wallpaper.cycle.manualControl !== false) {
-      star.addEventListener('click', cycleTheme);
+      star.addEventListener('click', function(){ stopAutomaticCycle(); cycleTheme(); });
     } else {
       star.disabled = true;
       star.setAttribute('aria-hidden', 'true');
@@ -102,9 +130,9 @@ function renderMarquee(messages) {
 window.__fsfmRenderMarquee = renderMarquee;
 renderMarquee(runtimeConfig.marqueeMessages || []);
 var cycleSettings = runtimeConfig.wallpaper && runtimeConfig.wallpaper.cycle || {};
-if (cycleSettings.enabled && VISTA_THEMES.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+if (cycleSettings.enabled && themes.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
   var cycleSeconds = Math.max(5, Math.min(3600, Number(cycleSettings.intervalSeconds) || 30));
-  window.setInterval(function(){ if (!document.hidden) cycleTheme(); }, cycleSeconds * 1000);
+  cycleTimer = window.setInterval(function(){ if (!document.hidden && cycleTimer !== null) cycleTheme(); }, cycleSeconds * 1000);
 }
 
 // Keep the splash simple: the moving XP-era segment stays visible until the four
@@ -120,7 +148,8 @@ preloadAllThemes().then(function(results) {
     window.setTimeout(function() {
       var overlay = document.getElementById('fsfmBootScreen');
       if (overlay) overlay.classList.add('loaded');
-    }, 260);
+      try { sessionStorage.setItem('fsfm_boot_seen_v1', '1'); } catch (e) {}
+    }, bootSeen ? 0 : 260);
   }, remaining);
 });
 
@@ -130,7 +159,7 @@ try {
 
 var canvas = document.getElementById('bgCanvas');
 
-if (canvas && runtimeConfig.effects?.backgroundEffects !== false && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+if (canvas && runtimeConfig.effects?.backgroundEffects !== false && (runtimeConfig.effects?.respectReducedMotion === false || !window.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
 
 var ctx = canvas.getContext('2d');
 

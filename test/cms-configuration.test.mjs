@@ -5,7 +5,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const config = fs.readFileSync(path.join(root, '.pages.yml'), 'utf8');
+// Normalize checkout line endings; CI sees LF while Windows checkouts may be CRLF. [OpenCode, 2026-11-24]
+const config = fs.readFileSync(path.join(root, '.pages.yml'), 'utf8').replace(/\r\n/g, '\n');
 
 test('Pages CMS exposes the four approved page areas', () => {
   for (const entry of [

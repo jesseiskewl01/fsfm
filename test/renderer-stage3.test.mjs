@@ -83,6 +83,7 @@ test('page renderer emits crawlable HTML, canonical SEO, schema, navigation and 
   assert.match(html, /rel="canonical" href="https:\/\/fsfm\.port82\.net\/pages\/test\//);
   assert.match(html, /application\/ld\+json/);
   assert.match(html, /data-background-effects="true"/);
+  assert.match(html, /data-respect-reduced-motion="true"/);
   assert.match(html, /aria-current="page"/);
   assert.match(html, /noindex, nofollow/);
   assert.match(html, /wallpaper-engine\.js/);

@@ -24,7 +24,7 @@ const gadgets = [
 test('Homepage renders through the dedicated V13 Vista desktop shell', () => {
   assert.match(html, /<body class="template-homepage" data-template="homepage"/);
   assert.match(html, /class="taskbar"/);
-  assert.match(html, /class="aero-window hero-window"/);
+  assert.match(html, /class="[^"]*\baero-window hero-window\b[^"]*"/);
   assert.match(html, /id="fsfmBootScreen"/);
   assert.match(html, /id="wallA"/);
   assert.match(html, /id="wallB"/);
@@ -53,8 +53,8 @@ test('All original Homepage desktop gadgets are included in the Homepage templat
   const albumRecord = readJson('content/v13/albums/the-early-bird.json');
   const albumHtml = renderPage(albumRecord, { site, pages, wallpapers });
   assert.doesNotMatch(albumHtml, /id="fsfmGadgets"|id="gadget-clock"|id="gadget-radio"/);
-  assert.match(fs.readFileSync(path.join(root, 'src/styles/homepage-vista.css'), 'utf8'), /@media \(min-width: 1320px\) and \(min-height: 700px\)/);
-  assert.match(fs.readFileSync(path.join(root, 'src/styles/homepage-vista.css'), 'utf8'), /@media \(max-width: 1319px\), \(max-height: 699px\)/);
+  assert.match(fs.readFileSync(path.join(root, 'src/styles/homepage-vista.css'), 'utf8'), /@media \(min-width: 1180px\) and \(min-height: 600px\)/);
+  assert.match(fs.readFileSync(path.join(root, 'src/styles/homepage-vista.css'), 'utf8'), /@media \(max-width: 1179px\), \(max-height: 599px\)/);
 });
 
 test('Radio remains user-initiated and Purble Place remains a deferred, dismissible overlay', () => {
@@ -119,10 +119,12 @@ test('Preview keeps the Spotify embed but avoids loading the live Bandsintown sc
 test('Homepage CMS configuration exposes content, visibility and gadget controls', () => {
   const config = fs.readFileSync(path.join(root, '.pages.yml'), 'utf8');
   for (const field of [
-    'name: hero', 'name: photos', 'name: dates', 'name: stickyNote', 'name: funWidgets',
-    'name: visibility', 'name: showClock', 'name: showCalendar', 'name: showFeaturedRelease',
-    'name: showPhotos', 'name: showDates', 'name: showStickyNote', 'name: radioAudioUrl',
-    'name: bubbleDefault', 'name: purblePlaceUrl', 'name: featuredRelease'
+    'component: homepageAppearance', 'name: desktopHero', 'name: desktopGadgets',
+    'label: Desktop gadget content', 'name: photos', 'name: dates', 'name: stickyNote',
+    'name: funWidgets', 'name: visibility', 'name: showClock', 'name: showCalendar',
+    'name: showFeaturedRelease', 'name: showPhotos', 'name: showDates',
+    'name: showStickyNote', 'name: radioAudioUrl', 'name: bubbleDefault',
+    'name: purblePlaceUrl', 'name: featuredRelease'
   ]) assert.ok(config.includes(field), `CMS config is missing ${field}`);
 });
 
@@ -159,32 +161,25 @@ test('Homepage custom wallpaper options reach the desktop runtime and Aurora has
 
 
 test('Homepage interface labels are CMS-editable and render from the canonical record', () => {
-  const configured = {
-    ...homepage,
-    templateData: {
-      ...homepage.templateData,
-      desktopLabels: {
-        ...homepage.templateData.desktopLabels,
-        bootLoading: 'DESKTOP STARTING',
-        bootCaption: 'WELCOME TO THE STRANGE INTERNET',
-        shutdownTitle: 'See you later.',
-        shutdownMessage: 'The desktop is powering down.',
-        homeNavigationLabel: 'Start'
-      },
-      gadgets: {
-        ...homepage.templateData.gadgets,
-        labels: {
-          ...homepage.templateData.gadgets.labels,
-          clock: 'Local Time',
-          pictureFrame: 'Photo Window',
-          barrelRollButton: 'SPIN THE DESKTOP',
-          bubbleFrequencyLabel: 'BUBBLE DENSITY',
-          radioPlay: 'START RADIO',
-          purblePlaceButton: 'LAUNCH GAME'
-        }
-      }
-    }
-  };
+  const configured = JSON.parse(JSON.stringify(homepage));
+  const parts = configured.appearance.parts;
+  Object.assign(parts.bootOverlay.content, {
+    bootLoading: 'DESKTOP STARTING',
+    bootCaption: 'WELCOME TO THE STRANGE INTERNET'
+  });
+  Object.assign(parts.shutdownOverlay.content, {
+    shutdownTitle: 'See you later.',
+    shutdownMessage: 'The desktop is powering down.'
+  });
+  parts.desktopTaskbar.content.homeNavigationLabel = 'Start';
+  Object.assign(parts.desktopGadgets.content.labels, {
+    clock: 'Local Time',
+    pictureFrame: 'Photo Window',
+    barrelRollButton: 'SPIN THE DESKTOP',
+    bubbleFrequencyLabel: 'BUBBLE DENSITY',
+    radioPlay: 'START RADIO',
+    purblePlaceButton: 'LAUNCH GAME'
+  });
   const customized = renderHomepage(configured, { site, pages: [configured, ...pages.slice(1)], wallpapers });
   for (const value of [
     'DESKTOP STARTING', 'WELCOME TO THE STRANGE INTERNET', 'See you later.',
@@ -193,8 +188,10 @@ test('Homepage interface labels are CMS-editable and render from the canonical r
   ]) assert.ok(customized.includes(value), `Customized Homepage should render ${value}`);
   const config = fs.readFileSync(path.join(root, '.pages.yml'), 'utf8');
   for (const field of [
-    'name: desktopLabels', 'name: bootLoading', 'name: bootWelcome', 'name: bootReady',
-    'name: bootCaption', 'name: shutdownTitle', 'name: shutdownMessage',
+    'name: bootOverlay', 'label: Boot overlay content', 'name: bootLoading',
+    'name: bootWelcome', 'name: bootReady', 'name: bootCaption',
+    'name: shutdownOverlay', 'label: Shutdown content', 'name: shutdownTitle',
+    'name: shutdownMessage', 'name: desktopTaskbar', 'label: Taskbar content',
     'name: homeNavigationLabel', 'name: labels', 'name: clock', 'name: calendar',
     'name: pictureFrame', 'name: importantDates', 'name: stickyNote',
     'name: barrelRollButton', 'name: bubbleFrequencyLabel', 'name: radioPlay',
@@ -202,11 +199,16 @@ test('Homepage interface labels are CMS-editable and render from the canonical r
   ]) assert.ok(config.includes(field), `CMS config is missing ${field}`);
 });
 
-test('Default build command targets the V14 generator and the legacy builder is explicit', () => {
+test('Package scripts expose only the canonical build and preview commands', () => {
   const pkg = readJson('package.json');
   assert.equal(pkg.scripts.build, 'node scripts/build-v13.mjs');
-  assert.equal(pkg.scripts['build:v13:stage5'], 'node scripts/build-v13-stage5.mjs');
-  assert.equal(pkg.scripts['build:legacy'], 'node scripts/build-pages.mjs');
+  assert.equal(pkg.scripts.preview, undefined);
+  assert.equal(pkg.scripts['build:legacy'], undefined);
+  assert.equal(pkg.scripts['preview:v13:templates'], undefined);
+  for (const [name, value] of Object.entries(pkg.scripts)) {
+    assert.doesNotMatch(name, /stage[3-6]|legacy/i, `${name} should not be exposed as an npm script`);
+    assert.doesNotMatch(value, /build-v13-template-previews\.mjs/i, `${name} should not expose the stage-era template preview builder`);
+  }
 });
 
  
@@ -223,7 +225,7 @@ test('Homepage and reusable page templates share the same custom scrollbar syste
   const homepageCss = fs.readFileSync(path.join(root, 'src/styles/homepage-vista.css'), 'utf8');
   const pageCss = fs.readFileSync(path.join(root, 'src/styles/v13.css'), 'utf8');
   for (const css of [homepageCss, pageCss]) {
-    assert.match(css, /\*::-webkit-scrollbar \{ width: 12px; height: 12px; \}/);
+    assert.match(css, /\*::-webkit-scrollbar \{ width: 10px; height: 10px; \}/);
     assert.match(css, /scrollbar-width: thin/);
     assert.match(css, /rgba\(154,204,240,.9\)/);
   }

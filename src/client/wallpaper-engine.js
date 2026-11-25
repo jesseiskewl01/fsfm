@@ -17,6 +17,7 @@
   let pageVisible = !document.hidden;
 
   function safeImageUrl(value) {
+    if (typeof value !== 'string' || !value.trim()) return null;
     try {
       const url = new URL(value, document.baseURI);
       return url.protocol === 'https:' || url.origin === location.origin ? url.href : null;

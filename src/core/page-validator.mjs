@@ -2,12 +2,15 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { COMPONENTS } from '../components/registry.mjs';
 import { TEMPLATES } from '../templates/registry.mjs';
+import { EFFECTS, PAGE_PARTS, PRESENTATION_VARIANTS as SHARED_VARIANTS, GROUP_LAYOUTS as SHARED_LAYOUTS, PRESENTATION_PADDINGS as SHARED_PADDINGS, PRESENTATION_BACKGROUNDS as SHARED_BACKGROUNDS } from './parts.mjs';
 import { routeForPage } from './page-routes.mjs';
 
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const PRESET_IDS = new Set(['vista-violet-haze','vista-aqua-glass','vista-solar-flare','vista-rose-bloom','aurora','album-amber']);
-const PRESENTATION_VARIANTS = new Set(['vista-window','vista-desktop','editorial','amber-editorial','amber-player','plain']);
-const GROUP_LAYOUTS = new Set(['grid','stack','columns']);
+const PRESENTATION_VARIANTS = new Set(SHARED_VARIANTS);
+const PRESENTATION_PADDINGS = new Set(SHARED_PADDINGS);
+const PRESENTATION_BACKGROUNDS = new Set(SHARED_BACKGROUNDS);
+const GROUP_LAYOUTS = new Set(SHARED_LAYOUTS);
 const isRecord = value => value && typeof value === 'object' && !Array.isArray(value);
 const getPath = (object, dotted) => dotted.split('.').reduce((value, key) => value?.[key], object);
 const issue = (list, where, message) => list.push(`${where}: ${message}`);
@@ -56,6 +59,37 @@ export function validatePage(page, options = {}) {
         }
       }
     }
+    // Effect modes are validated from the shared part definitions, so the
+    // editor choices and the build rules cannot disagree.
+    const effects = appearance?.effects || {};
+    if (isRecord(effects)) {
+      for (const [name, definition] of Object.entries(EFFECTS)) {
+        const value = effects[name];
+        if (value === undefined) continue;
+        if (definition.valueType === 'boolean') {
+          if (typeof value !== 'boolean') issue(problems, where, `${definition.path} must be true or false`);
+          continue;
+        }
+        const mode = typeof value === 'string' ? value : value?.mode;
+        if (!definition.modes.includes(mode)) {
+          issue(problems, where, `${definition.path} must be one of ${definition.modes.join(', ')}`);
+        }
+      }
+    }
+    // Chrome parts default to enabled when absent, so every existing record
+    // keeps its historical desktop. Only explicit values are checked.
+    const parts = appearance?.parts;
+    if (parts !== undefined) {
+      if (!isRecord(parts)) issue(problems, where, 'appearance.parts must be an object');
+      else {
+        for (const [name, definition] of Object.entries(PAGE_PARTS)) {
+          const value = parts[name];
+          if (value === undefined || typeof value === 'boolean') continue;
+          if (isRecord(value) && typeof value.enabled === 'boolean') continue;
+          issue(problems, where, `${definition.path} must be true, false, or an object with a boolean enabled field`);
+        }
+      }
+    }
     const seo = page.seo;
     if (!isRecord(seo)) issue(problems, where, 'seo object is required');
     else {
@@ -65,8 +99,11 @@ export function validatePage(page, options = {}) {
     }
   }
 
-  if (['homepage', 'album'].includes(page.template) && !isRecord(page.templateData)) issue(problems, where, 'templateData object is required');
+  if (page.template === 'album' && !isRecord(page.templateData)) issue(problems, where, 'templateData object is required');
   else if (page.templateData !== undefined && !isRecord(page.templateData)) issue(problems, where, 'templateData must be an object when provided');
+  // The homepage no longer has templateData: every piece of desktop content
+  // lives on its declared chrome part. [OpenCode, 2026-11-24]
+  if (page.template === 'homepage' && page.templateData !== undefined) issue(problems, where, 'homepage content must live in appearance.parts, not templateData');
   if (!Array.isArray(page.sections)) issue(problems, where, 'sections must be an ordered array');
   else {
     const ids = new Set();
@@ -86,6 +123,10 @@ export function validatePage(page, options = {}) {
       if (!isRecord(section.content)) issue(problems, sectionWhere, 'content object is required');
       const variant = section.presentation?.variant;
       if (variant && !PRESENTATION_VARIANTS.has(variant)) issue(problems, sectionWhere, `unknown presentation variant "${variant}"`);
+      const padding = section.presentation?.padding;
+      if (padding && !PRESENTATION_PADDINGS.has(padding)) issue(problems, sectionWhere, `unknown presentation padding "${padding}"`);
+      const background = section.presentation?.background;
+      if (background && !PRESENTATION_BACKGROUNDS.has(background)) issue(problems, sectionWhere, `unknown presentation background "${background}"`);
       if (section.group?.id) {
         if (typeof section.group.id !== 'string' || !/^[a-z0-9_-]+$/i.test(section.group.id)) issue(problems, sectionWhere, 'layout group id must use letters, numbers, hyphens or underscores');
         if (!GROUP_LAYOUTS.has(section.group.layout || 'grid')) issue(problems, sectionWhere, 'layout group layout must be grid, stack or columns');

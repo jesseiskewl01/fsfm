@@ -1,7 +1,70 @@
 'use strict';
+
+// A small Vista-style reset icon at the bottom of the gadget area. It clears
+// only saved gadget positions, never content or settings. [Jesse + OpenCode, 2026-11-24]
+(function() {
+  var STORAGE_KEY = 'fsfm_gadget_positions_v2';
+  var LEGACY_STORAGE_KEY = 'fsfm_gadget_positions_v1';
+  function installResetButton() {
+    var host = document.querySelector('.fsfm-gadgets-extras');
+    if (!host || document.getElementById('fsfmGadgetReset')) return;
+    var bar = document.createElement('div');
+    bar.className = 'fsfm-gadget-reset';
+    bar.innerHTML = '<button type="button" id="fsfmGadgetReset" class="gadget-reset-button" aria-label="Reset gadget positions" title="Reset gadget positions"><span aria-hidden="true">↺</span></button>';
+    host.appendChild(bar);
+    var button = document.getElementById('fsfmGadgetReset');
+    button.addEventListener('click', function() {
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(LEGACY_STORAGE_KEY);
+      } catch (e) {}
+      window.dispatchEvent(new CustomEvent('fsfm:reset-gadgets'));
+      button.classList.add('is-resetting');
+      window.setTimeout(function() { button.classList.remove('is-resetting'); }, 600);
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', installResetButton);
+  else installResetButton();
+})();
+
+// Spotify's black embed has its own rounded edge. Its exposed corners need the
+// two-tone player colors, so paint them at runtime without touching saved HTML.
+// [Jesse + OpenCode, 2026-11-24]
+(function() {
+  var EMBED_URL = 'https://open.spotify.com/embed/artist/2PcGMMcKTObTrK7XVw9GSX?utm_source=generator&theme=0&si=5263054ac6d0459f';
+  var CORNERS = [
+    { name: 'tl', color: '#1F1F1F', css: 'left:0;top:0' },
+    { name: 'tr', color: '#1F1F1F', css: 'right:0;top:0' },
+    { name: 'bl', color: '#121212', css: 'left:0;bottom:0' },
+    { name: 'br', color: '#121212', css: 'right:0;bottom:0' }
+  ];
+  function installSpotifyCorners() {
+    var body = document.querySelector('.spotify-window-body');
+    var iframe = body && body.querySelector('iframe');
+    if (!body || !iframe) return;
+    if (iframe.getAttribute('src') !== EMBED_URL) iframe.setAttribute('src', EMBED_URL);
+    iframe.setAttribute('style', 'border-radius:12px');
+    body.style.background = 'linear-gradient(#1F1F1F 0 50%, #121212 50% 100%)';
+    Array.prototype.slice.call(body.querySelectorAll('.fsfm-spotify-corner')).forEach(function(node) { node.remove(); });
+    CORNERS.forEach(function(corner) {
+      var square = document.createElement('div');
+      square.className = 'fsfm-spotify-corner';
+      square.setAttribute('data-corner', corner.name);
+      square.setAttribute('style', 'position:absolute;width:15px;height:15px;pointer-events:none;z-index:2;background:' + corner.color + ';' + corner.css);
+      body.appendChild(square);
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', installSpotifyCorners);
+  else installSpotifyCorners();
+})();
+
 (function() {
   var layer = document.getElementById('fsfmGadgets');
-  if (!layer || !window.matchMedia('(min-width: 1320px) and (min-height: 700px)').matches) return;
+  if (!layer) return;
+  // CSS still hides gadgets on small screens, but the viewport can grow after
+  // load. Keep the runtime alive and lay out whenever desktop space exists.
+  // [Jesse + OpenCode, 2026-11-24]
+  var desktopQuery = window.matchMedia('(min-width: 1180px) and (min-height: 600px)');
 
   var STORAGE_KEY = 'fsfm_gadget_positions_v2';
   var LEGACY_STORAGE_KEY = 'fsfm_gadget_positions_v1';
@@ -24,6 +87,11 @@
     }
   } catch (e) { storedPositions = {}; customPositions = {}; }
 
+  var COLLISION_GAP = 12;
+  var REGION_GAP = 16;
+  var COLUMN_GAP = 24;
+  var ROW_GAP = 32;
+
   function clampWidget(widget, x, y) {
     var maxX = Math.max(8, window.innerWidth - widget.offsetWidth - 8);
     var maxY = Math.max(48, window.innerHeight - widget.offsetHeight - 8);
@@ -31,44 +99,79 @@
   }
 
   function computeDesktopLayout() {
-    var hero = document.querySelector('.hero-window');
-    var wrap = document.querySelector('.wrap');
+    // Widgets live in the gutters between the website edges and the hero edges.
+    // [Jesse + OpenCode, 2026-11-24]
+    var hero = document.querySelector('.hero-window') || document.querySelector('.wrap');
     var heroRect = hero ? hero.getBoundingClientRect() : null;
-    var wrapRect = wrap ? wrap.getBoundingClientRect() : null;
-    var viewportWidth = window.innerWidth;
+    var viewportWidth = document.documentElement.clientWidth || window.innerWidth;
     var viewportHeight = window.innerHeight;
-    var wrapLeft = wrapRect ? wrapRect.left : (viewportWidth - 880) / 2;
-    var wrapRight = wrapRect ? wrapRect.right : (viewportWidth + 880) / 2;
-    var heroTop = heroRect ? heroRect.top : 82;
-    var heroHeight = heroRect ? heroRect.height : Math.min(390, viewportHeight * 0.58);
-    var topRow = Math.max(72, Math.round(heroTop));
-    var leftMiddle = Math.max(topRow + 180, Math.round(viewportHeight * 0.405));
-    var leftLower = Math.max(leftMiddle + 142, Math.round(viewportHeight * 0.63));
-    var rightMiddle = Math.max(topRow + 230, Math.round(viewportHeight * 0.48));
-    var rightLower = Math.max(rightMiddle + 150, Math.round(viewportHeight * 0.76));
     var mainWidth = 184;
-    var compactWidth = 176;
-    var leftOuter = 16;
-    var leftInner = 34;
-    var rightOuter = viewportWidth - mainWidth - 16;
-    var rightInner = viewportWidth - mainWidth - 34;
+    var edge = 8;
+    var heroLeft = heroRect ? Math.round(heroRect.left) : Math.round(viewportWidth * 0.27);
+    var heroRight = heroRect ? Math.round(heroRect.right) : Math.round(viewportWidth * 0.73);
+    var leftRegion = { start:edge, end:Math.max(edge + mainWidth, heroLeft - REGION_GAP) };
+    var rightRegion = { start:Math.min(viewportWidth - edge - mainWidth, heroRight + REGION_GAP), end:viewportWidth - edge };
+
+    function columnsFor(region) {
+      var width = region.end - region.start;
+      if (width >= (mainWidth * 2) + COLUMN_GAP + (edge * 2)) {
+        var start = region.start + Math.floor((width - (mainWidth * 2) - COLUMN_GAP) / 2);
+        return [start, start + mainWidth + COLUMN_GAP];
+      }
+      return [region.start + Math.max(0, Math.floor((width - mainWidth) / 2))];
+    }
+
+    var leftColumns = columnsFor(leftRegion);
+    var rightColumns = columnsFor(rightRegion);
+    var leftPaired = leftColumns.length > 1;
+    var rightPaired = rightColumns.length > 1;
+    var topRow = viewportHeight < 720 ? 48 : 72;
+    function height(id, fallback) {
+      var widget = widgetById[id];
+      return widget ? widget.offsetHeight : fallback;
+    }
+    var clockHeight = height('gadget-clock', 191);
+    var nowHeight = height('gadget-now-playing', 127);
+    var datesHeight = height('gadget-dates', 85);
+    var calendarHeight = height('gadget-calendar', 241);
+    var photosHeight = height('gadget-photos', 183);
+    var noteHeight = height('gadget-note', 124);
+
+    // Three shared rows: outside / inside / outside on each side. Clock and dates
+    // hug the left gutter, featured release steps toward the hero; calendar and
+    // sticky note hug the right gutter, picture steps toward the hero.
+    // [Jesse + OpenCode, 2026-11-24]
+    var rowHeights = [
+      Math.max(clockHeight, calendarHeight),
+      Math.max(nowHeight, photosHeight),
+      Math.max(datesHeight, noteHeight)
+    ];
+    var stackedHeight = rowHeights[0] + rowHeights[1] + rowHeights[2];
+    var availableHeight = Math.max(0, viewportHeight - 8 - topRow);
+    var rowGap = ROW_GAP;
+    if (stackedHeight + rowGap * 2 > availableHeight) {
+      // A small vertical stagger is safe only when the two columns are separate;
+      // their 24px horizontal gap still clears the 12px collision gap.
+      var minGap = leftPaired && rightPaired ? -4 : COLLISION_GAP;
+      rowGap = Math.max(minGap, Math.floor((availableHeight - stackedHeight) / 2));
+    }
+    var rows = [
+      topRow,
+      topRow + rowHeights[0] + rowGap,
+      topRow + rowHeights[0] + rowHeights[1] + rowGap * 2
+    ];
+    var leftOuter = leftColumns[0];
+    var leftInner = leftColumns[leftPaired ? 1 : 0];
+    var rightInner = rightColumns[0];
+    var rightOuter = rightColumns[rightPaired ? 1 : 0];
 
     return {
-      // The six primary windows frame the central homepage in three loose rows.
-      // The middle pair steps inward slightly, matching the intended Vista composition.
-      'gadget-clock': [leftOuter, topRow],
-      'gadget-now-playing': [leftInner, leftMiddle],
-      'gadget-dates': [leftOuter, leftLower],
-      'gadget-calendar': [rightOuter, topRow],
-      'gadget-photos': [rightInner, rightMiddle],
-      'gadget-note': [rightOuter, rightLower],
-
-      // The four optional controls sit in staggered pairs around the centre body.
-      // Their offsets intentionally avoid a rigid third column or a neat grid.
-      'gadget-barrel-roll': [wrapLeft + 22, heroTop + Math.max(48, heroHeight * 0.20)],
-      'gadget-bubbles': [wrapRight - compactWidth - 22, heroTop + Math.max(112, heroHeight * 0.34)],
-      'gadget-radio': [wrapLeft + 72, Math.max(leftMiddle + 62, heroTop + heroHeight * 0.62)],
-      'gadget-purble': [wrapRight - compactWidth - 72, Math.max(rightMiddle + 112, heroTop + heroHeight * 0.78)]
+      'gadget-clock': [leftOuter, rows[0]],
+      'gadget-now-playing': [leftInner, rows[1]],
+      'gadget-dates': [leftOuter, rows[2]],
+      'gadget-calendar': [rightOuter, rows[0]],
+      'gadget-photos': [rightInner, rows[1]],
+      'gadget-note': [rightOuter, rows[2]]
     };
   }
 
@@ -124,17 +227,17 @@
 
     primaryIds.forEach(function(id) {
       var widget = widgetById[id], point = layout[id];
-      if (!widget || !point) return;
+      if (!widget || widget.hidden || !point) return;
       occupied.push({ x:point[0], y:point[1], width:widget.offsetWidth, height:widget.offsetHeight });
     });
 
     bonusIds.forEach(function(id) {
       var widget = widgetById[id], point = layout[id];
-      if (!widget || !point) return;
+      if (!widget || widget.hidden || !point) return;
       var candidate = { x:point[0], y:point[1], width:widget.offsetWidth, height:widget.offsetHeight };
       var attempts = 0;
-      while (occupied.some(function(other) { return boxesOverlap(candidate, other, 12); }) && attempts < 24) {
-        candidate.y += 20;
+      while (occupied.some(function(other) { return boxesOverlap(candidate, other, COLLISION_GAP); }) && attempts < 24) {
+        candidate.y += 24;
         if (candidate.y + candidate.height > window.innerHeight - 8) {
           candidate.y = Math.max(48, point[1] - 36);
           candidate.x += 24;
@@ -150,20 +253,24 @@
     return layout;
   }
 
-  widgets.forEach(function(widget) {
-    var saved = storedPositions[widget.id];
-    if (storedV2) {
-      customPositions[widget.id] = customPositions[widget.id] === true;
-    } else {
-      customPositions[widget.id] = !!(saved && !isLegacyDefault(widget, saved));
-    }
-    var configured = gadgetConfig.positions && gadgetConfig.positions[widget.id];
-    var fallback = defaultPositions[widget.id] || [16, 90];
-    var useSaved = customPositions[widget.id] && saved && Number.isFinite(saved[0]) && Number.isFinite(saved[1]);
-    var x = useSaved ? saved[0] : (configured ? Number(configured[0]) : fallback[0]);
-    var y = useSaved ? saved[1] : (configured ? Number(configured[1]) : fallback[1]);
-    applyInitialPosition(widget, x, y);
-  });
+  if (desktopQuery.matches) {
+    widgets.forEach(function(widget) {
+      var saved = storedPositions[widget.id];
+      if (storedV2) {
+        customPositions[widget.id] = customPositions[widget.id] === true;
+      } else {
+        customPositions[widget.id] = !!(saved && !isLegacyDefault(widget, saved));
+      }
+      var configured = gadgetConfig.positions && gadgetConfig.positions[widget.id];
+      var fallback = defaultPositions[widget.id] || [16, 90];
+      var useSaved = customPositions[widget.id] && saved && Number.isFinite(saved[0]) && Number.isFinite(saved[1]);
+      var x = useSaved ? saved[0] : (configured ? Number(configured[0]) : fallback[0]);
+      var y = useSaved ? saved[1] : (configured ? Number(configured[1]) : fallback[1]);
+      applyInitialPosition(widget, x, y);
+    });
+
+    settleWidgets(null);
+  }
 
   function applyInitialPosition(widget, x, y) {
     var p = clampWidget(widget, x, y);
@@ -189,6 +296,94 @@
     } catch (e) {}
   }
 
+  // Keep the held widget where the user dropped it, then move everything else
+  // until no two visible widgets share the same space. [Jesse + OpenCode, 2026-11-24]
+  function settleWidgets(anchor) {
+    var movable = widgets.filter(function(widget) {
+      return !widget.hidden && !!widget.querySelector('[data-drag-handle]');
+    });
+    movable.sort(function(a, b) {
+      if (a === anchor) return -1;
+      if (b === anchor) return 1;
+      var ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+      return ra.top - rb.top || ra.left - rb.left;
+    });
+
+    var placed = [];
+    movable.forEach(function(widget) {
+      var rect = widget.getBoundingClientRect();
+      var box = { x:rect.left, y:rect.top, width:rect.width, height:rect.height };
+      var originalX = box.x, originalY = box.y;
+      var attempts = 0;
+      while (placed.some(function(other) { return boxesOverlap(box, other, COLLISION_GAP); }) && attempts < 48) {
+        var blocker = placed.filter(function(other) { return boxesOverlap(box, other, COLLISION_GAP); })[0];
+        var candidates = [
+          { x:box.x, y:blocker.y + blocker.height + COLLISION_GAP },
+          { x:box.x, y:blocker.y - box.height - COLLISION_GAP },
+          { x:blocker.x + blocker.width + COLLISION_GAP, y:box.y },
+          { x:blocker.x - box.width - COLLISION_GAP, y:box.y },
+          { x:box.x, y:box.y + 24 },
+          { x:box.x + 24, y:box.y },
+          { x:box.x, y:box.y - 24 },
+          { x:box.x - 24, y:box.y }
+        ];
+        var best = null;
+        candidates.forEach(function(candidate) {
+          var point = clampWidget(widget, candidate.x, candidate.y);
+          var trial = { x:point.x, y:point.y, width:box.width, height:box.height };
+          if (placed.some(function(other) { return boxesOverlap(trial, other, COLLISION_GAP); })) return;
+          var distance = Math.abs(point.x - originalX) + Math.abs(point.y - originalY);
+          if (!best || distance < best.distance) best = { x:point.x, y:point.y, distance:distance };
+        });
+        if (best) {
+          box.x = best.x;
+          box.y = best.y;
+        } else {
+          var fallback = clampWidget(widget, box.x, box.y + 24);
+          box.x = fallback.x;
+          box.y = fallback.y;
+        }
+        attempts += 1;
+      }
+      applyPosition(widget, box.x, box.y);
+      placed.push({ x:box.x, y:box.y, width:box.width, height:box.height });
+    });
+  }
+
+  // A held widget nudges a hit widget by the smallest amount that clears it,
+  // along the drag direction. The soft glow and settle still apply on release.
+  // [Jesse + OpenCode, 2026-11-24]
+  function pushOverlappingWidgets(held, dx, dy) {
+    if (!dx && !dy) return;
+    var gap = COLLISION_GAP;
+    for (var pass = 0; pass < 2; pass += 1) {
+      var heldRect = held.getBoundingClientRect();
+      var heldBox = { x:heldRect.left, y:heldRect.top, width:heldRect.width, height:heldRect.height };
+      var moved = false;
+      widgets.forEach(function(other) {
+        if (other === held || other.hidden || !other.querySelector('[data-drag-handle]')) return;
+        var rect = other.getBoundingClientRect();
+        var box = { x:rect.left, y:rect.top, width:rect.width, height:rect.height };
+        if (!boxesOverlap(heldBox, box, gap)) return;
+        var stored = positions[other.id] || [rect.left, rect.top];
+        var clearX = dx > 0 ? heldBox.x + heldBox.width + gap - box.x : box.x + box.width + gap - heldBox.x;
+        var clearY = dy > 0 ? heldBox.y + heldBox.height + gap - box.y : box.y + box.height + gap - heldBox.y;
+        var nx = stored[0], ny = stored[1];
+        if (Math.abs(dx) >= Math.abs(dy) && clearX > 0) nx += dx > 0 ? clearX : -clearX;
+        else if (clearY > 0) ny += dy > 0 ? clearY : -clearY;
+        else if (clearX > 0) nx += dx > 0 ? clearX : -clearX;
+        if (nx === stored[0] && ny === stored[1]) return;
+        applyPosition(other, nx, ny);
+        // A pushed widget is not a user-placed widget: reflow may restore it.
+        other.classList.add('gadget-pushed');
+        if (other._pushTimer) clearTimeout(other._pushTimer);
+        other._pushTimer = setTimeout(function() { other.classList.remove('gadget-pushed'); other._pushTimer = null; }, 240);
+        moved = true;
+      });
+      if (!moved) break;
+    }
+  }
+
   widgets.forEach(function(widget) {
     var handle = widget.querySelector('[data-drag-handle]');
     if (!handle) return;
@@ -196,7 +391,8 @@
     handle.addEventListener('pointerdown', function(event) {
       if (event.button !== 0 || event.target.closest('button,select,a,input')) return;
       var rect = widget.getBoundingClientRect();
-      drag = { pointerId:event.pointerId, startX:event.clientX, startY:event.clientY, left:rect.left, top:rect.top };
+      drag = { pointerId:event.pointerId, startX:event.clientX, startY:event.clientY, lastX:event.clientX, lastY:event.clientY, left:rect.left, top:rect.top };
+      widget.classList.add('is-dragging');
       widget.style.zIndex = '80';
       widgets.forEach(function(other) { if (other !== widget) other.style.zIndex = '35'; });
       try { handle.setPointerCapture(event.pointerId); } catch (e) {}
@@ -205,11 +401,16 @@
     handle.addEventListener('pointermove', function(event) {
       if (!drag || event.pointerId !== drag.pointerId) return;
       customPositions[widget.id] = true;
+      var dx = event.clientX - drag.lastX, dy = event.clientY - drag.lastY;
+      drag.lastX = event.clientX; drag.lastY = event.clientY;
       applyPosition(widget, drag.left + event.clientX - drag.startX, drag.top + event.clientY - drag.startY);
+      pushOverlappingWidgets(widget, dx, dy);
     });
     function endDrag(event) {
       if (!drag || (event && event.pointerId !== drag.pointerId)) return;
       drag = null;
+      widget.classList.remove('is-dragging');
+      settleWidgets(widget);
       savePositions();
     }
     handle.addEventListener('pointerup', endDrag);
@@ -225,7 +426,10 @@
       else return;
       event.preventDefault();
       customPositions[widget.id] = true;
+      var beforeX = rect.left, beforeY = rect.top;
       applyPosition(widget, x, y);
+      pushOverlappingWidgets(widget, x - beforeX, y - beforeY);
+      settleWidgets(widget);
       savePositions();
     });
   });
@@ -250,18 +454,28 @@
         applyPosition(widget, target[0], target[1]);
       }
     });
-    savePositions();
+    settleWidgets(null);
+    // Reflow is layout repair, not a user move: never persist clamped positions.
   }
-  window.addEventListener('resize', function() {
+  // The reset icon clears storage first; restore the computed spawn points
+  // without writing them back. [Jesse + OpenCode, 2026-11-24]
+  window.addEventListener('fsfm:reset-gadgets', function() {
+    customPositions = {};
+    storedPositions = {};
+    storedV2 = false;
+    reflowDesktopWidgets();
+  });
+  function scheduleDesktopReflow() {
+    if (!desktopQuery.matches) return;
     if (resizeFrame) cancelAnimationFrame(resizeFrame);
     resizeFrame = requestAnimationFrame(reflowDesktopWidgets);
-  }, { passive: true });
+  }
+  window.addEventListener('resize', scheduleDesktopReflow, { passive: true });
+  if (desktopQuery.addEventListener) desktopQuery.addEventListener('change', scheduleDesktopReflow);
+  else if (desktopQuery.addListener) desktopQuery.addListener(scheduleDesktopReflow);
 
   if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(function() {
-      if (resizeFrame) cancelAnimationFrame(resizeFrame);
-      resizeFrame = requestAnimationFrame(reflowDesktopWidgets);
-    });
+    document.fonts.ready.then(scheduleDesktopReflow);
   }
 
   // Clock
@@ -402,7 +616,9 @@
     Object.keys(allFlags).forEach(function(key){var node=document.getElementById(allFlags[key]);if(node && visibilityFlags[key]===false)node.hidden=true;});
     Object.keys(widgetFlags).forEach(function(key) {
       var widget = document.getElementById(widgetFlags[key]);
-      if (widget) widget.hidden = cmsData.funWidgets[key] === false;
+      // The saved flag used to hide this only on desktop while small screens
+      // skipped this script entirely. Keep the button available everywhere.
+      if (widget) widget.hidden = key === 'showBarrelRoll' ? false : cmsData.funWidgets[key] === false;
     });
   }
   renderCalendar();
